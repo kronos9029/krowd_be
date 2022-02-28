@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using RevenueSharingInvest.Data.Models.Entities;
 
 #nullable disable
 
