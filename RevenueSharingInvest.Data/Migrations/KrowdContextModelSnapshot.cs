@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Models.Entities;
 
 namespace RevenueSharingInvest.Data.Migrations
