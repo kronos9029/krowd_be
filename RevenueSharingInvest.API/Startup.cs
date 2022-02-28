@@ -65,6 +65,8 @@ namespace RevenueSharingInvest.API
 
             services.AddControllers();
 
+            services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
+
             // configure strongly typed settings objects
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);

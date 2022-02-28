@@ -12,17 +12,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
 {
     public class ProjectService : IProjectService
     {
-        private readonly IProjectRepository projectRepository;
+        private readonly IProjectRepository _projectRepository;
+        private readonly IMapper _mapper;
 
 
-        public ProjectService(IProjectRepository projectRepository)
+        public ProjectService(IProjectRepository projectRepository, IMapper mapper)
         {
-            this.projectRepository = projectRepository;
+            _projectRepository = projectRepository;
+            _mapper = mapper;
         }
 
         public async Task<List<Project>> GetAllProjects()
         {
-            List<Project> projectList = await projectRepository.GetAllProjects();
+            List<Project> projectList = await _projectRepository.GetAllProjects();
             return projectList;
         }
     }
