@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevenueSharingInvest.Busine
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevenueSharingInvest.Data", "RevenueSharingInvest.Data\RevenueSharingInvest.Data.csproj", "{79277258-F7F6-450A-8DDE-E05CAA7247E2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iRepair_BE_NET.API", "..\..\Do an\iRepair_Backend\iRepair_BE_NET.API\iRepair_BE_NET.API.csproj", "{99363F0C-F62C-479F-83EA-2AB3FC0F3890}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{79277258-F7F6-450A-8DDE-E05CAA7247E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79277258-F7F6-450A-8DDE-E05CAA7247E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79277258-F7F6-450A-8DDE-E05CAA7247E2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{99363F0C-F62C-479F-83EA-2AB3FC0F3890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{99363F0C-F62C-479F-83EA-2AB3FC0F3890}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{99363F0C-F62C-479F-83EA-2AB3FC0F3890}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{99363F0C-F62C-479F-83EA-2AB3FC0F3890}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

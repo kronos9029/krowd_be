@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Models.DTOs
 {
-    class ProjectDTO
+    public class ProjectDTO
     {
         public string ID { get; set; }
         public string businessID { get; set; }

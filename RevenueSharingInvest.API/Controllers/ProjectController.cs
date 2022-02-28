@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +14,23 @@ namespace RevenueSharingInvest.API.Controllers
     [ApiController]
     [Route("api/v1.0/projects")]
     [EnableCors]
-    [Authorize]
-    public class ProjectController : Controller
+    //[Authorize]
+    public class ProjectController : ControllerBase
     {
+        private readonly IProjectService _projectService;
         private readonly IHttpContextAccessor httpContextAccessor;
-        public ProjectController(IHttpContextAccessor httpContextAccessor)
+        public ProjectController(IProjectService projectService, IHttpContextAccessor httpContextAccessor)
         {
+            _projectService = projectService;
             this.httpContextAccessor = httpContextAccessor;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllProject()
+        {
+            var result = new List<Project>();
+            result = await _projectService.GetAllProjects();
+            return Ok(result);
         }
     }
 }

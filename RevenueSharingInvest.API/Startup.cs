@@ -13,7 +13,11 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
+using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Repositories.IRepos;
+using RevenueSharingInvest.Data.Repositories.Repos;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -47,6 +51,11 @@ namespace RevenueSharingInvest.API
 
             //Authorize
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            // Register your regular repositories
+            // services.AddScoped<IDiameterRepository, DiameterRepository>();
+            services.AddScoped<IProjectRepository, ProjectRepository>();
+            services.AddScoped<IProjectService, ProjectService>();
 
             //CORS
             services.AddCors(options =>
