@@ -1,3 +1,5 @@
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -41,7 +43,7 @@ namespace RevenueSharingInvest.API
         public void ConfigureServices(IServiceCollection services)
         {
             // Read the connection string from appsettings.
-            string dbConnectionString = this.Configuration.GetConnectionString("DEV");
+            string dbConnectionString = this.Configuration.GetConnectionString("PROD");
 
             // Inject IDbConnection, with implementation from SqlConnection class.
             services.AddTransient<IDbConnection>((sp) => new SqlConnection(dbConnectionString));
@@ -62,7 +64,11 @@ namespace RevenueSharingInvest.API
                 options.AddDefaultPolicy(
                 builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
             ));
-
+            FirebaseApp.Create(new AppOptions()
+            {
+                Credential = GoogleCredential.GetApplicationDefault(),
+                ProjectId = "revenuesharinginvest-44354",
+            });
             services.AddControllers();
 
             services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
