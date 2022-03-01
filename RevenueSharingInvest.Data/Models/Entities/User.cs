@@ -18,6 +18,15 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column("businessID")]
         [StringLength(10)]
         public string BusinessId { get; set; }
+
+        [Column("investorID")]
+        [StringLength(10)]
+        public string InvestorId { get; set; }
+
+        [Column("provider")]
+        [StringLength(20)]
+        public string provider { get; set; }
+
         [Column("roleID")]
         [StringLength(10)]
         public string RoleId { get; set; }
