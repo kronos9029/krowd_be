@@ -18,28 +18,27 @@ namespace RevenueSharingInvest.Data.Models.Entities
         }
 
         [Key]
-        [Column("ID")]
-        [StringLength(10)]
-        public string Id { get; set; }
-        [Column("projectID")]
-        [StringLength(10)]
-        public string ProjectId { get; set; }
-        [Column("periodNum")]
+        public Guid Id { get; set; }
+        public Guid? ProjectId { get; set; }
         public int? PeriodNum { get; set; }
-        [Column("amount")]
-        public double? Amount { get; set; }
-        [Column("createDate", TypeName = "datetime")]
+        public double? ActualAmount { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
-        [Column("createBy")]
         [StringLength(10)]
         public string CreateBy { get; set; }
-        [Column("updateDate", TypeName = "datetime")]
+        [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
-        [Column("updateBy")]
         [StringLength(10)]
         public string UpdateBy { get; set; }
-        [Column("isDeleted")]
         public bool? IsDeleted { get; set; }
+        [StringLength(20)]
+        public string Status { get; set; }
+        public double? PessimisticExpectedAmount { get; set; }
+        public double? NormalExpectedAmount { get; set; }
+        public double? OptimisticExpectedAmount { get; set; }
+        public double? PessimisticExpectedRatio { get; set; }
+        public double? NormalExpectedRatio { get; set; }
+        public double? OptimisticExpectedRatio { get; set; }
 
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("PeriodRevenues")]

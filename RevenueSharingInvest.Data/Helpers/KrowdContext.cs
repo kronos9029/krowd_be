@@ -18,14 +18,13 @@ namespace RevenueSharingInvest.Data.Helpers
         {
         }
 
+        public virtual DbSet<AccountTransaction> AccountTransactions { get; set; }
         public virtual DbSet<Area> Areas { get; set; }
         public virtual DbSet<Business> Businesses { get; set; }
         public virtual DbSet<BusinessField> BusinessFields { get; set; }
-        public virtual DbSet<BusinessWallet> BusinessWallets { get; set; }
         public virtual DbSet<Field> Fields { get; set; }
         public virtual DbSet<Investment> Investments { get; set; }
         public virtual DbSet<Investor> Investors { get; set; }
-        public virtual DbSet<InvestorLocation> InvestorLocations { get; set; }
         public virtual DbSet<InvestorType> InvestorTypes { get; set; }
         public virtual DbSet<InvestorWallet> InvestorWallets { get; set; }
         public virtual DbSet<Package> Packages { get; set; }
@@ -34,17 +33,17 @@ namespace RevenueSharingInvest.Data.Helpers
         public virtual DbSet<PeriodRevenue> PeriodRevenues { get; set; }
         public virtual DbSet<PeriodRevenueHistory> PeriodRevenueHistories { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
-        public virtual DbSet<ProjectHighlight> ProjectHighlights { get; set; }
-        public virtual DbSet<ProjectUpdate> ProjectUpdates { get; set; }
+        public virtual DbSet<ProjectEntity> ProjectEntities { get; set; }
+        public virtual DbSet<ProjectWallet> ProjectWallets { get; set; }
         public virtual DbSet<Risk> Risks { get; set; }
         public virtual DbSet<RiskType> RiskTypes { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Stage> Stages { get; set; }
         public virtual DbSet<SystemWallet> SystemWallets { get; set; }
-        public virtual DbSet<Transaction> Transactions { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Voucher> Vouchers { get; set; }
         public virtual DbSet<VoucherItem> VoucherItems { get; set; }
+        public virtual DbSet<WalletTransaction> WalletTransactions { get; set; }
         public virtual DbSet<WalletType> WalletTypes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -52,14 +51,38 @@ namespace RevenueSharingInvest.Data.Helpers
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
-                //Server=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com;Database=KrowdDB;User Id=krowdAdmin2022;Password=krowd2022;
+                optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;User ID=sa;Password=123");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
+            modelBuilder.Entity<AccountTransaction>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.HasOne(d => d.FromUser)
+                    .WithMany(p => p.AccountTransactionFromUsers)
+                    .HasForeignKey(d => d.FromUserId)
+                    .HasConstraintName("FK_AccountTransaction_User");
+
+                entity.HasOne(d => d.ToUser)
+                    .WithMany(p => p.AccountTransactionToUsers)
+                    .HasForeignKey(d => d.ToUserId)
+                    .HasConstraintName("FK_AccountTransaction_User1");
+            });
+
+            modelBuilder.Entity<Area>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+            });
+
+            modelBuilder.Entity<Business>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+            });
 
             modelBuilder.Entity<BusinessField>(entity =>
             {
@@ -78,21 +101,15 @@ namespace RevenueSharingInvest.Data.Helpers
                     .HasConstraintName("FK_BusinessField_Field");
             });
 
-            modelBuilder.Entity<BusinessWallet>(entity =>
+            modelBuilder.Entity<Field>(entity =>
             {
-                entity.HasOne(d => d.Business)
-                    .WithMany(p => p.BusinessWallets)
-                    .HasForeignKey(d => d.BusinessId)
-                    .HasConstraintName("FK_BusinessWallet_Business");
-
-                entity.HasOne(d => d.WalletType)
-                    .WithMany(p => p.BusinessWallets)
-                    .HasForeignKey(d => d.WalletTypeId)
-                    .HasConstraintName("FK_BusinessWallet_WalletType");
+                entity.Property(e => e.Id).ValueGeneratedNever();
             });
 
             modelBuilder.Entity<Investment>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
                 entity.HasOne(d => d.Investor)
                     .WithMany(p => p.Investments)
                     .HasForeignKey(d => d.InvestorId)
@@ -111,31 +128,23 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Investor>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
                 entity.HasOne(d => d.InvestorType)
                     .WithMany(p => p.Investors)
                     .HasForeignKey(d => d.InvestorTypeId)
                     .HasConstraintName("FK_Investor_InvestorType");
             });
 
-            modelBuilder.Entity<InvestorLocation>(entity =>
+            modelBuilder.Entity<InvestorType>(entity =>
             {
-                entity.HasKey(e => new { e.InvestorId, e.AreaId });
-
-                entity.HasOne(d => d.Area)
-                    .WithMany(p => p.InvestorLocations)
-                    .HasForeignKey(d => d.AreaId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_InvestorLocation_Area");
-
-                entity.HasOne(d => d.Investor)
-                    .WithMany(p => p.InvestorLocations)
-                    .HasForeignKey(d => d.InvestorId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_InvestorLocation_Investor");
+                entity.Property(e => e.Id).ValueGeneratedNever();
             });
 
             modelBuilder.Entity<InvestorWallet>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
                 entity.HasOne(d => d.Investor)
                     .WithMany(p => p.InvestorWallets)
                     .HasForeignKey(d => d.InvestorId)
@@ -149,6 +158,8 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Package>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Packages)
                     .HasForeignKey(d => d.ProjectId)
@@ -174,6 +185,13 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Payment>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.HasOne(d => d.Investment)
+                    .WithMany(p => p.Payments)
+                    .HasForeignKey(d => d.InvestmentId)
+                    .HasConstraintName("FK_Payment_Investment");
+
                 entity.HasOne(d => d.PeriodRevenue)
                     .WithMany(p => p.Payments)
                     .HasForeignKey(d => d.PeriodRevenueId)
@@ -182,6 +200,8 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<PeriodRevenue>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.PeriodRevenues)
                     .HasForeignKey(d => d.ProjectId)
@@ -190,6 +210,8 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<PeriodRevenueHistory>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
                 entity.HasOne(d => d.PeriodRevenue)
                     .WithMany(p => p.PeriodRevenueHistories)
                     .HasForeignKey(d => d.PeriodRevenueId)
@@ -198,6 +220,8 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Project>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
                 entity.HasOne(d => d.Area)
                     .WithMany(p => p.Projects)
                     .HasForeignKey(d => d.AreaId)
@@ -207,26 +231,42 @@ namespace RevenueSharingInvest.Data.Helpers
                     .WithMany(p => p.Projects)
                     .HasForeignKey(d => d.BusinessId)
                     .HasConstraintName("FK_Project_Business");
+
+                entity.HasOne(d => d.Manager)
+                    .WithMany(p => p.Projects)
+                    .HasForeignKey(d => d.ManagerId)
+                    .HasConstraintName("FK_Project_User");
             });
 
-            modelBuilder.Entity<ProjectHighlight>(entity =>
+            modelBuilder.Entity<ProjectEntity>(entity =>
             {
-                entity.HasOne(d => d.Project)
-                    .WithMany(p => p.ProjectHighlights)
-                    .HasForeignKey(d => d.ProjectId)
-                    .HasConstraintName("FK_ProjectHighlight_Project");
-            });
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
-            modelBuilder.Entity<ProjectUpdate>(entity =>
-            {
                 entity.HasOne(d => d.Project)
-                    .WithMany(p => p.ProjectUpdates)
+                    .WithMany(p => p.ProjectEntities)
                     .HasForeignKey(d => d.ProjectId)
                     .HasConstraintName("FK_ProjectUpdate_Project");
             });
 
+            modelBuilder.Entity<ProjectWallet>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.HasOne(d => d.Project)
+                    .WithMany(p => p.ProjectWallets)
+                    .HasForeignKey(d => d.ProjectId)
+                    .HasConstraintName("FK_ProjectWallet_Project");
+
+                entity.HasOne(d => d.WalletType)
+                    .WithMany(p => p.ProjectWallets)
+                    .HasForeignKey(d => d.WalletTypeId)
+                    .HasConstraintName("FK_BusinessWallet_WalletType");
+            });
+
             modelBuilder.Entity<Risk>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Risks)
                     .HasForeignKey(d => d.ProjectId)
@@ -238,8 +278,20 @@ namespace RevenueSharingInvest.Data.Helpers
                     .HasConstraintName("FK_Risk_RiskType");
             });
 
+            modelBuilder.Entity<RiskType>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+            });
+
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+            });
+
             modelBuilder.Entity<Stage>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Stages)
                     .HasForeignKey(d => d.ProjectId)
@@ -248,35 +300,38 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<SystemWallet>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
                 entity.HasOne(d => d.WalletType)
                     .WithMany(p => p.SystemWallets)
                     .HasForeignKey(d => d.WalletTypeId)
                     .HasConstraintName("FK_SystemWallet_WalletType");
             });
 
-            modelBuilder.Entity<Transaction>(entity =>
-            {
-                entity.HasOne(d => d.Investment)
-                    .WithMany(p => p.Transactions)
-                    .HasForeignKey(d => d.InvestmentId)
-                    .HasConstraintName("FK_Transaction_Investment");
-
-                entity.HasOne(d => d.Payment)
-                    .WithMany(p => p.Transactions)
-                    .HasForeignKey(d => d.PaymentId)
-                    .HasConstraintName("FK_Transaction_Payment");
-            });
-
             modelBuilder.Entity<User>(entity =>
             {
-                entity.HasOne(d => d.Role)
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.HasOne(d => d.Business)
                     .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.RoleId)
+                    .HasForeignKey(d => d.BusinessId)
+                    .HasConstraintName("FK_User_Business");
+
+                entity.HasOne(d => d.Investor)
+                    .WithMany(p => p.Users)
+                    .HasForeignKey(d => d.InvestorId)
+                    .HasConstraintName("FK_User_Investor");
+
+                entity.HasOne(d => d.InvestorNavigation)
+                    .WithMany(p => p.Users)
+                    .HasForeignKey(d => d.InvestorId)
                     .HasConstraintName("FK_User_Role");
             });
 
             modelBuilder.Entity<Voucher>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Vouchers)
                     .HasForeignKey(d => d.ProjectId)
@@ -298,6 +353,36 @@ namespace RevenueSharingInvest.Data.Helpers
                     .HasForeignKey(d => d.VoucherId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_VoucherItem_Voucher");
+            });
+
+            modelBuilder.Entity<WalletTransaction>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.HasOne(d => d.InvestorWallet)
+                    .WithMany(p => p.WalletTransactions)
+                    .HasForeignKey(d => d.InvestorWalletId)
+                    .HasConstraintName("FK_Transaction_InvestorWallet");
+
+                entity.HasOne(d => d.Payment)
+                    .WithMany(p => p.WalletTransactions)
+                    .HasForeignKey(d => d.PaymentId)
+                    .HasConstraintName("FK_Transaction_Payment");
+
+                entity.HasOne(d => d.ProjectWallet)
+                    .WithMany(p => p.WalletTransactions)
+                    .HasForeignKey(d => d.ProjectWalletId)
+                    .HasConstraintName("FK_Transaction_ProjectWallet");
+
+                entity.HasOne(d => d.SystemWallet)
+                    .WithMany(p => p.WalletTransactions)
+                    .HasForeignKey(d => d.SystemWalletId)
+                    .HasConstraintName("FK_Transaction_SystemWallet");
+            });
+
+            modelBuilder.Entity<WalletType>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
             });
 
             OnModelCreatingPartial(modelBuilder);

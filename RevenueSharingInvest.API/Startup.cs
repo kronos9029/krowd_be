@@ -43,13 +43,13 @@ namespace RevenueSharingInvest.API
         public void ConfigureServices(IServiceCollection services)
         {
             // Read the connection string from appsettings.
-            string dbConnectionString = this.Configuration.GetConnectionString("PROD");
+            string dbConnectionString = this.Configuration.GetConnectionString("DEV");
 
             // Inject IDbConnection, with implementation from SqlConnection class.
             services.AddTransient<IDbConnection>((sp) => new SqlConnection(dbConnectionString));
 
             //Register DBcontext for migration
-            services.AddDbContext<KrowdContext>(options => options.UseSqlServer(dbConnectionString));
+           services.AddDbContext<KrowdContext>(options => options.UseSqlServer(dbConnectionString));
 
             //Authorize
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -58,6 +58,10 @@ namespace RevenueSharingInvest.API
             // services.AddScoped<IDiameterRepository, DiameterRepository>();
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IProjectService, ProjectService>();
+
+            services.AddScoped<IInvestorRepository, InvestorRepository>();
+
+            services.AddScoped<IUserService, UserService>();
 
             //CORS
             services.AddCors(options =>

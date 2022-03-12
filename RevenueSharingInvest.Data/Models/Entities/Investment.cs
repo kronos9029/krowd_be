@@ -13,39 +13,26 @@ namespace RevenueSharingInvest.Data.Models.Entities
     {
         public Investment()
         {
-            Transactions = new HashSet<Transaction>();
+            Payments = new HashSet<Payment>();
         }
 
         [Key]
-        [Column("ID")]
-        [StringLength(10)]
-        public string Id { get; set; }
-        [Column("investorID")]
-        [StringLength(10)]
-        public string InvestorId { get; set; }
-        [Column("projectID")]
-        [StringLength(10)]
-        public string ProjectId { get; set; }
-        [Column("packageID")]
-        [StringLength(10)]
-        public string PackageId { get; set; }
-        [Column("quantity")]
+        public Guid Id { get; set; }
+        public Guid? InvestorId { get; set; }
+        public Guid? ProjectId { get; set; }
+        public Guid? PackageId { get; set; }
         public int? Quantity { get; set; }
-        [Column("totalPrice")]
         public double? TotalPrice { get; set; }
-        [Column("lastPayment", TypeName = "datetime")]
+        [Column(TypeName = "datetime")]
         public DateTime? LastPayment { get; set; }
-        [Column("createDate", TypeName = "datetime")]
+        [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
-        [Column("createBy")]
         [StringLength(10)]
         public string CreateBy { get; set; }
-        [Column("updateDate", TypeName = "datetime")]
+        [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
-        [Column("updateBy")]
         [StringLength(10)]
         public string UpdateBy { get; set; }
-        [Column("isDeleted")]
         public bool? IsDeleted { get; set; }
 
         [ForeignKey(nameof(InvestorId))]
@@ -57,7 +44,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("Investments")]
         public virtual Project Project { get; set; }
-        [InverseProperty(nameof(Transaction.Investment))]
-        public virtual ICollection<Transaction> Transactions { get; set; }
+        [InverseProperty(nameof(Payment.Investment))]
+        public virtual ICollection<Payment> Payments { get; set; }
     }
 }

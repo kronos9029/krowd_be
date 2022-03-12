@@ -13,46 +13,38 @@ namespace RevenueSharingInvest.Data.Models.Entities
     {
         public Payment()
         {
-            Transactions = new HashSet<Transaction>();
+            WalletTransactions = new HashSet<WalletTransaction>();
         }
 
         [Key]
-        [Column("ID")]
-        [StringLength(10)]
-        public string Id { get; set; }
-        [Column("periodRevenueID")]
-        [StringLength(10)]
-        public string PeriodRevenueId { get; set; }
-        [Column("amount")]
+        public Guid Id { get; set; }
+        public Guid? PeriodRevenueId { get; set; }
         public double? Amount { get; set; }
-        [Column("description")]
         public string Description { get; set; }
-        [Column("type")]
         [StringLength(20)]
         public string Type { get; set; }
-        [Column("fromID")]
         [StringLength(10)]
         public string FromId { get; set; }
-        [Column("toID")]
         [StringLength(10)]
         public string ToId { get; set; }
-        [Column("createDate", TypeName = "datetime")]
+        [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
-        [Column("createBy")]
         [StringLength(10)]
         public string CreateBy { get; set; }
-        [Column("updateDate", TypeName = "datetime")]
+        [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
-        [Column("updateBy")]
         [StringLength(10)]
         public string UpdateBy { get; set; }
-        [Column("isDeleted")]
         public bool? IsDeleted { get; set; }
+        public Guid? InvestmentId { get; set; }
 
+        [ForeignKey(nameof(InvestmentId))]
+        [InverseProperty("Payments")]
+        public virtual Investment Investment { get; set; }
         [ForeignKey(nameof(PeriodRevenueId))]
         [InverseProperty("Payments")]
         public virtual PeriodRevenue PeriodRevenue { get; set; }
-        [InverseProperty(nameof(Transaction.Payment))]
-        public virtual ICollection<Transaction> Transactions { get; set; }
+        [InverseProperty(nameof(WalletTransaction.Payment))]
+        public virtual ICollection<WalletTransaction> WalletTransactions { get; set; }
     }
 }

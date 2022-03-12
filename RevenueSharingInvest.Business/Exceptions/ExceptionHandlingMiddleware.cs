@@ -39,6 +39,10 @@ namespace RevenueSharingInvest.Business.Exceptions
                     errorMessageObject.Code = "401";
                     statusCode = (int)HttpStatusCode.Unauthorized;
                     break;
+                case RegisterException:
+                    errorMessageObject.Code = "R001";
+                    statusCode = (int)HttpStatusCode.BadRequest;
+                    break;
 
             }
 

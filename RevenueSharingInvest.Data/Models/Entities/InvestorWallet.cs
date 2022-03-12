@@ -11,29 +11,24 @@ namespace RevenueSharingInvest.Data.Models.Entities
     [Table("InvestorWallet")]
     public partial class InvestorWallet
     {
+        public InvestorWallet()
+        {
+            WalletTransactions = new HashSet<WalletTransaction>();
+        }
+
         [Key]
-        [Column("ID")]
-        [StringLength(10)]
-        public string Id { get; set; }
-        [Column("investorID")]
-        [StringLength(10)]
-        public string InvestorId { get; set; }
-        [Column("balance")]
+        public Guid Id { get; set; }
+        public Guid? InvestorId { get; set; }
         public double? Balance { get; set; }
-        [Column("walletTypeID")]
-        [StringLength(10)]
-        public string WalletTypeId { get; set; }
-        [Column("createDate", TypeName = "datetime")]
+        public Guid? WalletTypeId { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
-        [Column("createBy")]
         [StringLength(10)]
         public string CreateBy { get; set; }
-        [Column("updateDate", TypeName = "datetime")]
+        [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
-        [Column("upDateBy")]
         [StringLength(10)]
         public string UpDateBy { get; set; }
-        [Column("isDeleted")]
         public bool? IsDeleted { get; set; }
 
         [ForeignKey(nameof(InvestorId))]
@@ -42,5 +37,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [ForeignKey(nameof(WalletTypeId))]
         [InverseProperty("InvestorWallets")]
         public virtual WalletType WalletType { get; set; }
+        [InverseProperty(nameof(WalletTransaction.InvestorWallet))]
+        public virtual ICollection<WalletTransaction> WalletTransactions { get; set; }
     }
 }

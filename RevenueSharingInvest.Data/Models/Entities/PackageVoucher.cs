@@ -12,16 +12,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
     public partial class PackageVoucher
     {
         [Key]
-        [Column("packageID")]
-        [StringLength(10)]
-        public string PackageId { get; set; }
+        public Guid PackageId { get; set; }
         [Key]
-        [Column("voucherID")]
-        [StringLength(10)]
-        public string VoucherId { get; set; }
-        [Column("quantity")]
+        public Guid VoucherId { get; set; }
         public int? Quantity { get; set; }
-        [Column("maxQuantity")]
         public int MaxQuantity { get; set; }
 
         [ForeignKey(nameof(PackageId))]

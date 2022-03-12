@@ -20,49 +20,80 @@ namespace RevenueSharingInvest.Data.Migrations
                 .HasAnnotation("ProductVersion", "5.0.14")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Area", b =>
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.AccountTransaction", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
-
-                    b.Property<string>("City")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("city");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
-                    b.Property<string>("District")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("district");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                    b.Property<Guid?>("FromUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<Guid?>("ToUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FromUserId");
+
+                    b.HasIndex("ToUserId");
+
+                    b.ToTable("AccountTransaction");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Area", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("City")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CreateBy")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("District")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UpdateBy")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Ward")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("ward");
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -71,85 +102,66 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Business", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("address");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Bank")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("bank");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("BankAccount")
                         .HasMaxLength(14)
-                        .HasColumnType("nvarchar(14)")
-                        .HasColumnName("bankAccount");
+                        .HasColumnType("nvarchar(14)");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("email");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("image");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int?>("NumOfProject")
-                        .HasColumnType("int")
-                        .HasColumnName("numOfProject");
+                        .HasColumnType("int");
 
                     b.Property<int?>("NumOfSuccessfulProject")
-                        .HasColumnType("int")
-                        .HasColumnName("numOfSuccessfulProject");
+                        .HasColumnType("int");
 
                     b.Property<string>("PhoneNum")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("phoneNum");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<double?>("SuccessfulRate")
-                        .HasColumnType("float")
-                        .HasColumnName("successfulRate");
+                        .HasColumnType("float");
 
                     b.Property<string>("TaxIdentificationNumber")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("taxIdentificationNumber");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -158,15 +170,11 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.BusinessField", b =>
                 {
-                    b.Property<string>("BusinessId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("businessID");
+                    b.Property<Guid>("BusinessId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("FieldId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("fieldID");
+                    b.Property<Guid>("FieldId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("BusinessId", "FieldId");
 
@@ -175,95 +183,34 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.ToTable("BusinessField");
                 });
 
-            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.BusinessWallet", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
-
-                    b.Property<double?>("Balance")
-                        .HasColumnType("float")
-                        .HasColumnName("balance");
-
-                    b.Property<string>("BusinessId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("businessID");
-
-                    b.Property<string>("CreateBy")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
-
-                    b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
-
-                    b.Property<string>("UpdateBy")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
-
-                    b.Property<string>("WalletTypeId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("walletTypeID");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BusinessId");
-
-                    b.HasIndex("WalletTypeId");
-
-                    b.ToTable("BusinessWallet");
-                });
-
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Field", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -272,59 +219,43 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investment", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
-                    b.Property<string>("InvestorId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("investorID");
+                    b.Property<Guid?>("InvestorId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastPayment")
-                        .HasColumnType("datetime")
-                        .HasColumnName("lastPayment");
+                        .HasColumnType("datetime");
 
-                    b.Property<string>("PackageId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("packageID");
+                    b.Property<Guid?>("PackageId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ProjectId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("projectID");
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("Quantity")
-                        .HasColumnType("int")
-                        .HasColumnName("quantity");
+                        .HasColumnType("int");
 
                     b.Property<double?>("TotalPrice")
-                        .HasColumnType("float")
-                        .HasColumnName("totalPrice");
+                        .HasColumnType("float");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -339,100 +270,31 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investor", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("address");
-
-                    b.Property<string>("Bank")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("bank");
-
-                    b.Property<string>("BankAccount")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("bankAccount");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
-                    b.Property<string>("DateOfBirth")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("dateOfBirth");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("email");
-
-                    b.Property<string>("FirstName")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("firstName");
-
-                    b.Property<string>("Gender")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("gender");
-
-                    b.Property<string>("Idcard")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("IDCard");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("image");
-
-                    b.Property<string>("InvestorTypeId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("investorTypeID");
+                    b.Property<Guid?>("InvestorTypeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
-
-                    b.Property<string>("LastName")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("lastName");
-
-                    b.Property<string>("PhoneNum")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("phoneNum");
-
-                    b.Property<string>("TaxIdentificationNumber")
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)")
-                        .HasColumnName("taxIdentificationNumber");
+                        .HasColumnType("bit");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
-                    b.Property<string>("UserId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("userID");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -441,62 +303,34 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.ToTable("Investor");
                 });
 
-            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.InvestorLocation", b =>
-                {
-                    b.Property<string>("InvestorId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("investorID");
-
-                    b.Property<string>("AreaId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("areaID");
-
-                    b.HasKey("InvestorId", "AreaId");
-
-                    b.HasIndex("AreaId");
-
-                    b.ToTable("InvestorLocation");
-                });
-
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.InvestorType", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -505,46 +339,34 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.InvestorWallet", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<double?>("Balance")
-                        .HasColumnType("float")
-                        .HasColumnName("balance");
+                        .HasColumnType("float");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
-                    b.Property<string>("InvestorId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("investorID");
+                    b.Property<Guid?>("InvestorId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
                     b.Property<string>("UpDateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("upDateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
-                    b.Property<string>("WalletTypeId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("walletTypeID");
+                    b.Property<Guid?>("WalletTypeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -557,83 +379,63 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Package", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ApprovedBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("approvedBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("ApprovedDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("approvedDate");
+                        .HasColumnType("datetime");
 
                     b.Property<DateTime?>("CloseDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("closeDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("image");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
                     b.Property<int?>("MaxForPurchasing")
-                        .HasColumnType("int")
-                        .HasColumnName("maxForPurchasing");
+                        .HasColumnType("int");
 
                     b.Property<int?>("MinForPurchasing")
-                        .HasColumnType("int")
-                        .HasColumnName("minForPurchasing");
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime?>("OpenDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("openDate");
+                        .HasColumnType("datetime");
 
                     b.Property<double?>("Price")
-                        .HasColumnType("float")
-                        .HasColumnName("price");
+                        .HasColumnType("float");
 
-                    b.Property<string>("ProjectId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("projectID");
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("Quantity")
-                        .HasColumnType("int")
-                        .HasColumnName("quantity");
+                        .HasColumnType("int");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -644,23 +446,17 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.PackageVoucher", b =>
                 {
-                    b.Property<string>("PackageId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("packageID");
+                    b.Property<Guid>("PackageId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("VoucherId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("voucherID");
+                    b.Property<Guid>("VoucherId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("MaxQuantity")
-                        .HasColumnType("int")
-                        .HasColumnName("maxQuantity");
+                        .HasColumnType("int");
 
                     b.Property<int?>("Quantity")
-                        .HasColumnType("int")
-                        .HasColumnName("quantity");
+                        .HasColumnType("int");
 
                     b.HasKey("PackageId", "VoucherId");
 
@@ -671,62 +467,53 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Payment", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<double?>("Amount")
-                        .HasColumnType("float")
-                        .HasColumnName("amount");
+                        .HasColumnType("float");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FromId")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("fromID");
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<Guid?>("InvestmentId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
-                    b.Property<string>("PeriodRevenueId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("periodRevenueID");
+                    b.Property<Guid?>("PeriodRevenueId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ToId")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("toID");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Type")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("type");
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InvestmentId");
 
                     b.HasIndex("PeriodRevenueId");
 
@@ -735,45 +522,56 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.PeriodRevenue", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<double?>("Amount")
-                        .HasColumnType("float")
-                        .HasColumnName("amount");
+                    b.Property<double?>("ActualAmount")
+                        .HasColumnType("float");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
+
+                    b.Property<double?>("NormalExpectedAmount")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("NormalExpectedRatio")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("OptimisticExpectedAmount")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("OptimisticExpectedRatio")
+                        .HasColumnType("float");
 
                     b.Property<int?>("PeriodNum")
-                        .HasColumnType("int")
-                        .HasColumnName("periodNum");
+                        .HasColumnType("int");
 
-                    b.Property<string>("ProjectId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("projectID");
+                    b.Property<double?>("PessimisticExpectedAmount")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("PessimisticExpectedRatio")
+                        .HasColumnType("float");
+
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -784,51 +582,39 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.PeriodRevenueHistory", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("PeriodRevenueId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("periodRevenueID");
+                    b.Property<Guid?>("PeriodRevenueId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("status");
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -839,119 +625,93 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Project", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("address");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ApprovedBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("approvedBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("ApprovedDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("approvedDate");
+                        .HasColumnType("datetime");
 
-                    b.Property<string>("AreaId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("areaID");
+                    b.Property<Guid?>("AreaId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("BusinessId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("businessID");
+                    b.Property<Guid?>("BusinessId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BusinessLicense")
                         .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)")
-                        .HasColumnName("businessLicense");
+                        .HasColumnType("nvarchar(13)");
 
                     b.Property<string>("Category")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("category");
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Duration")
-                        .HasColumnType("int")
-                        .HasColumnName("duration");
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("endDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("image");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double?>("InvestedCapital")
-                        .HasColumnType("float")
-                        .HasColumnName("investedCapital");
+                        .HasColumnType("float");
 
                     b.Property<double?>("InvestmentTargetCapital")
-                        .HasColumnType("float")
-                        .HasColumnName("investmentTargetCapital");
+                        .HasColumnType("float");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
-                    b.Property<double?>("MinInvestmentAmount")
-                        .HasColumnType("float")
-                        .HasColumnName("minInvestmentAmount");
+                    b.Property<Guid?>("ManagerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<double?>("Multiplier")
-                        .HasColumnType("float")
-                        .HasColumnName("multiplier");
+                        .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int?>("NumOfPeriod")
-                        .HasColumnType("int")
-                        .HasColumnName("numOfPeriod");
+                        .HasColumnType("int");
+
+                    b.Property<double?>("RemainAmount")
+                        .HasColumnType("float");
 
                     b.Property<double?>("SharedRevenue")
-                        .HasColumnType("float")
-                        .HasColumnName("sharedRevenue");
+                        .HasColumnType("float");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("startDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Status")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("status");
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -959,164 +719,131 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasIndex("BusinessId");
 
+                    b.HasIndex("ManagerId");
+
                     b.ToTable("Project");
                 });
 
-            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.ProjectHighlight", b =>
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.ProjectEntity", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("image");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
-                    b.Property<string>("ProjectId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("projectID");
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Title")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("title");
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Type")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("ProjectHighlight");
+                    b.ToTable("ProjectEntity");
                 });
 
-            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.ProjectUpdate", b =>
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.ProjectWallet", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double?>("Balance")
+                        .HasColumnType("float");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("image");
+                        .HasColumnType("datetime");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
-                    b.Property<string>("ProjectId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("projectID");
-
-                    b.Property<string>("Title")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("title");
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
+
+                    b.Property<Guid?>("WalletTypeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("ProjectUpdate");
+                    b.HasIndex("WalletTypeId");
+
+                    b.ToTable("ProjectWallet");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Risk", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("ProjectId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("projectID");
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("RiskTypeId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("riskTypeID");
+                    b.Property<Guid?>("RiskTypeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -1129,41 +856,32 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.RiskType", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -1172,41 +890,32 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Role", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -1215,63 +924,48 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Stage", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("CloseMonth")
-                        .HasColumnType("int")
-                        .HasColumnName("closeMonth");
+                        .HasColumnType("int");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int?>("OpenMonth")
-                        .HasColumnType("int")
-                        .HasColumnName("openMonth");
+                        .HasColumnType("int");
 
                     b.Property<double?>("Percents")
-                        .HasColumnType("float")
-                        .HasColumnName("percents");
+                        .HasColumnType("float");
 
-                    b.Property<string>("ProjectId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("projectID");
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("status");
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -1282,41 +976,31 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.SystemWallet", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<double?>("Balance")
-                        .HasColumnType("float")
-                        .HasColumnName("balance");
+                        .HasColumnType("float");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
-                    b.Property<string>("WalletTypeId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("walletTypeID");
+                    b.Property<Guid?>("WalletTypeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -1325,209 +1009,158 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.ToTable("SystemWallet");
                 });
 
-            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Transaction", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
-
-                    b.Property<double?>("Amount")
-                        .HasColumnType("float")
-                        .HasColumnName("amount");
-
-                    b.Property<string>("CreateBy")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
-
-                    b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
-
-                    b.Property<double?>("Fee")
-                        .HasColumnType("float")
-                        .HasColumnName("fee");
-
-                    b.Property<string>("FromWalletId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("fromWalletID");
-
-                    b.Property<string>("InvestmentId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("investmentID");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
-
-                    b.Property<string>("PaymentId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("paymentID");
-
-                    b.Property<string>("ToWalletId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("toWalletID");
-
-                    b.Property<string>("Type")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("type");
-
-                    b.Property<string>("UpdateBy")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InvestmentId");
-
-                    b.HasIndex("PaymentId");
-
-                    b.ToTable("Transaction");
-                });
-
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.User", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("BusinessId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("businessID");
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Bank")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("BankAccount")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<Guid?>("BusinessId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("City")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createDate");
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("DateOfBirth")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("InvestorId")
+                    b.Property<string>("District")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Gender")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("investorID");
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("IdCard")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("InvestorId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
-                    b.Property<string>("RoleId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("roleID");
+                    b.Property<string>("LastName")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PhoneNum")
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
+
+                    b.Property<Guid?>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TaxIdentificationNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("datetime");
 
-                    b.Property<string>("provider")
+                    b.Property<string>("Ward")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("provider");
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("BusinessId");
+
+                    b.HasIndex("InvestorId");
 
                     b.ToTable("User");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Voucher", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Code")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("code");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("CreateBy")
-                        .HasColumnType("datetime")
-                        .HasColumnName("createBy");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("CreateDate")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("createDate");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("endDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("image");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("ProjectId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("projectID");
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("Quantity")
-                        .HasColumnType("int")
-                        .HasColumnName("quantity");
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("startDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Status")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("status");
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime?>("UpdateBy")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updateBy");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("UpdateDate")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("updateDate");
+                        .HasColumnType("nvarchar(10)");
 
                     b.HasKey("Id");
 
@@ -1538,36 +1171,27 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.VoucherItem", b =>
                 {
-                    b.Property<string>("InvestorId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("investorID");
+                    b.Property<Guid>("InvestorId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("VoucherId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("voucherId");
+                    b.Property<Guid>("VoucherId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("AvailableDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("availableDate");
+                        .HasColumnType("datetime");
 
                     b.Property<DateTime?>("ExpireDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("expireDate");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("InvestmentId")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("investmentID");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime?>("IssuedDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("issuedDate");
+                        .HasColumnType("datetime");
 
                     b.Property<DateTime?>("RedeemDate")
-                        .HasColumnType("datetime")
-                        .HasColumnName("redeemDate");
+                        .HasColumnType("datetime");
 
                     b.HasKey("InvestorId", "VoucherId");
 
@@ -1576,29 +1200,117 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.ToTable("VoucherItem");
                 });
 
-            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.WalletType", b =>
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.WalletTransaction", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double?>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<string>("CreateBy")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("ID");
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("Fee")
+                        .HasColumnType("float");
+
+                    b.Property<string>("FromWalletId")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<Guid?>("InvestorWalletId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("isDeleted");
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("PaymentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ProjectWalletId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("SystemWalletId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ToWalletId")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Type")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("UpdateBy")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvestorWalletId");
+
+                    b.HasIndex("PaymentId");
+
+                    b.HasIndex("ProjectWalletId");
+
+                    b.HasIndex("SystemWalletId");
+
+                    b.ToTable("WalletTransaction");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.WalletType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Mode")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Type")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.HasKey("Id");
 
                     b.ToTable("WalletType");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.AccountTransaction", b =>
+                {
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "FromUser")
+                        .WithMany("AccountTransactionFromUsers")
+                        .HasForeignKey("FromUserId")
+                        .HasConstraintName("FK_AccountTransaction_User");
+
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "ToUser")
+                        .WithMany("AccountTransactionToUsers")
+                        .HasForeignKey("ToUserId")
+                        .HasConstraintName("FK_AccountTransaction_User1");
+
+                    b.Navigation("FromUser");
+
+                    b.Navigation("ToUser");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.BusinessField", b =>
@@ -1618,23 +1330,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("Business");
 
                     b.Navigation("Field");
-                });
-
-            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.BusinessWallet", b =>
-                {
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Business", "Business")
-                        .WithMany("BusinessWallets")
-                        .HasForeignKey("BusinessId")
-                        .HasConstraintName("FK_BusinessWallet_Business");
-
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.WalletType", "WalletType")
-                        .WithMany("BusinessWallets")
-                        .HasForeignKey("WalletTypeId")
-                        .HasConstraintName("FK_BusinessWallet_WalletType");
-
-                    b.Navigation("Business");
-
-                    b.Navigation("WalletType");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investment", b =>
@@ -1669,25 +1364,6 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasConstraintName("FK_Investor_InvestorType");
 
                     b.Navigation("InvestorType");
-                });
-
-            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.InvestorLocation", b =>
-                {
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Area", "Area")
-                        .WithMany("InvestorLocations")
-                        .HasForeignKey("AreaId")
-                        .HasConstraintName("FK_InvestorLocation_Area")
-                        .IsRequired();
-
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Investor", "Investor")
-                        .WithMany("InvestorLocations")
-                        .HasForeignKey("InvestorId")
-                        .HasConstraintName("FK_InvestorLocation_Investor")
-                        .IsRequired();
-
-                    b.Navigation("Area");
-
-                    b.Navigation("Investor");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.InvestorWallet", b =>
@@ -1738,10 +1414,17 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Payment", b =>
                 {
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Investment", "Investment")
+                        .WithMany("Payments")
+                        .HasForeignKey("InvestmentId")
+                        .HasConstraintName("FK_Payment_Investment");
+
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.PeriodRevenue", "PeriodRevenue")
                         .WithMany("Payments")
                         .HasForeignKey("PeriodRevenueId")
                         .HasConstraintName("FK_Payment_PeriodRevenue");
+
+                    b.Navigation("Investment");
 
                     b.Navigation("PeriodRevenue");
                 });
@@ -1778,29 +1461,43 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasForeignKey("BusinessId")
                         .HasConstraintName("FK_Project_Business");
 
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "Manager")
+                        .WithMany("Projects")
+                        .HasForeignKey("ManagerId")
+                        .HasConstraintName("FK_Project_User");
+
                     b.Navigation("Area");
 
                     b.Navigation("Business");
+
+                    b.Navigation("Manager");
                 });
 
-            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.ProjectHighlight", b =>
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.ProjectEntity", b =>
                 {
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Project", "Project")
-                        .WithMany("ProjectHighlights")
-                        .HasForeignKey("ProjectId")
-                        .HasConstraintName("FK_ProjectHighlight_Project");
-
-                    b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.ProjectUpdate", b =>
-                {
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Project", "Project")
-                        .WithMany("ProjectUpdates")
+                        .WithMany("ProjectEntities")
                         .HasForeignKey("ProjectId")
                         .HasConstraintName("FK_ProjectUpdate_Project");
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.ProjectWallet", b =>
+                {
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Project", "Project")
+                        .WithMany("ProjectWallets")
+                        .HasForeignKey("ProjectId")
+                        .HasConstraintName("FK_ProjectWallet_Project");
+
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.WalletType", "WalletType")
+                        .WithMany("ProjectWallets")
+                        .HasForeignKey("WalletTypeId")
+                        .HasConstraintName("FK_BusinessWallet_WalletType");
+
+                    b.Navigation("Project");
+
+                    b.Navigation("WalletType");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Risk", b =>
@@ -1840,31 +1537,28 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("WalletType");
                 });
 
-            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Transaction", b =>
-                {
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Investment", "Investment")
-                        .WithMany("Transactions")
-                        .HasForeignKey("InvestmentId")
-                        .HasConstraintName("FK_Transaction_Investment");
-
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Payment", "Payment")
-                        .WithMany("Transactions")
-                        .HasForeignKey("PaymentId")
-                        .HasConstraintName("FK_Transaction_Payment");
-
-                    b.Navigation("Investment");
-
-                    b.Navigation("Payment");
-                });
-
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.User", b =>
                 {
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Role", "Role")
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Business", "Business")
                         .WithMany("Users")
-                        .HasForeignKey("RoleId")
+                        .HasForeignKey("BusinessId")
+                        .HasConstraintName("FK_User_Business");
+
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Investor", "Investor")
+                        .WithMany("Users")
+                        .HasForeignKey("InvestorId")
+                        .HasConstraintName("FK_User_Investor");
+
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Role", "InvestorNavigation")
+                        .WithMany("Users")
+                        .HasForeignKey("InvestorId")
                         .HasConstraintName("FK_User_Role");
 
-                    b.Navigation("Role");
+                    b.Navigation("Business");
+
+                    b.Navigation("Investor");
+
+                    b.Navigation("InvestorNavigation");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Voucher", b =>
@@ -1896,10 +1590,39 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("Voucher");
                 });
 
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.WalletTransaction", b =>
+                {
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.InvestorWallet", "InvestorWallet")
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("InvestorWalletId")
+                        .HasConstraintName("FK_Transaction_InvestorWallet");
+
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Payment", "Payment")
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("PaymentId")
+                        .HasConstraintName("FK_Transaction_Payment");
+
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.ProjectWallet", "ProjectWallet")
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("ProjectWalletId")
+                        .HasConstraintName("FK_Transaction_ProjectWallet");
+
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.SystemWallet", "SystemWallet")
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("SystemWalletId")
+                        .HasConstraintName("FK_Transaction_SystemWallet");
+
+                    b.Navigation("InvestorWallet");
+
+                    b.Navigation("Payment");
+
+                    b.Navigation("ProjectWallet");
+
+                    b.Navigation("SystemWallet");
+                });
+
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Area", b =>
                 {
-                    b.Navigation("InvestorLocations");
-
                     b.Navigation("Projects");
                 });
 
@@ -1907,9 +1630,9 @@ namespace RevenueSharingInvest.Data.Migrations
                 {
                     b.Navigation("BusinessFields");
 
-                    b.Navigation("BusinessWallets");
-
                     b.Navigation("Projects");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Field", b =>
@@ -1919,16 +1642,16 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investment", b =>
                 {
-                    b.Navigation("Transactions");
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investor", b =>
                 {
                     b.Navigation("Investments");
 
-                    b.Navigation("InvestorLocations");
-
                     b.Navigation("InvestorWallets");
+
+                    b.Navigation("Users");
 
                     b.Navigation("VoucherItems");
                 });
@@ -1936,6 +1659,11 @@ namespace RevenueSharingInvest.Data.Migrations
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.InvestorType", b =>
                 {
                     b.Navigation("Investors");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.InvestorWallet", b =>
+                {
+                    b.Navigation("WalletTransactions");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Package", b =>
@@ -1947,7 +1675,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Payment", b =>
                 {
-                    b.Navigation("Transactions");
+                    b.Navigation("WalletTransactions");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.PeriodRevenue", b =>
@@ -1965,15 +1693,20 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.Navigation("PeriodRevenues");
 
-                    b.Navigation("ProjectHighlights");
+                    b.Navigation("ProjectEntities");
 
-                    b.Navigation("ProjectUpdates");
+                    b.Navigation("ProjectWallets");
 
                     b.Navigation("Risks");
 
                     b.Navigation("Stages");
 
                     b.Navigation("Vouchers");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.ProjectWallet", b =>
+                {
+                    b.Navigation("WalletTransactions");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.RiskType", b =>
@@ -1986,6 +1719,20 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.SystemWallet", b =>
+                {
+                    b.Navigation("WalletTransactions");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.User", b =>
+                {
+                    b.Navigation("AccountTransactionFromUsers");
+
+                    b.Navigation("AccountTransactionToUsers");
+
+                    b.Navigation("Projects");
+                });
+
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Voucher", b =>
                 {
                     b.Navigation("PackageVouchers");
@@ -1995,9 +1742,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.WalletType", b =>
                 {
-                    b.Navigation("BusinessWallets");
-
                     b.Navigation("InvestorWallets");
+
+                    b.Navigation("ProjectWallets");
 
                     b.Navigation("SystemWallets");
                 });

@@ -18,42 +18,29 @@ namespace RevenueSharingInvest.Data.Models.Entities
         }
 
         [Key]
-        [Column("ID")]
-        [StringLength(10)]
-        public string Id { get; set; }
-        [Column("name")]
+        public Guid Id { get; set; }
         [StringLength(50)]
         public string Name { get; set; }
-        [Column("code")]
         [StringLength(10)]
         public string Code { get; set; }
-        [Column("projectID")]
-        [StringLength(10)]
-        public string ProjectId { get; set; }
-        [Column("description")]
+        public Guid? ProjectId { get; set; }
         public string Description { get; set; }
-        [Column("image")]
         public string Image { get; set; }
-        [Column("quantity")]
         public int? Quantity { get; set; }
-        [Column("status")]
         [StringLength(20)]
         public string Status { get; set; }
-        [Column("startDate", TypeName = "datetime")]
+        [Column(TypeName = "datetime")]
         public DateTime? StartDate { get; set; }
-        [Column("endDate", TypeName = "datetime")]
+        [Column(TypeName = "datetime")]
         public DateTime? EndDate { get; set; }
-        [Column("createDate")]
         [StringLength(10)]
         public string CreateDate { get; set; }
-        [Column("createBy", TypeName = "datetime")]
+        [Column(TypeName = "datetime")]
         public DateTime? CreateBy { get; set; }
-        [Column("updateDate")]
         [StringLength(10)]
         public string UpdateDate { get; set; }
-        [Column("updateBy", TypeName = "datetime")]
+        [Column(TypeName = "datetime")]
         public DateTime? UpdateBy { get; set; }
-        [Column("isDeleted")]
         public bool? IsDeleted { get; set; }
 
         [ForeignKey(nameof(ProjectId))]

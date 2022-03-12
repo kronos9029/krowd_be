@@ -12,13 +12,9 @@ namespace RevenueSharingInvest.Data.Models.Entities
     public partial class BusinessField
     {
         [Key]
-        [Column("businessID")]
-        [StringLength(10)]
-        public string BusinessId { get; set; }
+        public Guid BusinessId { get; set; }
         [Key]
-        [Column("fieldID")]
-        [StringLength(10)]
-        public string FieldId { get; set; }
+        public Guid FieldId { get; set; }
 
         [ForeignKey(nameof(BusinessId))]
         [InverseProperty("BusinessFields")]
