@@ -6,25 +6,19 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Models.DTOs
 {
-    public class ProjectDTO
+    public class PackageDTO
     {
         public string id { get; set; }
-        public string businessId { get; set; }
         public string name { get; set; }
+        public string projectId { get; set; }
+        public float price { get; set; }
         public string image { get; set; }
+        public int quantity { get; set; }
         public string description { get; set; }
-        public string category { get; set; }
-        public string address { get; set; }
-        public string areaId { get; set; }
-        public float investmentTargetCapital { get; set; }
-        public float investedCapital { get; set; }
-        public float sharedRevenue { get; set; }
-        public float multiplier { get; set; }
-        public int duration { get; set; }
-        public int numOfPeriod { get; set; }
-        public float remainAmount { get; set; }
-        public DateTime startDate { get; set; }
-        public DateTime endDate { get; set; }
+        public int minForPurchasing { get; set; }
+        public int maxForPurchasing { get; set; }
+        public DateTime openDate { get; set; }
+        public DateTime closeDate { get; set; }
         public string businessLicense { get; set; }
         public string status { get; set; }
         public DateTime createDate { get; set; }

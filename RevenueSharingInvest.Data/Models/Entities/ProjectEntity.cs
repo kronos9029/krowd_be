@@ -14,10 +14,12 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
         public Guid? ProjectId { get; set; }
-        public string Image { get; set; }
         [StringLength(50)]
         public string Title { get; set; }
+        public string Image { get; set; }
         public string Description { get; set; }
+        [StringLength(20)]
+        public string Type { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         [StringLength(10)]
@@ -27,8 +29,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [StringLength(10)]
         public string UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
-        [StringLength(20)]
-        public string Type { get; set; }
 
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("ProjectEntities")]

@@ -49,7 +49,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string Ward { get; set; }
         public string Address { get; set; }
         [StringLength(50)]
-        public string Bank { get; set; }
+        public string BankName { get; set; }
         [StringLength(20)]
         public string BankAccount { get; set; }
         [Column(TypeName = "datetime")]

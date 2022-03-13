@@ -8,6 +8,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 {
     public interface IInvestorRepository
     {
-        Task<int> CreateInvestor();
+        //Task<int> CreateInvestor();
     }
 }

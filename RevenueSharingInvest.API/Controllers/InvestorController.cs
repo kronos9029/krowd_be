@@ -33,11 +33,11 @@ namespace RevenueSharingInvest.API.Controllers
             //CompanyDTO dto = new CompanyDTO();
             //if ((role == "Company" && currentCompanyId == id) || role == "Admin" || role == "Worker")
             //{
-            InvestorDTO dto = new InvestorDTO();
-            dto = await _investorService.GetInvestorById(id);
-            return Ok(dto);
+            //InvestorDTO dto = new InvestorDTO();
+            //dto = await _investorService.GetInvestorById(id);
+            //return Ok(dto);
             //return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission To Do This");
-
+            return null;
         }
     }
 }

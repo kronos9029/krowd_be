@@ -26,36 +26,38 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
         public async Task<InvestorDTO> GetInvestorById(string ID)
         {
-            try
-            {
-                Investor result = await _investorRepository.GetInvestorByID(ID);
-                if (result == null)
-                    throw new NotFoundException("Investor With Id " + ID + " Not Found!!");
-                InvestorDTO investorDTO = _mapper.Map<InvestorDTO>(result);
-                investorDTO.balance = await _investorWalletRepository.GetInvestorTotalBalance(investorDTO.ID);
-                return investorDTO;
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Error at InvestorService: " + e.Message);
-            }
+            //try
+            //{
+            //    Investor result = await _investorRepository.GetInvestorByID(ID);
+            //    if (result == null)
+            //        throw new NotFoundException("Investor With Id " + ID + " Not Found!!");
+            //    InvestorDTO investorDTO = _mapper.Map<InvestorDTO>(result);
+            //    investorDTO.balance = await _investorWalletRepository.GetInvestorTotalBalance(investorDTO.ID);
+            //    return investorDTO;
+            //}
+            //catch (Exception e)
+            //{
+            //    throw new Exception("Error at InvestorService: " + e.Message);
+            //}
+            return null;
         }
 
         public async Task<List<ProjectMemberDTO>> GetProjectMembers(string projectID)
         {
-            try
-            {
-                ProjectMemberDTO ceo = await _investorRepository.GetInvestorByID(ID);
-                if (result == null)
-                    throw new NotFoundException("Investor With Id " + ID + " Not Found!!");
-                InvestorDTO investorDTO = _mapper.Map<InvestorDTO>(result);
-                investorDTO.balance = await _investorWalletRepository.GetInvestorTotalBalance(investorDTO.ID);
-                return investorDTO;
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Error at InvestorService: " + e.Message);
-            }
+            //try
+            //{
+            //    ProjectMemberDTO ceo = await _investorRepository.GetInvestorByID(ID);
+            //    if (result == null)
+            //        throw new NotFoundException("Investor With Id " + ID + " Not Found!!");
+            //    InvestorDTO investorDTO = _mapper.Map<InvestorDTO>(result);
+            //    investorDTO.balance = await _investorWalletRepository.GetInvestorTotalBalance(investorDTO.ID);
+            //    return investorDTO;
+            //}
+            //catch (Exception e)
+            //{
+            //    throw new Exception("Error at InvestorService: " + e.Message);
+            //}
+            return null;
         }
     }
 }

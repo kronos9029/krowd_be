@@ -11,6 +11,11 @@ namespace RevenueSharingInvest.Data.Models.Entities
     [Table("Stage")]
     public partial class Stage
     {
+        public Stage()
+        {
+            PeriodRevenues = new HashSet<PeriodRevenue>();
+        }
+
         [Key]
         public Guid Id { get; set; }
         [StringLength(50)]
@@ -35,5 +40,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("Stages")]
         public virtual Project Project { get; set; }
+        [InverseProperty(nameof(PeriodRevenue.Stage))]
+        public virtual ICollection<PeriodRevenue> PeriodRevenues { get; set; }
     }
 }

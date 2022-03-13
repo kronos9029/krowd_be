@@ -30,10 +30,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string Description { get; set; }
         public string TaxIdentificationNumber { get; set; }
         public string Address { get; set; }
-        [StringLength(50)]
-        public string Bank { get; set; }
-        [StringLength(14)]
-        public string BankAccount { get; set; }
         public int? NumOfProject { get; set; }
         public int? NumOfSuccessfulProject { get; set; }
         public double? SuccessfulRate { get; set; }

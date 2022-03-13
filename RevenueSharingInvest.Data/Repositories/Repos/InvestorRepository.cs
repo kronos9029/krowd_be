@@ -15,9 +15,5 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
         }
 
-        public async Task<int> CreateInvestor()
-        {
-            
-        }
     }
 }

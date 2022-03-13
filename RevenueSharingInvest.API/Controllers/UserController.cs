@@ -24,13 +24,13 @@ namespace RevenueSharingInvest.API.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("authenticate-user")]
-        public async Task<IActionResult> AuthenticateUser([FromQuery]string token)
-        {
-            var result = await _userService.AuthenticateUser(token);
-            return Ok(result);
-        }
+        //[HttpPost]
+        //[AllowAnonymous]
+        //[Route("authenticate-user")]
+        //public async Task<IActionResult> AuthenticateUser([FromQuery]string token)
+        //{
+        //    var result = await _userService.AuthenticateUser(token);
+        //    return Ok(result);
+        //}
     }
 }

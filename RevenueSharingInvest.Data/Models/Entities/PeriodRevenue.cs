@@ -20,8 +20,16 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
         public Guid? ProjectId { get; set; }
-        public int? PeriodNum { get; set; }
+        public Guid? StageId { get; set; }
         public double? ActualAmount { get; set; }
+        public double? PessimisticExpectedAmount { get; set; }
+        public double? NormalExpectedAmount { get; set; }
+        public double? OptimisticExpectedAmount { get; set; }
+        public double? PessimisticExpectedRatio { get; set; }
+        public double? NormalExpectedRatio { get; set; }
+        public double? OptimisticExpectedRatio { get; set; }
+        [StringLength(20)]
+        public string Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         [StringLength(10)]
@@ -31,18 +39,13 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [StringLength(10)]
         public string UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
-        [StringLength(20)]
-        public string Status { get; set; }
-        public double? PessimisticExpectedAmount { get; set; }
-        public double? NormalExpectedAmount { get; set; }
-        public double? OptimisticExpectedAmount { get; set; }
-        public double? PessimisticExpectedRatio { get; set; }
-        public double? NormalExpectedRatio { get; set; }
-        public double? OptimisticExpectedRatio { get; set; }
 
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("PeriodRevenues")]
         public virtual Project Project { get; set; }
+        [ForeignKey(nameof(StageId))]
+        [InverseProperty("PeriodRevenues")]
+        public virtual Stage Stage { get; set; }
         [InverseProperty(nameof(Payment.PeriodRevenue))]
         public virtual ICollection<Payment> Payments { get; set; }
         [InverseProperty(nameof(PeriodRevenueHistory.PeriodRevenue))]

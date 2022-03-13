@@ -9,7 +9,7 @@ namespace RevenueSharingInvest.Business.Services
 {
     public interface IInvestorService
     {
-        public Task<InvestorDTO> GetInvestorById(String ID);
-        public Task<List<ProjectMemberDTO>> GetProjectMembers(String projectID);
+        //public Task<InvestorDTO> GetInvestorById(String ID);
+        //public Task<List<ProjectMemberDTO>> GetProjectMembers(String projectID);
     }
 }
