@@ -8,7 +8,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
 {
     public class AuthenticateResponse
     {
-        public string id { get; set; }
+        public Guid id { get; set; }
         public string uid { get; set; }
         public string fullName { get; set; }
         public string email { get; set; }

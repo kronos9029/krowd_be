@@ -9,6 +9,11 @@ namespace RevenueSharingInvest.Business.Services
 {
     public interface IUserService
     {
+<<<<<<< Updated upstream
         //public Task<AuthenticateResponse> GetTokenMobileInvestor(string firebaseToken);
+=======
+        public Task<AuthenticateResponse> GetTokenMobileInvestor(string firebaseToken);
+       /* public Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken);*/
+>>>>>>> Stashed changes
     }
 }

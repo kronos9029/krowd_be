@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.IRepos
 {
-    public interface IUserRepository
+    public interface IRoleRepository
     {
-        public Task<User> GetUserByEmail(String userEmail);
-        public Task<int> CreateInvestorUser(User newUser);
-        public Task<int> CreateBusinessUser(User newUser);
+        Task<List<Role>> GetAllRoles();
+        Task<Role> GetRoleById(Guid roleId);
     }
 }

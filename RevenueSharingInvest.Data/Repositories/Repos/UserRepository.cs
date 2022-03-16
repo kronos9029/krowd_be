@@ -20,29 +20,58 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
         public async Task<User> GetUserByEmail(string userEmail)
         {
-            string query = "SELECT * FROM User WHERE Email=@Email";
-            var parameters = new DynamicParameters();
-            parameters.Add("Email", userEmail, DbType.String);
-
-            using (var connection = CreateConnection())
+            try
             {
+                string query = "SELECT * FROM User WHERE Email=@Email";
+                var parameters = new DynamicParameters();
+                parameters.Add("Email", userEmail, DbType.String);
+                using var connection = CreateConnection();
                 return await connection.QueryFirstOrDefaultAsync<User>(query, parameters);
+            }catch(Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+            
+        }
+
+        public async Task<int> CreateInvestorUser(User newUser)
+        {
+            try
+            {
+                var query = "INSERT INTO User (Email, CreateDate, Image, BusinessId, InvestorId, RoleId) VALUES (@Email, @CreateDate, @Image, @InvestorId, @RoleId)";
+                var parameters = new DynamicParameters();
+                parameters.Add("Email", newUser.Email, DbType.String);
+                parameters.Add("CreateDate", newUser.CreateDate, DbType.DateTime);
+                parameters.Add("Image", newUser.Image, DbType.String);
+                parameters.Add("InvestorId", newUser.InvestorId, DbType.Guid);
+                parameters.Add("RoleId", newUser.RoleId, DbType.Guid);
+
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
+            } catch(Exception e)
+            {
+                throw new Exception(e.Message, e);
             }
         }
 
-        public async Task<int> CreateUser(string email, DateTime createDate, string imageUrl, string businessId, string investorId, string roleId)
+        public async Task<int> CreateBusinessUser(User newUser)
         {
-            var query = "INSERT INTO Customer (Email, CreateDate, Image, BusinessId, InvestorId, RoleId) VALUES (@Email, @CreateDate, @Image, @BusinessId, @InvestorId, @RoleId)";
-            var parameters = new DynamicParameters();
-            parameters.Add("Email", email, DbType.String);
-            parameters.Add("CreateDate", createDate, DbType.DateTime);
-            parameters.Add("BusinessId", businessId, DbType.String);
-            parameters.Add("InvestorId", investorId, DbType.String);
-            parameters.Add("RoleId", roleId, DbType.String);
-
-            using (var connection = CreateConnection())
+            try
             {
+                var query = "INSERT INTO User (Email, CreateDate, Image, BusinessId, InvestorId, RoleId) VALUES (@Email, @CreateDate, @Image, @BusinessId, @RoleId)";
+                var parameters = new DynamicParameters();
+                parameters.Add("Email", newUser.Email, DbType.String);
+                parameters.Add("CreateDate", newUser.CreateDate, DbType.DateTime);
+                parameters.Add("Image", newUser.Image, DbType.String);
+                parameters.Add("BusinessId", newUser.BusinessId, DbType.Guid);
+                parameters.Add("RoleId", newUser.RoleId, DbType.Guid);
+
+                using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
             }
         }
     }

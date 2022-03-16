@@ -19,8 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
         public async Task<List<Project>> GetAllProjects()
         {
-            try
-            {
+            try{
                 string query = "SELECT * FROM Project";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<Project>(query)).ToList();

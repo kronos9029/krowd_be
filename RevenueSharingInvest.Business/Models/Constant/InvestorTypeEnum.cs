@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Models.Constant
 {
-    public enum RoleEnum
+    public enum InvestorTypeEnum
     {
-        Admin,
         Investor,
-        BusinessManager,
-        ProjectOwner,
-        Nigga
+        AngelInvestor,
+        PeerToPeerInvestor,
+        PersonalInvestor,
+        Banks,
+        VentureCapitalist
     }
 }
