@@ -22,6 +22,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly AppSettings _appSettings;
         private readonly IUserRepository _userRepository;
         private readonly IInvestorRepository _investorRepository;
+        private readonly IBusinessRepository _businessRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly String ROLE_ADMIN_ID = "";
         private readonly String ROLE_INVESTOR_ID = "";
@@ -96,7 +97,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return response;
         }
 
-/*        public async Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken)
+        public async Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken)
         {
             FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
             string uid = decryptedToken.Uid;
@@ -108,9 +109,53 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             User userObject = await _userRepository.GetUserByEmail(email);
 
+            AuthenticateResponse response = new();
 
+            if (userObject == null)
+            {
+                Guid userId = Guid.NewGuid();
+                Guid businessId = Guid.NewGuid();
 
-        }*/
+                Data.Models.Entities.Business business = new();
+                User newBusinessObject = new();
+
+                newBusinessObject.Id = userId;
+                newBusinessObject.BusinessId = businessId;
+                newBusinessObject.Email = email;
+                newBusinessObject.CreateDate = createdDate;
+                newBusinessObject.Image = ImageUrl;
+
+                int checkCreateUser = await _userRepository.CreateBusinessUser(newBusinessObject);
+                if (checkCreateUser == 0)
+                {
+                    throw new RegisterException("Register Fail!!");
+                }
+                User user = await _userRepository.GetUserByEmail(email);
+                business.Id = businessId;
+                business.Image = ImageUrl;
+                business.Email = email;
+
+                int checkCreateInvestor = await _businessRepository.CreateBusiness(business);
+                if (checkCreateInvestor == 0)
+                {
+                    throw new RegisterException("Create Business Fail!!");
+                }
+                response.email = email;
+                response.id = userId;
+                response.uid = uid;
+                response = GenerateToken(response, RoleEnum.BusinessManager.ToString());
+            }
+            else
+            {
+                response.email = email;
+                response.id = userObject.Id;
+                response.uid = uid;
+                response = GenerateToken(response, RoleEnum.BusinessManager.ToString());
+            }
+
+            return response;
+
+        }
 
         private AuthenticateResponse GenerateToken(AuthenticateResponse response, string roleCheck)
         {
@@ -123,13 +168,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Admin.ToString());
             }
-            else if (roleCheck.Equals(RoleEnum.BusinessManager.ToString()))
-            {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BusinessManager.ToString());
-            }
             else if (roleCheck.Equals(RoleEnum.Investor.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Investor.ToString());
+            }
+            else if (roleCheck.Equals(RoleEnum.BusinessManager.ToString()))
+            {
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BusinessManager.ToString());
             }
             else
             {

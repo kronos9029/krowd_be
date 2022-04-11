@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.IRepos
 {
-    public interface IInvestorRepository
+    public interface IBusinessRepository
     {
-        Task<int> CreateInvestorType(InvestorType investorType);
-        Task<int> CreateInvestor(Investor investor);
-        Task<List<InvestorType>> GetAllInvestorType();
+        Task<Business> GetBusinessById(Guid businesssId);
 
+        Task<List<Business>> GetAllBusiness();
+        Task<int> CreateBusiness(Business newBusiness);
     }
 }

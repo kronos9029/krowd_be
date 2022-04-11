@@ -18,8 +18,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
         }
 
-<<<<<<< Updated upstream
-=======
         public async Task<int> CreateInvestor(Investor investor)
         {
             try
@@ -77,6 +75,5 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
->>>>>>> Stashed changes
     }
 }
