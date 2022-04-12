@@ -12,11 +12,9 @@ namespace RevenueSharingInvest.Data.Models.Entities
     public partial class VoucherItem
     {
         [Key]
-        public Guid InvestorId { get; set; }
-        [Key]
+        public Guid Id { get; set; }
         public Guid VoucherId { get; set; }
-        [StringLength(10)]
-        public string InvestmentId { get; set; }
+        public Guid InvestmentId { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? IssuedDate { get; set; }
         [Column(TypeName = "datetime")]
@@ -26,9 +24,9 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? AvailableDate { get; set; }
 
-        [ForeignKey(nameof(InvestorId))]
+        [ForeignKey(nameof(InvestmentId))]
         [InverseProperty("VoucherItems")]
-        public virtual Investor Investor { get; set; }
+        public virtual Investment Investment { get; set; }
         [ForeignKey(nameof(VoucherId))]
         [InverseProperty("VoucherItems")]
         public virtual Voucher Voucher { get; set; }

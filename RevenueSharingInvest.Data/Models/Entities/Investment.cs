@@ -14,6 +14,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Investment()
         {
             Payments = new HashSet<Payment>();
+            VoucherItems = new HashSet<VoucherItem>();
         }
 
         [Key]
@@ -46,5 +47,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public virtual Project Project { get; set; }
         [InverseProperty(nameof(Payment.Investment))]
         public virtual ICollection<Payment> Payments { get; set; }
+        [InverseProperty(nameof(VoucherItem.Investment))]
+        public virtual ICollection<VoucherItem> VoucherItems { get; set; }
     }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
-    public class InvestmentService : IInvestorService
+    public class InvestmentService : IInvestmentService
     {
         //private readonly IInvestorRepository _investorRepository;
         //private readonly IInvestorWalletRepository _investorWalletRepository;
@@ -21,7 +21,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public Task<InvestorDTO> GetInvestorById(string ID)
+        public Task<List<InvestorDTO>> GetProjectMember(string projectID)
         {
             throw new NotImplementedException();
         }

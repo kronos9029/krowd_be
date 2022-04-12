@@ -11,5 +11,6 @@ namespace RevenueSharingInvest.Business.Services
     public interface IProjectService
     {
         public Task<List<Project>> GetAllProjects();
+        public Task<int> CreateProject(ProjectDTO newProjectDTO);
     }
 }

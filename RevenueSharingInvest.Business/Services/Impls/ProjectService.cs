@@ -22,6 +22,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
+        //CREATE PROJECT
+        public async Task<int> CreateProject(ProjectDTO newProjectDTO)
+        {
+            try
+            {
+                Project dto = _mapper.Map<Project>(newProjectDTO);
+                int result = await _projectRepository.CreateProject(dto);
+                //StageDTO stageDTO = newProjectDTO.stage;
+                //List<PackageDTO> packageList = newProjectDTO.packageList;
+                //List<PeriodRevenueDTO> periodRevenueList = newProjectDTO.periodRevenueList;
+                //ProjectEntityDTO projectEntity = newProjectDTO.projectEntity
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public async Task<List<Project>> GetAllProjects()
         {
             List<Project> projectList = await _projectRepository.GetAllProjects();
