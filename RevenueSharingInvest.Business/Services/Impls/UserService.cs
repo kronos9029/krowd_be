@@ -37,7 +37,34 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _investorRepository = investorRepository;
         }
 
-        public async Task<AuthenticateResponse> GetTokenMobileInvestor(string firebaseToken)
+/*        public async Task<int> AdminCreateBusinessUser(User newBusiness, string email)
+        {
+            User userObject = await _userRepository.GetUserByEmail(email);
+            if(userObject == null)
+            {
+                throw new NotFoundException("Business Not Found!!");
+            }
+            else
+            {
+                if (!userObject.RoleId.Equals(ROLE_ADMIN_ID))
+                {
+                    throw new Exceptions.UnauthorizedAccessException("Only Admin Can Create Business!!");
+                }
+                else
+                {
+                    if(await _userRepository.CreateBusinessUser(newBusiness) < 1)
+                    {
+                        throw new CreateBusinessException("Create Business Failed!!");
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
+        }*/
+
+        public async Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken)
         {
             FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
             string uid = decryptedToken.Uid;
@@ -104,8 +131,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
             string email = userRecord.Email;
-            DateTime createdDate = (DateTime)userRecord.UserMetaData.CreationTimestamp;
-            string ImageUrl = userRecord.PhotoUrl.ToString();
 
             User userObject = await _userRepository.GetUserByEmail(email);
 
@@ -113,37 +138,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             if (userObject == null)
             {
-                Guid userId = Guid.NewGuid();
-                Guid businessId = Guid.NewGuid();
-
-                Data.Models.Entities.Business business = new();
-                User newBusinessObject = new();
-
-                newBusinessObject.Id = userId;
-                newBusinessObject.BusinessId = businessId;
-                newBusinessObject.Email = email;
-                newBusinessObject.CreateDate = createdDate;
-                newBusinessObject.Image = ImageUrl;
-
-                int checkCreateUser = await _userRepository.CreateBusinessUser(newBusinessObject);
-                if (checkCreateUser == 0)
-                {
-                    throw new RegisterException("Register Fail!!");
-                }
-                User user = await _userRepository.GetUserByEmail(email);
-                business.Id = businessId;
-                business.Image = ImageUrl;
-                business.Email = email;
-
-                int checkCreateInvestor = await _businessRepository.CreateBusiness(business);
-                if (checkCreateInvestor == 0)
-                {
-                    throw new RegisterException("Create Business Fail!!");
-                }
-                response.email = email;
-                response.id = userId;
-                response.uid = uid;
-                response = GenerateToken(response, RoleEnum.BusinessManager.ToString());
+                throw new NotFoundException("Business Not Found!!");
             }
             else
             {
@@ -154,8 +149,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
 
             return response;
-
         }
+
+
+
+
 
         private AuthenticateResponse GenerateToken(AuthenticateResponse response, string roleCheck)
         {
@@ -178,7 +176,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             else
             {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Nigga.ToString());
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Investor.ToString());
             }
 
             var tokenDescriptor = new SecurityTokenDescriptor

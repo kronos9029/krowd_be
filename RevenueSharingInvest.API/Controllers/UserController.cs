@@ -29,7 +29,7 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("authenticate-user")]
         public async Task<IActionResult> AuthenticateUser([FromQuery]string token)
         {
-            var result = await _userService.GetTokenMobileInvestor(token);
+            var result = await _userService.GetTokenInvestor(token);
             return Ok(result);
         }
 

@@ -1,4 +1,5 @@
 ﻿using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,9 @@ namespace RevenueSharingInvest.Business.Services
 {
     public interface IUserService
     {
-        public Task<AuthenticateResponse> GetTokenMobileInvestor(string firebaseToken);
+        public Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken);
         public Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken);
+        /*public Task<int> AdminCreateBusiness(User newBusiness, string email);*/
 
     }
 }

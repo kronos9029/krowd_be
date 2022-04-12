@@ -43,6 +43,18 @@ namespace RevenueSharingInvest.Business.Exceptions
                     errorMessageObject.Code = "R001";
                     statusCode = (int)HttpStatusCode.BadRequest;
                     break;
+                case UnauthorizedAccessException:
+                    errorMessageObject.Code = "U001";
+                    statusCode = (int)HttpStatusCode.ServiceUnavailable;
+                    break;
+                case NotFoundException:
+                    errorMessageObject.Code = "N001";
+                    statusCode = (int)HttpStatusCode.NotFound;
+                    break;
+                case CreateBusinessException:
+                    errorMessageObject.Code = "B001";
+                    statusCode = (int)HttpStatusCode.BadRequest;
+                    break;
 
             }
 
