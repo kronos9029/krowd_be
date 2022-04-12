@@ -11,5 +11,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IProjectRepository
     {
         public Task<List<Project>> GetAllProjects();
+        public Task<int> CreateProject(Project projectDTO);
     }
 }

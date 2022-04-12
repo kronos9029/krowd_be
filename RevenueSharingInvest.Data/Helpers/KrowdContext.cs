@@ -340,13 +340,13 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<VoucherItem>(entity =>
             {
-                entity.HasKey(e => new { e.InvestorId, e.VoucherId });
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.HasOne(d => d.Investor)
-                    .WithMany(p => p.VoucherItems)
-                    .HasForeignKey(d => d.InvestorId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_VoucherItem_Investor");
+                //entity.HasOne(d => d.Investor)
+                //    .WithMany(p => p.VoucherItems)
+                //    .HasForeignKey(d => d.InvestorId)
+                //    .OnDelete(DeleteBehavior.ClientSetNull)
+                //    .HasConstraintName("FK_VoucherItem_Investor");
 
                 entity.HasOne(d => d.Voucher)
                     .WithMany(p => p.VoucherItems)

@@ -26,12 +26,12 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
         public Guid? ManagerId { get; set; }
+        public Guid? BusinessId { get; set; }
         [StringLength(50)]
         public string Name { get; set; }
         public string Image { get; set; }
         public string Description { get; set; }
-        [StringLength(20)]
-        public string Category { get; set; }
+        public int? Category { get; set; }
         public string Address { get; set; }
         public Guid? AreaId { get; set; }
         public double? InvestmentTargetCapital { get; set; }
@@ -47,22 +47,17 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public DateTime? EndDate { get; set; }
         [StringLength(13)]
         public string BusinessLicense { get; set; }
-        [StringLength(20)]
-        public string Status { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        [StringLength(10)]
-        public string CreateBy { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? UpdateDate { get; set; }
-        [StringLength(10)]
-        public string UpdateBy { get; set; }
+        public int? Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? ApprovedDate { get; set; }
-        [StringLength(10)]
-        public string ApprovedBy { get; set; }
+        public Guid? ApprovedBy { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? CreateDate { get; set; }
+        public Guid? CreateBy { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? UpdateDate { get; set; }
+        public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
-        public Guid? BusinessId { get; set; }
 
         [ForeignKey(nameof(AreaId))]
         [InverseProperty("Projects")]
