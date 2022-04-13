@@ -37,32 +37,32 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _investorRepository = investorRepository;
         }
 
-/*        public async Task<int> AdminCreateBusinessUser(User newBusiness, string email)
+        public async Task<int> AdminCreateBusinessUser(User newBusiness, string email)
         {
             User userObject = await _userRepository.GetUserByEmail(email);
-            if(userObject == null)
+            if (userObject == null)
             {
-                throw new NotFoundException("Business Not Found!!");
+                throw new NotFoundException("User Not Found!!");
             }
             else
             {
-                if (!userObject.RoleId.Equals(ROLE_ADMIN_ID))
+                if (!userObject.RoleId.ToString().Equals(ROLE_ADMIN_ID))
                 {
                     throw new Exceptions.UnauthorizedAccessException("Only Admin Can Create Business!!");
                 }
                 else
                 {
-                    if(await _userRepository.CreateBusinessUser(newBusiness) < 1)
+                    if (await _userRepository.CreateBusinessUser(newBusiness) < 1)
                     {
                         throw new CreateBusinessException("Create Business Failed!!");
                     }
                     else
                     {
-
+                        return 1;
                     }
                 }
             }
-        }*/
+        }
 
         public async Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken)
         {

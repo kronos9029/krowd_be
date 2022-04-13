@@ -69,6 +69,9 @@ namespace RevenueSharingInvest.API
             services.AddScoped<IInvestorWalletRepository, InvestorWalletRepository>();
                 //INVESTMENT
             services.AddScoped<IInvestmentService, InvestmentService>();
+            //BUSINESS
+            services.AddScoped<IBusinessService, BusinessService>();
+            services.AddScoped<IBusinessRepository, BusinessRepository>();
 
             //CORS
             services.AddCors(options =>

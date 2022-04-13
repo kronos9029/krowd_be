@@ -12,7 +12,7 @@ namespace RevenueSharingInvest.Business.Services
     {
         public Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken);
         public Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken);
-        /*public Task<int> AdminCreateBusiness(User newBusiness, string email);*/
+        public Task<int> AdminCreateBusinessUser(User newBusiness, string email);
 
     }
 }
