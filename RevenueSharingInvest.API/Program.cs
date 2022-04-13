@@ -21,6 +21,7 @@ namespace RevenueSharingInvest.API
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseIIS();
                 });
     }
 }
