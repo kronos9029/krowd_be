@@ -41,21 +41,16 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public int? Duration { get; set; }
         public int? NumOfStage { get; set; }
         public double? RemainAmount { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? StartDate { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? EndDate { get; set; }
+        public long? StartDate { get; set; }
+        public long? EndDate { get; set; }
         [StringLength(13)]
         public string BusinessLicense { get; set; }
         public int? Status { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? ApprovedDate { get; set; }
+        public long? ApprovedDate { get; set; }
         public Guid? ApprovedBy { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
+        public long? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? UpdateDate { get; set; }
+        public long? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
 

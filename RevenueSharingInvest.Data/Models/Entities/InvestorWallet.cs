@@ -21,14 +21,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid? InvestorId { get; set; }
         public double? Balance { get; set; }
         public Guid? WalletTypeId { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        [StringLength(10)]
-        public string CreateBy { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? UpdateDate { get; set; }
-        [StringLength(10)]
-        public string UpDateBy { get; set; }
+        public long? CreateDate { get; set; }
+        public Guid? CreateBy { get; set; }
+        public long? UpdateDate { get; set; }
+        public Guid? UpDateBy { get; set; }
         public bool? IsDeleted { get; set; }
 
         [ForeignKey(nameof(InvestorId))]

@@ -18,6 +18,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
 
         [Key]
         public Guid Id { get; set; }
+        public Guid? InvestmentId { get; set; }
         public Guid? PeriodRevenueId { get; set; }
         public double? Amount { get; set; }
         public string Description { get; set; }
@@ -27,16 +28,11 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string FromId { get; set; }
         [StringLength(10)]
         public string ToId { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        [StringLength(10)]
-        public string CreateBy { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? UpdateDate { get; set; }
-        [StringLength(10)]
-        public string UpdateBy { get; set; }
+        public long? CreateDate { get; set; }
+        public Guid? CreateBy { get; set; }
+        public long? UpdateDate { get; set; }
+        public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
-        public Guid? InvestmentId { get; set; }
 
         [ForeignKey(nameof(InvestmentId))]
         [InverseProperty("Payments")]

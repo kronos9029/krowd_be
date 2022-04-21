@@ -37,8 +37,9 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProject([FromBody] ProjectDTO newProjectDTO)
         {
-            var result = await _projectService.CreateProject(newProjectDTO);
-            return Ok(result);
+            //var result = await _projectService.CreateProject(newProjectDTO);
+            //return Ok(result);
+            return Ok();
         }
     }
 }

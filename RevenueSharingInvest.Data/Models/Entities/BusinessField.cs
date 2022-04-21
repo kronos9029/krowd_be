@@ -15,6 +15,11 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid BusinessId { get; set; }
         [Key]
         public Guid FieldId { get; set; }
+        public long? CreateDate { get; set; }
+        public Guid? CreateBy { get; set; }
+        public long? UpdateDate { get; set; }
+        public Guid? UpdateBy { get; set; }
+        public bool? IsDeleted { get; set; }
 
         [ForeignKey(nameof(BusinessId))]
         [InverseProperty("BusinessFields")]
