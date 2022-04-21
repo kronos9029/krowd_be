@@ -24,10 +24,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid? PackageId { get; set; }
         public int? Quantity { get; set; }
         public double? TotalPrice { get; set; }
-        public long? LastPayment { get; set; }
-        public long? CreateDate { get; set; }
+        public DateTime? LastPayment { get; set; }
+        public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
-        public long? UpdateDate { get; set; }
+        public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
 

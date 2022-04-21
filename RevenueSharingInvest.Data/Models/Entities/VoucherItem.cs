@@ -15,13 +15,13 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid Id { get; set; }
         public Guid VoucherId { get; set; }
         public Guid InvestmentId { get; set; }
-        public long? IssuedDate { get; set; }
-        public long? ExpireDate { get; set; }
-        public long? RedeemDate { get; set; }
-        public long? AvailableDate { get; set; }
-        public long? CreateDate { get; set; }
+        public DateTime? IssuedDate { get; set; }
+        public DateTime? ExpireDate { get; set; }
+        public DateTime? RedeemDate { get; set; }
+        public DateTime? AvailableDate { get; set; }
+        public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
-        public long? UpdateDate { get; set; }
+        public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
 

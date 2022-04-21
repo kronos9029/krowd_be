@@ -34,9 +34,9 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? EndDate { get; set; }
         public Guid? CreateDate { get; set; }
-        public long? CreateBy { get; set; }
+        public DateTime? CreateBy { get; set; }
         public Guid? UpdateDate { get; set; }
-        public long? UpdateBy { get; set; }
+        public DateTime? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
 
         [ForeignKey(nameof(ProjectId))]

@@ -19,9 +19,9 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string Description { get; set; }
         [StringLength(20)]
         public string Status { get; set; }
-        public long? CreateDate { get; set; }
+        public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
-        public long? UpdateDate { get; set; }
+        public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
 
