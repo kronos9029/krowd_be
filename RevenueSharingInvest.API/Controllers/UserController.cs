@@ -26,10 +26,19 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [Route("authenticate-user")]
-        public async Task<IActionResult> AuthenticateUser([FromQuery]string token)
+        [Route("authenticate-mobile")]
+        public async Task<IActionResult> AuthenticateMobile([FromQuery]string token)
         {
             var result = await _userService.GetTokenInvestor(token);
+            return Ok(result);
+        }
+        
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("authenticate-web")]
+        public async Task<IActionResult> AuthenticateWeb([FromQuery]string token)
+        {
+            var result = await _userService.GetTokenWebBusiness(token);
             return Ok(result);
         }
 
