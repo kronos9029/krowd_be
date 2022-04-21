@@ -23,11 +23,15 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [StringLength(50)]
         public string Name { get; set; }
         public string Description { get; set; }
-        public bool? IsDeleted { get; set; }
         [StringLength(10)]
         public string Mode { get; set; }
         [StringLength(10)]
         public string Type { get; set; }
+        public long? CreateDate { get; set; }
+        public Guid? CreateBy { get; set; }
+        public long? UpdateDate { get; set; }
+        public Guid? UpdateBy { get; set; }
+        public bool? IsDeleted { get; set; }
 
         [InverseProperty(nameof(InvestorWallet.WalletType))]
         public virtual ICollection<InvestorWallet> InvestorWallets { get; set; }

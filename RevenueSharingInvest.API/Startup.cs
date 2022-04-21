@@ -72,6 +72,8 @@ namespace RevenueSharingInvest.API
             //BUSINESS
             services.AddScoped<IBusinessService, BusinessService>();
             services.AddScoped<IBusinessRepository, BusinessRepository>();
+                //STAGE
+            services.AddScoped<IStageRepository, StageRepository>();
 
             //CORS
             services.AddCors(options =>

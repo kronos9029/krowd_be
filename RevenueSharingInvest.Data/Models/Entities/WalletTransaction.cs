@@ -14,6 +14,9 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
         public Guid? PaymentId { get; set; }
+        public Guid? SystemWalletId { get; set; }
+        public Guid? ProjectWalletId { get; set; }
+        public Guid? InvestorWalletId { get; set; }
         public double? Amount { get; set; }
         public string Description { get; set; }
         [StringLength(20)]
@@ -23,18 +26,11 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [StringLength(10)]
         public string ToWalletId { get; set; }
         public double? Fee { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        [StringLength(10)]
-        public string CreateBy { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? UpdateDate { get; set; }
-        [StringLength(10)]
-        public string UpdateBy { get; set; }
+        public long? CreateDate { get; set; }
+        public Guid? CreateBy { get; set; }
+        public long? UpdateDate { get; set; }
+        public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
-        public Guid? SystemWalletId { get; set; }
-        public Guid? ProjectWalletId { get; set; }
-        public Guid? InvestorWalletId { get; set; }
 
         [ForeignKey(nameof(InvestorWalletId))]
         [InverseProperty("WalletTransactions")]

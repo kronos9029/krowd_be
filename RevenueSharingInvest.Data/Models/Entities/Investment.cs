@@ -24,16 +24,11 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid? PackageId { get; set; }
         public int? Quantity { get; set; }
         public double? TotalPrice { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? LastPayment { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
-        [StringLength(10)]
-        public string CreateBy { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? UpdateDate { get; set; }
-        [StringLength(10)]
-        public string UpdateBy { get; set; }
+        public long? LastPayment { get; set; }
+        public long? CreateDate { get; set; }
+        public Guid? CreateBy { get; set; }
+        public long? UpdateDate { get; set; }
+        public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
 
         [ForeignKey(nameof(InvestorId))]
