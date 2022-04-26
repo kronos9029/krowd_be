@@ -114,9 +114,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET ALL
         public async Task<List<Project>> GetAllProjects()
         {
-            try{
+            try
+            {
                 string query = "SELECT * FROM Project";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<Project>(query)).ToList();
@@ -126,5 +128,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        //UPDATE
+
+        //DELETE
     }
 }

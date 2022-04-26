@@ -15,9 +15,11 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid BusinessId { get; set; }
         [Key]
         public Guid FieldId { get; set; }
-        public long? CreateDate { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
-        public long? UpdateDate { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
 

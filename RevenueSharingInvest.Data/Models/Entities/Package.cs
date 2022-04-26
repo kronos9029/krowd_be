@@ -28,13 +28,18 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string Description { get; set; }
         public int? MinForPurchasing { get; set; }
         public int? MaxForPurchasing { get; set; }
-        public long? OpenDate { get; set; }
-        public long? CloseDate { get; set; }
-        public long? ApprovedDate { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? OpenDate { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? CloseDate { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? ApprovedDate { get; set; }
         public Guid? ApprovedBy { get; set; }
-        public long? CreateDate { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
-        public long? UpdateDate { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
 
