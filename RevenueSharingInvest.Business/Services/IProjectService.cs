@@ -10,7 +10,17 @@ namespace RevenueSharingInvest.Business.Services
 {
     public interface IProjectService
     {
-        public Task<List<Project>> GetAllProjects();
-        public Task<int> CreateProject(NewProjectDTO newProjectDTO);
+        //CREATE
+        public Task<int> CreateNewProject(NewProjectDTO newProjectDTO);
+        public Task<int> CreateProject(ProjectDTO projectDTO);
+
+        //READ
+        public Task<List<ProjectDTO>> GetAllProjects();
+
+        //UPDATE
+        public Task<int> UpdateProject(ProjectDTO projectDTO, Guid projectId);
+
+        //DELETE
+        public Task<int> DeleteProjectById(Guid projectId);
     }
 }

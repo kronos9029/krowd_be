@@ -25,8 +25,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
-        //CREATE PROJECT
-        public async Task<int> CreateProject(NewProjectDTO newProjectDTO)
+        //CREATE NEW PROJECT - Để dành chơi
+        public async Task<int> CreateNewProject(NewProjectDTO newProjectDTO)
         {
             int result;
             try
@@ -67,10 +67,67 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<List<Project>> GetAllProjects()
+        //CREATE
+        public async Task<int> CreateProject(ProjectDTO projectDTO)
+        {
+            int result;
+            try
+            {
+                Project dto = _mapper.Map<Project>(projectDTO);
+                result = await _projectRepository.CreateProject(dto);
+                if (result == 0)
+                    throw new CreateObjectException("Can not create Project Object!");
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        //GET ALL
+        public async Task<List<ProjectDTO>> GetAllProjects()
         {
             List<Project> projectList = await _projectRepository.GetAllProjects();
-            return projectList;
+            List<ProjectDTO> list = _mapper.Map<List<ProjectDTO>>(projectList);
+            return list;
+        }
+
+        //UPDATE
+        public async Task<int> UpdateProject(ProjectDTO projectDTO, Guid projectId)
+        {
+            int result;
+            try
+            {
+                Project dto = _mapper.Map<Project>(projectDTO);
+                result = await _projectRepository.UpdateProject(dto, projectId);
+                if (result == 0)
+                    throw new CreateObjectException("Can not update Project Object!");
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        //DELETE
+
+        public async Task<int> DeleteProjectById(Guid projectId)
+        {
+            int result;
+            try
+            {
+                
+                result = await _projectRepository.DeleteProjectById(projectId);
+                if (result == 0)
+                    throw new CreateObjectException("Can not delete Project Object!");
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
