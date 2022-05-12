@@ -316,16 +316,6 @@ namespace RevenueSharingInvest.Data.Helpers
                     .WithMany(p => p.Users)
                     .HasForeignKey(d => d.BusinessId)
                     .HasConstraintName("FK_User_Business");
-
-                entity.HasOne(d => d.Investor)
-                    .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.InvestorId)
-                    .HasConstraintName("FK_User_Investor");
-
-                entity.HasOne(d => d.InvestorNavigation)
-                    .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.InvestorId)
-                    .HasConstraintName("FK_User_Role");
             });
 
             modelBuilder.Entity<Voucher>(entity =>

@@ -15,13 +15,13 @@ namespace RevenueSharingInvest.Data.Models.Entities
         {
             AccountTransactionFromUsers = new HashSet<AccountTransaction>();
             AccountTransactionToUsers = new HashSet<AccountTransaction>();
+            Investors = new HashSet<Investor>();
             Projects = new HashSet<Project>();
         }
 
         [Key]
         public Guid Id { get; set; }
         public Guid? BusinessId { get; set; }
-        public Guid? InvestorId { get; set; }
         public Guid? RoleId { get; set; }
         public string Description { get; set; }
         [StringLength(20)]
@@ -63,16 +63,15 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [ForeignKey(nameof(BusinessId))]
         [InverseProperty("Users")]
         public virtual Business Business { get; set; }
-        [ForeignKey(nameof(InvestorId))]
+        [ForeignKey(nameof(RoleId))]
         [InverseProperty("Users")]
-        public virtual Investor Investor { get; set; }
-        [ForeignKey(nameof(InvestorId))]
-        [InverseProperty(nameof(Role.Users))]
-        public virtual Role InvestorNavigation { get; set; }
+        public virtual Role Role { get; set; }
         [InverseProperty(nameof(AccountTransaction.FromUser))]
         public virtual ICollection<AccountTransaction> AccountTransactionFromUsers { get; set; }
         [InverseProperty(nameof(AccountTransaction.ToUser))]
         public virtual ICollection<AccountTransaction> AccountTransactionToUsers { get; set; }
+        [InverseProperty(nameof(Investor.User))]
+        public virtual ICollection<Investor> Investors { get; set; }
         [InverseProperty(nameof(Project.Manager))]
         public virtual ICollection<Project> Projects { get; set; }
     }

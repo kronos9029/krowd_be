@@ -88,7 +88,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Investor investor = new();
                 User newInvestorObject = new();
 
-                newInvestorObject.InvestorId = investorId;
                 newInvestorObject.Email = email;
                 newInvestorObject.CreateDate = createdDate;
                 newInvestorObject.Image = ImageUrl;

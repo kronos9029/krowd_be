@@ -133,6 +133,11 @@ namespace RevenueSharingInvest.Data.Models.Entities
                     .WithMany(p => p.Investors)
                     .HasForeignKey(d => d.InvestorTypeId)
                     .HasConstraintName("FK_Investor_InvestorType");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Investors)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_Investor_User");
             });
 
             modelBuilder.Entity<InvestorType>(entity =>
@@ -321,15 +326,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
                     .HasForeignKey(d => d.BusinessId)
                     .HasConstraintName("FK_User_Business");
 
-                entity.HasOne(d => d.Investor)
+                entity.HasOne(d => d.Role)
                     .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.InvestorId)
-                    .HasConstraintName("FK_User_Investor");
-
-                entity.HasOne(d => d.InvestorNavigation)
-                    .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.InvestorId)
-                    .HasConstraintName("FK_User_Role");
+                    .HasForeignKey(d => d.RoleId)
+                    .HasConstraintName("FK_User_Role1");
             });
 
             modelBuilder.Entity<Voucher>(entity =>

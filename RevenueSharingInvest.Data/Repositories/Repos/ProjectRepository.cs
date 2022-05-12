@@ -100,9 +100,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Status", projectDTO.Status, DbType.Int16);
                 parameters.Add("ApprovedDate", projectDTO.ApprovedDate, DbType.DateTime);
                 parameters.Add("ApprovedBy", projectDTO.ApprovedBy, DbType.Guid);
-                parameters.Add("CreateDate", projectDTO.CreateDate, DbType.DateTime);
+                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", projectDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", projectDTO.UpdateDate, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -119,10 +119,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "UPDATE Project SET IsDeleted=1 WHERE Id=@Id";
+                var query = "UPDATE Project SET IsDeleted=1, UpdateDate = @UpdateDate WHERE Id=@Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", projectId, DbType.Guid);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -207,7 +208,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("ApprovedBy", projectDTO.ApprovedBy, DbType.Guid);
                 parameters.Add("CreateDate", projectDTO.CreateDate, DbType.DateTime);
                 parameters.Add("CreateBy", projectDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", projectDTO.UpdateDate, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", projectDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", projectDTO.Id, DbType.Guid);

@@ -118,7 +118,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-                
                 result = await _projectRepository.DeleteProjectById(projectId);
                 if (result == 0)
                     throw new CreateObjectException("Can not delete Project Object!");

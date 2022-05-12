@@ -38,12 +38,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "INSERT INTO User (Email, CreateDate, Image, BusinessId, InvestorId, RoleId) VALUES (@Email, @CreateDate, @Image, @InvestorId, @RoleId)";
+                var query = "INSERT INTO User (Email, CreateDate, Image, BusinessId, RoleId) VALUES (@Email, @CreateDate, @Image, @InvestorId, @RoleId)";
                 var parameters = new DynamicParameters();
                 parameters.Add("Email", newUser.Email, DbType.String);
                 parameters.Add("CreateDate", newUser.CreateDate, DbType.DateTime);
                 parameters.Add("Image", newUser.Image, DbType.String);
-                parameters.Add("InvestorId", newUser.InvestorId, DbType.Guid);
                 parameters.Add("RoleId", newUser.RoleId, DbType.Guid);
 
                 using var connection = CreateConnection();

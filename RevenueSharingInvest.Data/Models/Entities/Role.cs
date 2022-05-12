@@ -29,7 +29,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
 
-        [InverseProperty(nameof(User.InvestorNavigation))]
+        [InverseProperty(nameof(User.Role))]
         public virtual ICollection<User> Users { get; set; }
     }
 }

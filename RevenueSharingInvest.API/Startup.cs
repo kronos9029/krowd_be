@@ -56,7 +56,20 @@ namespace RevenueSharingInvest.API
 
             // Register your regular repositories
             // services.AddScoped<IDiameterRepository, DiameterRepository>();
-                //PROJECT
+
+            //AREA
+            services.AddScoped<IAreaService, AreaService>();
+            services.AddScoped<IAreaRepository, AreaRepository>();
+
+            //BUSINESS
+            services.AddScoped<IBusinessService, BusinessService>();
+            services.AddScoped<IBusinessRepository, BusinessRepository>();
+
+            //BUSINESS FIELD
+            //services.AddScoped<IBusinessFieldService, BusinessFieldService>();
+            services.AddScoped<IBusinessFieldRepository, BusinessFieldRepository>();
+
+            //PROJECT
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IProjectService, ProjectService>();
                 //INVESTOR
@@ -69,11 +82,10 @@ namespace RevenueSharingInvest.API
             services.AddScoped<IInvestorWalletRepository, InvestorWalletRepository>();
                 //INVESTMENT
             services.AddScoped<IInvestmentService, InvestmentService>();
-            //BUSINESS
-            services.AddScoped<IBusinessService, BusinessService>();
-            services.AddScoped<IBusinessRepository, BusinessRepository>();
+            
                 //STAGE
             services.AddScoped<IStageRepository, StageRepository>();
+            
 
             //CORS
             services.AddCors(options =>
