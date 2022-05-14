@@ -60,6 +60,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return list;
         }
 
+        //GET BY ID
+        public async Task<BusinessFieldDTO> GetBusinessFieldById(Guid businessFieldId)
+        {
+            BusinessFieldDTO result;
+            try
+            {
+
+                BusinessField dto = await _businessFieldRepository.GetBusinessFieldById(businessFieldId);
+                result = _mapper.Map<BusinessFieldDTO>(dto);
+                if (result == null)
+                    throw new CreateObjectException("No BusinessField Object Found!");
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         //UPDATE
         public async Task<int> UpdateBusinessField(BusinessFieldDTO businessFieldDTO, Guid businessFieldId)
         {

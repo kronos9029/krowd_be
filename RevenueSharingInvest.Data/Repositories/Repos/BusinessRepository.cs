@@ -121,9 +121,20 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public Task<Business> GetBusinessById(Guid businesssId)
+        public async Task<Business> GetBusinessById(Guid businesssId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var query = "SELECT * FROM Business WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", businesssId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Business>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
         }
 
         //UPDATE

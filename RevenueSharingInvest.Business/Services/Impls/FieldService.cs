@@ -11,28 +11,28 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
-    public class AreaService : IAreaService
+    public class FieldService : IFieldService
     {
-        private readonly IAreaRepository _areaRepository;
+        private readonly IFieldRepository _fieldRepository;
         private readonly IMapper _mapper;
 
 
-        public AreaService(IAreaRepository areaRepository, IMapper mapper)
+        public FieldService(IFieldRepository fieldRepository, IMapper mapper)
         {
-            _areaRepository = areaRepository;
+            _fieldRepository = fieldRepository;
             _mapper = mapper;
         }
 
         //CREATE
-        public async Task<int> CreateArea(AreaDTO areaDTO)
+        public async Task<int> CreateField(FieldDTO fieldDTO)
         {
             int result;
             try
             {
-                Area dto = _mapper.Map<Area>(areaDTO);
-                result = await _areaRepository.CreateArea(dto);
+                Field dto = _mapper.Map<Field>(fieldDTO);
+                result = await _fieldRepository.CreateField(dto);
                 if (result == 0)
-                    throw new CreateObjectException("Can not create Area Object!");
+                    throw new CreateObjectException("Can not create Field Object!");
                 return result;
             }
             catch (Exception e)
@@ -42,15 +42,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //DELETE
-        public async Task<int> DeleteAreaById(Guid areaId)
+        public async Task<int> DeleteFieldById(Guid fieldId)
         {
             int result;
             try
             {
 
-                result = await _areaRepository.DeleteAreaById(areaId);
+                result = await _fieldRepository.DeleteFieldById(fieldId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not delete Area Object!");
+                    throw new CreateObjectException("Can not delete Field Object!");
                 return result;
             }
             catch (Exception e)
@@ -60,24 +60,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<AreaDTO>> GetAllAreas()
+        public async Task<List<FieldDTO>> GetAllFields()
         {
-            List<Area> areaList = await _areaRepository.GetAllAreas();
-            List<AreaDTO> list = _mapper.Map<List<AreaDTO>>(areaList);
+            List<Field> areaList = await _fieldRepository.GetAllFields();
+            List<FieldDTO> list = _mapper.Map<List<FieldDTO>>(areaList);
             return list;
         }
 
         //GET BY ID
-        public async Task<AreaDTO> GetAreaById(Guid areaId)
+        public async Task<FieldDTO> GetFieldById(Guid fieldId)
         {
-            AreaDTO result;
+            FieldDTO result;
             try
             {
 
-                Area dto = await _areaRepository.GetAreaById(areaId);
-                result = _mapper.Map<AreaDTO>(dto);
+                Field dto = await _fieldRepository.GetFieldById(fieldId);
+                result = _mapper.Map<FieldDTO>(dto);
                 if (result == null)
-                    throw new CreateObjectException("No Area Object Found!");
+                    throw new CreateObjectException("No Field Object Found!");
                 return result;
             }
             catch (Exception e)
@@ -87,15 +87,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdateArea(AreaDTO areaDTO, Guid areaId)
+        public async Task<int> UpdateField(FieldDTO fieldDTO, Guid fieldId)
         {
             int result;
             try
             {
-                Area dto = _mapper.Map<Area>(areaDTO);
-                result = await _areaRepository.UpdateArea(dto, areaId);
+                Field dto = _mapper.Map<Field>(fieldDTO);
+                result = await _fieldRepository.UpdateField(dto, fieldId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not update Area Object!");
+                    throw new CreateObjectException("Can not update Field Object!");
                 return result;
             }
             catch (Exception e)

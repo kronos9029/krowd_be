@@ -101,8 +101,25 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET BY ID
+        public async Task<Area> GetAreaById(Guid areaId)
+        {
+            try
+            {
+                string query = "SELECT * FROM Area WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", areaId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Area>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //UPDATE
-        public async Task<int> UpdateArea(Area areaDTO, Guid areaI)
+        public async Task<int> UpdateArea(Area areaDTO, Guid areaId)
         {
             try
             {
@@ -128,7 +145,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", areaDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", areaI, DbType.Guid);
+                parameters.Add("Id", areaId, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {

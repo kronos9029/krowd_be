@@ -12,28 +12,36 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
 {
-    public class BusinessFieldRepository : BaseRepository, IBusinessFieldRepository
+    public class InvestmentRepository : BaseRepository, IInvestmentRepository
     {
-        public BusinessFieldRepository(IConfiguration configuration) : base(configuration)
+        public InvestmentRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
         //CREATE
-        public async Task<int> CreateBusinessField(BusinessField businessFieldDTO)
+        public async Task<int> CreateInvestment(Investment investmentDTO)
         {
             try
             {
-                var query = "INSERT INTO BusinessField ("
-                    + "         BusinessId, "
-                    + "         FieldId, "
+                var query = "INSERT INTO Investment ("
+                    + "         InvestorId, "
+                    + "         ProjectId, "
+                    + "         PackageId, "
+                    + "         Quantity, "
+                    + "         TotalPrice, "
+                    + "         LastPayment, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
                     + "     VALUES ( "
-                    + "         @BusinessId, "
-                    + "         @FieldId, "
+                    + "         @InvestorId, "
+                    + "         @ProjectId, "
+                    + "         @PackageId, "
+                    + "         @Quantity, "
+                    + "         @TotalPrice, "
+                    + "         @LastPayment, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -41,12 +49,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("BusinessId", businessFieldDTO.BusinessId, DbType.Guid);
-                parameters.Add("FieldId", businessFieldDTO.FieldId, DbType.Guid);
+                parameters.Add("InvestorId", investmentDTO.InvestorId, DbType.Guid);
+                parameters.Add("ProjectId", investmentDTO.ProjectId, DbType.Guid);
+                parameters.Add("PackageId", investmentDTO.PackageId, DbType.Guid);
+                parameters.Add("Quantity", investmentDTO.Quantity, DbType.Int16);
+                parameters.Add("TotalPrice", investmentDTO.TotalPrice, DbType.Double);
+                parameters.Add("LastPayment", investmentDTO.LastPayment, DbType.DateTime);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", businessFieldDTO.CreateBy, DbType.Guid);
+                parameters.Add("CreateBy", investmentDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", businessFieldDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", investmentDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
@@ -56,13 +68,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
-        
+
         //DELETE
-        public async Task<int> DeleteBusinessFieldById(Guid businessFieldId)
+        public async Task<int> DeleteInvestmentById(Guid investmentId)
         {
             try
             {
-                var query = "UPDATE BusinessField "
+                var query = "UPDATE Investment "
                     + "     SET "
                     + "         UpdateDate = @UpdateDate, "
                     //+ "         UpdateBy = @UpdateBy, "
@@ -73,7 +85,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 //parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", businessFieldId, DbType.Guid);
+                parameters.Add("Id", investmentId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -84,13 +96,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<BusinessField>> GetAllBusinessFields()
+        public async Task<List<Investment>> GetAllInvestments()
         {
             try
             {
-                string query = "SELECT * FROM BusinessField";
+                string query = "SELECT * FROM Investment";
                 using var connection = CreateConnection();
-                return (await connection.QueryAsync<BusinessField>(query)).ToList();
+                return (await connection.QueryAsync<Investment>(query)).ToList();
             }
             catch (Exception e)
             {
@@ -99,15 +111,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET BY ID
-        public async Task<BusinessField> GetBusinessFieldById(Guid businessFieldId)
+        public async Task<Investment> GetInvestmentById(Guid investmentId)
         {
             try
             {
-                string query = "SELECT * FROM BusinessField WHERE Id = @Id";
+                string query = "SELECT * FROM Investment WHERE Id = @Id";
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", businessFieldId, DbType.Guid);
+                parameters.Add("Id", investmentId, DbType.Guid);
                 using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<BusinessField>(query, parameters);
+                return await connection.QueryFirstOrDefaultAsync<Investment>(query, parameters);
             }
             catch (Exception e)
             {
@@ -116,14 +128,18 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdateBusinessField(BusinessField businessFieldDTO, Guid businessFieldId)
+        public async Task<int> UpdateInvestment(Investment investmentDTO, Guid investmentId)
         {
             try
             {
-                var query = "UPDATE BusinessField "
+                var query = "UPDATE Investment "
                     + "     SET "
-                    + "         BusinessId = @BusinessId, "
-                    + "         FieldId = @FieldId, "
+                    + "         InvestorId = @InvestorId, "
+                    + "         ProjectId = @ProjectId, "
+                    + "         PackageId = @PackageId, "
+                    + "         Quantity = @Quantity, "
+                    + "         TotalPrice = @TotalPrice, "
+                    + "         LastPayment = @LastPayment, "
                     + "         CreateDate = @CreateDate, "
                     + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
@@ -133,14 +149,18 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("BusinessId", businessFieldDTO.BusinessId, DbType.Guid);
-                parameters.Add("FieldId", businessFieldDTO.FieldId, DbType.Guid);
-                parameters.Add("CreateDate", businessFieldDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", businessFieldDTO.CreateBy, DbType.Guid);
+                parameters.Add("InvestorId", investmentDTO.InvestorId, DbType.Guid);
+                parameters.Add("ProjectId", investmentDTO.ProjectId, DbType.Guid);
+                parameters.Add("PackageId", investmentDTO.PackageId, DbType.Guid);
+                parameters.Add("Quantity", investmentDTO.Quantity, DbType.Int16);
+                parameters.Add("TotalPrice", investmentDTO.TotalPrice, DbType.Double);
+                parameters.Add("LastPayment", investmentDTO.LastPayment, DbType.DateTime);
+                parameters.Add("CreateDate", investmentDTO.CreateDate, DbType.DateTime);
+                parameters.Add("CreateBy", investmentDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", businessFieldDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", businessFieldDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", businessFieldId, DbType.Guid);
+                parameters.Add("UpdateBy", investmentDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", investmentDTO.IsDeleted, DbType.Boolean);
+                parameters.Add("Id", investmentDTO, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {

@@ -66,8 +66,16 @@ namespace RevenueSharingInvest.API
             services.AddScoped<IBusinessRepository, BusinessRepository>();
 
             //BUSINESS FIELD
-            //services.AddScoped<IBusinessFieldService, BusinessFieldService>();
+            services.AddScoped<IBusinessFieldService, BusinessFieldService>();
             services.AddScoped<IBusinessFieldRepository, BusinessFieldRepository>();
+
+            //FIELD
+            services.AddScoped<IFieldService, FieldService>();
+            services.AddScoped<IFieldRepository, FieldRepository>();
+
+            //INVESTMENT
+            services.AddScoped<IInvestmentService, InvestmentService>();
+            services.AddScoped<IInvestmentRepository, InvestmentRepository>();
 
             //PROJECT
             services.AddScoped<IProjectRepository, ProjectRepository>();

@@ -15,6 +15,7 @@ namespace RevenueSharingInvest.Business.Services
 
         //READ
         public Task<List<BusinessDTO>> GetAllBusiness();
+        public Task<BusinessDTO> GetBusinessById(Guid businessId);
 
         //UPDATE
         public Task<int> UpdateBusiness(BusinessDTO businessDTO, Guid businessId);

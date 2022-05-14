@@ -12,28 +12,28 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
 {
-    public class BusinessFieldRepository : BaseRepository, IBusinessFieldRepository
+    public class FieldRepository : BaseRepository, IFieldRepository
     {
-        public BusinessFieldRepository(IConfiguration configuration) : base(configuration)
+        public FieldRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
         //CREATE
-        public async Task<int> CreateBusinessField(BusinessField businessFieldDTO)
+        public async Task<int> CreateField(Field fieldDTO)
         {
             try
             {
-                var query = "INSERT INTO BusinessField ("
-                    + "         BusinessId, "
-                    + "         FieldId, "
+                var query = "INSERT INTO Field ("
+                    + "         Name, "
+                    + "         Description, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
                     + "     VALUES ( "
-                    + "         @BusinessId, "
-                    + "         @FieldId, "
+                    + "         @Name, "
+                    + "         @Description, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -41,12 +41,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("BusinessId", businessFieldDTO.BusinessId, DbType.Guid);
-                parameters.Add("FieldId", businessFieldDTO.FieldId, DbType.Guid);
+                parameters.Add("Name", fieldDTO.Name, DbType.String);
+                parameters.Add("Description", fieldDTO.Description, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", businessFieldDTO.CreateBy, DbType.Guid);
+                parameters.Add("CreateBy", fieldDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", businessFieldDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", fieldDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
@@ -56,13 +56,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
-        
+
         //DELETE
-        public async Task<int> DeleteBusinessFieldById(Guid businessFieldId)
+        public async Task<int> DeleteFieldById(Guid fieldId)
         {
             try
             {
-                var query = "UPDATE BusinessField "
+                var query = "UPDATE Field "
                     + "     SET "
                     + "         UpdateDate = @UpdateDate, "
                     //+ "         UpdateBy = @UpdateBy, "
@@ -73,7 +73,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 //parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", businessFieldId, DbType.Guid);
+                parameters.Add("Id", fieldId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -84,13 +84,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<BusinessField>> GetAllBusinessFields()
+        public async Task<List<Field>> GetAllFields()
         {
             try
             {
-                string query = "SELECT * FROM BusinessField";
+                string query = "SELECT * FROM Field";
                 using var connection = CreateConnection();
-                return (await connection.QueryAsync<BusinessField>(query)).ToList();
+                return (await connection.QueryAsync<Field>(query)).ToList();
             }
             catch (Exception e)
             {
@@ -99,15 +99,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET BY ID
-        public async Task<BusinessField> GetBusinessFieldById(Guid businessFieldId)
+        public async Task<Field> GetFieldById(Guid fieldId)
         {
             try
             {
-                string query = "SELECT * FROM BusinessField WHERE Id = @Id";
+                string query = "SELECT * FROM Field WHERE Id = @Id";
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", businessFieldId, DbType.Guid);
+                parameters.Add("Id", fieldId, DbType.Guid);
                 using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<BusinessField>(query, parameters);
+                return await connection.QueryFirstOrDefaultAsync<Field>(query, parameters);
             }
             catch (Exception e)
             {
@@ -116,14 +116,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdateBusinessField(BusinessField businessFieldDTO, Guid businessFieldId)
+        public async Task<int> UpdateField(Field fieldDTO, Guid fieldId)
         {
             try
             {
-                var query = "UPDATE BusinessField "
+                var query = "UPDATE Field "
                     + "     SET "
-                    + "         BusinessId = @BusinessId, "
-                    + "         FieldId = @FieldId, "
+                    + "         Name = @Name, "
+                    + "         Description = @Description, "
                     + "         CreateDate = @CreateDate, "
                     + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
@@ -133,14 +133,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("BusinessId", businessFieldDTO.BusinessId, DbType.Guid);
-                parameters.Add("FieldId", businessFieldDTO.FieldId, DbType.Guid);
-                parameters.Add("CreateDate", businessFieldDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", businessFieldDTO.CreateBy, DbType.Guid);
+                parameters.Add("Name", fieldDTO.Name, DbType.String);
+                parameters.Add("Description", fieldDTO.Description, DbType.String);
+                parameters.Add("CreateDate", fieldDTO.CreateDate, DbType.DateTime);
+                parameters.Add("CreateBy", fieldDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", businessFieldDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", businessFieldDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", businessFieldId, DbType.Guid);
+                parameters.Add("UpdateBy", fieldDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", fieldDTO.IsDeleted, DbType.Boolean);
+                parameters.Add("Id", fieldId, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {

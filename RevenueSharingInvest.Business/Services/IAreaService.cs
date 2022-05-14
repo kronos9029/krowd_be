@@ -14,6 +14,7 @@ namespace RevenueSharingInvest.Business.Services
 
         //READ
         public Task<List<AreaDTO>> GetAllAreas();
+        public Task<AreaDTO> GetAreaById(Guid areaId);
 
         //UPDATE
         public Task<int> UpdateArea(AreaDTO areaDTO, Guid areaId);

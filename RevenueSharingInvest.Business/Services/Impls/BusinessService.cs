@@ -95,6 +95,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return list;
         }
 
+        //GET BY ID
+        public async Task<BusinessDTO> GetBusinessById(Guid businessId)
+        {
+            BusinessDTO result;
+            try
+            {
+
+                RevenueSharingInvest.Data.Models.Entities.Business dto = await _businessRepository.GetBusinessById(businessId);
+                result = _mapper.Map<BusinessDTO>(dto);
+                if (result == null)
+                    throw new CreateObjectException("No Business Object Found!");
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         //UPDATE
         public async Task<int> UpdateBusiness(BusinessDTO businessDTO, Guid businessId)
         {

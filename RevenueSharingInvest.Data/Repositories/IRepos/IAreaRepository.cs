@@ -14,9 +14,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //READ
         public Task<List<Area>> GetAllAreas();
+        public Task<Area> GetAreaById(Guid areaId);
 
         //UPDATE
-        public Task<int> UpdateArea(Area areaDTO, Guid areaI);
+        public Task<int> UpdateArea(Area areaDTO, Guid areaId);
 
         //DELETE
         public Task<int> DeleteAreaById(Guid areaId);

@@ -41,6 +41,15 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetAreaById(Guid id)
+        {
+            AreaDTO dto = new AreaDTO();
+            dto = await _areaService.GetAreaById(id);
+            return Ok(dto);
+        }
+
         [HttpPut]
         public async Task<IActionResult> UpdateArea([FromBody] AreaDTO areaDTO, [FromQuery] Guid areaId)
         {

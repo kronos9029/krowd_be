@@ -39,6 +39,15 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetBusinessById(Guid id)
+        {
+            BusinessDTO dto = new BusinessDTO();
+            dto = await _businessService.GetBusinessById(id);
+            return Ok(dto);
+        }
+
         [HttpPut]
         public async Task<IActionResult> UpdateBusiness([FromBody] BusinessDTO businessDTO, [FromQuery] Guid businessId)
         {
