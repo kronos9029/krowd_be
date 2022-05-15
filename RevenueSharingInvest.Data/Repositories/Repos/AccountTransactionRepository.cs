@@ -12,30 +12,32 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
 {
-    public class InvestorWalletRepository : BaseRepository, IInvestorWalletRepository
+    public class AccountTransactionRepository : BaseRepository, IAccountTransactionRepository
     {
-        public InvestorWalletRepository(IConfiguration configuration) : base(configuration)
+        public AccountTransactionRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
         //CREATE
-        public async Task<int> CreateInvestorWallet(InvestorWallet investorWalletDTO)
+        public async Task<int> CreateAccountTransaction(AccountTransaction accountTransactionDTO)
         {
             try
             {
-                var query = "INSERT INTO InvestorWallet ("
-                    + "         InvestorId, "
-                    + "         Balance, "
-                    + "         WalletTypeId, "
+                var query = "INSERT INTO AccountTransaction ("
+                    + "         FromUserId, "
+                    + "         ToUserId, "
+                    + "         Description, "
+                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
                     + "     VALUES ( "
-                    + "         @InvestorId, "
-                    + "         @Balance, "
-                    + "         @WalletTypeId, "
+                    + "         @FromUserId, "
+                    + "         @ToUserId, "
+                    + "         @Description, "
+                    + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -43,13 +45,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("InvestorId", investorWalletDTO.InvestorId, DbType.Guid);
-                parameters.Add("Balance", investorWalletDTO.Balance, DbType.Double);
-                parameters.Add("WalletTypeId", investorWalletDTO.WalletTypeId, DbType.Guid);
+                parameters.Add("FromUserId", accountTransactionDTO.FromUserId, DbType.Guid);
+                parameters.Add("ToUserId", accountTransactionDTO.ToUserId, DbType.Guid);
+                parameters.Add("Description", accountTransactionDTO.Description, DbType.String);
+                parameters.Add("Status", accountTransactionDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", investorWalletDTO.CreateBy, DbType.Guid);
+                parameters.Add("CreateBy", accountTransactionDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", accountTransactionDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
@@ -61,11 +64,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteInvestorWalletById(Guid investorWalletId)//thiếu para UpdateBy
+        public async Task<int> DeleteAccountTransactionById(Guid accountTransactionId)//thiếu para UpdateBy
         {
             try
             {
-                var query = "UPDATE InvestorWallet "
+                var query = "UPDATE AccountTransaction "
                     + "     SET "
                     + "         UpdateDate = @UpdateDate, "
                     //+ "         UpdateBy = @UpdateBy, "
@@ -75,8 +78,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", investorWalletId, DbType.Guid);
+                //parameters.Add("UpdateBy", accountTransactionDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", accountTransactionId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -87,13 +90,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<InvestorWallet>> GetAllInvestorWallets()
+        public async Task<List<AccountTransaction>> GetAllAccountTransactions()
         {
             try
             {
-                string query = "SELECT * FROM InvestorWallet";
+                string query = "SELECT * FROM AccountTransaction";
                 using var connection = CreateConnection();
-                return (await connection.QueryAsync<InvestorWallet>(query)).ToList();
+                return (await connection.QueryAsync<AccountTransaction>(query)).ToList();
             }
             catch (Exception e)
             {
@@ -102,15 +105,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET BY ID
-        public async Task<InvestorWallet> GetInvestorWalletById(Guid investorWalletId)
+        public async Task<AccountTransaction> GetAccountTransactionById(Guid accountTransactionId)
         {
             try
             {
-                string query = "SELECT * FROM InvestorWallet WHERE Id = @Id";
+                string query = "SELECT * FROM AccountTransaction WHERE Id = @Id";
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", investorWalletId, DbType.Guid);
+                parameters.Add("Id", accountTransactionId, DbType.Guid);
                 using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<InvestorWallet>(query, parameters);
+                return await connection.QueryFirstOrDefaultAsync<AccountTransaction>(query, parameters);
             }
             catch (Exception e)
             {
@@ -119,15 +122,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdateInvestorWallet(InvestorWallet investorWalletDTO, Guid investorWalletId)
+        public async Task<int> UpdateAccountTransaction(AccountTransaction accountTransactionDTO, Guid accountTransactionId)
         {
             try
             {
-                var query = "UPDATE InvestorWallet "
+                var query = "UPDATE AccountTransaction "
                     + "     SET "
-                    + "         InvestorId = @InvestorId, "
-                    + "         Balance = @Balance, "
-                    + "         WalletTypeId = @WalletTypeId, "
+                    + "         FromUserId = @FromUserId, "
+                    + "         ToUserId = @ToUserId, "
+                    + "         Description = @Description, "
+                    + "         Status = @Status, "
                     + "         CreateDate = @CreateDate, "
                     + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
@@ -137,15 +141,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("InvestorId", investorWalletDTO.InvestorId, DbType.Guid);
-                parameters.Add("Balance", investorWalletDTO.Balance, DbType.Double);
-                parameters.Add("WalletTypeId", investorWalletDTO.WalletTypeId, DbType.Guid);
-                parameters.Add("CreateDate", investorWalletDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", investorWalletDTO.CreateBy, DbType.Guid);
+                parameters.Add("FromUserId", accountTransactionDTO.FromUserId, DbType.Guid);
+                parameters.Add("ToUserId", accountTransactionDTO.ToUserId, DbType.Guid);
+                parameters.Add("Description", accountTransactionDTO.Description, DbType.String);
+                parameters.Add("Status", accountTransactionDTO.Status, DbType.String);
+                parameters.Add("CreateDate", accountTransactionDTO.CreateDate, DbType.DateTime);
+                parameters.Add("CreateBy", accountTransactionDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", investorWalletDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", investorWalletId, DbType.Guid);
+                parameters.Add("UpdateBy", accountTransactionDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", accountTransactionDTO.IsDeleted, DbType.Boolean);
+                parameters.Add("Id", accountTransactionId, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {

@@ -14,12 +14,12 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //READ
         public Task<List<BusinessField>> GetAllBusinessFields();
-        public Task<BusinessField> GetBusinessFieldById(Guid businessFieldId);
+        public Task<BusinessField> GetBusinessFieldById(Guid businessId, Guid fieldId);
 
         //UPDATE
-        public Task<int> UpdateBusinessField(BusinessField businessFieldDTO, Guid businessFieldId);
+        public Task<int> UpdateBusinessField(BusinessField businessFieldDTO, Guid businessId, Guid fieldId);
 
         //DELETE
-        public Task<int> DeleteBusinessFieldById(Guid businessFieldId);
+        public Task<int> DeleteBusinessFieldById(Guid businessId, Guid fieldId);
     }
 }

@@ -12,28 +12,32 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
 {
-    public class BusinessFieldRepository : BaseRepository, IBusinessFieldRepository
+    public class PackageVoucherRepository : BaseRepository, IPackageVoucherRepository
     {
-        public BusinessFieldRepository(IConfiguration configuration) : base(configuration)
+        public PackageVoucherRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
         //CREATE
-        public async Task<int> CreateBusinessField(BusinessField businessFieldDTO)
+        public async Task<int> CreatePackageVoucher(PackageVoucher packageVoucherDTO)
         {
             try
             {
-                var query = "INSERT INTO BusinessField ("
-                    + "         BusinessId, "
-                    + "         FieldId, "
+                var query = "INSERT INTO PackageVoucher ("
+                    + "         PackageId, "
+                    + "         VoucherId, "
+                    + "         Quantity, "
+                    + "         MaxQuantity, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
                     + "     VALUES ( "
-                    + "         @BusinessId, "
-                    + "         @FieldId, "
+                    + "         @PackageId, "
+                    + "         @VoucherId, "
+                    + "         @Quantity, "
+                    + "         @MaxQuantity, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -41,12 +45,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("BusinessId", businessFieldDTO.BusinessId, DbType.Guid);
-                parameters.Add("FieldId", businessFieldDTO.FieldId, DbType.Guid);
+                parameters.Add("PackageId", packageVoucherDTO.PackageId, DbType.Guid);
+                parameters.Add("VoucherId", packageVoucherDTO.VoucherId, DbType.Guid);
+                parameters.Add("Quantity", packageVoucherDTO.Quantity, DbType.Int16);
+                parameters.Add("MaxQuantity", packageVoucherDTO.MaxQuantity, DbType.Int16);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", businessFieldDTO.CreateBy, DbType.Guid);
+                parameters.Add("CreateBy", packageVoucherDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", businessFieldDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", packageVoucherDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
@@ -56,26 +62,26 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
-        
+
         //DELETE
-        public async Task<int> DeleteBusinessFieldById(Guid businessId, Guid fieldId)
+        public async Task<int> DeletePackageVoucherById(Guid packageId,Guid voucherId)
         {
             try
             {
-                var query = "UPDATE BusinessField "
+                var query = "UPDATE PackageVoucher "
                     + "     SET "
                     + "         UpdateDate = @UpdateDate, "
                     //+ "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = 1 "
                     + "     WHERE "
-                    + "         BusinessId=@BusinessId "
-                    + "         AND FieldId=@FieldId";
+                    + "         PackageId=@PackageId "
+                    + "         AND VoucherId=@VoucherId";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 //parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
-                parameters.Add("BusinessId", businessId, DbType.Guid);
-                parameters.Add("FieldId", fieldId, DbType.Guid);
+                parameters.Add("PackageId", packageId, DbType.Guid);
+                parameters.Add("VoucherId", voucherId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -86,13 +92,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<BusinessField>> GetAllBusinessFields()
+        public async Task<List<PackageVoucher>> GetAllPackageVouchers()
         {
             try
             {
-                string query = "SELECT * FROM BusinessField";
+                string query = "SELECT * FROM PackageVoucher";
                 using var connection = CreateConnection();
-                return (await connection.QueryAsync<BusinessField>(query)).ToList();
+                return (await connection.QueryAsync<PackageVoucher>(query)).ToList();
             }
             catch (Exception e)
             {
@@ -101,16 +107,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET BY ID
-        public async Task<BusinessField> GetBusinessFieldById(Guid businessId, Guid fieldId)
+        public async Task<PackageVoucher> GetPackageVoucherById(Guid packageId, Guid voucherId)
         {
             try
             {
-                string query = "SELECT * FROM BusinessField WHERE BusinessId = @BusinessId AND FieldId = @FieldId";
+                string query = "SELECT * FROM PackageVoucher WHERE PackageId = @PackageId AND VoucherId = @VoucherId";
                 var parameters = new DynamicParameters();
-                parameters.Add("BusinessId", businessId, DbType.Guid);
-                parameters.Add("FieldId", fieldId, DbType.Guid);
+                parameters.Add("PackageId", packageId, DbType.Guid);
+                parameters.Add("VoucherId", voucherId, DbType.Guid);
                 using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<BusinessField>(query, parameters);
+                return await connection.QueryFirstOrDefaultAsync<PackageVoucher>(query, parameters);
             }
             catch (Exception e)
             {
@@ -119,33 +125,37 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdateBusinessField(BusinessField businessFieldDTO, Guid businessId, Guid fieldId)
+        public async Task<int> UpdatePackageVoucher(PackageVoucher packageVoucherDTO, Guid packageId, Guid voucherId)
         {
             try
             {
-                var query = "UPDATE BusinessField "
+                var query = "UPDATE PackageVoucher "
                     + "     SET "
-                    + "         BusinessId = @BusinessId, "
-                    + "         FieldId = @FieldId, "
+                    + "         PackageId = @PackageId, "
+                    + "         VoucherId = @VoucherId, "
+                    + "         Quantity = Quantity, "
+                    + "         MaxQuantity = MaxQuantity, "
                     + "         CreateDate = @CreateDate, "
                     + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
                     + "     WHERE "
-                    + "         BusinessId=@BId "
-                    + "         AND FieldId=@FId";
+                    + "         PackageId=@PId "
+                    + "         AND VoucherId=@VId";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("BusinessId", businessFieldDTO.BusinessId, DbType.Guid);
-                parameters.Add("FieldId", businessFieldDTO.FieldId, DbType.Guid);
-                parameters.Add("CreateDate", businessFieldDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", businessFieldDTO.CreateBy, DbType.Guid);
+                parameters.Add("PackageId", packageVoucherDTO.PackageId, DbType.Guid);
+                parameters.Add("VoucherId", packageVoucherDTO.VoucherId, DbType.Guid);
+                parameters.Add("Quantity", packageVoucherDTO.Quantity, DbType.Int16);
+                parameters.Add("MaxQuantity", packageVoucherDTO.MaxQuantity, DbType.Int16);
+                parameters.Add("CreateDate", packageVoucherDTO.CreateDate, DbType.DateTime);
+                parameters.Add("CreateBy", packageVoucherDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", businessFieldDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", businessFieldDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("BId", businessId, DbType.Guid);
-                parameters.Add("FId", fieldId, DbType.Guid);
+                parameters.Add("UpdateBy", packageVoucherDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", packageVoucherDTO.IsDeleted, DbType.Boolean);
+                parameters.Add("PId", packageId, DbType.Guid);
+                parameters.Add("VId", voucherId, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RevenueSharingInvest.Data.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,17 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 {
     public interface IInvestorWalletRepository
     {
-        public Task<float> GetInvestorTotalBalance(String ID);
+        //CREATE
+        public Task<int> CreateInvestorWallet(InvestorWallet investorWalletDTO);
+
+        //READ
+        public Task<List<InvestorWallet>> GetAllInvestorWallets();
+        public Task<InvestorWallet> GetInvestorWalletById(Guid investorWalletId);
+
+        //UPDATE
+        public Task<int> UpdateInvestorWallet(InvestorWallet investorWalletDTO, Guid investorWalletId);
+
+        //DELETE
+        public Task<int> DeleteInvestorWalletById(Guid investorWalletId);
     }
 }

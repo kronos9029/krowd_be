@@ -58,9 +58,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteInvestment([FromQuery] Guid investmentId)
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteInvestment(Guid id)
         {
-            var result = await _investmentService.DeleteInvestmentById(investmentId);
+            var result = await _investmentService.DeleteInvestmentById(id);
             return Ok(result);
         }
     }

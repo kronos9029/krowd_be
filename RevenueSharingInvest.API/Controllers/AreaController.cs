@@ -58,9 +58,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteArea([FromQuery] Guid areaId)
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteArea(Guid id)
         {
-            var result = await _areaService.DeleteAreaById(areaId);
+            var result = await _areaService.DeleteAreaById(id);
             return Ok(result);
         }
     }

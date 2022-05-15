@@ -58,9 +58,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteField([FromQuery] Guid fieldId)
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteField(Guid id)
         {
-            var result = await _fieldService.DeleteFieldById(fieldId);
+            var result = await _fieldService.DeleteFieldById(id);
             return Ok(result);
         }
     }

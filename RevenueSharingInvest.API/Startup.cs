@@ -57,6 +57,10 @@ namespace RevenueSharingInvest.API
             // Register your regular repositories
             // services.AddScoped<IDiameterRepository, DiameterRepository>();
 
+            //ACCOUNT TRANSACTION
+            services.AddScoped<IAccountTransactionService, AccountTransactionService>();
+            services.AddScoped<IAccountTransactionRepository, AccountTransactionRepository>();
+
             //AREA
             services.AddScoped<IAreaService, AreaService>();
             services.AddScoped<IAreaRepository, AreaRepository>();
@@ -77,19 +81,35 @@ namespace RevenueSharingInvest.API
             services.AddScoped<IInvestmentService, InvestmentService>();
             services.AddScoped<IInvestmentRepository, InvestmentRepository>();
 
+            //INVESTOR
+            services.AddScoped<IInvestorRepository, InvestorRepository>();
+            services.AddScoped<IInvestorService, InvestorService>();
+
+            //INVESTOR TYPE
+            services.AddScoped<IInvestorTypeRepository, InvestorTypeRepository>();
+            services.AddScoped<IInvestorTypeService, InvestorTypeService>();
+
+            //INVESTOR WALLET
+            services.AddScoped<IInvestorWalletRepository, InvestorWalletRepository>();
+            services.AddScoped<IInvestorWalletService, InvestorWalletService>();
+
+            //PACKAGE
+            services.AddScoped<IPackageRepository, PackageRepository>();
+            services.AddScoped<IPackageService, PackageService>();
+
+            //PACKAGE VOUCHER
+            services.AddScoped<IPackageVoucherRepository, PackageVoucherRepository>();
+            services.AddScoped<IPackageVoucherService, PackageVoucherService>();
+
+            //////////
+
             //PROJECT
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IProjectService, ProjectService>();
-                //INVESTOR
-            services.AddScoped<IInvestorRepository, InvestorRepository>();
-            services.AddScoped<IInvestorService, InvestorService>();
+                
                 //USER
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
-                //INVESTOR WALLET
-            services.AddScoped<IInvestorWalletRepository, InvestorWalletRepository>();
-                //INVESTMENT
-            services.AddScoped<IInvestmentService, InvestmentService>();
             
                 //STAGE
             services.AddScoped<IStageRepository, StageRepository>();

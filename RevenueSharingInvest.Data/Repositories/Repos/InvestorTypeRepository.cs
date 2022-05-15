@@ -12,30 +12,28 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
 {
-    public class InvestorWalletRepository : BaseRepository, IInvestorWalletRepository
+    public class InvestorTypeRepository : BaseRepository, IInvestorTypeRepository
     {
-        public InvestorWalletRepository(IConfiguration configuration) : base(configuration)
+        public InvestorTypeRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
         //CREATE
-        public async Task<int> CreateInvestorWallet(InvestorWallet investorWalletDTO)
+        public async Task<int> CreateInvestorType(InvestorType investorTypeDTO)
         {
             try
             {
-                var query = "INSERT INTO InvestorWallet ("
-                    + "         InvestorId, "
-                    + "         Balance, "
-                    + "         WalletTypeId, "
+                var query = "INSERT INTO InvestorType ("
+                    + "         Name, "
+                    + "         Description, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
                     + "     VALUES ( "
-                    + "         @InvestorId, "
-                    + "         @Balance, "
-                    + "         @WalletTypeId, "
+                    + "         @Name, "
+                    + "         @Description, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -43,13 +41,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("InvestorId", investorWalletDTO.InvestorId, DbType.Guid);
-                parameters.Add("Balance", investorWalletDTO.Balance, DbType.Double);
-                parameters.Add("WalletTypeId", investorWalletDTO.WalletTypeId, DbType.Guid);
+                parameters.Add("Name", investorTypeDTO.Name, DbType.String);
+                parameters.Add("Description", investorTypeDTO.Description, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", investorWalletDTO.CreateBy, DbType.Guid);
+                parameters.Add("CreateBy", investorTypeDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", investorTypeDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
@@ -61,11 +58,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteInvestorWalletById(Guid investorWalletId)//thiếu para UpdateBy
+        public async Task<int> DeleteInvestorTypeById(Guid investorTypeId)//thiếu para UpdateBy
         {
             try
             {
-                var query = "UPDATE InvestorWallet "
+                var query = "UPDATE InvestorType "
                     + "     SET "
                     + "         UpdateDate = @UpdateDate, "
                     //+ "         UpdateBy = @UpdateBy, "
@@ -75,8 +72,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", investorWalletId, DbType.Guid);
+                //parameters.Add("UpdateBy", investorTypeDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", investorTypeId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -87,13 +84,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<InvestorWallet>> GetAllInvestorWallets()
+        public async Task<List<InvestorType>> GetAllInvestorTypes()
         {
             try
             {
-                string query = "SELECT * FROM InvestorWallet";
+                string query = "SELECT * FROM InvestorType";
                 using var connection = CreateConnection();
-                return (await connection.QueryAsync<InvestorWallet>(query)).ToList();
+                return (await connection.QueryAsync<InvestorType>(query)).ToList();
             }
             catch (Exception e)
             {
@@ -102,15 +99,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET BY ID
-        public async Task<InvestorWallet> GetInvestorWalletById(Guid investorWalletId)
+        public async Task<InvestorType> GetInvestorTypeById(Guid investorTypeId)
         {
             try
             {
-                string query = "SELECT * FROM InvestorWallet WHERE Id = @Id";
+                string query = "SELECT * FROM InvestorType WHERE Id = @Id";
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", investorWalletId, DbType.Guid);
+                parameters.Add("Id", investorTypeId, DbType.Guid);
                 using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<InvestorWallet>(query, parameters);
+                return await connection.QueryFirstOrDefaultAsync<InvestorType>(query, parameters);
             }
             catch (Exception e)
             {
@@ -119,15 +116,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdateInvestorWallet(InvestorWallet investorWalletDTO, Guid investorWalletId)
+        public async Task<int> UpdateInvestorType(InvestorType investorTypeDTO, Guid investorTypeId)
         {
             try
             {
-                var query = "UPDATE InvestorWallet "
+                var query = "UPDATE InvestorType "
                     + "     SET "
-                    + "         InvestorId = @InvestorId, "
-                    + "         Balance = @Balance, "
-                    + "         WalletTypeId = @WalletTypeId, "
+                    + "         Name = @Name, "
+                    + "         Description = @Description, "
                     + "         CreateDate = @CreateDate, "
                     + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
@@ -137,15 +133,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("InvestorId", investorWalletDTO.InvestorId, DbType.Guid);
-                parameters.Add("Balance", investorWalletDTO.Balance, DbType.Double);
-                parameters.Add("WalletTypeId", investorWalletDTO.WalletTypeId, DbType.Guid);
-                parameters.Add("CreateDate", investorWalletDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", investorWalletDTO.CreateBy, DbType.Guid);
+                parameters.Add("Name", investorTypeDTO.Name, DbType.String);
+                parameters.Add("Description", investorTypeDTO.Description, DbType.String);
+                parameters.Add("CreateDate", investorTypeDTO.CreateDate, DbType.DateTime);
+                parameters.Add("CreateBy", investorTypeDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", investorWalletDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", investorWalletId, DbType.Guid);
+                parameters.Add("UpdateBy", investorTypeDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", investorTypeDTO.IsDeleted, DbType.Boolean);
+                parameters.Add("Id", investorTypeId, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {

@@ -26,7 +26,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
-        public Guid? UpDateBy { get; set; }
+        public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
 
         [ForeignKey(nameof(InvestorId))]

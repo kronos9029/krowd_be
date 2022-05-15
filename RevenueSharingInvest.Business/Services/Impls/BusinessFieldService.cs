@@ -35,13 +35,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //DELETE    
-        public async Task<int> DeleteBusinessFieldById(Guid businessFieldId)
+        public async Task<int> DeleteBusinessFieldById(Guid businessId, Guid fieldId)
         {
             int result;
             try
             {
 
-                result = await _businessFieldRepository.DeleteBusinessFieldById(businessFieldId);
+                result = await _businessFieldRepository.DeleteBusinessFieldById(businessId, fieldId);
                 if (result == 0)
                     throw new CreateObjectException("Can not delete BusinessField Object!");
                 return result;
@@ -61,13 +61,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET BY ID
-        public async Task<BusinessFieldDTO> GetBusinessFieldById(Guid businessFieldId)
+        public async Task<BusinessFieldDTO> GetBusinessFieldById(Guid businessId, Guid fieldId)
         {
             BusinessFieldDTO result;
             try
             {
 
-                BusinessField dto = await _businessFieldRepository.GetBusinessFieldById(businessFieldId);
+                BusinessField dto = await _businessFieldRepository.GetBusinessFieldById(businessId, fieldId);
                 result = _mapper.Map<BusinessFieldDTO>(dto);
                 if (result == null)
                     throw new CreateObjectException("No BusinessField Object Found!");
@@ -80,13 +80,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdateBusinessField(BusinessFieldDTO businessFieldDTO, Guid businessFieldId)
+        public async Task<int> UpdateBusinessField(BusinessFieldDTO businessFieldDTO, Guid businessId, Guid fieldId)
         {
             int result;
             try
             {
                 BusinessField dto = _mapper.Map<BusinessField>(businessFieldDTO);
-                result = await _businessFieldRepository.UpdateBusinessField(dto, businessFieldId);
+                result = await _businessFieldRepository.UpdateBusinessField(dto, businessId, fieldId);
                 if (result == 0)
                     throw new CreateObjectException("Can not update BusinessField Object!");
                 return result;
