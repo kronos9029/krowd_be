@@ -7,19 +7,19 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.IRepos
 {
-    public interface IRoleRepository
+    public interface IRiskRepository
     {
         //CREATE
-        public Task<int> CreateRole(Role roleDTO);
+        public Task<int> CreateRisk(Risk riskDTO);
 
         //READ
-        public Task<List<Role>> GetAllRoles();
-        public Task<Role> GetRoleById(Guid roleId);
+        public Task<List<Risk>> GetAllRisks();
+        public Task<Risk> GetRiskById(Guid riskId);
 
         //UPDATE
-        public Task<int> UpdateRole(Role roleDTO, Guid roleId);
+        public Task<int> UpdateRisk(Risk riskDTO, Guid riskId);
 
         //DELETE
-        public Task<int> DeleteRoleById(Guid roleId);
+        public Task<int> DeleteRiskById(Guid riskId);
     }
 }

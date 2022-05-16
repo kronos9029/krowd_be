@@ -31,7 +31,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Description, "
                     + "         Category, "
                     + "         Address, "
-                    + "         AreaId, "
+                    + "         ProjectId, "
                     + "         InvestmentTargetCapital, "
                     + "         InvestedCapital, "
                     + "         SharedRevenue, "
@@ -58,7 +58,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @Description, "
                     + "         @Category, "
                     + "         @Address, "
-                    + "         @AreaId, "
+                    + "         @ProjectId, "
                     + "         @InvestmentTargetCapital, "
                     + "         @InvestedCapital, "
                     + "         @SharedRevenue, "
@@ -80,7 +80,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("ManagerId", projectDTO.ManagerId, DbType.Guid);
-                parameters.Add("BusinessId", projectDTO .BusinessId, DbType.Guid);
+                parameters.Add("BusinessId", projectDTO.BusinessId, DbType.Guid);
                 parameters.Add("Name", projectDTO.Name, DbType.String);
                 parameters.Add("Image", projectDTO.Image, DbType.String);
                 parameters.Add("Description", projectDTO.Description, DbType.String);
@@ -115,15 +115,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteProjectById(Guid projectId)
+        public async Task<int> DeleteProjectById(Guid projectId)//thiếu para UpdateBy
         {
             try
             {
-                var query = "UPDATE Project SET IsDeleted=1, UpdateDate = @UpdateDate WHERE Id=@Id";
+                var query = "UPDATE Project "
+                    + "     SET "
+                    + "         UpdateDate = @UpdateDate, "
+                    //+ "         UpdateBy = @UpdateBy, "
+                    + "         IsDeleted = 1 "
+                    + "     WHERE "
+                    + "         Id=@Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", projectId, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                //parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", projectId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -148,6 +155,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET BY ID
+        public async Task<Project> GetProjectById(Guid projectId)
+        {
+            try
+            {
+                string query = "SELECT * FROM Project WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Project>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //UPDATE
         public async Task<int> UpdateProject(Project projectDTO, Guid projectId)
         {
@@ -162,7 +186,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Description = @Description, "
                     + "         Category = @Category, "
                     + "         Address = @Address, "
-                    + "         AreaId = @AreaId, "
+                    + "         ProjectId = @ProjectId, "
                     + "         InvestmentTargetCapital = @InvestmentTargetCapital, "
                     + "         InvestedCapital = @InvestedCapital, "
                     + "         SharedRevenue = @SharedRevenue, "
@@ -224,8 +248,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        
 
-        
     }
 }

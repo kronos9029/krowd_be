@@ -11,28 +11,28 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
-    public class ProjectService : IProjectService
+    public class PaymentService : IPaymentService
     {
-        private readonly IProjectRepository _projectRepository;
+        private readonly IPaymentRepository _paymentRepository;
         private readonly IMapper _mapper;
 
 
-        public ProjectService(IProjectRepository projectRepository, IMapper mapper)
+        public PaymentService(IPaymentRepository paymentRepository, IMapper mapper)
         {
-            _projectRepository = projectRepository;
+            _paymentRepository = paymentRepository;
             _mapper = mapper;
         }
 
         //CREATE
-        public async Task<int> CreateProject(ProjectDTO projectDTO)
+        public async Task<int> CreatePayment(PaymentDTO paymentDTO)
         {
             int result;
             try
             {
-                Project dto = _mapper.Map<Project>(projectDTO);
-                result = await _projectRepository.CreateProject(dto);
+                Payment dto = _mapper.Map<Payment>(paymentDTO);
+                result = await _paymentRepository.CreatePayment(dto);
                 if (result == 0)
-                    throw new CreateObjectException("Can not create Project Object!");
+                    throw new CreateObjectException("Can not create Payment Object!");
                 return result;
             }
             catch (Exception e)
@@ -42,15 +42,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //DELETE
-        public async Task<int> DeleteProjectById(Guid projectId)
+        public async Task<int> DeletePaymentById(Guid paymentId)
         {
             int result;
             try
             {
 
-                result = await _projectRepository.DeleteProjectById(projectId);
+                result = await _paymentRepository.DeletePaymentById(paymentId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not delete Project Object!");
+                    throw new CreateObjectException("Can not delete Payment Object!");
                 return result;
             }
             catch (Exception e)
@@ -60,24 +60,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<ProjectDTO>> GetAllProjects()
+        public async Task<List<PaymentDTO>> GetAllPayments()
         {
-            List<Project> projectList = await _projectRepository.GetAllProjects();
-            List<ProjectDTO> list = _mapper.Map<List<ProjectDTO>>(projectList);
+            List<Payment> paymentList = await _paymentRepository.GetAllPayments();
+            List<PaymentDTO> list = _mapper.Map<List<PaymentDTO>>(paymentList);
             return list;
         }
 
         //GET BY ID
-        public async Task<ProjectDTO> GetProjectById(Guid projectId)
+        public async Task<PaymentDTO> GetPaymentById(Guid paymentId)
         {
-            ProjectDTO result;
+            PaymentDTO result;
             try
             {
 
-                Project dto = await _projectRepository.GetProjectById(projectId);
-                result = _mapper.Map<ProjectDTO>(dto);
+                Payment dto = await _paymentRepository.GetPaymentById(paymentId);
+                result = _mapper.Map<PaymentDTO>(dto);
                 if (result == null)
-                    throw new CreateObjectException("No Project Object Found!");
+                    throw new CreateObjectException("No Payment Object Found!");
                 return result;
             }
             catch (Exception e)
@@ -87,15 +87,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdateProject(ProjectDTO projectDTO, Guid projectId)
+        public async Task<int> UpdatePayment(PaymentDTO paymentDTO, Guid paymentId)
         {
             int result;
             try
             {
-                Project dto = _mapper.Map<Project>(projectDTO);
-                result = await _projectRepository.UpdateProject(dto, projectId);
+                Payment dto = _mapper.Map<Payment>(paymentDTO);
+                result = await _paymentRepository.UpdatePayment(dto, paymentId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not update Project Object!");
+                    throw new CreateObjectException("Can not update Payment Object!");
                 return result;
             }
             catch (Exception e)

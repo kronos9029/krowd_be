@@ -9,6 +9,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class ProjectDTO
     {
         public string id { get; set; }
+        public string managerId { get; set; }
         public string businessId { get; set; }
         public string name { get; set; }
         public string image { get; set; }
@@ -21,7 +22,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public float sharedRevenue { get; set; }
         public float multiplier { get; set; }
         public int duration { get; set; }
-        public int numOfPeriod { get; set; }
+        public int numOfStage { get; set; }
         public float remainAmount { get; set; }
         public DateTime startDate { get; set; }
         public DateTime endDate { get; set; }

@@ -12,28 +12,38 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
 {
-    public class RoleRepository : BaseRepository, IRoleRepository
+    public class PaymentRepository : BaseRepository, IPaymentRepository
     {
-        public RoleRepository(IConfiguration configuration) : base(configuration)
+        public PaymentRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
         //CREATE
-        public async Task<int> CreateRole(Role roleDTO)
+        public async Task<int> CreatePayment(Payment paymentDTO)
         {
             try
             {
-                var query = "INSERT INTO Role ("
-                    + "         Name, "
+                var query = "INSERT INTO Payment ("
+                    + "         InvestmentId, "
+                    + "         PeriodRevenueId, "
+                    + "         Amount, "
                     + "         Description, "
+                    + "         Type, "
+                    + "         FromId, "
+                    + "         ToId, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
                     + "     VALUES ( "
-                    + "         @Name, "
+                    + "         @InvestmentId, "
+                    + "         @PeriodRevenueId, "
+                    + "         @Amount, "
                     + "         @Description, "
+                    + "         @Type, "
+                    + "         @FromId, "
+                    + "         @ToId, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -41,12 +51,17 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("Name", roleDTO.Name, DbType.String);
-                parameters.Add("Description", roleDTO.Description, DbType.String);
+                parameters.Add("InvestmentId", paymentDTO.InvestmentId, DbType.Guid);
+                parameters.Add("PeriodRevenueId", paymentDTO.PeriodRevenueId, DbType.Guid);
+                parameters.Add("Amount", paymentDTO.Amount, DbType.Double);
+                parameters.Add("Description", paymentDTO.Description, DbType.String);
+                parameters.Add("Type", paymentDTO.Type, DbType.String);
+                parameters.Add("FromId", paymentDTO.FromId, DbType.Guid);
+                parameters.Add("ToId", paymentDTO.ToId, DbType.Guid);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", roleDTO.CreateBy, DbType.Guid);
+                parameters.Add("CreateBy", paymentDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", paymentDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
@@ -58,11 +73,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteRoleById(Guid roleId)//thiếu para UpdateBy
+        public async Task<int> DeletePaymentById(Guid paymentId)//thiếu para UpdateBy
         {
             try
             {
-                var query = "UPDATE Role "
+                var query = "UPDATE Payment "
                     + "     SET "
                     + "         UpdateDate = @UpdateDate, "
                     //+ "         UpdateBy = @UpdateBy, "
@@ -72,8 +87,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", roleId, DbType.Guid);
+                //parameters.Add("UpdateBy", paymentDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", paymentId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -84,13 +99,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Role>> GetAllRoles()
+        public async Task<List<Payment>> GetAllPayments()
         {
             try
             {
-                string query = "SELECT * FROM Role";
+                string query = "SELECT * FROM Payment";
                 using var connection = CreateConnection();
-                return (await connection.QueryAsync<Role>(query)).ToList();
+                return (await connection.QueryAsync<Payment>(query)).ToList();
             }
             catch (Exception e)
             {
@@ -99,15 +114,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET BY ID
-        public async Task<Role> GetRoleById(Guid roleId)
+        public async Task<Payment> GetPaymentById(Guid paymentId)
         {
             try
             {
-                string query = "SELECT * FROM Role WHERE Id = @Id";
+                string query = "SELECT * FROM Payment WHERE Id = @Id";
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", roleId, DbType.Guid);
+                parameters.Add("Id", paymentId, DbType.Guid);
                 using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<Role>(query, parameters);
+                return await connection.QueryFirstOrDefaultAsync<Payment>(query, parameters);
             }
             catch (Exception e)
             {
@@ -116,14 +131,19 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdateRole(Role roleDTO, Guid roleId)
+        public async Task<int> UpdatePayment(Payment paymentDTO, Guid paymentId)
         {
             try
             {
-                var query = "UPDATE Role "
+                var query = "UPDATE Payment "
                     + "     SET "
-                    + "         Name = @Name, "
+                    + "         InvestmentId = @InvestmentId, "
+                    + "         PeriodRevenueId = @PeriodRevenueId, "
+                    + "         Amount = @Amount, "
                     + "         Description = @Description, "
+                    + "         Type = @Type, "
+                    + "         FromId = @FromId, "
+                    + "         ToId = @ToId, "
                     + "         CreateDate = @CreateDate, "
                     + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
@@ -133,14 +153,19 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("Name", roleDTO.Name, DbType.String);
-                parameters.Add("Description", roleDTO.Description, DbType.String);
-                parameters.Add("CreateDate", roleDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", roleDTO.CreateBy, DbType.Guid);
+                parameters.Add("InvestmentId", paymentDTO.InvestmentId, DbType.Guid);
+                parameters.Add("PeriodRevenueId", paymentDTO.PeriodRevenueId, DbType.Guid);
+                parameters.Add("Amount", paymentDTO.Amount, DbType.Double);
+                parameters.Add("Description", paymentDTO.Description, DbType.String);
+                parameters.Add("Type", paymentDTO.Type, DbType.String);
+                parameters.Add("FromId", paymentDTO.FromId, DbType.Guid);
+                parameters.Add("ToId", paymentDTO.ToId, DbType.Guid);
+                parameters.Add("CreateDate", paymentDTO.CreateDate, DbType.DateTime);
+                parameters.Add("CreateBy", paymentDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", roleDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", roleId, DbType.Guid);
+                parameters.Add("UpdateBy", paymentDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", paymentDTO.IsDeleted, DbType.Boolean);
+                parameters.Add("Id", paymentId, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {

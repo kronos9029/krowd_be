@@ -12,18 +12,18 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
 {
-    public class RoleRepository : BaseRepository, IRoleRepository
+    public class RiskTypeRepository : BaseRepository, IRiskTypeRepository
     {
-        public RoleRepository(IConfiguration configuration) : base(configuration)
+        public RiskTypeRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
         //CREATE
-        public async Task<int> CreateRole(Role roleDTO)
+        public async Task<int> CreateRiskType(RiskType riskTypeDTO)
         {
             try
             {
-                var query = "INSERT INTO Role ("
+                var query = "INSERT INTO RiskType ("
                     + "         Name, "
                     + "         Description, "
                     + "         CreateDate, "
@@ -41,12 +41,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("Name", roleDTO.Name, DbType.String);
-                parameters.Add("Description", roleDTO.Description, DbType.String);
+                parameters.Add("Name", riskTypeDTO.Name, DbType.String);
+                parameters.Add("Description", riskTypeDTO.Description, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", roleDTO.CreateBy, DbType.Guid);
+                parameters.Add("CreateBy", riskTypeDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", riskTypeDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
@@ -58,11 +58,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteRoleById(Guid roleId)//thiếu para UpdateBy
+        public async Task<int> DeleteRiskTypeById(Guid riskTypeId)//thiếu para UpdateBy
         {
             try
             {
-                var query = "UPDATE Role "
+                var query = "UPDATE RiskType "
                     + "     SET "
                     + "         UpdateDate = @UpdateDate, "
                     //+ "         UpdateBy = @UpdateBy, "
@@ -72,8 +72,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", roleId, DbType.Guid);
+                //parameters.Add("UpdateBy", riskTypeDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", riskTypeId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -84,13 +84,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Role>> GetAllRoles()
+        public async Task<List<RiskType>> GetAllRiskTypes()
         {
             try
             {
-                string query = "SELECT * FROM Role";
+                string query = "SELECT * FROM RiskType";
                 using var connection = CreateConnection();
-                return (await connection.QueryAsync<Role>(query)).ToList();
+                return (await connection.QueryAsync<RiskType>(query)).ToList();
             }
             catch (Exception e)
             {
@@ -99,15 +99,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET BY ID
-        public async Task<Role> GetRoleById(Guid roleId)
+        public async Task<RiskType> GetRiskTypeById(Guid riskTypeId)
         {
             try
             {
-                string query = "SELECT * FROM Role WHERE Id = @Id";
+                string query = "SELECT * FROM RiskType WHERE Id = @Id";
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", roleId, DbType.Guid);
+                parameters.Add("Id", riskTypeId, DbType.Guid);
                 using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<Role>(query, parameters);
+                return await connection.QueryFirstOrDefaultAsync<RiskType>(query, parameters);
             }
             catch (Exception e)
             {
@@ -116,11 +116,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdateRole(Role roleDTO, Guid roleId)
+        public async Task<int> UpdateRiskType(RiskType riskTypeDTO, Guid riskTypeId)
         {
             try
             {
-                var query = "UPDATE Role "
+                var query = "UPDATE RiskType "
                     + "     SET "
                     + "         Name = @Name, "
                     + "         Description = @Description, "
@@ -133,14 +133,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("Name", roleDTO.Name, DbType.String);
-                parameters.Add("Description", roleDTO.Description, DbType.String);
-                parameters.Add("CreateDate", roleDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", roleDTO.CreateBy, DbType.Guid);
+                parameters.Add("Name", riskTypeDTO.Name, DbType.String);
+                parameters.Add("Description", riskTypeDTO.Description, DbType.String);
+                parameters.Add("CreateDate", riskTypeDTO.CreateDate, DbType.DateTime);
+                parameters.Add("CreateBy", riskTypeDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", roleDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", roleId, DbType.Guid);
+                parameters.Add("UpdateBy", riskTypeDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", riskTypeDTO.IsDeleted, DbType.Boolean);
+                parameters.Add("Id", riskTypeId, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {

@@ -26,7 +26,6 @@ namespace RevenueSharingInvest.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
-
         [HttpPost]
         public async Task<IActionResult> CreateProject([FromBody] ProjectDTO projectDTO)
         {
@@ -35,11 +34,20 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProject()
+        public async Task<IActionResult> GetAllProjects()
         {
             var result = new List<ProjectDTO>();
             result = await _projectService.GetAllProjects();
             return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetProjectById(Guid id)
+        {
+            ProjectDTO dto = new ProjectDTO();
+            dto = await _projectService.GetProjectById(id);
+            return Ok(dto);
         }
 
         [HttpPut]
@@ -50,10 +58,11 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteProject([FromQuery]Guid projectId)
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteProject(Guid id)
         {
-                var result = await _projectService.DeleteProjectById(projectId);
-                return Ok(result);
+            var result = await _projectService.DeleteProjectById(id);
+            return Ok(result);
         }
     }
 }

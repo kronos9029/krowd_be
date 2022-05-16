@@ -12,20 +12,22 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
 {
-    public class RoleRepository : BaseRepository, IRoleRepository
+    public class PeriodRevenueHistoryRepository : BaseRepository, IPeriodRevenueHistoryRepository
     {
-        public RoleRepository(IConfiguration configuration) : base(configuration)
+        public PeriodRevenueHistoryRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
         //CREATE
-        public async Task<int> CreateRole(Role roleDTO)
+        public async Task<int> CreatePeriodRevenueHistory(PeriodRevenueHistory periodRevenueHistoryDTO)
         {
             try
             {
-                var query = "INSERT INTO Role ("
+                var query = "INSERT INTO PeriodRevenueHistory ("
                     + "         Name, "
+                    + "         PeriodRevenueId, "
                     + "         Description, "
+                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -33,7 +35,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         IsDeleted ) "
                     + "     VALUES ( "
                     + "         @Name, "
+                    + "         @PeriodRevenueId, "
                     + "         @Description, "
+                    + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -41,12 +45,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("Name", roleDTO.Name, DbType.String);
-                parameters.Add("Description", roleDTO.Description, DbType.String);
+                parameters.Add("Name", periodRevenueHistoryDTO.Name, DbType.String);
+                parameters.Add("PeriodRevenueId", periodRevenueHistoryDTO.PeriodRevenueId, DbType.Guid);
+                parameters.Add("Description", periodRevenueHistoryDTO.Description, DbType.String);
+                parameters.Add("Status", periodRevenueHistoryDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", roleDTO.CreateBy, DbType.Guid);
+                parameters.Add("CreateBy", periodRevenueHistoryDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", periodRevenueHistoryDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
@@ -58,11 +64,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteRoleById(Guid roleId)//thiếu para UpdateBy
+        public async Task<int> DeletePeriodRevenueHistoryById(Guid periodRevenueHistoryId)//thiếu para UpdateBy
         {
             try
             {
-                var query = "UPDATE Role "
+                var query = "UPDATE PeriodRevenueHistory "
                     + "     SET "
                     + "         UpdateDate = @UpdateDate, "
                     //+ "         UpdateBy = @UpdateBy, "
@@ -72,8 +78,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", roleId, DbType.Guid);
+                //parameters.Add("UpdateBy", periodRevenueHistoryDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", periodRevenueHistoryId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -84,13 +90,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Role>> GetAllRoles()
+        public async Task<List<PeriodRevenueHistory>> GetAllPeriodRevenueHistorys()
         {
             try
             {
-                string query = "SELECT * FROM Role";
+                string query = "SELECT * FROM PeriodRevenueHistory";
                 using var connection = CreateConnection();
-                return (await connection.QueryAsync<Role>(query)).ToList();
+                return (await connection.QueryAsync<PeriodRevenueHistory>(query)).ToList();
             }
             catch (Exception e)
             {
@@ -99,15 +105,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET BY ID
-        public async Task<Role> GetRoleById(Guid roleId)
+        public async Task<PeriodRevenueHistory> GetPeriodRevenueHistoryById(Guid periodRevenueHistoryId)
         {
             try
             {
-                string query = "SELECT * FROM Role WHERE Id = @Id";
+                string query = "SELECT * FROM PeriodRevenueHistory WHERE Id = @Id";
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", roleId, DbType.Guid);
+                parameters.Add("Id", periodRevenueHistoryId, DbType.Guid);
                 using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<Role>(query, parameters);
+                return await connection.QueryFirstOrDefaultAsync<PeriodRevenueHistory>(query, parameters);
             }
             catch (Exception e)
             {
@@ -116,14 +122,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdateRole(Role roleDTO, Guid roleId)
+        public async Task<int> UpdatePeriodRevenueHistory(PeriodRevenueHistory periodRevenueHistoryDTO, Guid periodRevenueHistoryId)
         {
             try
             {
-                var query = "UPDATE Role "
+                var query = "UPDATE PeriodRevenueHistory "
                     + "     SET "
                     + "         Name = @Name, "
+                    + "         PeriodRevenueId = @PeriodRevenueId, "
                     + "         Description = @Description, "
+                    + "         Status = @Status, "
                     + "         CreateDate = @CreateDate, "
                     + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
@@ -133,14 +141,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("Name", roleDTO.Name, DbType.String);
-                parameters.Add("Description", roleDTO.Description, DbType.String);
-                parameters.Add("CreateDate", roleDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", roleDTO.CreateBy, DbType.Guid);
+                parameters.Add("Name", periodRevenueHistoryDTO.Name, DbType.String);
+                parameters.Add("PeriodRevenueId", periodRevenueHistoryDTO.PeriodRevenueId, DbType.Guid);
+                parameters.Add("Description", periodRevenueHistoryDTO.Description, DbType.String);
+                parameters.Add("Status", periodRevenueHistoryDTO.Status, DbType.String);
+                parameters.Add("CreateDate", periodRevenueHistoryDTO.CreateDate, DbType.DateTime);
+                parameters.Add("CreateBy", periodRevenueHistoryDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", roleDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", roleId, DbType.Guid);
+                parameters.Add("UpdateBy", periodRevenueHistoryDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", periodRevenueHistoryDTO.IsDeleted, DbType.Boolean);
+                parameters.Add("Id", periodRevenueHistoryId, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {

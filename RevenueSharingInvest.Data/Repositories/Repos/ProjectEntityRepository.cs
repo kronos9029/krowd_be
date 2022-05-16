@@ -12,28 +12,34 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
 {
-    public class RoleRepository : BaseRepository, IRoleRepository
+    public class ProjectEntityRepository : BaseRepository, IProjectEntityRepository
     {
-        public RoleRepository(IConfiguration configuration) : base(configuration)
+        public ProjectEntityRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
         //CREATE
-        public async Task<int> CreateRole(Role roleDTO)
+        public async Task<int> CreateProjectEntity(ProjectEntity projectEntityDTO)
         {
             try
             {
-                var query = "INSERT INTO Role ("
-                    + "         Name, "
+                var query = "INSERT INTO ProjectEntity ("
+                    + "         ProjectId, "
+                    + "         Title, "
+                    + "         Image, "
                     + "         Description, "
+                    + "         Type, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
                     + "     VALUES ( "
-                    + "         @Name, "
+                    + "         @ProjectId, "
+                    + "         @Title, "
+                    + "         @Image, "
                     + "         @Description, "
+                    + "         @Type, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -41,12 +47,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("Name", roleDTO.Name, DbType.String);
-                parameters.Add("Description", roleDTO.Description, DbType.String);
+                parameters.Add("ProjectId", projectEntityDTO.ProjectId, DbType.Guid);
+                parameters.Add("Title", projectEntityDTO.Title, DbType.String);
+                parameters.Add("Image", projectEntityDTO.Image, DbType.String);
+                parameters.Add("Description", projectEntityDTO.Description, DbType.String);
+                parameters.Add("Type", projectEntityDTO.Type, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", roleDTO.CreateBy, DbType.Guid);
+                parameters.Add("CreateBy", projectEntityDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", projectEntityDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
@@ -58,11 +67,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteRoleById(Guid roleId)//thiếu para UpdateBy
+        public async Task<int> DeleteProjectEntityById(Guid projectEntityId)//thiếu para UpdateBy
         {
             try
             {
-                var query = "UPDATE Role "
+                var query = "UPDATE ProjectEntity "
                     + "     SET "
                     + "         UpdateDate = @UpdateDate, "
                     //+ "         UpdateBy = @UpdateBy, "
@@ -72,8 +81,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", roleId, DbType.Guid);
+                //parameters.Add("UpdateBy", projectEntityDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", projectEntityId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -84,13 +93,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Role>> GetAllRoles()
+        public async Task<List<ProjectEntity>> GetAllProjectEntitys()
         {
             try
             {
-                string query = "SELECT * FROM Role";
+                string query = "SELECT * FROM ProjectEntity";
                 using var connection = CreateConnection();
-                return (await connection.QueryAsync<Role>(query)).ToList();
+                return (await connection.QueryAsync<ProjectEntity>(query)).ToList();
             }
             catch (Exception e)
             {
@@ -99,15 +108,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET BY ID
-        public async Task<Role> GetRoleById(Guid roleId)
+        public async Task<ProjectEntity> GetProjectEntityById(Guid projectEntityId)
         {
             try
             {
-                string query = "SELECT * FROM Role WHERE Id = @Id";
+                string query = "SELECT * FROM ProjectEntity WHERE Id = @Id";
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", roleId, DbType.Guid);
+                parameters.Add("Id", projectEntityId, DbType.Guid);
                 using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<Role>(query, parameters);
+                return await connection.QueryFirstOrDefaultAsync<ProjectEntity>(query, parameters);
             }
             catch (Exception e)
             {
@@ -116,14 +125,17 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdateRole(Role roleDTO, Guid roleId)
+        public async Task<int> UpdateProjectEntity(ProjectEntity projectEntityDTO, Guid projectEntityId)
         {
             try
             {
-                var query = "UPDATE Role "
+                var query = "UPDATE ProjectEntity "
                     + "     SET "
-                    + "         Name = @Name, "
+                    + "         ProjectId = @ProjectId, "
+                    + "         Title = @Title, "
+                    + "         Image = @Image, "
                     + "         Description = @Description, "
+                    + "         Type = @Type, "
                     + "         CreateDate = @CreateDate, "
                     + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
@@ -133,14 +145,17 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("Name", roleDTO.Name, DbType.String);
-                parameters.Add("Description", roleDTO.Description, DbType.String);
-                parameters.Add("CreateDate", roleDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", roleDTO.CreateBy, DbType.Guid);
+                parameters.Add("ProjectId", projectEntityDTO.ProjectId, DbType.Guid);
+                parameters.Add("Title", projectEntityDTO.Title, DbType.String);
+                parameters.Add("Image", projectEntityDTO.Image, DbType.String);
+                parameters.Add("Description", projectEntityDTO.Description, DbType.String);
+                parameters.Add("Type", projectEntityDTO.Type, DbType.String);
+                parameters.Add("CreateDate", projectEntityDTO.CreateDate, DbType.DateTime);
+                parameters.Add("CreateBy", projectEntityDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", roleDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", roleId, DbType.Guid);
+                parameters.Add("UpdateBy", projectEntityDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", projectEntityDTO.IsDeleted, DbType.Boolean);
+                parameters.Add("Id", projectEntityId, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {

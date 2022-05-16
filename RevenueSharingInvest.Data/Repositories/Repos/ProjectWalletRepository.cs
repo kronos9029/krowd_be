@@ -12,28 +12,30 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
 {
-    public class RoleRepository : BaseRepository, IRoleRepository
+    public class ProjectWalletRepository : BaseRepository, IProjectWalletRepository
     {
-        public RoleRepository(IConfiguration configuration) : base(configuration)
+        public ProjectWalletRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
         //CREATE
-        public async Task<int> CreateRole(Role roleDTO)
+        public async Task<int> CreateProjectWallet(ProjectWallet projectWalletDTO)
         {
             try
             {
-                var query = "INSERT INTO Role ("
-                    + "         Name, "
-                    + "         Description, "
+                var query = "INSERT INTO ProjectWallet ("
+                    + "         ProjectId, "
+                    + "         Balance, "
+                    + "         WalletTypeId, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
                     + "     VALUES ( "
-                    + "         @Name, "
-                    + "         @Description, "
+                    + "         @ProjectId, "
+                    + "         @Balance, "
+                    + "         @WalletTypeId, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -41,12 +43,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("Name", roleDTO.Name, DbType.String);
-                parameters.Add("Description", roleDTO.Description, DbType.String);
+                parameters.Add("ProjectId", projectWalletDTO.ProjectId, DbType.Guid);
+                parameters.Add("Balance", projectWalletDTO.Balance, DbType.Double);
+                parameters.Add("WalletTypeId", projectWalletDTO.WalletTypeId, DbType.Guid);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", roleDTO.CreateBy, DbType.Guid);
+                parameters.Add("CreateBy", projectWalletDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", projectWalletDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
@@ -58,11 +61,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteRoleById(Guid roleId)//thiếu para UpdateBy
+        public async Task<int> DeleteProjectWalletById(Guid projectWalletId)//thiếu para UpdateBy
         {
             try
             {
-                var query = "UPDATE Role "
+                var query = "UPDATE ProjectWallet "
                     + "     SET "
                     + "         UpdateDate = @UpdateDate, "
                     //+ "         UpdateBy = @UpdateBy, "
@@ -72,8 +75,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", roleId, DbType.Guid);
+                //parameters.Add("UpdateBy", projectWalletDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", projectWalletId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -84,13 +87,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Role>> GetAllRoles()
+        public async Task<List<ProjectWallet>> GetAllProjectWallets()
         {
             try
             {
-                string query = "SELECT * FROM Role";
+                string query = "SELECT * FROM ProjectWallet";
                 using var connection = CreateConnection();
-                return (await connection.QueryAsync<Role>(query)).ToList();
+                return (await connection.QueryAsync<ProjectWallet>(query)).ToList();
             }
             catch (Exception e)
             {
@@ -99,15 +102,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET BY ID
-        public async Task<Role> GetRoleById(Guid roleId)
+        public async Task<ProjectWallet> GetProjectWalletById(Guid projectWalletId)
         {
             try
             {
-                string query = "SELECT * FROM Role WHERE Id = @Id";
+                string query = "SELECT * FROM ProjectWallet WHERE Id = @Id";
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", roleId, DbType.Guid);
+                parameters.Add("Id", projectWalletId, DbType.Guid);
                 using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<Role>(query, parameters);
+                return await connection.QueryFirstOrDefaultAsync<ProjectWallet>(query, parameters);
             }
             catch (Exception e)
             {
@@ -116,14 +119,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdateRole(Role roleDTO, Guid roleId)
+        public async Task<int> UpdateProjectWallet(ProjectWallet projectWalletDTO, Guid projectWalletId)
         {
             try
             {
-                var query = "UPDATE Role "
+                var query = "UPDATE ProjectWallet "
                     + "     SET "
-                    + "         Name = @Name, "
-                    + "         Description = @Description, "
+                    + "         ProjectId = @ProjectId, "
+                    + "         Balance = @Balance, "
+                    + "         WalletTypeId = @WalletTypeId, "
                     + "         CreateDate = @CreateDate, "
                     + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
@@ -133,14 +137,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("Name", roleDTO.Name, DbType.String);
-                parameters.Add("Description", roleDTO.Description, DbType.String);
-                parameters.Add("CreateDate", roleDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", roleDTO.CreateBy, DbType.Guid);
+                parameters.Add("ProjectId", projectWalletDTO.ProjectId, DbType.Guid);
+                parameters.Add("Balance", projectWalletDTO.Balance, DbType.Double);
+                parameters.Add("WalletTypeId", projectWalletDTO.WalletTypeId, DbType.Guid);
+                parameters.Add("CreateDate", projectWalletDTO.CreateDate, DbType.DateTime);
+                parameters.Add("CreateBy", projectWalletDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", roleDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", roleId, DbType.Guid);
+                parameters.Add("UpdateBy", projectWalletDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", projectWalletDTO.IsDeleted, DbType.Boolean);
+                parameters.Add("Id", projectWalletId, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {

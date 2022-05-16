@@ -11,28 +11,28 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
-    public class ProjectService : IProjectService
+    public class RoleService : IRoleService
     {
-        private readonly IProjectRepository _projectRepository;
+        private readonly IRoleRepository _roleRepository;
         private readonly IMapper _mapper;
 
 
-        public ProjectService(IProjectRepository projectRepository, IMapper mapper)
+        public RoleService(IRoleRepository roleRepository, IMapper mapper)
         {
-            _projectRepository = projectRepository;
+            _roleRepository = roleRepository;
             _mapper = mapper;
         }
 
         //CREATE
-        public async Task<int> CreateProject(ProjectDTO projectDTO)
+        public async Task<int> CreateRole(RoleDTO roleDTO)
         {
             int result;
             try
             {
-                Project dto = _mapper.Map<Project>(projectDTO);
-                result = await _projectRepository.CreateProject(dto);
+                Role dto = _mapper.Map<Role>(roleDTO);
+                result = await _roleRepository.CreateRole(dto);
                 if (result == 0)
-                    throw new CreateObjectException("Can not create Project Object!");
+                    throw new CreateObjectException("Can not create Role Object!");
                 return result;
             }
             catch (Exception e)
@@ -42,15 +42,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //DELETE
-        public async Task<int> DeleteProjectById(Guid projectId)
+        public async Task<int> DeleteRoleById(Guid roleId)
         {
             int result;
             try
             {
 
-                result = await _projectRepository.DeleteProjectById(projectId);
+                result = await _roleRepository.DeleteRoleById(roleId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not delete Project Object!");
+                    throw new CreateObjectException("Can not delete Role Object!");
                 return result;
             }
             catch (Exception e)
@@ -60,24 +60,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<ProjectDTO>> GetAllProjects()
+        public async Task<List<RoleDTO>> GetAllRoles()
         {
-            List<Project> projectList = await _projectRepository.GetAllProjects();
-            List<ProjectDTO> list = _mapper.Map<List<ProjectDTO>>(projectList);
+            List<Role> roleList = await _roleRepository.GetAllRoles();
+            List<RoleDTO> list = _mapper.Map<List<RoleDTO>>(roleList);
             return list;
         }
 
         //GET BY ID
-        public async Task<ProjectDTO> GetProjectById(Guid projectId)
+        public async Task<RoleDTO> GetRoleById(Guid roleId)
         {
-            ProjectDTO result;
+            RoleDTO result;
             try
             {
 
-                Project dto = await _projectRepository.GetProjectById(projectId);
-                result = _mapper.Map<ProjectDTO>(dto);
+                Role dto = await _roleRepository.GetRoleById(roleId);
+                result = _mapper.Map<RoleDTO>(dto);
                 if (result == null)
-                    throw new CreateObjectException("No Project Object Found!");
+                    throw new CreateObjectException("No Role Object Found!");
                 return result;
             }
             catch (Exception e)
@@ -87,15 +87,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdateProject(ProjectDTO projectDTO, Guid projectId)
+        public async Task<int> UpdateRole(RoleDTO roleDTO, Guid roleId)
         {
             int result;
             try
             {
-                Project dto = _mapper.Map<Project>(projectDTO);
-                result = await _projectRepository.UpdateProject(dto, projectId);
+                Role dto = _mapper.Map<Role>(roleDTO);
+                result = await _roleRepository.UpdateRole(dto, roleId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not update Project Object!");
+                    throw new CreateObjectException("Can not update Role Object!");
                 return result;
             }
             catch (Exception e)

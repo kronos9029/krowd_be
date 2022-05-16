@@ -11,28 +11,28 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
-    public class ProjectService : IProjectService
+    public class RiskService : IRiskService
     {
-        private readonly IProjectRepository _projectRepository;
+        private readonly IRiskRepository _riskRepository;
         private readonly IMapper _mapper;
 
 
-        public ProjectService(IProjectRepository projectRepository, IMapper mapper)
+        public RiskService(IRiskRepository riskRepository, IMapper mapper)
         {
-            _projectRepository = projectRepository;
+            _riskRepository = riskRepository;
             _mapper = mapper;
         }
 
         //CREATE
-        public async Task<int> CreateProject(ProjectDTO projectDTO)
+        public async Task<int> CreateRisk(RiskDTO riskDTO)
         {
             int result;
             try
             {
-                Project dto = _mapper.Map<Project>(projectDTO);
-                result = await _projectRepository.CreateProject(dto);
+                Risk dto = _mapper.Map<Risk>(riskDTO);
+                result = await _riskRepository.CreateRisk(dto);
                 if (result == 0)
-                    throw new CreateObjectException("Can not create Project Object!");
+                    throw new CreateObjectException("Can not create Risk Object!");
                 return result;
             }
             catch (Exception e)
@@ -42,15 +42,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //DELETE
-        public async Task<int> DeleteProjectById(Guid projectId)
+        public async Task<int> DeleteRiskById(Guid riskId)
         {
             int result;
             try
             {
 
-                result = await _projectRepository.DeleteProjectById(projectId);
+                result = await _riskRepository.DeleteRiskById(riskId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not delete Project Object!");
+                    throw new CreateObjectException("Can not delete Risk Object!");
                 return result;
             }
             catch (Exception e)
@@ -60,24 +60,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<ProjectDTO>> GetAllProjects()
+        public async Task<List<RiskDTO>> GetAllRisks()
         {
-            List<Project> projectList = await _projectRepository.GetAllProjects();
-            List<ProjectDTO> list = _mapper.Map<List<ProjectDTO>>(projectList);
+            List<Risk> riskList = await _riskRepository.GetAllRisks();
+            List<RiskDTO> list = _mapper.Map<List<RiskDTO>>(riskList);
             return list;
         }
 
         //GET BY ID
-        public async Task<ProjectDTO> GetProjectById(Guid projectId)
+        public async Task<RiskDTO> GetRiskById(Guid riskId)
         {
-            ProjectDTO result;
+            RiskDTO result;
             try
             {
 
-                Project dto = await _projectRepository.GetProjectById(projectId);
-                result = _mapper.Map<ProjectDTO>(dto);
+                Risk dto = await _riskRepository.GetRiskById(riskId);
+                result = _mapper.Map<RiskDTO>(dto);
                 if (result == null)
-                    throw new CreateObjectException("No Project Object Found!");
+                    throw new CreateObjectException("No Risk Object Found!");
                 return result;
             }
             catch (Exception e)
@@ -87,15 +87,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdateProject(ProjectDTO projectDTO, Guid projectId)
+        public async Task<int> UpdateRisk(RiskDTO riskDTO, Guid riskId)
         {
             int result;
             try
             {
-                Project dto = _mapper.Map<Project>(projectDTO);
-                result = await _projectRepository.UpdateProject(dto, projectId);
+                Risk dto = _mapper.Map<Risk>(riskDTO);
+                result = await _riskRepository.UpdateRisk(dto, riskId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not update Project Object!");
+                    throw new CreateObjectException("Can not update Risk Object!");
                 return result;
             }
             catch (Exception e)

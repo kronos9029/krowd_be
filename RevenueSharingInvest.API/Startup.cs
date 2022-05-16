@@ -100,14 +100,52 @@ namespace RevenueSharingInvest.API
             //PACKAGE VOUCHER
             services.AddScoped<IPackageVoucherRepository, PackageVoucherRepository>();
             services.AddScoped<IPackageVoucherService, PackageVoucherService>();
+            
+            //PAYMENT
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<IPaymentService, PaymentService>();
+            
+            //PERIOD REVENUE
+            services.AddScoped<IPeriodRevenueRepository, PeriodRevenueRepository>();
+            services.AddScoped<IPeriodRevenueService, PeriodRevenueService>();
 
-            //////////
+            //PERIOD REVENUE HISTORY
+            services.AddScoped<IPeriodRevenueHistoryRepository, PeriodRevenueHistoryRepository>();
+            services.AddScoped<IPeriodRevenueHistoryService, PeriodRevenueHistoryService>();
 
             //PROJECT
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IProjectService, ProjectService>();
-                
-                //USER
+            
+            //PROJECT ENTITY
+            services.AddScoped<IProjectEntityRepository, ProjectEntityRepository>();
+            services.AddScoped<IProjectEntityService, ProjectEntityService>();
+
+            //PROJECT WALLET
+            services.AddScoped<IProjectWalletRepository, ProjectWalletRepository>();
+            services.AddScoped<IProjectWalletService, ProjectWalletService>();
+            
+            //RISK
+            services.AddScoped<IRiskRepository, RiskRepository>();
+            services.AddScoped<IRiskService, RiskService>();
+
+            //RISK TYPE
+            services.AddScoped<IRiskTypeRepository, RiskTypeRepository>();
+            services.AddScoped<IRiskTypeService, RiskTypeService>();
+            
+            //ROLE
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IRoleService, RoleService>();
+
+            //STAGE
+
+            //SYSTEM WALLET
+            services.AddScoped<ISystemWalletRepository, SystemWalletRepository>();
+            services.AddScoped<ISystemWalletService, SystemWalletService>();
+
+            //////////
+
+            //USER
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
             
