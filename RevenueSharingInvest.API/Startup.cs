@@ -57,6 +57,8 @@ namespace RevenueSharingInvest.API
             // Register your regular repositories
             // services.AddScoped<IDiameterRepository, DiameterRepository>();
 
+            ////////// 
+
             //ACCOUNT TRANSACTION
             services.AddScoped<IAccountTransactionService, AccountTransactionService>();
             services.AddScoped<IAccountTransactionRepository, AccountTransactionRepository>();
@@ -138,23 +140,37 @@ namespace RevenueSharingInvest.API
             services.AddScoped<IRoleService, RoleService>();
 
             //STAGE
+            services.AddScoped<IStageRepository, StageRepository>();
+            services.AddScoped<IStageService, StageService>();
 
             //SYSTEM WALLET
             services.AddScoped<ISystemWalletRepository, SystemWalletRepository>();
             services.AddScoped<ISystemWalletService, SystemWalletService>();
 
-            //////////
-
             //USER
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
-            
-                //STAGE
-            services.AddScoped<IStageRepository, StageRepository>();
-            
+
+            //VOUCHER
+            services.AddScoped<IVoucherRepository, VoucherRepository>();
+            services.AddScoped<IVoucherService, VoucherService>();
+
+            //VOUCHER ITEM
+            services.AddScoped<IVoucherItemRepository, VoucherItemRepository>();
+            services.AddScoped<IVoucherItemService, VoucherItemService>();
+
+            // WALLET TRANSACTION
+            services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
+            services.AddScoped<IWalletTransactionService, WalletTransactionService>();
+
+            // WALLET TYPE
+            services.AddScoped<IWalletTypeRepository, WalletTypeRepository>();
+            services.AddScoped<IWalletTypeService, WalletTypeService>();
+
+            //////////        
 
             //CORS
-            services.AddCors(options =>
+            services.AddCors(options =>      
                 options.AddDefaultPolicy(
                 builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
             ));

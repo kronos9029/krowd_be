@@ -11,7 +11,7 @@ namespace RevenueSharingInvest.Business.Services
     {
         //CREATE
         public Task<int> CreateBusiness(BusinessDTO businessDTO);
-        public Task<int> AdminCreateBusiness(Data.Models.Entities.Business newBusiness, string email);
+        //public Task<int> AdminCreateBusiness(Data.Models.Entities.Business newBusiness, string email);
 
         //READ
         public Task<List<BusinessDTO>> GetAllBusiness();

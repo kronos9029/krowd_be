@@ -9,8 +9,17 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 {
     public interface IUserRepository
     {
-        public Task<User> GetUserByEmail(String userEmail);
-        public Task<int> CreateInvestorUser(User newUser);
-        public Task<int> CreateBusinessUser(User newUser);
+        //CREATE
+        public Task<int> CreateUser(User userDTO);
+
+        //READ
+        public Task<List<User>> GetAllUsers();
+        public Task<User> GetUserById(Guid userId);
+
+        //UPDATE
+        public Task<int> UpdateUser(User userDTO, Guid userId);
+
+        //DELETE
+        public Task<int> DeleteUserById(Guid userId);
     }
 }

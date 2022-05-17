@@ -25,31 +25,31 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
-        //ADMIN CREATE
-        public async Task<int> AdminCreateBusiness(Data.Models.Entities.Business newBusiness, string email)
-        {
-            User userObject = await _userRepository.GetUserByEmail(email);
-            if(userObject == null)
-            {
-                throw new NotFoundException("User Not Found!!");
-            }
-            else
-            {
-                if (!userObject.RoleId.ToString().Equals(ROLE_ADMIN_ID))
-                {
-                    throw new Exceptions.UnauthorizedAccessException("Only Admin Can Create Business!!");
-                }
-                else
-                {
-                    if(await _businessRepository.CreateBusiness(newBusiness) < 1)
-                    {
-                        throw new CreateBusinessException("Create Business Fail!!");
-                    }
-                }
-            }
+        ////ADMIN CREATE
+        //public async Task<int> AdminCreateBusiness(Data.Models.Entities.Business newBusiness, string email)
+        //{
+        //    User userObject = await _userRepository.GetUserByEmail(email);
+        //    if(userObject == null)
+        //    {
+        //        throw new NotFoundException("User Not Found!!");
+        //    }
+        //    else
+        //    {
+        //        if (!userObject.RoleId.ToString().Equals(ROLE_ADMIN_ID))
+        //        {
+        //            throw new Exceptions.UnauthorizedAccessException("Only Admin Can Create Business!!");
+        //        }
+        //        else
+        //        {
+        //            if(await _businessRepository.CreateBusiness(newBusiness) < 1)
+        //            {
+        //                throw new CreateBusinessException("Create Business Fail!!");
+        //            }
+        //        }
+        //    }
 
-            return 1;
-        }
+        //    return 1;
+        //}
         
         //CREATE
         public async Task<int> CreateBusiness(BusinessDTO businessDTO)

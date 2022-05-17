@@ -12,25 +12,22 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
 {
-    public class StageRepository : BaseRepository, IStageRepository
+    public class WalletTypeRepository : BaseRepository, IWalletTypeRepository
     {
-        public StageRepository(IConfiguration configuration) : base(configuration)
+        public WalletTypeRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
         //CREATE
-        public async Task<int> CreateStage(Stage stageDTO)
+        public async Task<int> CreateWalletType(WalletType walletTypeDTO)
         {
             try
             {
-                var query = "INSERT INTO Stage ("
+                var query = "INSERT INTO WalletType ("
                     + "         Name, "
-                    + "         ProjectId, "
                     + "         Description, "
-                    + "         Percents, "
-                    + "         OpenMonth, "
-                    + "         CloseMonth, "
-                    + "         Status, "
+                    + "         Mode, "
+                    + "         Type, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -38,12 +35,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         IsDeleted ) "
                     + "     VALUES ( "
                     + "         @Name, "
-                    + "         @ProjectId, "
                     + "         @Description, "
-                    + "         @Percents, "
-                    + "         @OpenMonth, "
-                    + "         @CloseMonth, "
-                    + "         @Status, "
+                    + "         @Mode, "
+                    + "         @Type, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -51,17 +45,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("Name", stageDTO.Name, DbType.String);
-                parameters.Add("ProjectId", stageDTO.ProjectId, DbType.Guid);
-                parameters.Add("Description", stageDTO.Description, DbType.String);
-                parameters.Add("Percents", stageDTO.Percents, DbType.Double);
-                parameters.Add("OpenMonth", stageDTO.OpenMonth, DbType.Int16);
-                parameters.Add("CloseMonth", stageDTO.CloseMonth, DbType.Int16);
-                parameters.Add("Status", stageDTO.Status, DbType.String);
+                parameters.Add("Name", walletTypeDTO.Name, DbType.String);
+                parameters.Add("Description", walletTypeDTO.Description, DbType.String);
+                parameters.Add("Mode", walletTypeDTO.Mode, DbType.String);
+                parameters.Add("Type", walletTypeDTO.Type, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", stageDTO.CreateBy, DbType.Guid);
+                parameters.Add("CreateBy", walletTypeDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", stageDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", walletTypeDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
@@ -73,11 +64,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteStageById(Guid stageId)//thiếu para UpdateBy
+        public async Task<int> DeleteWalletTypeById(Guid walletTypeId)//thiếu para UpdateBy
         {
             try
             {
-                var query = "UPDATE Stage "
+                var query = "UPDATE WalletType "
                     + "     SET "
                     + "         UpdateDate = @UpdateDate, "
                     //+ "         UpdateBy = @UpdateBy, "
@@ -87,8 +78,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", stageDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", stageId, DbType.Guid);
+                //parameters.Add("UpdateBy", walletTypeDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", walletTypeId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -99,13 +90,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Stage>> GetAllStages()
+        public async Task<List<WalletType>> GetAllWalletTypes()
         {
             try
             {
-                string query = "SELECT * FROM Stage";
+                string query = "SELECT * FROM WalletType";
                 using var connection = CreateConnection();
-                return (await connection.QueryAsync<Stage>(query)).ToList();
+                return (await connection.QueryAsync<WalletType>(query)).ToList();
             }
             catch (Exception e)
             {
@@ -114,15 +105,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET BY ID
-        public async Task<Stage> GetStageById(Guid stageId)
+        public async Task<WalletType> GetWalletTypeById(Guid walletTypeId)
         {
             try
             {
-                string query = "SELECT * FROM Stage WHERE Id = @Id";
+                string query = "SELECT * FROM WalletType WHERE Id = @Id";
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", stageId, DbType.Guid);
+                parameters.Add("Id", walletTypeId, DbType.Guid);
                 using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<Stage>(query, parameters);
+                return await connection.QueryFirstOrDefaultAsync<WalletType>(query, parameters);
             }
             catch (Exception e)
             {
@@ -131,19 +122,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdateStage(Stage stageDTO, Guid stageId)
+        public async Task<int> UpdateWalletType(WalletType walletTypeDTO, Guid walletTypeId)
         {
             try
             {
-                var query = "UPDATE Stage "
+                var query = "UPDATE WalletType "
                     + "     SET "
                     + "         Name = @Name, "
-                    + "         ProjectId = @ProjectId, "
                     + "         Description = @Description, "
-                    + "         Percents = @Percents, "
-                    + "         OpenMonth = @OpenMonth, "
-                    + "         CloseMonth = @CloseMonth, "
-                    + "         Status = @Status, "
+                    + "         Mode = @Mode, "
+                    + "         Type = @Type, "
                     + "         CreateDate = @CreateDate, "
                     + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
@@ -153,19 +141,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("Name", stageDTO.Name, DbType.String);
-                parameters.Add("ProjectId", stageDTO.ProjectId, DbType.Guid);
-                parameters.Add("Description", stageDTO.Description, DbType.String);
-                parameters.Add("Percents", stageDTO.Percents, DbType.Double);
-                parameters.Add("OpenMonth", stageDTO.OpenMonth, DbType.Int16);
-                parameters.Add("CloseMonth", stageDTO.CloseMonth, DbType.Int16);
-                parameters.Add("Status", stageDTO.Status, DbType.String);
-                parameters.Add("CreateDate", stageDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", stageDTO.CreateBy, DbType.Guid);
+                parameters.Add("Name", walletTypeDTO.Name, DbType.String);
+                parameters.Add("Description", walletTypeDTO.Description, DbType.String);
+                parameters.Add("Mode", walletTypeDTO.Mode, DbType.String);
+                parameters.Add("Type", walletTypeDTO.Type, DbType.String);
+                parameters.Add("CreateDate", walletTypeDTO.CreateDate, DbType.DateTime);
+                parameters.Add("CreateBy", walletTypeDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", stageDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", stageDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", stageId, DbType.Guid);
+                parameters.Add("UpdateBy", walletTypeDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", walletTypeDTO.IsDeleted, DbType.Boolean);
+                parameters.Add("Id", walletTypeId, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {

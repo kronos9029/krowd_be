@@ -6,13 +6,19 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Models.DTOs
 {
-    public class WalletTypeDTO
+    public class WalletTransactionDTO
     {
         public string id { get; set; }
-        public string name { get; set; }//ví đầu tư chung, ví tạm, ví thanh toán chung
+        public string paymentId { get; set; }
+        public string systemWalletId { get; set; }
+        public string projectWalletId { get; set; }
+        public string investorWalletId { get; set; }
+        public float amount { get; set; }       
         public string description { get; set; }
-        public string mode { get; set; }//project, investor, krowd
-        public string type { get; set; }//I1 - I5, B1 - B4
+        public string type { get; set; }
+        public string fromWalletId { get; set; }
+        public string toWalletId { get; set; }
+        public float fee { get; set; }
         public DateTime createDate { get; set; }
         public string createBy { get; set; }
         public DateTime updateDate { get; set; }
