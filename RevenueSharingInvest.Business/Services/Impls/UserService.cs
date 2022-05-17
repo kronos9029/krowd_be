@@ -195,5 +195,41 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return response;
         }
 
+/*        protected string GenerateOtp()
+        {
+            char[] charArr = "0123456789".ToCharArray();
+            string strrandom = string.Empty;
+            Random objran = new();
+            for (int i = 0; i < 4; i++)
+            {
+                //It will not allow Repetation of Characters
+                int pos = objran.Next(1, charArr.Length);
+                if (!strrandom.Contains(charArr.GetValue(pos).ToString())) strrandom += charArr.GetValue(pos);
+                else i--;
+            }
+            return strrandom;
+        }*/
+
+        private string GenerateOTP(Guid UserId)
+        {
+            string[] OTP = UserId.ToString().Split("-");
+
+            return OTP[0];
+        }
+
+        public async Task<bool> VerifyOTP(String OTP, String email)
+        {
+            User userObj = await _userRepository.GetUserByEmail(email);
+
+            if (userObj.Id.ToString().Contains(OTP))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
 }

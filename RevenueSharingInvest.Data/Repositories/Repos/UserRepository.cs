@@ -38,13 +38,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "INSERT INTO User (Email, CreateDate, Image, BusinessId, InvestorId, RoleId) VALUES (@Email, @CreateDate, @Image, @InvestorId, @RoleId)";
+                var query = "INSERT INTO User (Email, CreateDate, Image, BusinessId, InvestorId, RoleId, Status) VALUES (@Email, @CreateDate, @Image, @InvestorId, @RoleId, @Status)";
                 var parameters = new DynamicParameters();
                 parameters.Add("Email", newUser.Email, DbType.String);
                 parameters.Add("CreateDate", newUser.CreateDate, DbType.DateTime);
                 parameters.Add("Image", newUser.Image, DbType.String);
                 parameters.Add("InvestorId", newUser.InvestorId, DbType.Guid);
                 parameters.Add("RoleId", newUser.RoleId, DbType.Guid);
+                parameters.Add("Status", "Inactive", DbType.String);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
@@ -58,8 +59,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "INSERT INTO User (Email, CreateDate, Image, BusinessId, RoleId, Description, LastName, FirstName, PhoneNum, IdCard, Gender, DateOfBirth, TaxIdentificationNumber, City, District, Ward, Address, Bank, BankAccount, CreateBy, IsDeleted) " +
-                    "VALUES (@Email, @CreateDate, @Image, @BusinessId, @RoleId, @Description, @LastName, @FirstName, @PhoneNum, @IdCard, @Gender, @DateOfBirth, @TaxIdentificationNumber, @City, @District, @Ward, @Address, @Bank, @BankAccount, @CreateBy, 0)";
+                var query = "INSERT INTO User (Email, CreateDate, Image, BusinessId, RoleId, Description, LastName, FirstName, PhoneNum, IdCard, Gender, DateOfBirth, TaxIdentificationNumber, City, District, Ward, Address, Bank, BankAccount, CreateBy, IsDeleted, Status) " +
+                    "VALUES (@Email, @CreateDate, @Image, @BusinessId, @RoleId, @Description, @LastName, @FirstName, @PhoneNum, @IdCard, @Gender, @DateOfBirth, @TaxIdentificationNumber, @City, @District, @Ward, @Address, @Bank, @BankAccount, @CreateBy, 0, @Status)";
                 var parameters = new DynamicParameters();
                 parameters.Add("Email", newUser.Email, DbType.String);
                 parameters.Add("CreateDate", newUser.CreateDate, DbType.DateTime);
@@ -82,6 +83,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("BankAccount", newUser.RoleId, DbType.String);
                 parameters.Add("CreateBy", newUser.RoleId, DbType.String);
                 parameters.Add("IsDeleted", newUser.RoleId, DbType.Binary);
+                parameters.Add("Status", "Inactive", DbType.String);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);

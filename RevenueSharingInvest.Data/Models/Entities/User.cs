@@ -28,6 +28,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string LastName { get; set; }
         [StringLength(20)]
         public string FirstName { get; set; }
+        public string Status { get; set; }
         [StringLength(11)]
         public string PhoneNum { get; set; }
         public string Image { get; set; }
