@@ -33,8 +33,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public int? NumOfProject { get; set; }
         public int? NumOfSuccessfulProject { get; set; }
         public double? SuccessfulRate { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }

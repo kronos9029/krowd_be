@@ -24,8 +24,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string District { get; set; }
         [StringLength(50)]
         public string Ward { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }

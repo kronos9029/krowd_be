@@ -10,9 +10,19 @@ namespace RevenueSharingInvest.Business.Services
 {
     public interface IUserService
     {
-        public Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken);
-        public Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken);
-        public Task<int> AdminCreateBusinessUser(User newBusiness, string email);
+        //public Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken);
+        //public Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken);
+        //CREATE
+        public Task<int> CreateUser(UserDTO userDTO);
 
+        //READ
+        public Task<List<UserDTO>> GetAllUsers();
+        public Task<UserDTO> GetUserById(Guid userId);
+
+        //UPDATE
+        public Task<int> UpdateUser(UserDTO userDTO, Guid userId);
+
+        //DELETE
+        public Task<int> DeleteUserById(Guid userId);
     }
 }

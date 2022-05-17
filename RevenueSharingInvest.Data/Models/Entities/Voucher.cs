@@ -33,10 +33,12 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public DateTime? StartDate { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? EndDate { get; set; }
-        public Guid? CreateDate { get; set; }
-        public DateTime? CreateBy { get; set; }
-        public Guid? UpdateDate { get; set; }
-        public DateTime? UpdateBy { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? CreateDate { get; set; }
+        public Guid? CreateBy { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? UpdateDate { get; set; }
+        public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
 
         [ForeignKey(nameof(ProjectId))]

@@ -15,12 +15,18 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid Id { get; set; }
         public Guid VoucherId { get; set; }
         public Guid InvestmentId { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? IssuedDate { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? ExpireDate { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? RedeemDate { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? AvailableDate { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }

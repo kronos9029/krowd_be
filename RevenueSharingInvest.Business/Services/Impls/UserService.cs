@@ -1,4 +1,5 @@
-﻿using FirebaseAdmin.Auth;
+﻿using AutoMapper;
+using FirebaseAdmin.Auth;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RevenueSharingInvest.Business.Exceptions;
@@ -24,176 +25,232 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IInvestorRepository _investorRepository;
         private readonly IBusinessRepository _businessRepository;
         private readonly IRoleRepository _roleRepository;
+        private readonly IMapper _mapper;
         private readonly String ROLE_ADMIN_ID = "";
         private readonly String ROLE_INVESTOR_ID = "";
         private readonly String ROLE_BUSINESS_MANAGER_ID = "";
         private readonly String ROLE_PROJECT_OWNER_ID = "";
         private readonly String INVESTOR_TYPE_ID = "";
 
-        public UserService(IOptions<AppSettings> appSettings, IUserRepository userRepository, IInvestorRepository investorRepository)
+        public UserService(IOptions<AppSettings> appSettings, IUserRepository userRepository, IInvestorRepository investorRepository, IMapper mapper)
         {
             _appSettings = appSettings.Value;
             _userRepository = userRepository;
             _investorRepository = investorRepository;
+            _mapper = mapper;
         }
 
-        public async Task<int> AdminCreateBusinessUser(User newBusiness, string email)
+        //CREATE
+        public async Task<int> CreateUser(UserDTO userDTO)
         {
-            User userObject = await _userRepository.GetUserByEmail(email);
-            if (userObject == null)
+            int result;
+            try
             {
-                throw new NotFoundException("User Not Found!!");
+                User dto = _mapper.Map<User>(userDTO);
+                result = await _userRepository.CreateUser(dto);
+                if (result == 0)
+                    throw new CreateObjectException("Can not create User Object!");
+                return result;
             }
-            else
+            catch (Exception e)
             {
-                if (!userObject.RoleId.ToString().Equals(ROLE_ADMIN_ID))
-                {
-                    throw new Exceptions.UnauthorizedAccessException("Only Admin Can Create Business!!");
-                }
-                else
-                {
-                    if (await _userRepository.CreateBusinessUser(newBusiness) < 1)
-                    {
-                        throw new CreateBusinessException("Create Business Failed!!");
-                    }
-                    else
-                    {
-                        return 1;
-                    }
-                }
+                throw new NotImplementedException();
             }
         }
 
-        public async Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken)
+        //DELETE
+        public async Task<int> DeleteUserById(Guid userId)
         {
-            FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
-            string uid = decryptedToken.Uid;
-
-            UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
-            string email = userRecord.Email;
-            DateTime createdDate = (DateTime)userRecord.UserMetaData.CreationTimestamp;
-            string ImageUrl = userRecord.PhotoUrl.ToString();
-
-            User userObject = await _userRepository.GetUserByEmail(email);
-
-            AuthenticateResponse response = new();
-
-            if (userObject == null)
+            int result;
+            try
             {
-                Role role = await _roleRepository.GetRoleById(Guid.Parse(ROLE_INVESTOR_ID));
 
-                Guid userId = Guid.NewGuid();
-                Guid investorId = Guid.NewGuid();
-
-                Investor investor = new();
-                User newInvestorObject = new();
-
-                newInvestorObject.InvestorId = investorId;
-                newInvestorObject.Email = email;
-                newInvestorObject.CreateDate = createdDate;
-                newInvestorObject.Image = ImageUrl;
-                newInvestorObject.RoleId = role.Id;
-
-                int checkCreateUser = await _userRepository.CreateInvestorUser(newInvestorObject);
-                if (checkCreateUser == 0)
-                {
-                    throw new RegisterException("Register Fail!!");
-                }
-                User user = await _userRepository.GetUserByEmail(email);
-                investor.Id = investorId;
-                investor.UserId = userId;
-                investor.InvestorTypeId = Guid.Parse(INVESTOR_TYPE_ID);
-
-                int checkCreateInvestor = await _investorRepository.CreateInvestor(investor);
-                if (checkCreateInvestor == 0)
-                {
-                    throw new RegisterException("Create Investor Fail!!");
-                }
-                response.email = email;
-                response.id = userId;
-                response.uid = uid;
-                response = GenerateToken(response, RoleEnum.Investor.ToString());
+                result = await _userRepository.DeleteUserById(userId);
+                if (result == 0)
+                    throw new CreateObjectException("Can not delete User Object!");
+                return result;
             }
-            else
+            catch (Exception e)
             {
-                response.email = email;
-                response.id = userObject.Id;
-                response.uid = uid;
-                response = GenerateToken(response, RoleEnum.Investor.ToString());
+                throw new NotImplementedException();
             }
-            return response;
         }
 
-        public async Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken)
+        //GET ALL
+        public async Task<List<UserDTO>> GetAllUsers()
         {
-            FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
-            string uid = decryptedToken.Uid;
-
-            UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
-            string email = userRecord.Email;
-
-            User userObject = await _userRepository.GetUserByEmail(email);
-
-            AuthenticateResponse response = new();
-
-            if (userObject == null)
-            {
-                throw new NotFoundException("Business Not Found!!");
-            }
-            else
-            {
-                response.email = email;
-                response.id = userObject.Id;
-                response.uid = uid;
-                response = GenerateToken(response, RoleEnum.BusinessManager.ToString());
-            }
-
-            return response;
+            List<User> userList = await _userRepository.GetAllUsers();
+            List<UserDTO> list = _mapper.Map<List<UserDTO>>(userList);
+            return list;
         }
 
-
-
-
-
-        private AuthenticateResponse GenerateToken(AuthenticateResponse response, string roleCheck)
+        //GET BY ID
+        public async Task<UserDTO> GetUserById(Guid userId)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            UserDTO result;
+            try
+            {
 
-            Claim roleClaim;
-
-            if (roleCheck.Equals(RoleEnum.Admin.ToString()))
-            {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Admin.ToString());
+                User dto = await _userRepository.GetUserById(userId);
+                result = _mapper.Map<UserDTO>(dto);
+                if (result == null)
+                    throw new CreateObjectException("No User Object Found!");
+                return result;
             }
-            else if (roleCheck.Equals(RoleEnum.Investor.ToString()))
+            catch (Exception e)
             {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Investor.ToString());
+                throw new NotImplementedException();
             }
-            else if (roleCheck.Equals(RoleEnum.BusinessManager.ToString()))
-            {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BusinessManager.ToString());
-            }
-            else
-            {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Investor.ToString());
-            }
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                   new Claim(ClaimTypes.SerialNumber, response.id.ToString()),
-                   roleClaim
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            response.token = tokenHandler.WriteToken(token);
-            return response;
         }
+
+        //UPDATE
+        public async Task<int> UpdateUser(UserDTO userDTO, Guid userId)
+        {
+            int result;
+            try
+            {
+                User dto = _mapper.Map<User>(userDTO);
+                result = await _userRepository.UpdateUser(dto, userId);
+                if (result == 0)
+                    throw new CreateObjectException("Can not update User Object!");
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        //Tấn Phát coi lại chổ này
+        //public async Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken)
+        //{
+        //    FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
+        //    string uid = decryptedToken.Uid;
+
+        //    UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+        //    string email = userRecord.Email;
+        //    DateTime createdDate = (DateTime)userRecord.UserMetaData.CreationTimestamp;
+        //    string ImageUrl = userRecord.PhotoUrl.ToString();
+
+        //    User userObject = await _userRepository.GetUserByEmail(email);
+
+        //    AuthenticateResponse response = new();
+
+        //    if (userObject == null)
+        //    {
+        //        Role role = await _roleRepository.GetRoleById(Guid.Parse(ROLE_INVESTOR_ID));
+
+        //        Guid userId = Guid.NewGuid();
+        //        Guid investorId = Guid.NewGuid();
+
+        //        Investor investor = new();
+        //        User newInvestorObject = new();
+
+        //        newInvestorObject.Email = email;
+        //        newInvestorObject.CreateDate = createdDate;
+        //        newInvestorObject.Image = ImageUrl;
+        //        newInvestorObject.RoleId = role.Id;
+
+        //        int checkCreateUser = await _userRepository.CreateInvestorUser(newInvestorObject);
+        //        if (checkCreateUser == 0)
+        //        {
+        //            throw new RegisterException("Register Fail!!");
+        //        }
+        //        User user = await _userRepository.GetUserByEmail(email);
+        //        investor.Id = investorId;
+        //        investor.UserId = userId;
+        //        investor.InvestorTypeId = Guid.Parse(INVESTOR_TYPE_ID);
+
+        //        int checkCreateInvestor = await _investorRepository.CreateInvestor(investor);
+        //        if (checkCreateInvestor == 0)
+        //        {
+        //            throw new RegisterException("Create Investor Fail!!");
+        //        }
+        //        response.email = email;
+        //        response.id = userId;
+        //        response.uid = uid;
+        //        response = GenerateToken(response, RoleEnum.Investor.ToString());
+        //    }
+        //    else
+        //    {
+        //        response.email = email;
+        //        response.id = userObject.Id;
+        //        response.uid = uid;
+        //        response = GenerateToken(response, RoleEnum.Investor.ToString());
+        //    }
+        //    return response;
+        //}
+
+        //public async Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken)
+        //{
+        //    FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
+        //    string uid = decryptedToken.Uid;
+
+        //    UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+        //    string email = userRecord.Email;
+
+        //    User userObject = await _userRepository.GetUserByEmail(email);
+
+        //    AuthenticateResponse response = new();
+
+        //    if (userObject == null)
+        //    {
+        //        throw new NotFoundException("Business Not Found!!");
+        //    }
+        //    else
+        //    {
+        //        response.email = email;
+        //        response.id = userObject.Id;
+        //        response.uid = uid;
+        //        response = GenerateToken(response, RoleEnum.BusinessManager.ToString());
+        //    }
+
+        //    return response;
+        //}
+
+
+
+
+
+        //private AuthenticateResponse GenerateToken(AuthenticateResponse response, string roleCheck)
+        //{
+        //    var tokenHandler = new JwtSecurityTokenHandler();
+        //    var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+
+        //    Claim roleClaim;
+
+        //    if (roleCheck.Equals(RoleEnum.Admin.ToString()))
+        //    {
+        //        roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Admin.ToString());
+        //    }
+        //    else if (roleCheck.Equals(RoleEnum.Investor.ToString()))
+        //    {
+        //        roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Investor.ToString());
+        //    }
+        //    else if (roleCheck.Equals(RoleEnum.BusinessManager.ToString()))
+        //    {
+        //        roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BusinessManager.ToString());
+        //    }
+        //    else
+        //    {
+        //        roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Investor.ToString());
+        //    }
+
+        //    var tokenDescriptor = new SecurityTokenDescriptor
+        //    {
+        //        Subject = new ClaimsIdentity(new Claim[]
+        //        {
+        //           new Claim(ClaimTypes.SerialNumber, response.id.ToString()),
+        //           roleClaim
+        //        }),
+        //        Expires = DateTime.UtcNow.AddDays(7),
+        //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
+        //    };
+
+        //    var token = tokenHandler.CreateToken(tokenDescriptor);
+        //    response.token = tokenHandler.WriteToken(token);
+        //    return response;
+        //}
 
 /*        protected string GenerateOtp()
         {

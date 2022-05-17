@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,20 +26,43 @@ namespace RevenueSharingInvest.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateInvestor([FromBody] InvestorDTO investorDTO)
+        {
+            var result = await _investorService.CreateInvestor(investorDTO);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllInvestors()
+        {
+            var result = new List<InvestorDTO>();
+            result = await _investorService.GetAllInvestors();
+            return Ok(result);
+        }
+
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetInvestorById(String id)
+        public async Task<IActionResult> GetInvestorById(Guid id)
         {
-            //string currentCompanyId = httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
-            //string role = httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.Role).Value;
-            //CompanyDTO dto = new CompanyDTO();
-            //if ((role == "Company" && currentCompanyId == id) || role == "Admin" || role == "Worker")
-            //{
-            //InvestorDTO dto = new InvestorDTO();
-            //dto = await _investorService.GetInvestorById(id);
-            //return Ok(dto);
-            //return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission To Do This");
-            return null;
+            InvestorDTO dto = new InvestorDTO();
+            dto = await _investorService.GetInvestorById(id);
+            return Ok(dto);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateInvestor([FromBody] InvestorDTO investorDTO, [FromQuery] Guid investorId)
+        {
+            var result = await _investorService.UpdateInvestor(investorDTO, investorId);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteInvestor(Guid id)
+        {
+            var result = await _investorService.DeleteInvestorById(id);
+            return Ok(result);
         }
     }
 }

@@ -18,6 +18,72 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
         }
 
+        //CREATE
+        public async Task<int> CreateRole(Role roleDTO)
+        {
+            try
+            {
+                var query = "INSERT INTO Role ("
+                    + "         Name, "
+                    + "         Description, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted ) "
+                    + "     VALUES ( "
+                    + "         @Name, "
+                    + "         @Description, "
+                    + "         @CreateDate, "
+                    + "         @CreateBy, "
+                    + "         @UpdateDate, "
+                    + "         @UpdateBy, "
+                    + "         0 )";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Name", roleDTO.Name, DbType.String);
+                parameters.Add("Description", roleDTO.Description, DbType.String);
+                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("CreateBy", roleDTO.CreateBy, DbType.Guid);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
+
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //DELETE
+        public async Task<int> DeleteRoleById(Guid roleId)//thiếu para UpdateBy
+        {
+            try
+            {
+                var query = "UPDATE Role "
+                    + "     SET "
+                    + "         UpdateDate = @UpdateDate, "
+                    //+ "         UpdateBy = @UpdateBy, "
+                    + "         IsDeleted = 1 "
+                    + "     WHERE "
+                    + "         Id=@Id";
+                using var connection = CreateConnection();
+                var parameters = new DynamicParameters();
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                //parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", roleId, DbType.Guid);
+
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        //GET ALL
         public async Task<List<Role>> GetAllRoles()
         {
             try
@@ -32,6 +98,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET BY ID
         public async Task<Role> GetRoleById(Guid roleId)
         {
             try
@@ -41,6 +108,44 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Id", roleId, DbType.Guid);
                 using var connection = CreateConnection();
                 return await connection.QueryFirstOrDefaultAsync<Role>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //UPDATE
+        public async Task<int> UpdateRole(Role roleDTO, Guid roleId)
+        {
+            try
+            {
+                var query = "UPDATE Role "
+                    + "     SET "
+                    + "         Name = @Name, "
+                    + "         Description = @Description, "
+                    + "         CreateDate = @CreateDate, "
+                    + "         CreateBy = @CreateBy, "
+                    + "         UpdateDate = @UpdateDate, "
+                    + "         UpdateBy = @UpdateBy, "
+                    + "         IsDeleted = @IsDeleted"
+                    + "     WHERE "
+                    + "         Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Name", roleDTO.Name, DbType.String);
+                parameters.Add("Description", roleDTO.Description, DbType.String);
+                parameters.Add("CreateDate", roleDTO.CreateDate, DbType.DateTime);
+                parameters.Add("CreateBy", roleDTO.CreateBy, DbType.Guid);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", roleDTO.IsDeleted, DbType.Boolean);
+                parameters.Add("Id", roleId, DbType.Guid);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
             }
             catch (Exception e)
             {

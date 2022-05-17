@@ -18,8 +18,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid? ProjectId { get; set; }
         public Guid? RiskTypeId { get; set; }
         public string Description { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }

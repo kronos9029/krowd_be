@@ -9,6 +9,17 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 {
     public interface IPackageRepository
     {
-        //public Task<int> CreatePackage(Package packageDTO);
+        //CREATE
+        public Task<int> CreatePackage(Package packageDTO);
+
+        //READ
+        public Task<List<Package>> GetAllPackages();
+        public Task<Package> GetPackageById(Guid packageId);
+
+        //UPDATE
+        public Task<int> UpdatePackage(Package packageDTO, Guid packageId);
+
+        //DELETE
+        public Task<int> DeletePackageById(Guid packageId);
     }
 }

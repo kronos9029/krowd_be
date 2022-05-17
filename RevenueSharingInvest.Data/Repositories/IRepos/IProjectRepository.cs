@@ -1,5 +1,4 @@
-﻿
-using RevenueSharingInvest.Data.Models.Entities;
+﻿using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +9,17 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 {
     public interface IProjectRepository
     {
-        public Task<List<Project>> GetAllProjects();
+        //CREATE
         public Task<int> CreateProject(Project projectDTO);
+
+        //READ
+        public Task<List<Project>> GetAllProjects();
+        public Task<Project> GetProjectById(Guid projectId);
+
+        //UPDATE
+        public Task<int> UpdateProject(Project projectDTO, Guid projectId);
+
+        //DELETE
+        public Task<int> DeleteProjectById(Guid projectId);
     }
 }

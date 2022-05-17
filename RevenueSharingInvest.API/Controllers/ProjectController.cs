@@ -26,20 +26,43 @@ namespace RevenueSharingInvest.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllProject()
+        [HttpPost]
+        public async Task<IActionResult> CreateProject([FromBody] ProjectDTO projectDTO)
         {
-            var result = new List<Project>();
+            var result = await _projectService.CreateProject(projectDTO);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllProjects()
+        {
+            var result = new List<ProjectDTO>();
             result = await _projectService.GetAllProjects();
             return Ok(result);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateProject([FromBody] ProjectDTO newProjectDTO)
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetProjectById(Guid id)
         {
-            //var result = await _projectService.CreateProject(newProjectDTO);
-            //return Ok(result);
-            return Ok();
+            ProjectDTO dto = new ProjectDTO();
+            dto = await _projectService.GetProjectById(id);
+            return Ok(dto);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateProject([FromBody] ProjectDTO projectDTO, [FromQuery] Guid projectId)
+        {
+            var result = await _projectService.UpdateProject(projectDTO, projectId);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteProject(Guid id)
+        {
+            var result = await _projectService.DeleteProjectById(id);
+            return Ok(result);
         }
     }
 }

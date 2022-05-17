@@ -13,5 +13,10 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string description { get; set; }
         public string mode { get; set; }//project, investor, krowd
         public string type { get; set; }//I1 - I5, B1 - B4
+        public DateTime createDate { get; set; }
+        public string createBy { get; set; }
+        public DateTime updateDate { get; set; }
+        public string updateBy { get; set; }
+        public bool isDeleted { get; set; }
     }
 }

@@ -24,12 +24,12 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string Description { get; set; }
         [StringLength(20)]
         public string Type { get; set; }
-        [StringLength(10)]
-        public string FromId { get; set; }
-        [StringLength(10)]
-        public string ToId { get; set; }
+        public Guid? FromId { get; set; }
+        public Guid? ToId { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
