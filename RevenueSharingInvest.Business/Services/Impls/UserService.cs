@@ -274,7 +274,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return OTP[0];
         }
 
-        public async Task<bool> VerifyOTP(String OTP, String email)
+/*        public async Task<bool> VerifyOTP(String OTP, String email)
         {
             User userObj = await _userRepository.GetUserByEmail(email);
 
@@ -286,7 +286,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 return false;
             }
-        }
+        }*/
 
     }
 }
