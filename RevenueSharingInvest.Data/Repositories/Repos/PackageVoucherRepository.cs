@@ -96,7 +96,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM PackageVoucher";
+                string query = "SELECT * FROM PackageVoucher WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<PackageVoucher>(query)).ToList();
             }

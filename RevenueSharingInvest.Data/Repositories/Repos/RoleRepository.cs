@@ -88,7 +88,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM Role";
+                string query = "SELECT * FROM Role WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<Role>(query)).ToList();
             }

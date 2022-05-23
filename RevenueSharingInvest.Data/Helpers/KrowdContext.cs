@@ -52,7 +52,7 @@ namespace RevenueSharingInvest.Data.Helpers
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
                 //optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com,1433;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
-                optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=KrowdDB;User ID=SE140840;Trusted_Connection=True");
+                optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;User ID=SE140840;Trusted_Connection=True");
             }
         }
 

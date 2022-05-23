@@ -91,7 +91,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM InvestorWallet";
+                string query = "SELECT * FROM InvestorWallet WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<InvestorWallet>(query)).ToList();
             }

@@ -103,7 +103,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM Payment";
+                string query = "SELECT * FROM Payment WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<Payment>(query)).ToList();
             }

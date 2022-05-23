@@ -88,7 +88,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM Field";
+                string query = "SELECT * FROM Field WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<Field>(query)).ToList();
             }

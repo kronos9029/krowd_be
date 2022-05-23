@@ -100,7 +100,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM VoucherItem";
+                string query = "SELECT * FROM VoucherItem WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<VoucherItem>(query)).ToList();
             }

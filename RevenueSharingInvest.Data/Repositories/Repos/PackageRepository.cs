@@ -118,7 +118,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM Package";
+                string query = "SELECT * FROM Package WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<Package>(query)).ToList();
             }

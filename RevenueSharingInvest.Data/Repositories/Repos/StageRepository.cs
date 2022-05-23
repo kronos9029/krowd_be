@@ -103,7 +103,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM Stage";
+                string query = "SELECT * FROM Stage WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<Stage>(query)).ToList();
             }

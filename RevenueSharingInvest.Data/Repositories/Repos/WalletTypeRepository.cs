@@ -94,7 +94,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM WalletType";
+                string query = "SELECT * FROM WalletType WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<WalletType>(query)).ToList();
             }

@@ -136,7 +136,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM [User]";
+                string query = "SELECT * FROM [User] WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<User>(query)).ToList();
             }

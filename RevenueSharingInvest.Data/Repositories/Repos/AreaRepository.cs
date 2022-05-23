@@ -91,7 +91,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM Area";
+                string query = "SELECT * FROM Area WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<Area>(query)).ToList();
             }
