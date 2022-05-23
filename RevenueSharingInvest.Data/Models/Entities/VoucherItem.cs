@@ -11,6 +11,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
     [Table("VoucherItem")]
     public partial class VoucherItem
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         public Guid VoucherId { get; set; }

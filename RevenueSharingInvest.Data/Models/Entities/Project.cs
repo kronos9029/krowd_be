@@ -22,7 +22,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
             Stages = new HashSet<Stage>();
             Vouchers = new HashSet<Voucher>();
         }
-
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         public Guid? ManagerId { get; set; }

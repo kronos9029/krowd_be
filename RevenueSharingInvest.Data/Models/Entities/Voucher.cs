@@ -16,7 +16,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
             PackageVouchers = new HashSet<PackageVoucher>();
             VoucherItems = new HashSet<VoucherItem>();
         }
-
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         [StringLength(50)]

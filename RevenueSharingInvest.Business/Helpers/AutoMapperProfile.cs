@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +13,7 @@ namespace RevenueSharingInvest.Business.Helpers
     {
         public AutoMapperProfile()
         {
-
+            CreateMap<Area, AreaDTO>().ReverseMap();
         }
     }
 }

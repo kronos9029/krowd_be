@@ -18,6 +18,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
             SystemWallets = new HashSet<SystemWallet>();
         }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         [StringLength(50)]

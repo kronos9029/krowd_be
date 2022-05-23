@@ -37,7 +37,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 

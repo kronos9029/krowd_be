@@ -8,7 +8,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
 {
     public class AreaDTO
     {
-        public string id { get; set; }
         public string city { get; set; }
         public string district { get; set; }
         public string ward { get; set; }

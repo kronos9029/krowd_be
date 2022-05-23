@@ -16,7 +16,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
             Investments = new HashSet<Investment>();
             InvestorWallets = new HashSet<InvestorWallet>();
         }
-
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         public Guid? UserId { get; set; }

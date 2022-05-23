@@ -15,7 +15,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         {
             WalletTransactions = new HashSet<WalletTransaction>();
         }
-
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         public double? Balance { get; set; }

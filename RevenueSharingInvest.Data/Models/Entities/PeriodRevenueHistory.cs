@@ -11,6 +11,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
     [Table("PeriodRevenueHistory")]
     public partial class PeriodRevenueHistory
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         [StringLength(50)]

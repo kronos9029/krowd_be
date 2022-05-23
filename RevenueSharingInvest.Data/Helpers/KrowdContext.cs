@@ -51,7 +51,8 @@ namespace RevenueSharingInvest.Data.Helpers
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;User ID=sa;Password=123");
+                //optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com,1433;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
+                optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=KrowdDB;User ID=SE140840;Trusted_Connection=True");
             }
         }
 
@@ -61,7 +62,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<AccountTransaction>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.FromUser)
                     .WithMany(p => p.AccountTransactionFromUsers)
@@ -76,12 +77,12 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Area>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
             });
 
             modelBuilder.Entity<Business>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
 
             modelBuilder.Entity<BusinessField>(entity =>
@@ -103,12 +104,12 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Field>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
 
             modelBuilder.Entity<Investment>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.Investor)
                     .WithMany(p => p.Investments)
@@ -128,7 +129,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Investor>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.InvestorType)
                     .WithMany(p => p.Investors)
@@ -138,12 +139,12 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<InvestorType>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
 
             modelBuilder.Entity<InvestorWallet>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.Investor)
                     .WithMany(p => p.InvestorWallets)
@@ -158,7 +159,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Package>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Packages)
@@ -185,7 +186,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Payment>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.Investment)
                     .WithMany(p => p.Payments)
@@ -200,7 +201,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<PeriodRevenue>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.PeriodRevenues)
@@ -210,7 +211,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<PeriodRevenueHistory>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.PeriodRevenue)
                     .WithMany(p => p.PeriodRevenueHistories)
@@ -220,7 +221,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Project>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.Area)
                     .WithMany(p => p.Projects)
@@ -240,7 +241,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<ProjectEntity>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.ProjectEntities)
@@ -250,7 +251,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<ProjectWallet>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.ProjectWallets)
@@ -265,7 +266,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Risk>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Risks)
@@ -280,17 +281,17 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<RiskType>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
 
             modelBuilder.Entity<Role>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
 
             modelBuilder.Entity<Stage>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Stages)
@@ -300,7 +301,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<SystemWallet>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.WalletType)
                     .WithMany(p => p.SystemWallets)
@@ -310,7 +311,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.Business)
                     .WithMany(p => p.Users)
@@ -320,7 +321,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Voucher>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Vouchers)
@@ -330,7 +331,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<VoucherItem>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 //entity.HasOne(d => d.Investor)
                 //    .WithMany(p => p.VoucherItems)
@@ -347,7 +348,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<WalletTransaction>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.InvestorWallet)
                     .WithMany(p => p.WalletTransactions)
@@ -372,7 +373,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<WalletType>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
 
             OnModelCreatingPartial(modelBuilder);

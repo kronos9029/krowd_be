@@ -16,7 +16,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
             Payments = new HashSet<Payment>();
             PeriodRevenueHistories = new HashSet<PeriodRevenueHistory>();
         }
-
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         public Guid? ProjectId { get; set; }

@@ -11,6 +11,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
     [Table("AccountTransaction")]
     public partial class AccountTransaction
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         public Guid? FromUserId { get; set; }

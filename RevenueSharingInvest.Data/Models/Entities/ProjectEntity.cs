@@ -11,6 +11,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
     [Table("ProjectEntity")]
     public partial class ProjectEntity
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         public Guid? ProjectId { get; set; }

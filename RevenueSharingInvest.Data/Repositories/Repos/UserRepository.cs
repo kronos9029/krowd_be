@@ -161,6 +161,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 throw new Exception(e.Message, e);
             }
+        }        
+        
+        public async Task<User> GetUserByEmail(string email)
+        {
+            try
+            {
+                string query = "SELECT * FROM [User] WHERE Email = @Email";
+                var parameters = new DynamicParameters();
+                parameters.Add("Email", email, DbType.String);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<User>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
         }
 
         //UPDATE

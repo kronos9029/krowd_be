@@ -17,6 +17,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
             VoucherItems = new HashSet<VoucherItem>();
         }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         public Guid? InvestorId { get; set; }

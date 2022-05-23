@@ -18,7 +18,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
             Investors = new HashSet<Investor>();
             Projects = new HashSet<Project>();
         }
-
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         public Guid? BusinessId { get; set; }

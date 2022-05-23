@@ -16,7 +16,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
             Investments = new HashSet<Investment>();
             PackageVouchers = new HashSet<PackageVoucher>();
         }
-
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         [StringLength(50)]

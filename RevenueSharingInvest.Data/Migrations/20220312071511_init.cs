@@ -11,7 +11,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "Area",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     City = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     District = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Ward = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
@@ -30,7 +30,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "Business",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     PhoneNum = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -58,7 +58,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "Field",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
@@ -76,7 +76,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "InvestorType",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
@@ -94,7 +94,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "RiskType",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
@@ -112,7 +112,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "Role",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
@@ -130,7 +130,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "WalletType",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
@@ -170,7 +170,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "Investor",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     UserId = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
@@ -194,7 +194,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "SystemWallet",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     Balance = table.Column<double>(type: "float", nullable: true),
                     WalletTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
@@ -218,7 +218,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "InvestorWallet",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     InvestorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Balance = table.Column<double>(type: "float", nullable: true),
                     WalletTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -249,7 +249,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "User",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     InvestorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -302,7 +302,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "AccountTransaction",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     FromUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ToUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -333,7 +333,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "Project",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     ManagerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -388,7 +388,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "Package",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Price = table.Column<double>(type: "float", nullable: true),
@@ -422,7 +422,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "PeriodRevenue",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PeriodNum = table.Column<int>(type: "int", nullable: true),
                     ActualAmount = table.Column<double>(type: "float", nullable: true),
@@ -454,7 +454,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "ProjectEntity",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Title = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
@@ -481,7 +481,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "ProjectWallet",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Balance = table.Column<double>(type: "float", nullable: true),
                     WalletTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -512,7 +512,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "Risk",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     RiskTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -544,7 +544,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "Stage",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -573,7 +573,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "Voucher",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Code = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -604,7 +604,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "Investment",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     InvestorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PackageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -644,7 +644,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "PeriodRevenueHistory",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     PeriodRevenueId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -725,7 +725,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "Payment",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     PeriodRevenueId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Amount = table.Column<double>(type: "float", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -760,7 +760,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "WalletTransaction",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     PaymentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Amount = table.Column<double>(type: "float", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
