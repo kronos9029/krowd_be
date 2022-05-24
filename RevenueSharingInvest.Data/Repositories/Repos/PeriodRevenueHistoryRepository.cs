@@ -90,11 +90,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<PeriodRevenueHistory>> GetAllPeriodRevenueHistorys()
+        public async Task<List<PeriodRevenueHistory>> GetAllPeriodRevenueHistories()
         {
             try
             {
-                string query = "SELECT * FROM PeriodRevenueHistory";
+                string query = "SELECT * FROM PeriodRevenueHistory WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<PeriodRevenueHistory>(query)).ToList();
             }

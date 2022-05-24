@@ -94,7 +94,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM AccountTransaction";
+                string query = "SELECT * FROM AccountTransaction WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<AccountTransaction>(query)).ToList();
             }

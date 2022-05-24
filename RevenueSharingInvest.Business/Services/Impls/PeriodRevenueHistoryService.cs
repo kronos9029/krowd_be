@@ -60,9 +60,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<PeriodRevenueHistoryDTO>> GetAllPeriodRevenueHistorys()
+        public async Task<List<PeriodRevenueHistoryDTO>> GetAllPeriodRevenueHistories()
         {
-            List<PeriodRevenueHistory> periodRevenueHistoryList = await _periodRevenueHistoryRepository.GetAllPeriodRevenueHistorys();
+            List<PeriodRevenueHistory> periodRevenueHistoryList = await _periodRevenueHistoryRepository.GetAllPeriodRevenueHistories();
             List<PeriodRevenueHistoryDTO> list = _mapper.Map<List<PeriodRevenueHistoryDTO>>(periodRevenueHistoryList);
             return list;
         }

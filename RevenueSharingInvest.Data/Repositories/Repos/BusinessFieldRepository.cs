@@ -90,7 +90,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM BusinessField";
+                string query = "SELECT * FROM BusinessField WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<BusinessField>(query)).ToList();
             }

@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.Business.Services
         public Task<int> CreatePeriodRevenueHistory(PeriodRevenueHistoryDTO periodRevenueHistoryDTO);
 
         //READ
-        public Task<List<PeriodRevenueHistoryDTO>> GetAllPeriodRevenueHistorys();
+        public Task<List<PeriodRevenueHistoryDTO>> GetAllPeriodRevenueHistories();
         public Task<PeriodRevenueHistoryDTO> GetPeriodRevenueHistoryById(Guid periodRevenueHistoryId);
 
         //UPDATE

@@ -77,12 +77,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Role dto = await _roleRepository.GetRoleById(roleId);
                 result = _mapper.Map<RoleDTO>(dto);
                 if (result == null)
-                    throw new CreateObjectException("No Role Object Found!");
+                    throw new NotFoundException("No Role Object Found!");
                 return result;
             }
-            catch (Exception e)
+            catch (NotFoundException e)
             {
-                throw new NotImplementedException();
+                throw new NotFoundException("No Role Object Found!");
             }
         }
 
@@ -100,7 +100,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
     }

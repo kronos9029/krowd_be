@@ -111,7 +111,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM Business";
+                string query = "SELECT * FROM Business WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<Business>(query)).ToList();
             }

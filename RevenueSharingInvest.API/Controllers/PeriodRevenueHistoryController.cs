@@ -37,7 +37,7 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> GetAllPeriodRevenueHistorys()
         {
             var result = new List<PeriodRevenueHistoryDTO>();
-            result = await _periodRevenueHistoryService.GetAllPeriodRevenueHistorys();
+            result = await _periodRevenueHistoryService.GetAllPeriodRevenueHistories();
             return Ok(result);
         }
 

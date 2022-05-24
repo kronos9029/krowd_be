@@ -94,7 +94,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM Risk";
+                string query = "SELECT * FROM Risk WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<Risk>(query)).ToList();
             }
