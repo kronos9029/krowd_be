@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Business.Services
     public interface IAreaService
     {
         //CREATE
-        public Task<int> CreateArea(AreaDTO areaDTO);
+        public Task<Guid> CreateArea(AreaDTO areaDTO);
 
         //READ
         public Task<List<AreaDTO>> GetAllAreas();

@@ -41,16 +41,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<int> CreateUser(UserDTO userDTO)
+        public async Task<Guid> CreateUser(UserDTO userDTO)
         {
-            int result;
+            Guid newId;
             try
             {
                 User dto = _mapper.Map<User>(userDTO);
-                result = await _userRepository.CreateUser(dto);
-                if (result == 0)
+                newId = await _userRepository.CreateUser(dto);
+                if (newId.Equals(""))
                     throw new CreateObjectException("Can not create User Object!");
-                return result;
+                return newId;
             }
             catch (Exception e)
             {
@@ -117,7 +117,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 

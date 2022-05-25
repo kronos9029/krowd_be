@@ -24,16 +24,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<int> CreateArea(AreaDTO areaDTO)
+        public async Task<Guid> CreateArea(AreaDTO areaDTO)
         {
-            int result;
+            Guid newId;
             try
             {
                 Area dto = _mapper.Map<Area>(areaDTO);
-                result = await _areaRepository.CreateArea(dto);
-                if (result == 0)
+                newId = await _areaRepository.CreateArea(dto);
+                if (newId.Equals(""))
                     throw new CreateObjectException("Can not create Area Object!");
-                return result;
+                return newId;
             }
             catch (Exception e)
             {

@@ -72,8 +72,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
 
 
-                int checkCreateUser = await _userRepository.CreateUser(newInvestorObject);
-                if (checkCreateUser == 0)
+                Guid checkCreateUser = await _userRepository.CreateUser(newInvestorObject);
+                if (checkCreateUser.Equals(""))
                 {
                     throw new RegisterException("Register Fail!!");
                 }
@@ -85,7 +85,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 int checkCreateInvestor = await _investorRepository.CreateInvestor(investor);
                 if (checkCreateInvestor == 0)
                 {
-                    throw new RegisterException("Create Investor Fail!!");
+                    throw new RegisterException("Create Investor Fail!!"); 
                 }
                 response.email = email;
                 response.id = userId;

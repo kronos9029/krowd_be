@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IAreaRepository
     {
         //CREATE
-        public Task<int> CreateArea(Area areaDTO);
+        public Task<Guid> CreateArea(Area areaDTO);
 
         //READ
         public Task<List<Area>> GetAllAreas();

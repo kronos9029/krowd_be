@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreateUser(User userDTO)
+        public async Task<Guid> CreateUser(User userDTO)
         {
             try
             {
@@ -47,6 +47,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @BusinessId, "
                     + "         @RoleId, "
@@ -97,7 +99,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", userDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return (Guid)connection.ExecuteScalar(query, parameters);
             }
             catch (Exception e)
             {
@@ -204,11 +206,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Address = @Address, "
                     + "         BankName = @BankName, "
                     + "         BankAccount = @BankAccount, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         UpdateBy = @UpdateBy"
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -231,11 +230,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Address", userDTO.Address, DbType.String);
                 parameters.Add("BankName", userDTO.BankName, DbType.String);
                 parameters.Add("BankAccount", userDTO.BankAccount, DbType.String);
-                parameters.Add("CreateDate", userDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", userDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", userDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", userDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", userId, DbType.Guid);
 
                 using (var connection = CreateConnection())

@@ -54,7 +54,7 @@ namespace RevenueSharingInvest.Data.Helpers
                 optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com,1433;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
                 //optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=KrowdDB;User ID=SE140840;Trusted_Connection=True");
                 //optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com,1433;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
-                optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;User ID=SE140840;Trusted_Connection=True");
+                optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;Trusted_Connection=True");
             }
         }
 
