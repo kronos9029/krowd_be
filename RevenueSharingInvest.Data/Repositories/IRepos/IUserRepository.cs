@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IUserRepository
     {
         //CREATE
-        public Task<Guid> CreateUser(User userDTO);
+        public Task<string> CreateUser(User userDTO);
 
         //READ
         public Task<List<User>> GetAllUsers();

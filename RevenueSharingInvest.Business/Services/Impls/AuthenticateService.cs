@@ -72,7 +72,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
 
 
-                Guid checkCreateUser = await _userRepository.CreateUser(newInvestorObject);
+                string checkCreateUser = await _userRepository.CreateUser(newInvestorObject);
                 if (checkCreateUser.Equals(""))
                 {
                     throw new RegisterException("Register Fail!!");

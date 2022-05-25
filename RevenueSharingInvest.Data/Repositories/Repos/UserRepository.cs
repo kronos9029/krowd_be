@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<Guid> CreateUser(User userDTO)
+        public async Task<string> CreateUser(User userDTO)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", userDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return (Guid)connection.ExecuteScalar(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
