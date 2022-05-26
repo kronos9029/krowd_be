@@ -5,8 +5,6 @@ using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Services.Impls
@@ -24,20 +22,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<int> CreateRole(RoleDTO roleDTO)
+        public async Task<IdDTO> CreateRole(RoleDTO roleDTO)
         {
-            int result;
+            IdDTO newId = new IdDTO();
             try
             {
                 Role dto = _mapper.Map<Role>(roleDTO);
-                result = await _roleRepository.CreateRole(dto);
-                if (result == 0)
+                newId.id = await _roleRepository.CreateRole(dto);
+                if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create Role Object!");
-                return result;
+                return newId;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
@@ -50,12 +48,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 result = await _roleRepository.DeleteRoleById(roleId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not delete Role Object!");
+                    throw new DeleteObjectException("Can not delete Role Object!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
@@ -82,7 +80,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (NotFoundException e)
             {
-                throw new NotFoundException("No Role Object Found!");
+                throw new Exception(e.Message);
             }
         }
 
@@ -95,7 +93,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Role dto = _mapper.Map<Role>(roleDTO);
                 result = await _roleRepository.UpdateRole(dto, roleId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not update Role Object!");
+                    throw new UpdateObjectException("Can not update Role Object!");
                 return result;
             }
             catch (Exception e)

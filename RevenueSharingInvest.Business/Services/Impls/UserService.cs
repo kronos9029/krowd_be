@@ -92,9 +92,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<UserDTO>> GetAllUsers()
+        public async Task<List<UserDTO>> GetAllUsers(int pageIndex, int pageSize)
         {
-            List<User> userList = await _userRepository.GetAllUsers();
+            List<User> userList = await _userRepository.GetAllUsers(pageIndex, pageSize);
             List<UserDTO> list = _mapper.Map<List<UserDTO>>(userList);
             return list;
         }

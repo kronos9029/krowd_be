@@ -134,13 +134,53 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<User>> GetAllUsers()
+        public async Task<List<User>> GetAllUsers(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM [User] WHERE IsDeleted = 0";
+                var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY RoleId, "
+                    + "                     RoleId, "
+                    + "                     LastName ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM [User]) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         BusinessId, "
+                    + "         RoleId, "
+                    + "         Description, "
+                    + "         LastName, "
+                    + "         FirstName, "
+                    + "         PhoneNum, "
+                    + "         Image, "
+                    + "         IdCard, "
+                    + "         Email, "
+                    + "         Gender, "
+                    + "         DateOfBirth, "
+                    + "         TaxIdentificationNumber, "
+                    + "         City, "
+                    + "         District, "
+                    + "         Ward, "
+                    + "         Address, "
+                    + "         BankName, "
+                    + "         BankAccount, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                var parameters = new DynamicParameters();
+                parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                parameters.Add("PageSize", pageSize, DbType.Int16);
                 using var connection = CreateConnection();
-                return (await connection.QueryAsync<User>(query)).ToList();
+                return (await connection.QueryAsync<User>(query, parameters)).ToList();
             }
             catch (Exception e)
             {

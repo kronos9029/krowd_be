@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreateRole(Role roleDTO)
+        public async Task<string> CreateRole(Role roleDTO)
         {
             try
             {
@@ -31,6 +31,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @Name, "
                     + "         @Description, "
@@ -49,7 +51,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -124,22 +126,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SET "
                     + "         Name = @Name, "
                     + "         Description = @Description, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         UpdateBy = @UpdateBy "
                     + "     WHERE "
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", roleDTO.Name, DbType.String);
                 parameters.Add("Description", roleDTO.Description, DbType.String);
-                parameters.Add("CreateDate", roleDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", roleDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", roleDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", roleDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", roleId, DbType.Guid);
 
                 using (var connection = CreateConnection())

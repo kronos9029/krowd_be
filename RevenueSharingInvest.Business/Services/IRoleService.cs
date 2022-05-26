@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Business.Services
     public interface IRoleService
     {
         //CREATE
-        public Task<int> CreateRole(RoleDTO roleDTO);
+        public Task<IdDTO> CreateRole(RoleDTO roleDTO);
 
         //READ
         public Task<List<RoleDTO>> GetAllRoles();

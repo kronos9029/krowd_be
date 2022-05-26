@@ -34,10 +34,11 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUsers()
+        [Route("{pageIndex},{pageSize}")]
+        public async Task<IActionResult> GetAllUsers(int pageIndex, int pageSize)
         {
             var result = new List<UserDTO>();
-            result = await _userService.GetAllUsers();
+            result = await _userService.GetAllUsers(pageIndex, pageSize);
             return Ok(result);
         }
 

@@ -11,6 +11,6 @@ namespace RevenueSharingInvest.Business.Models.Constant
         Admin,
         Investor,
         BusinessManager,
-        ProjectOwner
+        ProjectMânger
     }
 }

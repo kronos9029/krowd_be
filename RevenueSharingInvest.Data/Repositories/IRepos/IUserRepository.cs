@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<string> CreateUser(User userDTO);
 
         //READ
-        public Task<List<User>> GetAllUsers();
+        public Task<List<User>> GetAllUsers(int pageIndex, int pageSize);
         public Task<User> GetUserById(Guid userId);
         public Task<User> GetUserByEmail(string email);
 

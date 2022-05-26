@@ -16,7 +16,7 @@ namespace RevenueSharingInvest.Business.Services
         public Task<IdDTO> CreateUser(UserDTO userDTO);
 
         //READ
-        public Task<List<UserDTO>> GetAllUsers();
+        public Task<List<UserDTO>> GetAllUsers(int pageIndex, int pageSize);
         public Task<UserDTO> GetUserById(Guid userId);
 
         //UPDATE

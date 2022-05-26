@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IRoleRepository
     {
         //CREATE
-        public Task<int> CreateRole(Role roleDTO);
+        public Task<string> CreateRole(Role roleDTO);
 
         //READ
         public Task<List<Role>> GetAllRoles();
