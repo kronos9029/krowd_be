@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IInvestorRepository
     {
         //CREATE
-        public Task<int> CreateInvestor(Investor investorDTO);
+        public Task<string> CreateInvestor(Investor investorDTO);
 
         //READ
-        public Task<List<Investor>> GetAllInvestors();
+        public Task<List<Investor>> GetAllInvestors(int pageIndex, int pageSize);
         public Task<Investor> GetInvestorById(Guid investorId);
 
         //UPDATE

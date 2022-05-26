@@ -12,10 +12,10 @@ namespace RevenueSharingInvest.Business.Services
         //public Task<InvestorDTO> GetInvestorById(String ID);
         //public Task<List<ProjectMemberDTO>> GetProjectMembers(String projectID);
         //CREATE
-        public Task<int> CreateInvestor(InvestorDTO investorDTO);
+        public Task<IdDTO> CreateInvestor(InvestorDTO investorDTO);
 
         //READ
-        public Task<List<InvestorDTO>> GetAllInvestors();
+        public Task<List<InvestorDTO>> GetAllInvestors(int pageIndex, int pageSize);
         public Task<InvestorDTO> GetInvestorById(Guid investorId);
 
         //UPDATE

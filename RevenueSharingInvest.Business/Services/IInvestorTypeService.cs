@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Business.Services
     public interface IInvestorTypeService
     {
         //CREATE
-        public Task<int> CreateInvestorType(InvestorTypeDTO investorTypeDTO);
+        public Task<IdDTO> CreateInvestorType(InvestorTypeDTO investorTypeDTO);
 
         //READ
         public Task<List<InvestorTypeDTO>> GetAllInvestorTypes();

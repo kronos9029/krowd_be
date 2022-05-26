@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IInvestorTypeRepository
     {
         //CREATE
-        public Task<int> CreateInvestorType(InvestorType investorTypeDTO);
+        public Task<string> CreateInvestorType(InvestorType investorTypeDTO);
 
         //READ
         public Task<List<InvestorType>> GetAllInvestorTypes();

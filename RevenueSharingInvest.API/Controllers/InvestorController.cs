@@ -34,10 +34,11 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllInvestors()
+        [Route("{pageIndex},{pageSize}")]
+        public async Task<IActionResult> GetAllInvestors(int pageIndex, int pageSize)
         {
             var result = new List<InvestorDTO>();
-            result = await _investorService.GetAllInvestors();
+            result = await _investorService.GetAllInvestors(pageIndex, pageSize);
             return Ok(result);
         }
 

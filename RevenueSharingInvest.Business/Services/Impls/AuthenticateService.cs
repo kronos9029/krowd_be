@@ -82,8 +82,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 investor.UserId = userId;
                 investor.InvestorTypeId = Guid.Parse(INVESTOR_TYPE_ID);
 
-                int checkCreateInvestor = await _investorRepository.CreateInvestor(investor);
-                if (checkCreateInvestor == 0)
+                string checkCreateInvestor = await _investorRepository.CreateInvestor(investor);
+                if (checkCreateInvestor.Equals("")) 
                 {
                     throw new RegisterException("Create Investor Fail!!"); 
                 }

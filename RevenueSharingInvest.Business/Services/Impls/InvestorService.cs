@@ -25,20 +25,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<int> CreateInvestor(InvestorDTO investorDTO)
+        public async Task<IdDTO> CreateInvestor(InvestorDTO investorDTO)
         {
-            int result;
+            IdDTO newId = new IdDTO();
             try
             {
                 Investor dto = _mapper.Map<Investor>(investorDTO);
-                result = await _investorRepository.CreateInvestor(dto);
-                if (result == 0)
+                newId.id = await _investorRepository.CreateInvestor(dto);
+                if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create Investor Object!");
-                return result;
+                return newId;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
         
@@ -51,19 +51,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 result = await _investorRepository.DeleteInvestorById(investorId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not delete Investor Object!");
+                    throw new DeleteObjectException("Can not delete Investor Object!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
         //GET ALL
-        public async Task<List<InvestorDTO>> GetAllInvestors()
+        public async Task<List<InvestorDTO>> GetAllInvestors(int pageIndex, int pageSize)
         {
-            List<Investor> investorList = await _investorRepository.GetAllInvestors();
+            List<Investor> investorList = await _investorRepository.GetAllInvestors(pageIndex, pageSize);
             List<InvestorDTO> list = _mapper.Map<List<InvestorDTO>>(investorList);
             return list;
         }
@@ -83,7 +83,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
@@ -96,12 +96,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Investor dto = _mapper.Map<Investor>(investorDTO);
                 result = await _investorRepository.UpdateInvestor(dto, investorId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not update Investor Object!");
+                    throw new UpdateObjectException("Can not update Investor Object!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
     }

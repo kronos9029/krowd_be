@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreateInvestorType(InvestorType investorTypeDTO)
+        public async Task<string> CreateInvestorType(InvestorType investorTypeDTO)
         {
             try
             {
@@ -31,6 +31,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @Name, "
                     + "         @Description, "
@@ -49,7 +51,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", investorTypeDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -124,22 +126,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SET "
                     + "         Name = @Name, "
                     + "         Description = @Description, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         UpdateBy = @UpdateBy "
                     + "     WHERE "
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", investorTypeDTO.Name, DbType.String);
                 parameters.Add("Description", investorTypeDTO.Description, DbType.String);
-                parameters.Add("CreateDate", investorTypeDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", investorTypeDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", investorTypeDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", investorTypeDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", investorTypeId, DbType.Guid);
 
                 using (var connection = CreateConnection())
