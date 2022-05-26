@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Exceptions
 {
-    public class CreateObjectException : Exception
+    public class DeleteObjectException : Exception
     {
-        public CreateObjectException(string message) : base(message)
+        public DeleteObjectException(string message) : base(message)
         {
         }
     }

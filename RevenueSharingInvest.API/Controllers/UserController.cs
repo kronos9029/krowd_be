@@ -65,6 +65,13 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> ClearAllUserData()
+        {
+            var result = await _userService.ClearAllUserData();
+            return Ok(result);
+        }
+
         //[HttpPost]
         //[AllowAnonymous]
         //[Route("authenticate-mobile")]

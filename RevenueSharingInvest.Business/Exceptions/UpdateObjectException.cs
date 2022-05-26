@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Exceptions
 {
-    public class CreateObjectException : Exception
+    public class UpdateObjectException : Exception
     {
-        public CreateObjectException(string message) : base(message)
+        public UpdateObjectException(string message) : base(message)
         {
         }
     }

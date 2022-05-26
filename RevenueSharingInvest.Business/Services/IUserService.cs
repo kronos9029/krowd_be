@@ -24,5 +24,6 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteUserById(Guid userId);
+        public Task<int> ClearAllUserData();
     }
 }

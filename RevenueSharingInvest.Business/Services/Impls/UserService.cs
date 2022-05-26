@@ -40,6 +40,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
+        //CLEAR DATA
+        public async Task<int> ClearAllUserData()
+        {
+            int result;
+            try 
+            {
+                result = await _userRepository.ClearAllUserData();
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         //CREATE
         public async Task<IdDTO> CreateUser(UserDTO userDTO)
         {
@@ -54,7 +69,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
@@ -67,12 +82,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 result = await _userRepository.DeleteUserById(userId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not delete User Object!");
+                    throw new DeleteObjectException("Can not delete User Object!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
@@ -94,12 +109,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 User dto = await _userRepository.GetUserById(userId);
                 result = _mapper.Map<UserDTO>(dto);
                 if (result == null)
-                    throw new CreateObjectException("No User Object Found!");
+                    throw new NotFoundException("No User Object Found!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
@@ -112,7 +127,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 User dto = _mapper.Map<User>(userDTO);
                 result = await _userRepository.UpdateUser(dto, userId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not update User Object!");
+                    throw new UpdateObjectException("Can not update User Object!");
                 return result;
             }
             catch (Exception e)
