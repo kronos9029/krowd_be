@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Business.Services
     public interface IFieldService
     {
         //CREATE
-        public Task<int> CreateField(FieldDTO fieldDTO);
+        public Task<IdDTO> CreateField(FieldDTO fieldDTO);
 
         //READ
-        public Task<List<FieldDTO>> GetAllFields();
+        public Task<List<FieldDTO>> GetAllFields(int pageIndex, int pageSize);
         public Task<FieldDTO> GetFieldById(Guid fieldId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteFieldById(Guid fieldId);
+        public Task<int> ClearAllFieldData();
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models.Constant;
+using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -25,18 +26,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IInvestorRepository _investorRepository;
         private readonly IBusinessRepository _businessRepository;
         private readonly IRoleRepository _roleRepository;
+        private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
-        private readonly String ROLE_ADMIN_ID = "";
-        private readonly String ROLE_INVESTOR_ID = "";
-        private readonly String ROLE_BUSINESS_MANAGER_ID = "";
-        private readonly String ROLE_PROJECT_OWNER_ID = "";
+        private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
+        private readonly String ROLE_INVESTOR_ID = "ad5f37da-ca48-4dc5-9f4b-963d94b535e6";
+        private readonly String ROLE_BUSINESS_MANAGER_ID = "015ae3c5-eee9-4f5c-befb-57d41a43d9df";
+        private readonly String ROLE_PROJECT_OWNER_ID = "2d80393a-3a3d-495d-8dd7-f9261f85cc8f";
         private readonly String INVESTOR_TYPE_ID = "";
 
-        public UserService(IOptions<AppSettings> appSettings, IUserRepository userRepository, IInvestorRepository investorRepository, IMapper mapper)
+        public UserService(IOptions<AppSettings> appSettings, IUserRepository userRepository, IInvestorRepository investorRepository, IValidationService validationService, IMapper mapper)
         {
             _appSettings = appSettings.Value;
             _userRepository = userRepository;
             _investorRepository = investorRepository;
+            _validationService = validationService;
             _mapper = mapper;
         }
 
@@ -61,6 +64,86 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IdDTO newId = new IdDTO();
             try
             {
+                if ((userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID)) && userDTO.businessId == null)
+                    throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
+
+                if ((userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID)
+                    || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID))
+                    && !await _validationService.CheckExistenceId("Business", Guid.Parse(userDTO.businessId)))
+                    throw new NotFoundException("This BusinessId is not existed!!!");
+
+                if (!userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID)
+                    && !userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID)
+                    && !userDTO.roleId.Equals(ROLE_ADMIN_ID)
+                    && !userDTO.roleId.Equals(ROLE_INVESTOR_ID))
+                    throw new NotFoundException("This RoleId is not existed!!!");
+
+                if (userDTO.description != null && (userDTO.description.Equals("string") || userDTO.description.Length == 0))
+                    userDTO.description = null;
+
+                if (userDTO.lastName == null || !await _validationService.CheckText(userDTO.lastName))
+                    throw new InvalidFieldException("Invalid lastName!!!");
+
+                if (userDTO.firstName == null || !await _validationService.CheckText(userDTO.firstName))
+                    throw new InvalidFieldException("Invalid firstName!!!");
+
+                if (userDTO.image != null && (userDTO.image.Equals("string") || userDTO.image.Length == 0))
+                    userDTO.image = null;
+
+                if (userDTO.phoneNum == null || userDTO.phoneNum.Length == 0 || !await _validationService.CheckPhoneNumber(userDTO.phoneNum))
+                    throw new InvalidFieldException("Invalid phoneNum!!!");
+
+                if (userDTO.idCard == null || !await _validationService.CheckText(userDTO.idCard))
+                    throw new InvalidFieldException("Invalid idCard!!!");
+
+                if (userDTO.email == null || userDTO.email.Length == 0 || !await _validationService.CheckEmail(userDTO.email))
+                    throw new InvalidFieldException("Invalid email!!!");
+
+                if (userDTO.gender == null || !await _validationService.CheckText(userDTO.gender))
+                    throw new InvalidFieldException("Invalid gender!!!");
+
+                if (userDTO.dateOfBirth == null || userDTO.dateOfBirth.Length == 0 || !await _validationService.CheckDate(userDTO.dateOfBirth))
+                    throw new InvalidFieldException("Invalid dateOfBirth!!!");
+
+                if (userDTO.taxIdentificationNumber == null || !await _validationService.CheckText(userDTO.taxIdentificationNumber))
+                    throw new InvalidFieldException("Invalid taxIdentificationNumber!!!");
+
+                if (userDTO.city == null || !await _validationService.CheckText(userDTO.city))
+                    throw new InvalidFieldException("Invalid city!!!");
+
+                if (userDTO.district == null || !await _validationService.CheckText(userDTO.district))
+                    throw new InvalidFieldException("Invalid district!!!");
+
+                if (userDTO.ward == null || !await _validationService.CheckText(userDTO.ward))
+                    throw new InvalidFieldException("Invalid ward!!!");
+
+                if (userDTO.address == null || !await _validationService.CheckText(userDTO.address))
+                    throw new InvalidFieldException("Invalid address!!!");
+
+                if (userDTO.bankName == null || !await _validationService.CheckText(userDTO.bankName))
+                    throw new InvalidFieldException("Invalid bankName!!!");
+
+                if (userDTO.bankAccount == null || !await _validationService.CheckText(userDTO.bankAccount))
+                    throw new InvalidFieldException("Invalid bankAccount!!!");
+
+                if (userDTO.createBy != null && userDTO.createBy.Length >= 0)
+                {
+                    if (userDTO.createBy.Equals("string"))
+                        userDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(userDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (userDTO.updateBy != null && userDTO.updateBy.Length >= 0)
+                {
+                    if (userDTO.updateBy.Equals("string"))
+                        userDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(userDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
+                userDTO.isDeleted = false;
+
                 User dto = _mapper.Map<User>(userDTO);
                 newId.id = await _userRepository.CreateUser(dto);
                 if (newId.id.Equals(""))
@@ -79,7 +162,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-
                 result = await _userRepository.DeleteUserById(userId);
                 if (result == 0)
                     throw new DeleteObjectException("Can not delete User Object!");
@@ -94,9 +176,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
         //GET ALL
         public async Task<List<UserDTO>> GetAllUsers(int pageIndex, int pageSize)
         {
-            List<User> userList = await _userRepository.GetAllUsers(pageIndex, pageSize);
-            List<UserDTO> list = _mapper.Map<List<UserDTO>>(userList);
-            return list;
+            try
+            {
+                List<User> userList = await _userRepository.GetAllUsers(pageIndex, pageSize);
+                List<UserDTO> list = _mapper.Map<List<UserDTO>>(userList);
+                return list;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         //GET BY ID
@@ -124,6 +213,88 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                if ((userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID)) && userDTO.businessId == null)
+                    throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
+
+                if (userDTO.businessId != null
+                    && (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID)
+                    || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID))
+                    && !await _validationService.CheckExistenceId("Business", Guid.Parse(userDTO.businessId)))
+                    throw new NotFoundException("This BusinessId is not existed!!!");
+
+                if (userDTO.roleId == null)
+                    throw new InvalidFieldException("Invalid roleId!!!");
+
+                if (!userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID)
+                    && !userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID)
+                    && !userDTO.roleId.Equals(ROLE_ADMIN_ID)
+                    && !userDTO.roleId.Equals(ROLE_INVESTOR_ID))
+                    throw new NotFoundException("This RoleId is not existed!!!");
+
+                if (userDTO.description != null && (userDTO.description.Equals("string") || userDTO.description.Length == 0))
+                    userDTO.description = null;
+
+                if (userDTO.lastName == null || !await _validationService.CheckText(userDTO.lastName))
+                    throw new InvalidFieldException("Invalid lastName!!!");
+
+                if (userDTO.firstName == null || !await _validationService.CheckText(userDTO.firstName))
+                    throw new InvalidFieldException("Invalid firstName!!!");
+
+                if (userDTO.image != null && (userDTO.image.Equals("string") || userDTO.image.Length == 0))
+                    userDTO.image = null;
+
+                if (userDTO.phoneNum == null || userDTO.phoneNum.Length == 0 || !await _validationService.CheckPhoneNumber(userDTO.phoneNum))
+                    throw new InvalidFieldException("Invalid phoneNum!!!");
+
+                if (userDTO.idCard == null || !await _validationService.CheckText(userDTO.idCard))
+                    throw new InvalidFieldException("Invalid idCard!!!");
+
+                if (userDTO.email == null || userDTO.email.Length == 0 || !await _validationService.CheckEmail(userDTO.email))
+                    throw new InvalidFieldException("Invalid email!!!");
+
+                if (userDTO.gender == null || !await _validationService.CheckText(userDTO.gender))
+                    throw new InvalidFieldException("Invalid gender!!!");
+
+                if (userDTO.dateOfBirth == null || userDTO.dateOfBirth.Length == 0 || !await _validationService.CheckDate(userDTO.dateOfBirth))
+                    throw new InvalidFieldException("Invalid dateOfBirth!!!");
+
+                if (userDTO.taxIdentificationNumber == null || !await _validationService.CheckText(userDTO.taxIdentificationNumber))
+                    throw new InvalidFieldException("Invalid taxIdentificationNumber!!!");
+
+                if (userDTO.city == null || !await _validationService.CheckText(userDTO.city))
+                    throw new InvalidFieldException("Invalid city!!!");
+
+                if (userDTO.district == null || !await _validationService.CheckText(userDTO.district))
+                    throw new InvalidFieldException("Invalid district!!!");
+
+                if (userDTO.ward == null || !await _validationService.CheckText(userDTO.ward))
+                    throw new InvalidFieldException("Invalid ward!!!");
+
+                if (userDTO.address == null || !await _validationService.CheckText(userDTO.address))
+                    throw new InvalidFieldException("Invalid address!!!");
+
+                if (userDTO.bankName == null || !await _validationService.CheckText(userDTO.bankName))
+                    throw new InvalidFieldException("Invalid bankName!!!");
+
+                if (userDTO.bankAccount == null || !await _validationService.CheckText(userDTO.bankAccount))
+                    throw new InvalidFieldException("Invalid bankAccount!!!");
+
+                if (userDTO.createBy != null && userDTO.createBy.Length >= 0)
+                {
+                    if (userDTO.createBy.Equals("string"))
+                        userDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(userDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (userDTO.updateBy != null && userDTO.updateBy.Length >= 0)
+                {
+                    if (userDTO.updateBy.Equals("string"))
+                        userDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(userDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
                 User dto = _mapper.Map<User>(userDTO);
                 result = await _userRepository.UpdateUser(dto, userId);
                 if (result == 0)

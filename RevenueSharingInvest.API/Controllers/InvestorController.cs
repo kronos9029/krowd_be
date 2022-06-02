@@ -34,7 +34,6 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        [Route("{pageIndex},{pageSize}")]
         public async Task<IActionResult> GetAllInvestors(int pageIndex, int pageSize)
         {
             var result = new List<InvestorDTO>();
@@ -52,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateInvestor([FromBody] InvestorDTO investorDTO, [FromQuery] Guid investorId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateInvestor([FromBody] InvestorDTO investorDTO, Guid id)
         {
-            var result = await _investorService.UpdateInvestor(investorDTO, investorId);
+            var result = await _investorService.UpdateInvestor(investorDTO, id);
             return Ok(result);
         }
 
@@ -63,6 +63,13 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> DeleteInvestor(Guid id)
         {
             var result = await _investorService.DeleteInvestorById(id);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> ClearAllInvestorData()
+        {
+            var result = await _investorService.ClearAllInvestorData();
             return Ok(result);
         }
     }

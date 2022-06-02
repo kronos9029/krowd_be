@@ -138,12 +138,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "WITH X AS ( "
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
                     + "         SELECT "
                     + "             ROW_NUMBER() OVER ( "
                     + "                 ORDER BY "
                     + "                     RoleId, "
-                    + "                     LastName ASC ) AS Num, "
+                    + "                     FirstName ASC ) AS Num, "
                     + "             * "
                     + "         FROM [User] "
                     + "         WHERE "
@@ -178,11 +180,18 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     WHERE "
                     + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
                     + "         AND @PageIndex * @PageSize";
-                var parameters = new DynamicParameters();
-                parameters.Add("PageIndex", pageIndex, DbType.Int16);
-                parameters.Add("PageSize", pageSize, DbType.Int16);
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<User>(query, parameters)).ToList();
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<User>(query, parameters)).ToList();
+                }    
+                else
+                {
+                    var query = "SELECT * FROM [User] WHERE IsDeleted = 0 ORDER BY RoleId, FirstName ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<User>(query)).ToList();
+                }    
             }
             catch (Exception e)
             {
@@ -249,7 +258,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         BankName = @BankName, "
                     + "         BankAccount = @BankAccount, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy"
+                    + "         UpdateBy = @UpdateBy, "
+                    + "         IsDeleted = @IsDeleted "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -274,6 +284,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("BankAccount", userDTO.BankAccount, DbType.String);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", userDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", userDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", userId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -287,6 +298,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //CLEAR DATA
         public async Task<int> ClearAllUserData()
         {
             try

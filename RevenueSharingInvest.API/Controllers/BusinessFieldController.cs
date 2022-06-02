@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/businessFields")]
+    [Route("api/v1.0/business_fields")]
     [EnableCors]
     //[Authorize]
     public class BusinessFieldController : ControllerBase
@@ -24,43 +24,51 @@ namespace RevenueSharingInvest.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateBusinessField([FromBody] BusinessFieldDTO businessFieldDTO)
-    {
-        var result = await _businessFieldService.CreateBusinessField(businessFieldDTO);
-        return Ok(result);
-    }
+        [HttpPost]
+        public async Task<IActionResult> CreateBusinessField([FromBody] BusinessFieldDTO businessFieldDTO)
+        {
+            var result = await _businessFieldService.CreateBusinessField(businessFieldDTO);
+            return Ok(result);
+        }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAllBusinessFields()
-    {
-        var result = new List<BusinessFieldDTO>();
-        result = await _businessFieldService.GetAllBusinessFields();
-        return Ok(result);
-    }
+        [HttpGet]
+        public async Task<IActionResult> GetAllBusinessFields(int pageIndex, int pageSize)
+        {
+            var result = new List<BusinessFieldDTO>();
+            result = await _businessFieldService.GetAllBusinessFields(pageIndex, pageSize);
+            return Ok(result);
+        }
 
-    [HttpGet]
-    [Route("{businessId},{fieldId}")]
-    public async Task<IActionResult> GetBusinessFieldById(Guid businessId, Guid fieldId)
-    {
-        BusinessFieldDTO dto = new BusinessFieldDTO();
-        dto = await _businessFieldService.GetBusinessFieldById(businessId, fieldId);
-        return Ok(dto);
-    }
+        [HttpGet]
+        [Route("{businessId},{fieldId}")]
+        public async Task<IActionResult> GetBusinessFieldById(Guid businessId, Guid fieldId)
+        {
+            BusinessFieldDTO dto = new BusinessFieldDTO();
+            dto = await _businessFieldService.GetBusinessFieldById(businessId, fieldId);
+            return Ok(dto);
+        }
 
-    [HttpPut]
-    public async Task<IActionResult> UpdateBusinessField([FromBody] BusinessFieldDTO businessFieldDTO, [FromQuery] Guid businessId, [FromQuery] Guid fieldId)
-    {
-        var result = await _businessFieldService.UpdateBusinessField(businessFieldDTO, businessId, fieldId);
-        return Ok(result);
-    }
+        [HttpPut]
+        [Route("{businessId},{fieldId}")]
+        public async Task<IActionResult> UpdateBusinessField([FromBody] BusinessFieldDTO businessFieldDTO, Guid businessId, Guid fieldId)
+        {
+            var result = await _businessFieldService.UpdateBusinessField(businessFieldDTO, businessId, fieldId);
+            return Ok(result);
+        }
 
-    [HttpDelete]
-    [Route("{businessId},{fieldId}")]
-    public async Task<IActionResult> DeleteBusinessField(Guid businessId, Guid fieldId)
-    {
-        var result = await _businessFieldService.DeleteBusinessFieldById(businessId, fieldId);
-        return Ok(result);
+        [HttpDelete]
+        [Route("{businessId},{fieldId}")]
+        public async Task<IActionResult> DeleteBusinessField(Guid businessId, Guid fieldId)
+        {
+            var result = await _businessFieldService.DeleteBusinessFieldById(businessId, fieldId);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> ClearAllBusinessFieldData()
+        {
+            var result = await _businessFieldService.ClearAllBusinessFieldData();
+            return Ok(result);
+        }
     }
-}
 }

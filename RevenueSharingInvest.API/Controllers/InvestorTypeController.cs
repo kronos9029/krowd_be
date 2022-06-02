@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/investorTypes")]
+    [Route("api/v1.0/investor_Types")]
     [EnableCors]
     //[Authorize]
     public class InvestorTypeController : ControllerBase
@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllInvestorTypes()
+        public async Task<IActionResult> GetAllInvestorTypes(int pageIndex, int pageSize)
         {
             var result = new List<InvestorTypeDTO>();
-            result = await _investorTypeService.GetAllInvestorTypes();
+            result = await _investorTypeService.GetAllInvestorTypes(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateInvestorType([FromBody] InvestorTypeDTO investorTypeDTO, [FromQuery] Guid investorTypeId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateInvestorType([FromBody] InvestorTypeDTO investorTypeDTO, Guid id)
         {
-            var result = await _investorTypeService.UpdateInvestorType(investorTypeDTO, investorTypeId);
+            var result = await _investorTypeService.UpdateInvestorType(investorTypeDTO, id);
             return Ok(result);
         }
 
@@ -62,6 +63,13 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> DeleteInvestorType(Guid id)
         {
             var result = await _investorTypeService.DeleteInvestorTypeById(id);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> ClearAllInvestorTypeData()
+        {
+            var result = await _investorTypeService.ClearAllInvestorTypeData();
             return Ok(result);
         }
     }

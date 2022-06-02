@@ -16,10 +16,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
     {
         public BusinessRepository(IConfiguration configuration) : base(configuration)
         {
-        }
+        }        
 
         //CREATE
-        public async Task<int> CreateBusiness(Business businessDTO)
+        public async Task<string> CreateBusiness(Business businessDTO)
         {
             try
             {
@@ -39,6 +39,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ("
                     + "         @Name, "
                     + "         @PhoneNum, "
@@ -47,9 +49,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @Description, "
                     + "         @TaxIdentificationNumber, "
                     + "         @Address, "
-                    + "         @NumOfProject, "
-                    + "         @NumOfSuccessfulProject, "
-                    + "         @SuccessfulRate, "
+                    + "         0, "
+                    + "         null, "
+                    + "         null, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -63,16 +65,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", businessDTO.Description, DbType.String);
                 parameters.Add("TaxIdentificationNumber", businessDTO.TaxIdentificationNumber, DbType.String);
                 parameters.Add("Address", businessDTO.Address, DbType.String);
-                parameters.Add("NumOfProject", businessDTO.NumOfProject, DbType.Int16);
-                parameters.Add("NumOfSuccessfulProject", businessDTO.NumOfSuccessfulProject, DbType.Int16);
-                parameters.Add("SuccessfulRate", businessDTO.SuccessfulRate, DbType.Double);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", businessDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", businessDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -107,13 +106,55 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Business>> GetAllBusiness()
+        public async Task<List<Business>> GetAllBusiness(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM Business WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<Business>(query)).ToList();
+                if(pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     Name ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM Business "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         Name, "
+                    + "         PhoneNum,"
+                    + "         Image, "
+                    + "         Email, "
+                    + "         Description, "
+                    + "         TaxIdentificationNumber, "
+                    + "         Address, "
+                    + "         NumOfProject, "
+                    + "         NumOfSuccessfulProject, "
+                    + "         SuccessfulRate, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Business>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM Business WHERE IsDeleted = 0 ORDER BY Name ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Business>(query)).ToList();
+                }              
             }
             catch (Exception e)
             {
@@ -137,7 +178,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //UPDATE
+        //UPDATE - chưa update NumOfProject, NumOfSuccessfulProject, SuccessfulRate (update riêng)
         public async Task<int> UpdateBusiness(Business businessDTO, Guid businesssId)
         {
             try
@@ -151,11 +192,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Description = @Description, "
                     + "         TaxIdentificationNumber = @TaxIdentificationNumber, "
                     + "         Address = @Address, "
-                    + "         NumOfProject = @NumOfProject, "
-                    + "         NumOfSuccessfulProject = @NumOfSuccessfulProject, "
-                    + "         SuccessfulRate = @SuccessfulRate, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
@@ -170,13 +206,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", businessDTO.Description, DbType.String);
                 parameters.Add("TaxIdentificationNumber", businessDTO.TaxIdentificationNumber, DbType.String);
                 parameters.Add("Address", businessDTO.Address, DbType.String);
-                parameters.Add("NumOfProject", businessDTO.NumOfProject, DbType.Int16);
-                parameters.Add("NumOfSuccessfulProject", businessDTO.NumOfSuccessfulProject, DbType.Int16);
-                parameters.Add("SuccessfulRate", businessDTO.SuccessfulRate, DbType.Double);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", businessDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", businessDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", businessDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", businesssId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -187,6 +219,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllBusinessData()
+        {
+            try
+            {
+                var query = "DELETE FROM Business";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

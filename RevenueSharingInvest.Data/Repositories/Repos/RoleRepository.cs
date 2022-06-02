@@ -90,7 +90,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM Role WHERE IsDeleted = 0";
+                string query = "SELECT * FROM Role WHERE IsDeleted = 0 ORDER BY Name ASC";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<Role>(query)).ToList();
             }

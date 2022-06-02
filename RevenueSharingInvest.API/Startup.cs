@@ -16,8 +16,11 @@ using Microsoft.OpenApi.Models;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Repositories.CommonRepos;
+using RevenueSharingInvest.Data.Repositories.CommonRepos.Validation;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using RevenueSharingInvest.Data.Repositories.Repos;
 using System;
@@ -167,6 +170,10 @@ namespace RevenueSharingInvest.API
             services.AddScoped<IWalletTypeRepository, WalletTypeRepository>();
             services.AddScoped<IWalletTypeService, WalletTypeService>();
 
+            //////////   
+            // VALIDATION
+            services.AddScoped<IValidationRepository, ValidationRepository>();
+            services.AddScoped<IValidationService, ValidationService>();
             //////////        
 
             //CORS

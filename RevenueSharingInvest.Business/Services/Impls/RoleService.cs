@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Business.Exceptions;
+using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -12,12 +13,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
     public class RoleService : IRoleService
     {
         private readonly IRoleRepository _roleRepository;
+        private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
+        private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
 
 
-        public RoleService(IRoleRepository roleRepository, IMapper mapper)
+        public RoleService(IRoleRepository roleRepository, IValidationService validationService, IMapper mapper)
         {
             _roleRepository = roleRepository;
+            _validationService = validationService;
             _mapper = mapper;
         }
 
@@ -27,6 +31,30 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IdDTO newId = new IdDTO();
             try
             {
+                if (roleDTO.name == null || !await _validationService.CheckText(roleDTO.name))
+                    throw new InvalidFieldException("Invalid name!!!");
+
+                if (roleDTO.description != null && (roleDTO.description.Equals("string") || roleDTO.description.Length == 0))
+                    roleDTO.description = null;
+
+                if (roleDTO.createBy != null && roleDTO.createBy.Length >= 0)
+                {
+                    if (roleDTO.createBy.Equals("string"))
+                        roleDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(roleDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (roleDTO.updateBy != null && roleDTO.updateBy.Length >= 0)
+                {
+                    if (roleDTO.updateBy.Equals("string"))
+                        roleDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(roleDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
+                roleDTO.isDeleted = false;
+
                 Role dto = _mapper.Map<Role>(roleDTO);
                 newId.id = await _roleRepository.CreateRole(dto);
                 if (newId.id.Equals(""))
@@ -60,9 +88,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
         //GET ALL
         public async Task<List<RoleDTO>> GetAllRoles()
         {
-            List<Role> roleList = await _roleRepository.GetAllRoles();
-            List<RoleDTO> list = _mapper.Map<List<RoleDTO>>(roleList);
-            return list;
+            try
+            {
+                List<Role> roleList = await _roleRepository.GetAllRoles();
+                List<RoleDTO> list = _mapper.Map<List<RoleDTO>>(roleList);
+                return list;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         //GET BY ID
@@ -90,6 +125,28 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                if (roleDTO.name == null || !await _validationService.CheckText(roleDTO.name))
+                    throw new InvalidFieldException("Invalid name!!!");
+
+                if (roleDTO.description != null && (roleDTO.description.Equals("string") || roleDTO.description.Length == 0))
+                    roleDTO.description = null;
+
+                if (roleDTO.createBy != null && roleDTO.createBy.Length >= 0)
+                {
+                    if (roleDTO.createBy.Equals("string"))
+                        roleDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(roleDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (roleDTO.updateBy != null && roleDTO.updateBy.Length >= 0)
+                {
+                    if (roleDTO.updateBy.Equals("string"))
+                        roleDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(roleDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
                 Role dto = _mapper.Map<Role>(roleDTO);
                 result = await _roleRepository.UpdateRole(dto, roleId);
                 if (result == 0)

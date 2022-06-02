@@ -10,11 +10,11 @@ namespace RevenueSharingInvest.Business.Services
     public interface IBusinessService
     {
         //CREATE
-        public Task<int> CreateBusiness(BusinessDTO businessDTO);
+        public Task<IdDTO> CreateBusiness(BusinessDTO businessDTO);
         //public Task<int> AdminCreateBusiness(Data.Models.Entities.Business newBusiness, string email);
 
         //READ
-        public Task<List<BusinessDTO>> GetAllBusiness();
+        public Task<List<BusinessDTO>> GetAllBusiness(int pageIndex, int pageSize);
         public Task<BusinessDTO> GetBusinessById(Guid businessId);
 
         //UPDATE
@@ -22,5 +22,6 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteBusinessById(Guid businessId);
+        public Task<int> ClearAllBusinessData();
     }
 }
