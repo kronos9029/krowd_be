@@ -117,6 +117,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        public async Task<Role> GetRoleByName(string roleName)
+        {
+            try
+            {
+                string query = "SELECT * FROM Role WHERE Name = @Name";
+                var parameters = new DynamicParameters();
+                parameters.Add("Name", roleName, DbType.String);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Role>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //UPDATE
         public async Task<int> UpdateRole(Role roleDTO, Guid roleId)
         {
