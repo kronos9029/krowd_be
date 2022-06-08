@@ -108,9 +108,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(projectDTO.businessLicense))
                     throw new InvalidFieldException("Invalid businessLicense!!!");
 
-                ///
-                ///status???
-                ///
+                if (projectDTO.status < 0 || projectDTO.status > 5)
+                    throw new InvalidFieldException("Status must be 0(NOT_APPROVED_YET) or 1(DENIED) or 2(CALLING_FOR_INVESTMENT) or 3(CALLING_TIME_IS_OVER) or 4(ACTIVE) or 5(CLOSED)!!!");
 
                 if (projectDTO.createBy != null && projectDTO.createBy.Length >= 0)
                 {
@@ -261,9 +260,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(projectDTO.businessLicense))
                     throw new InvalidFieldException("Invalid businessLicense!!!");
 
-                ///
-                ///status???
-                ///
+                if (projectDTO.status < 0 || projectDTO.status > 5)
+                    throw new InvalidFieldException("Status must be 0(NOT_APPROVED_YET) or 1(DENIED) or 2(CALLING_FOR_INVESTMENT) or 3(CALLING_TIME_IS_OVER) or 4(ACTIVE) or 5(CLOSED)!!!");
 
                 if (projectDTO.approvedBy != null && projectDTO.approvedBy.Length >= 0)
                 {

@@ -26,6 +26,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "INSERT INTO Investor ("
                     + "         UserId, "
                     + "         InvestorTypeId, "
+                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -36,6 +37,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     VALUES ( "
                     + "         @UserId, "
                     + "         @InvestorTypeId, "
+                    + "         0, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -105,6 +107,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id, "
                     + "         UserId, "
                     + "         InvestorTypeId, "
+                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -160,6 +163,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SET "
                     + "         UserId = @UserId, "
                     + "         InvestorTypeId = @InvestorTypeId, "
+                    + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted "
@@ -169,6 +173,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("UserId", investorDTO.UserId, DbType.Guid);
                 parameters.Add("InvestorTypeId", investorDTO.InvestorTypeId, DbType.Guid);
+                parameters.Add("Status", investorDTO.Status, DbType.Int16);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", investorDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", investorDTO.IsDeleted, DbType.Boolean);

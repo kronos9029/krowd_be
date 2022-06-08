@@ -60,6 +60,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckExistenceId("InvestorType", Guid.Parse(investorDTO.investorTypeID)))
                     throw new NotFoundException("This investorTypeID is not existed!!!");
 
+                if (investorDTO.status < 0 || investorDTO.status > 2)
+                    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
+
                 if (investorDTO.createBy != null && investorDTO.createBy.Length >= 0)
                 {
                     if (investorDTO.createBy.Equals("string"))
@@ -159,6 +162,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (!await _validationService.CheckExistenceId("InvestorType", Guid.Parse(investorDTO.investorTypeID)))
                     throw new NotFoundException("This investorTypeID is not existed!!!");
+
+                if (investorDTO.status < 0 || investorDTO.status > 2)
+                    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
 
                 if (investorDTO.createBy != null && investorDTO.createBy.Length >= 0)
                 {

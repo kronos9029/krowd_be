@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using RevenueSharingInvest.Business.Models.Constant;
 
 #nullable disable
 
@@ -47,10 +48,11 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public DateTime? EndDate { get; set; }
         [StringLength(13)]
         public string BusinessLicense { get; set; }
-        public int? Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? ApprovedDate { get; set; }
         public Guid? ApprovedBy { get; set; }
+        public ProjectStatusEnum Status { get; set; }
+
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }

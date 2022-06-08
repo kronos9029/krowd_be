@@ -96,6 +96,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(businessDTO.address))
                     throw new InvalidFieldException("Invalid address!!!");
 
+                if (businessDTO.status < 0 || businessDTO.status > 2)
+                    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
+
                 if (businessDTO.createBy != null && businessDTO.createBy.Length >= 0)
                 {
                     if (businessDTO.createBy.Equals("string"))
@@ -203,6 +206,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (!await _validationService.CheckText(businessDTO.address))
                     throw new InvalidFieldException("Invalid address!!!");
+
+                if (businessDTO.status < 0 || businessDTO.status > 2)
+                    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
 
                 if (businessDTO.createBy != null && businessDTO.createBy.Length >= 0)
                 {

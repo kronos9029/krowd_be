@@ -64,13 +64,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IdDTO newId = new IdDTO();
             try
             {
-                if ((userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID)) && userDTO.businessId == null)
+                if (userDTO.businessId == null || !await _validationService.CheckUUIDFormat(userDTO.businessId))
+                    throw new InvalidFieldException("Invalid businessId!!!");
+
+                if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID))
                     throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
 
                 if ((userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID)
                     || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID))
                     && !await _validationService.CheckExistenceId("Business", Guid.Parse(userDTO.businessId)))
                     throw new NotFoundException("This BusinessId is not existed!!!");
+
+                if (userDTO.roleId == null || !await _validationService.CheckUUIDFormat(userDTO.roleId))
+                    throw new InvalidFieldException("Invalid roleId!!!");
 
                 if (!userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID)
                     && !userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID)
@@ -125,6 +131,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (!await _validationService.CheckText(userDTO.bankAccount))
                     throw new InvalidFieldException("Invalid bankAccount!!!");
+
+                if (userDTO.status < 0 || userDTO.status > 2)
+                    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
 
                 if (userDTO.createBy != null && userDTO.createBy.Length >= 0)
                 {
@@ -213,13 +222,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-                if ((userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID)) && userDTO.businessId == null)
+                if (userDTO.businessId == null || !await _validationService.CheckUUIDFormat(userDTO.businessId))
+                    throw new InvalidFieldException("Invalid businessId!!!");
+
+                if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID))
                     throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
 
                 if ((userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID)
                     || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID))
                     && !await _validationService.CheckExistenceId("Business", Guid.Parse(userDTO.businessId)))
                     throw new NotFoundException("This BusinessId is not existed!!!");
+
+                if (userDTO.roleId == null || !await _validationService.CheckUUIDFormat(userDTO.roleId))
+                    throw new InvalidFieldException("Invalid roleId!!!");
 
                 if (!userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID)
                     && !userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID)
@@ -274,6 +289,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (!await _validationService.CheckText(userDTO.bankAccount))
                     throw new InvalidFieldException("Invalid bankAccount!!!");
+
+                if (userDTO.status < 0 || userDTO.status > 2)
+                    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
 
                 if (userDTO.createBy != null && userDTO.createBy.Length >= 0)
                 {

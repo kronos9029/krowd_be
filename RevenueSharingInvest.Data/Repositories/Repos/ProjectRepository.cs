@@ -42,9 +42,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         StartDate, "
                     + "         EndDate, "
                     + "         BusinessLicense, "
-                    + "         Status, "
                     + "         ApprovedDate, "
                     + "         ApprovedBy, " //Id Admin
+                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, " //Id Business Manager
                     + "         UpdateDate, "
@@ -71,9 +71,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @StartDate, "
                     + "         @EndDate, "
                     + "         @BusinessLicense, "
-                    + "         @Status, "
                     + "         @ApprovedDate, "
                     + "         @ApprovedBy, "
+                    + "         0, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -99,7 +99,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("StartDate", projectDTO.StartDate, DbType.DateTime);
                 parameters.Add("EndDate", projectDTO.EndDate, DbType.DateTime);
                 parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
-                parameters.Add("Status", projectDTO.Status, DbType.Int16);
                 parameters.Add("ApprovedDate", projectDTO.ApprovedDate, DbType.DateTime);
                 parameters.Add("ApprovedBy", projectDTO.ApprovedBy, DbType.Guid);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
@@ -178,10 +177,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         RemainAmount, "
                     + "         StartDate, "
                     + "         EndDate, "
-                    + "         BusinessLicense, "
-                    + "         Status, "
+                    + "         BusinessLicense, "                   
                     + "         ApprovedDate, "
                     + "         ApprovedBy, " //Id Admin
+                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -252,10 +251,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         RemainAmount = @RemainAmount, "
                     + "         StartDate = @StartDate, "
                     + "         EndDate = @EndDate, "
-                    + "         BusinessLicense = @BusinessLicense, "
-                    + "         Status = @Status, "
+                    + "         BusinessLicense = @BusinessLicense, "                    
                     + "         ApprovedDate = @ApprovedDate, "
                     + "         ApprovedBy = @ApprovedBy, "
+                    + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted,"
@@ -281,9 +280,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("StartDate", projectDTO.StartDate, DbType.DateTime);
                 parameters.Add("EndDate", projectDTO.EndDate, DbType.DateTime);
                 parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
-                parameters.Add("Status", projectDTO.Status, DbType.Int16);
                 parameters.Add("ApprovedDate", projectDTO.ApprovedDate, DbType.DateTime);
                 parameters.Add("ApprovedBy", projectDTO.ApprovedBy, DbType.Guid);
+                parameters.Add("Status", projectDTO.Status, DbType.Int16);               
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", projectDTO.IsDeleted, DbType.Boolean);

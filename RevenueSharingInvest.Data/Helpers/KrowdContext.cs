@@ -20,7 +20,7 @@ namespace RevenueSharingInvest.Data.Models.Helpers
 
         public virtual DbSet<AccountTransaction> AccountTransactions { get; set; }
         public virtual DbSet<Area> Areas { get; set; }
-        public virtual DbSet<Business> Businesses { get; set; }
+        public virtual DbSet<RevenueSharingInvest.Data.Models.Entities.Business> Businesses { get; set; }
         public virtual DbSet<BusinessField> BusinessFields { get; set; }
         public virtual DbSet<Field> Fields { get; set; }
         public virtual DbSet<Investment> Investments { get; set; }
@@ -51,8 +51,8 @@ namespace RevenueSharingInvest.Data.Models.Helpers
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;User ID=sa;Password=123");
-                //optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com;nitial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
+                //optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;User ID=sa;Password=123");
+                optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com;nitial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
             }
         }
 
@@ -80,7 +80,7 @@ namespace RevenueSharingInvest.Data.Models.Helpers
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
 
-            modelBuilder.Entity<Business>(entity =>
+            modelBuilder.Entity<RevenueSharingInvest.Data.Models.Entities.Business>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });

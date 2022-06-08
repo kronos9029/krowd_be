@@ -11,6 +11,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string id { get; set; }
         public string userID { get; set; }
         public string investorTypeID { get; set; }
+        public int status { get; set; }
         public DateTime createDate { get; set; }
         public string createBy { get; set; }
         public DateTime updateDate { get; set; }
