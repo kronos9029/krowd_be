@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllStages()
+        public async Task<IActionResult> GetAllStages(int pageIndex, int pageSize)
         {
             var result = new List<StageDTO>();
-            result = await _stageService.GetAllStages();
+            result = await _stageService.GetAllStages(pageIndex, pageSize);
             return Ok(result);
         }
 

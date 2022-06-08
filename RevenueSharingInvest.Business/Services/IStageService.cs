@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.Business.Services
         public Task<IdDTO> CreateStage(StageDTO stageDTO);
 
         //READ
-        public Task<List<StageDTO>> GetAllStages();
+        public Task<List<StageDTO>> GetAllStages(int pageIndex, int pageSize);
         public Task<StageDTO> GetStageById(Guid stageId);
 
         //UPDATE
