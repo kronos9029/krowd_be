@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Models.Helpers;
 
 namespace RevenueSharingInvest.Data.Migrations
 {

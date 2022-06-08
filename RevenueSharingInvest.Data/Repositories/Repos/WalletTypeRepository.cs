@@ -18,8 +18,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
         }
 
+        //CLEAR DATA
+        public async Task<int> ClearAllWalletTypeData()
+        {
+            try
+            {
+                var query = "DELETE FROM WalletType";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         //CREATE
-        public async Task<int> CreateWalletType(WalletType walletTypeDTO)
+        public async Task<string> CreateWalletType(WalletType walletTypeDTO)
         {
             try
             {
@@ -33,6 +48,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @Name, "
                     + "         @Description, "
@@ -55,7 +72,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", walletTypeDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -94,7 +111,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT * FROM WalletType WHERE IsDeleted = 0";
+                string query = "SELECT * FROM WalletType WHERE IsDeleted = 0 ORDER BY Type ASC";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<WalletType>(query)).ToList();
             }
@@ -132,8 +149,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Description = @Description, "
                     + "         Mode = @Mode, "
                     + "         Type = @Type, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
@@ -145,8 +160,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", walletTypeDTO.Description, DbType.String);
                 parameters.Add("Mode", walletTypeDTO.Mode, DbType.String);
                 parameters.Add("Type", walletTypeDTO.Type, DbType.String);
-                parameters.Add("CreateDate", walletTypeDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", walletTypeDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", walletTypeDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", walletTypeDTO.IsDeleted, DbType.Boolean);

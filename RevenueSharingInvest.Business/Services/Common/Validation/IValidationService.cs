@@ -9,6 +9,7 @@ namespace RevenueSharingInvest.Business.Services.Common
     public interface IValidationService
     {
         public Task<bool> CheckExistenceId(string tableName, Guid id);
+        public Task<bool> CheckExistenceUserWithRole(string role, Guid id);
         public Task<bool> CheckUUIDFormat(string uuid);
         public Task<bool> CheckEmail(string email);
         public Task<bool> CheckDate(string date);

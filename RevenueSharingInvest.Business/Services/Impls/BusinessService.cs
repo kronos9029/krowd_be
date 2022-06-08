@@ -75,7 +75,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IdDTO newId = new IdDTO();
             try
             {
-                if (businessDTO.name == null || !await _validationService.CheckText(businessDTO.name))
+                if (!await _validationService.CheckText(businessDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");
 
                 if (businessDTO.phoneNum == null || businessDTO.phoneNum.Length == 0 || !await _validationService.CheckPhoneNumber(businessDTO.phoneNum))
@@ -90,10 +90,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (businessDTO.description != null && (businessDTO.description.Equals("string") || businessDTO.description.Length == 0))
                     businessDTO.description = null;
 
-                if (businessDTO.taxIdentificationNumber == null || !await _validationService.CheckText(businessDTO.taxIdentificationNumber))
+                if (!await _validationService.CheckText(businessDTO.taxIdentificationNumber))
                     throw new InvalidFieldException("Invalid taxIdentificationNumber!!!");
 
-                if (businessDTO.address == null || !await _validationService.CheckText(businessDTO.address))
+                if (!await _validationService.CheckText(businessDTO.address))
                     throw new InvalidFieldException("Invalid address!!!");
 
                 if (businessDTO.createBy != null && businessDTO.createBy.Length >= 0)
@@ -183,7 +183,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-                if (businessDTO.name == null || !await _validationService.CheckText(businessDTO.name))
+                if (!await _validationService.CheckText(businessDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");
 
                 if (businessDTO.phoneNum == null || businessDTO.phoneNum.Length == 0 || !await _validationService.CheckPhoneNumber(businessDTO.phoneNum))
@@ -198,10 +198,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (businessDTO.description != null && (businessDTO.description.Equals("string") || businessDTO.description.Length == 0))
                     businessDTO.description = null;
 
-                if (businessDTO.taxIdentificationNumber == null || !await _validationService.CheckText(businessDTO.taxIdentificationNumber))
+                if (!await _validationService.CheckText(businessDTO.taxIdentificationNumber))
                     throw new InvalidFieldException("Invalid taxIdentificationNumber!!!");
 
-                if (businessDTO.address == null || !await _validationService.CheckText(businessDTO.address))
+                if (!await _validationService.CheckText(businessDTO.address))
                     throw new InvalidFieldException("Invalid address!!!");
 
                 if (businessDTO.createBy != null && businessDTO.createBy.Length >= 0)

@@ -46,7 +46,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IdDTO newId = new IdDTO();
             try
             {
-                if (investorTypeDTO.name == null || !await _validationService.CheckText(investorTypeDTO.name))
+                if (!await _validationService.CheckText(investorTypeDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");
 
                 if (investorTypeDTO.description != null && (investorTypeDTO.description.Equals("string") || investorTypeDTO.description.Length == 0))
@@ -140,7 +140,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-                if (investorTypeDTO.name == null || !await _validationService.CheckText(investorTypeDTO.name))
+                if (!await _validationService.CheckText(investorTypeDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");
 
                 if (investorTypeDTO.description != null && (investorTypeDTO.description.Equals("string") || investorTypeDTO.description.Length == 0))

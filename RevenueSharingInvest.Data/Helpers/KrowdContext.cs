@@ -5,7 +5,7 @@ using RevenueSharingInvest.Data.Models.Entities;
 
 #nullable disable
 
-namespace RevenueSharingInvest.Data.Helpers
+namespace RevenueSharingInvest.Data.Models.Helpers
 {
     public partial class KrowdContext : DbContext
     {
@@ -51,10 +51,8 @@ namespace RevenueSharingInvest.Data.Helpers
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com,1433;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
-                //optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=KrowdDB;User ID=SE140840;Trusted_Connection=True");
-                //optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com,1433;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
-                optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;Trusted_Connection=True");
+                optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;User ID=sa;Password=123");
+                //optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com;nitial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
             }
         }
 
@@ -79,7 +77,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Area>(entity =>
             {
-                entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
 
             modelBuilder.Entity<Business>(entity =>
@@ -333,13 +331,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<VoucherItem>(entity =>
             {
-                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
-
-                //entity.HasOne(d => d.Investor)
-                //    .WithMany(p => p.VoucherItems)
-                //    .HasForeignKey(d => d.InvestorId)
-                //    .OnDelete(DeleteBehavior.ClientSetNull)
-                //    .HasConstraintName("FK_VoucherItem_Investor");
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.HasOne(d => d.Voucher)
                     .WithMany(p => p.VoucherItems)

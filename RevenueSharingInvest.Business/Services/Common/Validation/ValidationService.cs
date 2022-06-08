@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.CommonRepos;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace RevenueSharingInvest.Business.Services.Common
         private readonly IValidationRepository _validationRepository;
         private readonly Regex regexMail = new(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
         private readonly Regex regexPhone = new(@"\(?\d{3}\)?-? *\d{3}-? *-?\d{4}");
-        private readonly Regex regexDOB = new(@"(((0|1)[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/((19|20)\d\d))$");
+        private readonly Regex regexDate = new(@"(((0|1)[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/((19|20)\d\d))$");
         private readonly Regex regexUUID = new(@"(?im)^[{(]?[0-9A-F]{8}[-]?(?:[0-9A-F]{4}[-]?){3}[0-9A-F]{12}[)}]?$");
 
         public ValidationService(IMapper mapper, IValidationRepository validationRepository)
@@ -29,7 +30,7 @@ namespace RevenueSharingInvest.Business.Services.Common
             bool result;
             try
             {
-                Match match = regexDOB.Match(date);
+                Match match = regexDate.Match(date);
                 result = (date.Length == 0) ? false : match.Success;
                 return result;
             }
@@ -69,6 +70,27 @@ namespace RevenueSharingInvest.Business.Services.Common
             }
         }
 
+        public async Task<bool> CheckExistenceUserWithRole(string role, Guid id)
+        {
+            try
+            {
+                dynamic isExisted = await _validationRepository.CheckExistenceUserWithRole(id);
+                if(isExisted != null)
+                {
+                    User dto = _mapper.Map<User>(isExisted);
+                    return (dto.RoleId.Equals(Guid.Parse(role))) ? true : false;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         public Task<bool> CheckInt(int number)
         {
             throw new NotImplementedException();
@@ -94,7 +116,7 @@ namespace RevenueSharingInvest.Business.Services.Common
             bool result;
             try
             {
-                result = (text.Length == 0 || text == null || text.Equals("string")) ? false : true;
+                result = (text == null || text.Length == 0 || text.Equals("string")) ? false : true;
                 return result;
             }
             catch (Exception e)

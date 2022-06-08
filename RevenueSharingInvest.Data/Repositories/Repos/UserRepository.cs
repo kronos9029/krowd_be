@@ -108,7 +108,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteUserById(Guid userId)//thiếu para UpdateBy
+        public async Task<int> DeleteUserById(Guid userId)//thiếu para UpdateBy đợi Authen
         {
             try
             {

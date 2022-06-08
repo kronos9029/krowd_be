@@ -19,6 +19,7 @@ using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Models.Helpers;
 using RevenueSharingInvest.Data.Repositories.CommonRepos;
 using RevenueSharingInvest.Data.Repositories.CommonRepos.Validation;
 using RevenueSharingInvest.Data.Repositories.IRepos;

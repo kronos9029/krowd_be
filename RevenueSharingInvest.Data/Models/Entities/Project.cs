@@ -31,7 +31,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string Name { get; set; }
         public string Image { get; set; }
         public string Description { get; set; }
-        public int? Category { get; set; }
+        public Guid? FieldId { get; set; }
         public string Address { get; set; }
         public Guid? AreaId { get; set; }
         public double? InvestmentTargetCapital { get; set; }

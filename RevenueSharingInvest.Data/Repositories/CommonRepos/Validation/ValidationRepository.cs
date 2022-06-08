@@ -31,5 +31,21 @@ namespace RevenueSharingInvest.Data.Repositories.CommonRepos.Validation
                 throw new Exception(e.Message, e);
             }
         }
+
+        public async Task<dynamic> CheckExistenceUserWithRole(Guid id)
+        {
+            try
+            {
+                string query = "SELECT * FROM [User] WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", id, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<dynamic>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }
