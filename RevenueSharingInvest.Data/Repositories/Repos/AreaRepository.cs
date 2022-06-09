@@ -36,7 +36,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     VALUES ( "
                     + "         @City, "
                     + "         @District, "
-                    + "         @Ward, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
