@@ -24,8 +24,8 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public int duration { get; set; }
         public int numOfStage { get; set; }
         public float remainAmount { get; set; }
-        public DateTime startDate { get; set; }
-        public DateTime endDate { get; set; }
+        public string startDate { get; set; }
+        public string endDate { get; set; }
         public string businessLicense { get; set; }
         public DateTime approvedDate { get; set; }
         public string approvedBy { get; set; }

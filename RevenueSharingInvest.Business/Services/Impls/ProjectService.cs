@@ -108,10 +108,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new InvalidFieldException("remainAmount must be greater than 0!!!");
                 ///
 
-                if (!await _validationService.CheckDate((projectDTO.startDate).ToString()))
+                if (!await _validationService.CheckDate((projectDTO.startDate)))
                     throw new InvalidFieldException("Invalid startDate!!!");
 
-                if (!await _validationService.CheckDate((projectDTO.endDate).ToString()))
+                if (!await _validationService.CheckDate((projectDTO.endDate)))
                     throw new InvalidFieldException("Invalid endDate!!!");
 
                 if (!await _validationService.CheckText(projectDTO.businessLicense))
@@ -119,6 +119,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (projectDTO.status < 0 || projectDTO.status > 5)
                     throw new InvalidFieldException("Status must be 0(NOT_APPROVED_YET) or 1(DENIED) or 2(CALLING_FOR_INVESTMENT) or 3(CALLING_TIME_IS_OVER) or 4(ACTIVE) or 5(CLOSED)!!!");
+
+                projectDTO.approvedBy = null;
 
                 if (projectDTO.createBy != null && projectDTO.createBy.Length >= 0)
                 {
@@ -268,10 +270,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new InvalidFieldException("remainAmount must be greater than 0!!!");
                 ///
 
-                if (!await _validationService.CheckDate((projectDTO.startDate).ToString()))
+                if (!await _validationService.CheckDate((projectDTO.startDate)))
                     throw new InvalidFieldException("Invalid startDate!!!");
 
-                if (!await _validationService.CheckDate((projectDTO.endDate).ToString()))
+                if (!await _validationService.CheckDate((projectDTO.endDate)))
                     throw new InvalidFieldException("Invalid endDate!!!");
 
                 if (!await _validationService.CheckText(projectDTO.businessLicense))
@@ -280,13 +282,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (projectDTO.status < 0 || projectDTO.status > 5)
                     throw new InvalidFieldException("Status must be 0(NOT_APPROVED_YET) or 1(DENIED) or 2(CALLING_FOR_INVESTMENT) or 3(CALLING_TIME_IS_OVER) or 4(ACTIVE) or 5(CLOSED)!!!");
 
-                if (projectDTO.approvedBy != null && projectDTO.approvedBy.Length >= 0)
-                {
-                    if (projectDTO.approvedBy.Equals("string"))
-                        projectDTO.approvedBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(projectDTO.approvedBy))
-                        throw new InvalidFieldException("Invalid approvedBy!!!");
-                }
+                projectDTO.approvedBy = null;
 
                 if (projectDTO.createBy != null && projectDTO.createBy.Length >= 0)
                 {

@@ -71,8 +71,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @StartDate, "
                     + "         @EndDate, "
                     + "         @BusinessLicense, "
-                    + "         @ApprovedDate, "
-                    + "         @ApprovedBy, "
+                    + "         null, "
+                    + "         null, "
                     + "         0, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
@@ -96,11 +96,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Duration", projectDTO.Duration, DbType.Int16);
                 parameters.Add("NumOfStage", projectDTO.NumOfStage, DbType.Int16);
                 parameters.Add("RemainAmount", projectDTO.RemainAmount, DbType.Double);
-                parameters.Add("StartDate", projectDTO.StartDate, DbType.DateTime);
-                parameters.Add("EndDate", projectDTO.EndDate, DbType.DateTime);
+                parameters.Add("StartDate", Convert.ToDateTime(projectDTO.StartDate), DbType.DateTime);               
+                parameters.Add("EndDate", Convert.ToDateTime(projectDTO.EndDate), DbType.DateTime);
                 parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
-                parameters.Add("ApprovedDate", projectDTO.ApprovedDate, DbType.DateTime);
-                parameters.Add("ApprovedBy", projectDTO.ApprovedBy, DbType.Guid);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", projectDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
@@ -252,12 +250,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         StartDate = @StartDate, "
                     + "         EndDate = @EndDate, "
                     + "         BusinessLicense = @BusinessLicense, "                    
-                    + "         ApprovedDate = @ApprovedDate, "
-                    + "         ApprovedBy = @ApprovedBy, "
                     + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted,"
+                    + "         IsDeleted = @IsDeleted "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -277,20 +273,18 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Duration", projectDTO.Duration, DbType.Int16);
                 parameters.Add("NumOfStage", projectDTO.NumOfStage, DbType.Int16);
                 parameters.Add("RemainAmount", projectDTO.RemainAmount, DbType.Double);
-                parameters.Add("StartDate", projectDTO.StartDate, DbType.DateTime);
-                parameters.Add("EndDate", projectDTO.EndDate, DbType.DateTime);
+                parameters.Add("StartDate", Convert.ToDateTime(projectDTO.StartDate), DbType.DateTime);
+                parameters.Add("EndDate", Convert.ToDateTime(projectDTO.EndDate), DbType.DateTime);
                 parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
-                parameters.Add("ApprovedDate", projectDTO.ApprovedDate, DbType.DateTime);
-                parameters.Add("ApprovedBy", projectDTO.ApprovedBy, DbType.Guid);
                 parameters.Add("Status", projectDTO.Status, DbType.Int16);               
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", projectDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", projectDTO.Id, DbType.Guid);
+                parameters.Add("Id", projectId, DbType.Guid);
 
                 using (var connection = CreateConnection())
-                {
-                    return await connection.ExecuteAsync(query, parameters);
+                {                   
+                    return await connection.ExecuteAsync(query, parameters);                  
                 }
             }
             catch (Exception e)
