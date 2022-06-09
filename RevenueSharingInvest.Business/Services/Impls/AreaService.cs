@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Business.Exceptions;
+using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -14,24 +15,65 @@ namespace RevenueSharingInvest.Business.Services.Impls
     public class AreaService : IAreaService
     {
         private readonly IAreaRepository _areaRepository;
+        private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
 
-        public AreaService(IAreaRepository areaRepository, IMapper mapper)
+        public AreaService(IAreaRepository areaRepository, IValidationService validationService, IMapper mapper)
         {
             _areaRepository = areaRepository;
+            _validationService = validationService;
             _mapper = mapper;
         }
 
-        //CREATE
-        public async Task<Guid> CreateArea(AreaDTO areaDTO)
+        //CLEAR DATA
+        public async Task<int> ClearAllAreaData()
         {
-            Guid newId;
+            int result;
             try
             {
+                result = await _areaRepository.ClearAllAreaData();
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        //CREATE
+        public async Task<IdDTO> CreateArea(AreaDTO areaDTO)
+        {
+            IdDTO newId = new IdDTO();
+            try
+            {
+                if (!await _validationService.CheckText(areaDTO.city))
+                    throw new InvalidFieldException("Invalid city!!!");
+
+                if (!await _validationService.CheckText(areaDTO.district))
+                    throw new InvalidFieldException("Invalid district!!!");
+
+                if (areaDTO.createBy != null && areaDTO.createBy.Length >= 0)
+                {
+                    if (areaDTO.createBy.Equals("string"))
+                        areaDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(areaDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (areaDTO.updateBy != null && areaDTO.updateBy.Length >= 0)
+                {
+                    if (areaDTO.updateBy.Equals("string"))
+                        areaDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(areaDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
+                areaDTO.isDeleted = false;
+
                 Area dto = _mapper.Map<Area>(areaDTO);
-                newId = await _areaRepository.CreateArea(dto);
-                if (newId.Equals(""))
+                newId.id = await _areaRepository.CreateArea(dto);
+                if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create Area Object!");
                 return newId;
             }
@@ -47,24 +89,30 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-
                 result = await _areaRepository.DeleteAreaById(areaId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not delete Area Object!");
+                    throw new DeleteObjectException("Can not delete Area Object!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
         //GET ALL
-        public async Task<List<AreaDTO>> GetAllAreas()
+        public async Task<List<AreaDTO>> GetAllAreas(int pageIndex, int pageSize)
         {
-            List<Area> areaList = await _areaRepository.GetAllAreas();
-            List<AreaDTO> list = _mapper.Map<List<AreaDTO>>(areaList);
-            return list;
+            try
+            {
+                List<Area> areaList = await _areaRepository.GetAllAreas(pageIndex, pageSize);
+                List<AreaDTO> list = _mapper.Map<List<AreaDTO>>(areaList);
+                return list;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         //GET BY ID
@@ -77,12 +125,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Area dto = await _areaRepository.GetAreaById(areaId);
                 result = _mapper.Map<AreaDTO>(dto);
                 if (result == null)
-                    throw new CreateObjectException("No Area Object Found!");
+                    throw new NotFoundException("No Area Object Found!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
@@ -92,15 +140,37 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                if (!await _validationService.CheckText(areaDTO.city))
+                    throw new InvalidFieldException("Invalid city!!!");
+
+                if (!await _validationService.CheckText(areaDTO.district))
+                    throw new InvalidFieldException("Invalid district!!!");
+
+                if (areaDTO.createBy != null && areaDTO.createBy.Length >= 0)
+                {
+                    if (areaDTO.createBy.Equals("string"))
+                        areaDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(areaDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (areaDTO.updateBy != null && areaDTO.updateBy.Length >= 0)
+                {
+                    if (areaDTO.updateBy.Equals("string"))
+                        areaDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(areaDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
                 Area dto = _mapper.Map<Area>(areaDTO);
                 result = await _areaRepository.UpdateArea(dto, areaId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not update Area Object!");
+                    throw new UpdateObjectException("Can not update Area Object!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
     }

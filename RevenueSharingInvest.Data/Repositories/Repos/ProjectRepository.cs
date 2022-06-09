@@ -26,12 +26,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "INSERT INTO Project ("
                     + "         ManagerId, " //Id của chủ dự án
                     + "         BusinessId, " //Id của Business
+                    + "         FieldId, "
+                    + "         AreaId, "
                     + "         Name, "
                     + "         Image, "
-                    + "         Description, "
-                    + "         FieldId, "
+                    + "         Description, "                  
                     + "         Address, "
-                    + "         ProjectId, "
                     + "         InvestmentTargetCapital, "
                     + "         InvestedCapital, "
                     + "         SharedRevenue, "
@@ -55,12 +55,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     VALUES ( "
                     + "         @ManagerId, "
                     + "         @BusinessId, "
+                    + "         @FieldId, "
+                    + "         @AreaId, "
                     + "         @Name, "
                     + "         @Image, "
-                    + "         @Description, "
-                    + "         @FieldId, "
+                    + "         @Description, "                   
                     + "         @Address, "
-                    + "         @ProjectId, "
                     + "         @InvestmentTargetCapital, "
                     + "         @InvestedCapital, "
                     + "         @SharedRevenue, "
@@ -83,12 +83,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("ManagerId", projectDTO.ManagerId, DbType.Guid);
                 parameters.Add("BusinessId", projectDTO.BusinessId, DbType.Guid);
+                parameters.Add("FieldId", projectDTO.FieldId, DbType.Guid);
+                parameters.Add("AreaId", projectDTO.AreaId, DbType.Guid);
                 parameters.Add("Name", projectDTO.Name, DbType.String);
                 parameters.Add("Image", projectDTO.Image, DbType.String);
                 parameters.Add("Description", projectDTO.Description, DbType.String);
-                parameters.Add("FieldId", projectDTO.FieldId, DbType.Guid);
-                parameters.Add("Address", projectDTO.Description, DbType.String);
-                parameters.Add("AreaId", projectDTO.AreaId, DbType.Guid);
+                parameters.Add("Address", projectDTO.Description, DbType.String);               
                 parameters.Add("InvestmentTargetCapital", projectDTO.InvestmentTargetCapital, DbType.Double);
                 parameters.Add("InvestedCapital", projectDTO.InvestedCapital, DbType.Double);
                 parameters.Add("SharedRevenue", projectDTO.SharedRevenue, DbType.Double);
@@ -162,12 +162,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id, "
                     + "         ManagerId, " //Id của chủ dự án
                     + "         BusinessId, " //Id của Business
+                    + "         FieldId, "
+                    + "         AreaId, "
                     + "         Name, "
                     + "         Image, "
-                    + "         Description, "
-                    + "         FieldId, "
-                    + "         Address, "
-                    + "         ProjectId, "
+                    + "         Description, "                    
+                    + "         Address, "                   
                     + "         InvestmentTargetCapital, "
                     + "         InvestedCapital, "
                     + "         SharedRevenue, "
@@ -236,12 +236,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SET "
                     + "         ManagerId = @ManagerId, "
                     + "         BusinessId = @BusinessId, "
+                    + "         FieldId = @FieldId, "
+                    + "         AreaId = @AreaId, "
                     + "         Name = @Name, "
                     + "         Image = @Image, "
-                    + "         Description = @Description, "
-                    + "         FieldId = @FieldId, "
-                    + "         Address = @Address, "
-                    + "         ProjectId = @ProjectId, "
+                    + "         Description = @Description, "                  
+                    + "         Address = @Address, "                
                     + "         InvestmentTargetCapital = @InvestmentTargetCapital, "
                     + "         InvestedCapital = @InvestedCapital, "
                     + "         SharedRevenue = @SharedRevenue, "
@@ -264,12 +264,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("ManagerId", projectDTO.ManagerId, DbType.Guid);
                 parameters.Add("BusinessId", projectDTO.BusinessId, DbType.Guid);
+                parameters.Add("FieldId", projectDTO.FieldId, DbType.Guid);
+                parameters.Add("AreaId", projectDTO.AreaId, DbType.Guid);
                 parameters.Add("Name", projectDTO.Name, DbType.String);
                 parameters.Add("Image", projectDTO.Image, DbType.String);
                 parameters.Add("Description", projectDTO.Description, DbType.String);
-                parameters.Add("FieldId", projectDTO.FieldId, DbType.Guid);
                 parameters.Add("Address", projectDTO.Description, DbType.String);
-                parameters.Add("AreaId", projectDTO.AreaId, DbType.Guid);
                 parameters.Add("InvestmentTargetCapital", projectDTO.InvestmentTargetCapital, DbType.Double);
                 parameters.Add("InvestedCapital", projectDTO.InvestedCapital, DbType.Double);
                 parameters.Add("SharedRevenue", projectDTO.SharedRevenue, DbType.Double);

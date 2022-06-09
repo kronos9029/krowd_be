@@ -64,17 +64,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IdDTO newId = new IdDTO();
             try
             {
-                if (userDTO.businessId == null || !await _validationService.CheckUUIDFormat(userDTO.businessId))
-                    throw new InvalidFieldException("Invalid businessId!!!");
-
-                if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID))
-                    throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
-
-                if ((userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID)
-                    || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID))
-                    && !await _validationService.CheckExistenceId("Business", Guid.Parse(userDTO.businessId)))
-                    throw new NotFoundException("This BusinessId is not existed!!!");
-
                 if (userDTO.roleId == null || !await _validationService.CheckUUIDFormat(userDTO.roleId))
                     throw new InvalidFieldException("Invalid roleId!!!");
 
@@ -83,6 +72,22 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     && !userDTO.roleId.Equals(ROLE_ADMIN_ID)
                     && !userDTO.roleId.Equals(ROLE_INVESTOR_ID))
                     throw new NotFoundException("This RoleId is not existed!!!");
+
+                if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID))
+                {
+                    if (userDTO.businessId == null)
+                        throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
+
+                    if (!await _validationService.CheckUUIDFormat(userDTO.businessId))
+                        throw new InvalidFieldException("Invalid businessId!!!");
+
+                    if (!await _validationService.CheckExistenceId("Business", Guid.Parse(userDTO.businessId)))
+                        throw new NotFoundException("This BusinessId is not existed!!!");
+                }
+                else
+                {
+                    userDTO.businessId = null;
+                }               
 
                 if (userDTO.description != null && (userDTO.description.Equals("string") || userDTO.description.Length == 0))
                     userDTO.description = null;
@@ -119,9 +124,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (!await _validationService.CheckText(userDTO.district))
                     throw new InvalidFieldException("Invalid district!!!");
-
-                if (!await _validationService.CheckText(userDTO.ward))
-                    throw new InvalidFieldException("Invalid ward!!!");
 
                 if (!await _validationService.CheckText(userDTO.address))
                     throw new InvalidFieldException("Invalid address!!!");
@@ -222,17 +224,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-                if (userDTO.businessId == null || !await _validationService.CheckUUIDFormat(userDTO.businessId))
-                    throw new InvalidFieldException("Invalid businessId!!!");
-
-                if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID))
-                    throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
-
-                if ((userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID)
-                    || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID))
-                    && !await _validationService.CheckExistenceId("Business", Guid.Parse(userDTO.businessId)))
-                    throw new NotFoundException("This BusinessId is not existed!!!");
-
                 if (userDTO.roleId == null || !await _validationService.CheckUUIDFormat(userDTO.roleId))
                     throw new InvalidFieldException("Invalid roleId!!!");
 
@@ -241,6 +232,22 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     && !userDTO.roleId.Equals(ROLE_ADMIN_ID)
                     && !userDTO.roleId.Equals(ROLE_INVESTOR_ID))
                     throw new NotFoundException("This RoleId is not existed!!!");
+
+                if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID))
+                {
+                    if (userDTO.businessId == null)
+                        throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
+
+                    if (!await _validationService.CheckUUIDFormat(userDTO.businessId))
+                        throw new InvalidFieldException("Invalid businessId!!!");
+
+                    if (!await _validationService.CheckExistenceId("Business", Guid.Parse(userDTO.businessId)))
+                        throw new NotFoundException("This BusinessId is not existed!!!");
+                }
+                else
+                {
+                    userDTO.businessId = null;
+                }
 
                 if (userDTO.description != null && (userDTO.description.Equals("string") || userDTO.description.Length == 0))
                     userDTO.description = null;
@@ -277,9 +284,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (!await _validationService.CheckText(userDTO.district))
                     throw new InvalidFieldException("Invalid district!!!");
-
-                if (!await _validationService.CheckText(userDTO.ward))
-                    throw new InvalidFieldException("Invalid ward!!!");
 
                 if (!await _validationService.CheckText(userDTO.address))
                     throw new InvalidFieldException("Invalid address!!!");

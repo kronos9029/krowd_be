@@ -59,11 +59,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckExistenceId("Business", Guid.Parse(projectDTO.businessId)))
                     throw new NotFoundException("This BusinessId is not existed!!!");
 
-                //if (projectDTO.areaId == null || !await _validationService.CheckUUIDFormat(projectDTO.areaId))
-                //    throw new InvalidFieldException("Invalid areaId!!!");
+                if (projectDTO.fieldId == null || !await _validationService.CheckUUIDFormat(projectDTO.fieldId))
+                    throw new InvalidFieldException("Invalid fieldId!!!");
 
-                //if (!await _validationService.CheckExistenceId("Area", Guid.Parse(projectDTO.areaId)))
-                //    throw new NotFoundException("This areaId is not existed!!!");
+                if (!await _validationService.CheckExistenceId("Field", Guid.Parse(projectDTO.fieldId)))
+                    throw new NotFoundException("This fieldId is not existed!!!");
+
+                //
+                //check field với businessId co trong businessField không!!!
+                //
+                if (projectDTO.areaId == null || !await _validationService.CheckUUIDFormat(projectDTO.areaId))
+                    throw new InvalidFieldException("Invalid areaId!!!");
+
+                if (!await _validationService.CheckExistenceId("Area", Guid.Parse(projectDTO.areaId)))
+                    throw new NotFoundException("This areaId is not existed!!!");
 
                 if (!await _validationService.CheckText(projectDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");
@@ -211,11 +220,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckExistenceId("Business", Guid.Parse(projectDTO.businessId)))
                     throw new NotFoundException("This BusinessId is not existed!!!");
 
-                //if (projectDTO.areaId == null || !await _validationService.CheckUUIDFormat(projectDTO.areaId))
-                //    throw new InvalidFieldException("Invalid areaId!!!");
+                if (projectDTO.fieldId == null || !await _validationService.CheckUUIDFormat(projectDTO.fieldId))
+                    throw new InvalidFieldException("Invalid fieldId!!!");
 
-                //if (!await _validationService.CheckExistenceId("Area", Guid.Parse(projectDTO.areaId)))
-                //    throw new NotFoundException("This areaId is not existed!!!");
+                if (!await _validationService.CheckExistenceId("Field", Guid.Parse(projectDTO.fieldId)))
+                    throw new NotFoundException("This fieldId is not existed!!!");
+                //
+                //check field với businessId co trong businessField không!!!
+                //
+                if (projectDTO.areaId == null || !await _validationService.CheckUUIDFormat(projectDTO.areaId))
+                    throw new InvalidFieldException("Invalid areaId!!!");
+
+                if (!await _validationService.CheckExistenceId("Area", Guid.Parse(projectDTO.areaId)))
+                    throw new NotFoundException("This areaId is not existed!!!");
 
                 if (!await _validationService.CheckText(projectDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");

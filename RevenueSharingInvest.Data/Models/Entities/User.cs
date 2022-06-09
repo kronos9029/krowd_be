@@ -46,8 +46,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string City { get; set; }
         [StringLength(20)]
         public string District { get; set; }
-        [StringLength(20)]
-        public string Ward { get; set; }
         public string Address { get; set; }
         [StringLength(50)]
         public string BankName { get; set; }

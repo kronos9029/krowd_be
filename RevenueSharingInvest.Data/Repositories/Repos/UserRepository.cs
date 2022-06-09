@@ -38,7 +38,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         TaxIdentificationNumber, "
                     + "         City, "
                     + "         District, "
-                    + "         Ward, "
                     + "         Address, "                    
                     + "         BankName, "                    
                     + "         BankAccount, "                    
@@ -65,7 +64,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @TaxIdentificationNumber, "
                     + "         @City, "
                     + "         @District, "
-                    + "         @Ward, "
                     + "         @Address, "
                     + "         @BankName, "
                     + "         @BankAccount, "
@@ -91,7 +89,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("TaxIdentificationNumber", userDTO.TaxIdentificationNumber, DbType.String);
                 parameters.Add("City", userDTO.City, DbType.String);
                 parameters.Add("District", userDTO.District, DbType.String);
-                parameters.Add("Ward", userDTO.Ward, DbType.String);
                 parameters.Add("Address", userDTO.Address, DbType.String);
                 parameters.Add("BankName", userDTO.BankName, DbType.String);
                 parameters.Add("BankAccount", userDTO.BankAccount, DbType.String);
@@ -168,7 +165,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         TaxIdentificationNumber, "
                     + "         City, "
                     + "         District, "
-                    + "         Ward, "
                     + "         Address, "
                     + "         BankName, "
                     + "         BankAccount, "
@@ -256,7 +252,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         TaxIdentificationNumber = @TaxIdentificationNumber, "
                     + "         City = @City, "
                     + "         District = @District, "
-                    + "         Ward = @Ward, "
                     + "         Address = @Address, "
                     + "         BankName = @BankName, "
                     + "         BankAccount = @BankAccount, "
@@ -282,7 +277,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("TaxIdentificationNumber", userDTO.TaxIdentificationNumber, DbType.String);
                 parameters.Add("City", userDTO.City, DbType.String);
                 parameters.Add("District", userDTO.District, DbType.String);
-                parameters.Add("Ward", userDTO.Ward, DbType.String);
                 parameters.Add("Address", userDTO.Address, DbType.String);
                 parameters.Add("BankName", userDTO.BankName, DbType.String);
                 parameters.Add("BankAccount", userDTO.BankAccount, DbType.String);
