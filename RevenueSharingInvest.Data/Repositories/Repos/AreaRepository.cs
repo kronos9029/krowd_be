@@ -185,5 +185,20 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllAreaData()
+        {
+            try
+            {
+                var query = "DELETE FROM Area";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }
