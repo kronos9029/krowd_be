@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateRole([FromBody] RoleDTO roleDTO, [FromQuery] Guid roleId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateRole([FromBody] RoleDTO roleDTO, Guid id)
         {
-            var result = await _roleService.UpdateRole(roleDTO, roleId);
+            var result = await _roleService.UpdateRole(roleDTO, id);
             return Ok(result);
         }
 

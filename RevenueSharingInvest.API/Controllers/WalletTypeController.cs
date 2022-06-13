@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/walletTypes")]
+    [Route("api/v1.0/wallet_Types")]
     [EnableCors]
     //[Authorize]
     public class WalletTypeController : ControllerBase
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateWalletType([FromBody] WalletTypeDTO walletTypeDTO, [FromQuery] Guid walletTypeId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateWalletType([FromBody] WalletTypeDTO walletTypeDTO, Guid id)
         {
-            var result = await _walletTypeService.UpdateWalletType(walletTypeDTO, walletTypeId);
+            var result = await _walletTypeService.UpdateWalletType(walletTypeDTO, id);
             return Ok(result);
         }
 
@@ -62,6 +63,13 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> DeleteWalletType(Guid id)
         {
             var result = await _walletTypeService.DeleteWalletTypeById(id);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> ClearAllWalletTypeData()
+        {
+            var result = await _walletTypeService.ClearAllWalletTypeData();
             return Ok(result);
         }
     }

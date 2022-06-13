@@ -38,10 +38,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         TaxIdentificationNumber, "
                     + "         City, "
                     + "         District, "
-                    + "         Ward, "
                     + "         Address, "                    
                     + "         BankName, "                    
                     + "         BankAccount, "                    
+                    + "         Status, "                    
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -64,10 +64,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @TaxIdentificationNumber, "
                     + "         @City, "
                     + "         @District, "
-                    + "         @Ward, "
                     + "         @Address, "
                     + "         @BankName, "
                     + "         @BankAccount, "
+                    + "         0, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -89,7 +89,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("TaxIdentificationNumber", userDTO.TaxIdentificationNumber, DbType.String);
                 parameters.Add("City", userDTO.City, DbType.String);
                 parameters.Add("District", userDTO.District, DbType.String);
-                parameters.Add("Ward", userDTO.Ward, DbType.String);
                 parameters.Add("Address", userDTO.Address, DbType.String);
                 parameters.Add("BankName", userDTO.BankName, DbType.String);
                 parameters.Add("BankAccount", userDTO.BankAccount, DbType.String);
@@ -108,7 +107,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteUserById(Guid userId)//thiếu para UpdateBy
+        public async Task<int> DeleteUserById(Guid userId)//thiếu para UpdateBy đợi Authen
         {
             try
             {
@@ -138,12 +137,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "WITH X AS ( "
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
                     + "         SELECT "
                     + "             ROW_NUMBER() OVER ( "
                     + "                 ORDER BY "
                     + "                     RoleId, "
-                    + "                     LastName ASC ) AS Num, "
+                    + "                     FirstName ASC ) AS Num, "
                     + "             * "
                     + "         FROM [User] "
                     + "         WHERE "
@@ -164,10 +165,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         TaxIdentificationNumber, "
                     + "         City, "
                     + "         District, "
-                    + "         Ward, "
                     + "         Address, "
                     + "         BankName, "
                     + "         BankAccount, "
+                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -178,11 +179,18 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     WHERE "
                     + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
                     + "         AND @PageIndex * @PageSize";
-                var parameters = new DynamicParameters();
-                parameters.Add("PageIndex", pageIndex, DbType.Int16);
-                parameters.Add("PageSize", pageSize, DbType.Int16);
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<User>(query, parameters)).ToList();
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<User>(query, parameters)).ToList();
+                }    
+                else
+                {
+                    var query = "SELECT * FROM [User] WHERE IsDeleted = 0 ORDER BY RoleId, FirstName ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<User>(query)).ToList();
+                }    
             }
             catch (Exception e)
             {
@@ -244,12 +252,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         TaxIdentificationNumber = @TaxIdentificationNumber, "
                     + "         City = @City, "
                     + "         District = @District, "
-                    + "         Ward = @Ward, "
                     + "         Address = @Address, "
                     + "         BankName = @BankName, "
                     + "         BankAccount = @BankAccount, "
+                    + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy"
+                    + "         UpdateBy = @UpdateBy, "
+                    + "         IsDeleted = @IsDeleted "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -268,12 +277,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("TaxIdentificationNumber", userDTO.TaxIdentificationNumber, DbType.String);
                 parameters.Add("City", userDTO.City, DbType.String);
                 parameters.Add("District", userDTO.District, DbType.String);
-                parameters.Add("Ward", userDTO.Ward, DbType.String);
                 parameters.Add("Address", userDTO.Address, DbType.String);
                 parameters.Add("BankName", userDTO.BankName, DbType.String);
                 parameters.Add("BankAccount", userDTO.BankAccount, DbType.String);
+                parameters.Add("Status", userDTO.Status, DbType.Int16);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", userDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", userDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", userId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -287,6 +297,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //CLEAR DATA
         public async Task<int> ClearAllUserData()
         {
             try

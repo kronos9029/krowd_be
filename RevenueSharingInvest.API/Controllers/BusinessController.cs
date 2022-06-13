@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/businesss")]
+    [Route("api/v1.0/businesses")]
     [EnableCors]
     //[Authorize]
     public class BusinessController : ControllerBase
@@ -32,10 +32,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllBusinesses()
+        public async Task<IActionResult> GetAllBusinesses(int pageIndex, int pageSize)
         {
             var result = new List<BusinessDTO>();
-            result = await _businessService.GetAllBusiness();
+            result = await _businessService.GetAllBusiness(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -49,9 +49,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateBusiness([FromBody] BusinessDTO businessDTO, [FromQuery] Guid businessId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateBusiness([FromBody] BusinessDTO businessDTO, Guid id)
         {
-            var result = await _businessService.UpdateBusiness(businessDTO, businessId);
+            var result = await _businessService.UpdateBusiness(businessDTO, id);
             return Ok(result);
         }
 
@@ -60,6 +61,13 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> DeleteBusiness(Guid id)
         {
             var result = await _businessService.DeleteBusinessById(id);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> ClearAllBusinessData()
+        {
+            var result = await _businessService.ClearAllBusinessData();
             return Ok(result);
         }
     }

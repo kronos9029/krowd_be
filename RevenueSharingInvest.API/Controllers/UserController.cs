@@ -34,7 +34,6 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        [Route("{pageIndex},{pageSize}")]
         public async Task<IActionResult> GetAllUsers(int pageIndex, int pageSize)
         {
             var result = new List<UserDTO>();
@@ -52,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateUser([FromBody] UserDTO userDTO, [FromQuery] Guid userId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateUser([FromBody] UserDTO userDTO, Guid id)
         {
-            var result = await _userService.UpdateUser(userDTO, userId);
+            var result = await _userService.UpdateUser(userDTO, id);
             return Ok(result);
         }
 

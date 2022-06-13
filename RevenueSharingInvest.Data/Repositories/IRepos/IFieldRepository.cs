@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IFieldRepository
     {
         //CREATE
-        public Task<int> CreateField(Field fieldDTO);
+        public Task<string> CreateField(Field fieldDTO);
 
         //READ
-        public Task<List<Field>> GetAllFields();
+        public Task<List<Field>> GetAllFields(int pageIndex, int pageSize);
         public Task<Field> GetFieldById(Guid fieldId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteFieldById(Guid fieldId);
+        public Task<int> ClearAllFieldData();
     }
 }

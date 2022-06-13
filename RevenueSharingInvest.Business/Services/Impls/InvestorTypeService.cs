@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Business.Exceptions;
+using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -14,13 +15,29 @@ namespace RevenueSharingInvest.Business.Services.Impls
     public class InvestorTypeService : IInvestorTypeService
     {
         private readonly IInvestorTypeRepository _investorTypeRepository;
+        private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
 
-        public InvestorTypeService(IInvestorTypeRepository investorTypeRepository, IMapper mapper)
+        public InvestorTypeService(IInvestorTypeRepository investorTypeRepository, IValidationService validationService, IMapper mapper)
         {
             _investorTypeRepository = investorTypeRepository;
+            _validationService = validationService;
             _mapper = mapper;
+        }
+
+        public async Task<int> ClearAllInvestorTypeData()
+        {
+            int result;
+            try
+            {
+                result = await _investorTypeRepository.ClearAllInvestorTypeData();
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         //CREATE
@@ -29,6 +46,30 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IdDTO newId = new IdDTO();
             try
             {
+                if (!await _validationService.CheckText(investorTypeDTO.name))
+                    throw new InvalidFieldException("Invalid name!!!");
+
+                if (investorTypeDTO.description != null && (investorTypeDTO.description.Equals("string") || investorTypeDTO.description.Length == 0))
+                    investorTypeDTO.description = null;
+
+                if (investorTypeDTO.createBy != null && investorTypeDTO.createBy.Length >= 0)
+                {
+                    if (investorTypeDTO.createBy.Equals("string"))
+                        investorTypeDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(investorTypeDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (investorTypeDTO.updateBy != null && investorTypeDTO.updateBy.Length >= 0)
+                {
+                    if (investorTypeDTO.updateBy.Equals("string"))
+                        investorTypeDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(investorTypeDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
+                investorTypeDTO.isDeleted = false;
+
                 InvestorType dto = _mapper.Map<InvestorType>(investorTypeDTO);
                 newId.id = await _investorTypeRepository.CreateInvestorType(dto);
                 if (newId.id.Equals(""))
@@ -60,11 +101,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<InvestorTypeDTO>> GetAllInvestorTypes()
+        public async Task<List<InvestorTypeDTO>> GetAllInvestorTypes(int pageIndex, int pageSize)
         {
-            List<InvestorType> investorTypeList = await _investorTypeRepository.GetAllInvestorTypes();
-            List<InvestorTypeDTO> list = _mapper.Map<List<InvestorTypeDTO>>(investorTypeList);
-            return list;
+            try
+            {
+                List<InvestorType> investorTypeList = await _investorTypeRepository.GetAllInvestorTypes(pageIndex, pageSize);
+                List<InvestorTypeDTO> list = _mapper.Map<List<InvestorTypeDTO>>(investorTypeList);
+                return list;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         //GET BY ID
@@ -77,7 +125,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 InvestorType dto = await _investorTypeRepository.GetInvestorTypeById(investorTypeId);
                 result = _mapper.Map<InvestorTypeDTO>(dto);
                 if (result == null)
-                    throw new CreateObjectException("No InvestorType Object Found!");
+                    throw new NotFoundException("No InvestorType Object Found!");
                 return result;
             }
             catch (Exception e)
@@ -92,6 +140,28 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                if (!await _validationService.CheckText(investorTypeDTO.name))
+                    throw new InvalidFieldException("Invalid name!!!");
+
+                if (investorTypeDTO.description != null && (investorTypeDTO.description.Equals("string") || investorTypeDTO.description.Length == 0))
+                    investorTypeDTO.description = null;
+
+                if (investorTypeDTO.createBy != null && investorTypeDTO.createBy.Length >= 0)
+                {
+                    if (investorTypeDTO.createBy.Equals("string"))
+                        investorTypeDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(investorTypeDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (investorTypeDTO.updateBy != null && investorTypeDTO.updateBy.Length >= 0)
+                {
+                    if (investorTypeDTO.updateBy.Equals("string"))
+                        investorTypeDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(investorTypeDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
                 InvestorType dto = _mapper.Map<InvestorType>(investorTypeDTO);
                 result = await _investorTypeRepository.UpdateInvestorType(dto, investorTypeId);
                 if (result == 0)

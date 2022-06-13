@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAreas()
+        public async Task<IActionResult> GetAllAreas(int pageIndex, int pageSize)
         {
             var result = new List<AreaDTO>();
-            result = await _areaService.GetAllAreas();
+            result = await _areaService.GetAllAreas(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateArea([FromBody] AreaDTO areaDTO, [FromQuery] Guid areaId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateArea([FromBody] AreaDTO areaDTO, Guid id)
         {
-            var result = await _areaService.UpdateArea(areaDTO, areaId);
+            var result = await _areaService.UpdateArea(areaDTO, id);
             return Ok(result);
         }
 
@@ -64,5 +65,12 @@ namespace RevenueSharingInvest.API.Controllers
             var result = await _areaService.DeleteAreaById(id);
             return Ok(result);
         }
+
+        //[HttpDelete]
+        //public async Task<IActionResult> ClearAllAreaData()
+        //{
+        //    var result = await _areaService.ClearAllAreaData();
+        //    return Ok(result);
+        //}
     }
 }

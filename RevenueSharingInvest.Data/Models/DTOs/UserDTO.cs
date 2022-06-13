@@ -23,10 +23,10 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string taxIdentificationNumber { get; set; }
         public string city { get; set; }
         public string district { get; set; }
-        public string ward { get; set; }
         public string address { get; set; }
         public string bankName { get; set; }
         public string bankAccount { get; set; }
+        public int status { get; set; }
         public DateTime createDate { get; set; }
         public string createBy { get; set; }
         public DateTime updateDate { get; set; }

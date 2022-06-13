@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Business.Services
     public interface IAreaService
     {
         //CREATE
-        public Task<Guid> CreateArea(AreaDTO areaDTO);
+        public Task<IdDTO> CreateArea(AreaDTO areaDTO);
 
         //READ
-        public Task<List<AreaDTO>> GetAllAreas();
+        public Task<List<AreaDTO>> GetAllAreas(int pageIndex, int pageSize);
         public Task<AreaDTO> GetAreaById(Guid areaId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteAreaById(Guid areaId);
+        public Task<int> ClearAllAreaData();
     }
 }

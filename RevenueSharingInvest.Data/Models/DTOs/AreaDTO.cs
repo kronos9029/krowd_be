@@ -11,7 +11,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string id { get; set; }
         public string city { get; set; }
         public string district { get; set; }
-        public string ward { get; set; }
         public DateTime createDate { get; set; }
         public string createBy { get; set; }
         public DateTime updateDate { get; set; }

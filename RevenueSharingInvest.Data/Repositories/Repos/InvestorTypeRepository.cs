@@ -86,13 +86,47 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<InvestorType>> GetAllInvestorTypes()
+        public async Task<List<InvestorType>> GetAllInvestorTypes(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM InvestorType WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<InvestorType>(query)).ToList();
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     Name ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM InvestorType "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         Name, "
+                    + "         Description, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<InvestorType>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM InvestorType WHERE IsDeleted = 0 ORDER BY Name ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<InvestorType>(query)).ToList();
+                }               
             }
             catch (Exception e)
             {
@@ -127,7 +161,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Name = @Name, "
                     + "         Description = @Description, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy "
+                    + "         UpdateBy = @UpdateBy, "
+                    + "         IsDeleted = @IsDeleted "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -136,6 +171,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", investorTypeDTO.Description, DbType.String);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", investorTypeDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", investorTypeDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", investorTypeId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -146,6 +182,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllInvestorTypeData()
+        {
+            try
+            {
+                var query = "DELETE FROM InvestorType";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

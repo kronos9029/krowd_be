@@ -10,16 +10,17 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IBusinessRepository
     {
         //CREATE
-        public Task<int> CreateBusiness(Business businessDTO);
+        public Task<string> CreateBusiness(RevenueSharingInvest.Data.Models.Entities.Business businessDTO);
 
         //READ
-        public Task<List<Business>> GetAllBusiness();
-        public Task<Business> GetBusinessById(Guid businesssId);
+        public Task<List<RevenueSharingInvest.Data.Models.Entities.Business>> GetAllBusiness(int pageIndex, int pageSize);
+        public Task<RevenueSharingInvest.Data.Models.Entities.Business> GetBusinessById(Guid businesssId);
 
         //UPDATE
-        public Task<int> UpdateBusiness(Business businessDTO, Guid businesssId);
+        public Task<int> UpdateBusiness(RevenueSharingInvest.Data.Models.Entities.Business businessDTO, Guid businesssId);
 
         //DELETE
         public Task<int> DeleteBusinessById(Guid businesssId);
+        public Task<int> ClearAllBusinessData();
     }
 }

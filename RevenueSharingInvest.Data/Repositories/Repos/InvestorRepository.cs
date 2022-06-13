@@ -26,6 +26,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "INSERT INTO Investor ("
                     + "         UserId, "
                     + "         InvestorTypeId, "
+                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -36,6 +37,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     VALUES ( "
                     + "         @UserId, "
                     + "         @InvestorTypeId, "
+                    + "         0, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -90,7 +92,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "WITH X AS ( "
+                if(pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
                     + "         SELECT "
                     + "             ROW_NUMBER() OVER ( "
                     + "                 ORDER BY "
@@ -103,6 +107,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id, "
                     + "         UserId, "
                     + "         InvestorTypeId, "
+                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -113,11 +118,18 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     WHERE "
                     + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
                     + "         AND @PageIndex * @PageSize";
-                var parameters = new DynamicParameters();
-                parameters.Add("PageIndex", pageIndex, DbType.Int16);
-                parameters.Add("PageSize", pageSize, DbType.Int16);
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<Investor>(query, parameters)).ToList();
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Investor>(query, parameters)).ToList();
+                }                
+                else
+                {
+                    var query = "SELECT * FROM Investor WHERE IsDeleted = 0 ORDER BY InvestorTypeId ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Investor>(query)).ToList();
+                }
             }
             catch (Exception e)
             {
@@ -151,16 +163,20 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SET "
                     + "         UserId = @UserId, "
                     + "         InvestorTypeId = @InvestorTypeId, "
+                    + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy "
+                    + "         UpdateBy = @UpdateBy, "
+                    + "         IsDeleted = @IsDeleted "
                     + "     WHERE "
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("UserId", investorDTO.UserId, DbType.Guid);
                 parameters.Add("InvestorTypeId", investorDTO.InvestorTypeId, DbType.Guid);
+                parameters.Add("Status", investorDTO.Status, DbType.Int16);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", investorDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", investorDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", investorId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -171,6 +187,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllInvestorData()
+        {
+            try
+            {
+                var query = "DELETE FROM Investor";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

@@ -19,19 +19,19 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreateProject(Project projectDTO)
+        public async Task<string> CreateProject(Project projectDTO)
         {
             try
             {
                 var query = "INSERT INTO Project ("
                     + "         ManagerId, " //Id của chủ dự án
                     + "         BusinessId, " //Id của Business
+                    + "         FieldId, "
+                    + "         AreaId, "
                     + "         Name, "
                     + "         Image, "
-                    + "         Description, "
-                    + "         Category, "
+                    + "         Description, "                  
                     + "         Address, "
-                    + "         ProjectId, "
                     + "         InvestmentTargetCapital, "
                     + "         InvestedCapital, "
                     + "         SharedRevenue, "
@@ -42,23 +42,25 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         StartDate, "
                     + "         EndDate, "
                     + "         BusinessLicense, "
-                    + "         Status, "
                     + "         ApprovedDate, "
                     + "         ApprovedBy, " //Id Admin
+                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, " //Id Business Manager
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @ManagerId, "
                     + "         @BusinessId, "
+                    + "         @FieldId, "
+                    + "         @AreaId, "
                     + "         @Name, "
                     + "         @Image, "
-                    + "         @Description, "
-                    + "         @Category, "
+                    + "         @Description, "                   
                     + "         @Address, "
-                    + "         @ProjectId, "
                     + "         @InvestmentTargetCapital, "
                     + "         @InvestedCapital, "
                     + "         @SharedRevenue, "
@@ -69,9 +71,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @StartDate, "
                     + "         @EndDate, "
                     + "         @BusinessLicense, "
-                    + "         @Status, "
-                    + "         @ApprovedDate, "
-                    + "         @ApprovedBy, "
+                    + "         null, "
+                    + "         null, "
+                    + "         0, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -81,12 +83,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("ManagerId", projectDTO.ManagerId, DbType.Guid);
                 parameters.Add("BusinessId", projectDTO.BusinessId, DbType.Guid);
+                parameters.Add("FieldId", projectDTO.FieldId, DbType.Guid);
+                parameters.Add("AreaId", projectDTO.AreaId, DbType.Guid);
                 parameters.Add("Name", projectDTO.Name, DbType.String);
                 parameters.Add("Image", projectDTO.Image, DbType.String);
                 parameters.Add("Description", projectDTO.Description, DbType.String);
-                parameters.Add("Category", projectDTO.Category, DbType.Int16);
-                parameters.Add("Address", projectDTO.Description, DbType.String);
-                parameters.Add("AreaId", projectDTO.AreaId, DbType.Guid);
+                parameters.Add("Address", projectDTO.Description, DbType.String);               
                 parameters.Add("InvestmentTargetCapital", projectDTO.InvestmentTargetCapital, DbType.Double);
                 parameters.Add("InvestedCapital", projectDTO.InvestedCapital, DbType.Double);
                 parameters.Add("SharedRevenue", projectDTO.SharedRevenue, DbType.Double);
@@ -94,19 +96,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Duration", projectDTO.Duration, DbType.Int16);
                 parameters.Add("NumOfStage", projectDTO.NumOfStage, DbType.Int16);
                 parameters.Add("RemainAmount", projectDTO.RemainAmount, DbType.Double);
-                parameters.Add("StartDate", projectDTO.StartDate, DbType.DateTime);
-                parameters.Add("EndDate", projectDTO.EndDate, DbType.DateTime);
+                parameters.Add("StartDate", Convert.ToDateTime(projectDTO.StartDate), DbType.DateTime);               
+                parameters.Add("EndDate", Convert.ToDateTime(projectDTO.EndDate), DbType.DateTime);
                 parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
-                parameters.Add("Status", projectDTO.Status, DbType.Int16);
-                parameters.Add("ApprovedDate", projectDTO.ApprovedDate, DbType.DateTime);
-                parameters.Add("ApprovedBy", projectDTO.ApprovedBy, DbType.Guid);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", projectDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -141,13 +140,67 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Project>> GetAllProjects()
+        public async Task<List<Project>> GetAllProjects(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM Project WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<Project>(query)).ToList();
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     BusinessId ASC, "
+                    + "                     Name ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM Project "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         ManagerId, " //Id của chủ dự án
+                    + "         BusinessId, " //Id của Business
+                    + "         FieldId, "
+                    + "         AreaId, "
+                    + "         Name, "
+                    + "         Image, "
+                    + "         Description, "                    
+                    + "         Address, "                   
+                    + "         InvestmentTargetCapital, "
+                    + "         InvestedCapital, "
+                    + "         SharedRevenue, "
+                    + "         Multiplier, "
+                    + "         Duration, "
+                    + "         NumOfStage, "
+                    + "         RemainAmount, "
+                    + "         StartDate, "
+                    + "         EndDate, "
+                    + "         BusinessLicense, "                   
+                    + "         ApprovedDate, "
+                    + "         ApprovedBy, " //Id Admin
+                    + "         Status, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Project>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM Project WHERE IsDeleted = 0 ORDER BY BusinessId ASC, Name ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Project>(query)).ToList();
+                }              
             }
             catch (Exception e)
             {
@@ -181,12 +234,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SET "
                     + "         ManagerId = @ManagerId, "
                     + "         BusinessId = @BusinessId, "
+                    + "         FieldId = @FieldId, "
+                    + "         AreaId = @AreaId, "
                     + "         Name = @Name, "
                     + "         Image = @Image, "
-                    + "         Description = @Description, "
-                    + "         Category = @Category, "
-                    + "         Address = @Address, "
-                    + "         ProjectId = @ProjectId, "
+                    + "         Description = @Description, "                  
+                    + "         Address = @Address, "                
                     + "         InvestmentTargetCapital = @InvestmentTargetCapital, "
                     + "         InvestedCapital = @InvestedCapital, "
                     + "         SharedRevenue = @SharedRevenue, "
@@ -196,27 +249,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         RemainAmount = @RemainAmount, "
                     + "         StartDate = @StartDate, "
                     + "         EndDate = @EndDate, "
-                    + "         BusinessLicense = @BusinessLicense, "
+                    + "         BusinessLicense = @BusinessLicense, "                    
                     + "         Status = @Status, "
-                    + "         ApprovedDate = @ApprovedDate, "
-                    + "         ApprovedBy = @ApprovedBy, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted,"
+                    + "         IsDeleted = @IsDeleted "
                     + "     WHERE "
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("ManagerId", projectDTO.ManagerId, DbType.Guid);
                 parameters.Add("BusinessId", projectDTO.BusinessId, DbType.Guid);
+                parameters.Add("FieldId", projectDTO.FieldId, DbType.Guid);
+                parameters.Add("AreaId", projectDTO.AreaId, DbType.Guid);
                 parameters.Add("Name", projectDTO.Name, DbType.String);
                 parameters.Add("Image", projectDTO.Image, DbType.String);
                 parameters.Add("Description", projectDTO.Description, DbType.String);
-                parameters.Add("Category", projectDTO.Category, DbType.Int16);
                 parameters.Add("Address", projectDTO.Description, DbType.String);
-                parameters.Add("AreaId", projectDTO.AreaId, DbType.Guid);
                 parameters.Add("InvestmentTargetCapital", projectDTO.InvestmentTargetCapital, DbType.Double);
                 parameters.Add("InvestedCapital", projectDTO.InvestedCapital, DbType.Double);
                 parameters.Add("SharedRevenue", projectDTO.SharedRevenue, DbType.Double);
@@ -224,22 +273,18 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Duration", projectDTO.Duration, DbType.Int16);
                 parameters.Add("NumOfStage", projectDTO.NumOfStage, DbType.Int16);
                 parameters.Add("RemainAmount", projectDTO.RemainAmount, DbType.Double);
-                parameters.Add("StartDate", projectDTO.StartDate, DbType.DateTime);
-                parameters.Add("EndDate", projectDTO.EndDate, DbType.DateTime);
+                parameters.Add("StartDate", Convert.ToDateTime(projectDTO.StartDate), DbType.DateTime);
+                parameters.Add("EndDate", Convert.ToDateTime(projectDTO.EndDate), DbType.DateTime);
                 parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
-                parameters.Add("Status", projectDTO.Status, DbType.Int16);
-                parameters.Add("ApprovedDate", projectDTO.ApprovedDate, DbType.DateTime);
-                parameters.Add("ApprovedBy", projectDTO.ApprovedBy, DbType.Guid);
-                parameters.Add("CreateDate", projectDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", projectDTO.CreateBy, DbType.Guid);
+                parameters.Add("Status", projectDTO.Status, DbType.Int16);               
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", projectDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", projectDTO.Id, DbType.Guid);
+                parameters.Add("Id", projectId, DbType.Guid);
 
                 using (var connection = CreateConnection())
-                {
-                    return await connection.ExecuteAsync(query, parameters);
+                {                   
+                    return await connection.ExecuteAsync(query, parameters);                  
                 }
             }
             catch (Exception e)
@@ -248,6 +293,19 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-
+        //CLEAR DATA***
+        public async Task<int> ClearAllProjectData()
+        {
+            try
+            {
+                var query = "DELETE FROM Project";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

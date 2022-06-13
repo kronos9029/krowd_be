@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using RevenueSharingInvest.Data.Models.Constants;
 
 #nullable disable
 
@@ -28,7 +29,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string LastName { get; set; }
         [StringLength(20)]
         public string FirstName { get; set; }
-        public string Status { get; set; }
         [StringLength(11)]
         public string PhoneNum { get; set; }
         public string Image { get; set; }
@@ -46,13 +46,12 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string City { get; set; }
         [StringLength(20)]
         public string District { get; set; }
-        [StringLength(20)]
-        public string Ward { get; set; }
         public string Address { get; set; }
         [StringLength(50)]
         public string BankName { get; set; }
         [StringLength(20)]
         public string BankAccount { get; set; }
+        public ObjectStatusEnum Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }

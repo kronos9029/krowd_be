@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllStages()
+        public async Task<IActionResult> GetAllStages(int pageIndex, int pageSize)
         {
             var result = new List<StageDTO>();
-            result = await _stageService.GetAllStages();
+            result = await _stageService.GetAllStages(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateStage([FromBody] StageDTO stageDTO, [FromQuery] Guid stageId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateStage([FromBody] StageDTO stageDTO, Guid id)
         {
-            var result = await _stageService.UpdateStage(stageDTO, stageId);
+            var result = await _stageService.UpdateStage(stageDTO, id);
             return Ok(result);
         }
 

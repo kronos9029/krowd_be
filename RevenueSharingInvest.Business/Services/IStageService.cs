@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Business.Services
     public interface IStageService
     {
         //CREATE
-        public Task<int> CreateStage(StageDTO stageDTO);
+        public Task<IdDTO> CreateStage(StageDTO stageDTO);
 
         //READ
-        public Task<List<StageDTO>> GetAllStages();
+        public Task<List<StageDTO>> GetAllStages(int pageIndex, int pageSize);
         public Task<StageDTO> GetStageById(Guid stageId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteStageById(Guid stageId);
+        public Task<int> ClearAllStageData();
     }
 }

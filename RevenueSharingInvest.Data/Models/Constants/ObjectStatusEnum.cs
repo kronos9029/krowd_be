@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RevenueSharingInvest.Business.Models.Constant
+namespace RevenueSharingInvest.Data.Models.Constants
 {
-    public enum ProjectStatusEnum
+    public enum ObjectStatusEnum
     {
-
+        ACTIVE,
+        INACTIVE,
+        BLOCKED
     }
 }

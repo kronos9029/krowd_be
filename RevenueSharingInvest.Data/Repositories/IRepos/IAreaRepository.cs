@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IAreaRepository
     {
         //CREATE
-        public Task<Guid> CreateArea(Area areaDTO);
+        public Task<string> CreateArea(Area areaDTO);
 
         //READ
-        public Task<List<Area>> GetAllAreas();
+        public Task<List<Area>> GetAllAreas(int pageIndex, int pageSize);
         public Task<Area> GetAreaById(Guid areaId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteAreaById(Guid areaId);
+        public Task<int> ClearAllAreaData();
     }
 }

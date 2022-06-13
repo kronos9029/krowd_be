@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IStageRepository
     {
         //CREATE
-        public Task<int> CreateStage(Stage stageDTO);
+        public Task<string> CreateStage(Stage stageDTO);
 
         //READ
-        public Task<List<Stage>> GetAllStages();
+        public Task<List<Stage>> GetAllStages(int pageIndex, int pageSize);
         public Task<Stage> GetStageById(Guid stageId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteStageById(Guid stageId);
+        public Task<int> ClearAllStageData();
     }
 }

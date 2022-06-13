@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> CreateBusinessField(BusinessField businessFieldDTO);
 
         //READ
-        public Task<List<BusinessField>> GetAllBusinessFields();
+        public Task<List<BusinessField>> GetAllBusinessFields(int pageIndex, int pageSize);
         public Task<BusinessField> GetBusinessFieldById(Guid businessId, Guid fieldId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteBusinessFieldById(Guid businessId, Guid fieldId);
+        public Task<int> ClearAllBusinessFieldData();
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using RevenueSharingInvest.Data.Models.Constants;
 
 #nullable disable
 
@@ -21,6 +22,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid Id { get; set; }
         public Guid? UserId { get; set; }
         public Guid? InvestorTypeId { get; set; }
+        public ObjectStatusEnum Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }

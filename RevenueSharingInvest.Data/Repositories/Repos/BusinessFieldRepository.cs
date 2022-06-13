@@ -86,13 +86,46 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<BusinessField>> GetAllBusinessFields()
+        public async Task<List<BusinessField>> GetAllBusinessFields(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM BusinessField WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<BusinessField>(query)).ToList();
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     FieldId ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM BusinessField "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         BusinessId, "
+                    + "         FieldId, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<BusinessField>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM BusinessField WHERE IsDeleted = 0 ORDER BY FieldId ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<BusinessField>(query)).ToList();
+                }
             }
             catch (Exception e)
             {
@@ -127,8 +160,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SET "
                     + "         BusinessId = @BusinessId, "
                     + "         FieldId = @FieldId, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
@@ -139,8 +170,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("BusinessId", businessFieldDTO.BusinessId, DbType.Guid);
                 parameters.Add("FieldId", businessFieldDTO.FieldId, DbType.Guid);
-                parameters.Add("CreateDate", businessFieldDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", businessFieldDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", businessFieldDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", businessFieldDTO.IsDeleted, DbType.Boolean);
@@ -155,6 +184,20 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<int> ClearAllBusinessFieldData()
+        {
+            try
+            {
+                var query = "DELETE FROM BusisnessField";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllFields()
+        public async Task<IActionResult> GetAllFields(int pageIndex, int pageSize)
         {
             var result = new List<FieldDTO>();
-            result = await _fieldService.GetAllFields();
+            result = await _fieldService.GetAllFields(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateField([FromBody] FieldDTO fieldDTO, [FromQuery] Guid fieldId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateField([FromBody] FieldDTO fieldDTO, Guid id)
         {
-            var result = await _fieldService.UpdateField(fieldDTO, fieldId);
+            var result = await _fieldService.UpdateField(fieldDTO, id);
             return Ok(result);
         }
 
@@ -62,6 +63,13 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> DeleteField(Guid id)
         {
             var result = await _fieldService.DeleteFieldById(id);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> ClearAllFieldData()
+        {
+            var result = await _fieldService.ClearAllFieldData();
             return Ok(result);
         }
     }
