@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreateProjectEntity(ProjectEntity projectEntityDTO)
+        public async Task<string> CreateProjectEntity(ProjectEntity projectEntityDTO)
         {
             try
             {
@@ -34,6 +34,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @ProjectId, "
                     + "         @Title, "
@@ -58,7 +60,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", projectEntityDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -93,13 +95,50 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<ProjectEntity>> GetAllProjectEntitys()
+        public async Task<List<ProjectEntity>> GetAllProjectEntities(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM ProjectEntity WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<ProjectEntity>(query)).ToList();
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     ProjectId ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM ProjectEntity "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         ProjectId, "
+                    + "         Title, "
+                    + "         Image, "
+                    + "         Description, "
+                    + "         Type, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<ProjectEntity>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM ProjectEntity WHERE IsDeleted = 0 ORDER BY ProjectId ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<ProjectEntity>(query)).ToList();
+                }               
             }
             catch (Exception e)
             {
@@ -136,8 +175,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Image = @Image, "
                     + "         Description = @Description, "
                     + "         Type = @Type, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
@@ -150,8 +187,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Image", projectEntityDTO.Image, DbType.String);
                 parameters.Add("Description", projectEntityDTO.Description, DbType.String);
                 parameters.Add("Type", projectEntityDTO.Type, DbType.String);
-                parameters.Add("CreateDate", projectEntityDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", projectEntityDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", projectEntityDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", projectEntityDTO.IsDeleted, DbType.Boolean);
@@ -165,6 +200,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllProjectEntityData()
+        {
+            try
+            {
+                var query = "DELETE FROM ProjectEntity";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

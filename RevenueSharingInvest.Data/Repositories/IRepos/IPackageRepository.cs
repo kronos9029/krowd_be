@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IPackageRepository
     {
         //CREATE
-        public Task<int> CreatePackage(Package packageDTO);
+        public Task<string> CreatePackage(Package packageDTO);
 
         //READ
-        public Task<List<Package>> GetAllPackages();
+        public Task<List<Package>> GetAllPackages(int pageIndex, int pageSize);
         public Task<Package> GetPackageById(Guid packageId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeletePackageById(Guid packageId);
+        public Task<int> ClearAllPackageData();
     }
 }

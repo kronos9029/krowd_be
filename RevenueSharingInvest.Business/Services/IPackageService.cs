@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Business.Services
     public interface IPackageService
     {
         //CREATE
-        public Task<int> CreatePackage(PackageDTO packageDTO);
+        public Task<IdDTO> CreatePackage(PackageDTO packageDTO);
 
         //READ
-        public Task<List<PackageDTO>> GetAllPackages();
+        public Task<List<PackageDTO>> GetAllPackages(int pageIndex, int pageSize);
         public Task<PackageDTO> GetPackageById(Guid packageId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeletePackageById(Guid packageId);
+        public Task<int> ClearAllPackageData();
     }
 }

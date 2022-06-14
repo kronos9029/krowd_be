@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IRiskTypeRepository
     {
         //CREATE
-        public Task<int> CreateRiskType(RiskType riskTypeDTO);
+        public Task<string> CreateRiskType(RiskType riskTypeDTO);
 
         //READ
-        public Task<List<RiskType>> GetAllRiskTypes();
+        public Task<List<RiskType>> GetAllRiskTypes(int pageIndex, int pageSize);
         public Task<RiskType> GetRiskTypeById(Guid riskTypeId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteRiskTypeById(Guid riskTypeId);
+        public Task<int> ClearAllRiskTypeData();
     }
 }

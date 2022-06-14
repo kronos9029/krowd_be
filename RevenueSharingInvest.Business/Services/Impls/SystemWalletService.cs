@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Business.Exceptions;
+using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -14,30 +15,73 @@ namespace RevenueSharingInvest.Business.Services.Impls
     public class SystemWalletService : ISystemWalletService
     {
         private readonly ISystemWalletRepository _systemWalletRepository;
+        private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
 
-        public SystemWalletService(ISystemWalletRepository systemWalletRepository, IMapper mapper)
+        public SystemWalletService(ISystemWalletRepository systemWalletRepository, IValidationService validationService, IMapper mapper)
         {
             _systemWalletRepository = systemWalletRepository;
+            _validationService = validationService;
             _mapper = mapper;
         }
 
-        //CREATE
-        public async Task<int> CreateSystemWallet(SystemWalletDTO systemWalletDTO)
+        //CLEAR DATA
+        public async Task<int> ClearAllSystemWalletData()
         {
             int result;
             try
             {
-                SystemWallet dto = _mapper.Map<SystemWallet>(systemWalletDTO);
-                result = await _systemWalletRepository.CreateSystemWallet(dto);
-                if (result == 0)
-                    throw new CreateObjectException("Can not create SystemWallet Object!");
+                result = await _systemWalletRepository.ClearAllSystemWalletData();
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
+            }
+        }
+
+        //CREATE
+        public async Task<IdDTO> CreateSystemWallet(SystemWalletDTO systemWalletDTO)
+        {
+            IdDTO newId = new IdDTO();
+            try
+            {
+                systemWalletDTO.balance = 0;
+
+                if (systemWalletDTO.walletTypeId == null || !await _validationService.CheckUUIDFormat(systemWalletDTO.walletTypeId))
+                    throw new InvalidFieldException("Invalid walletTypeId!!!");
+
+                if (!await _validationService.CheckExistenceId("WalletType", Guid.Parse(systemWalletDTO.walletTypeId)))
+                    throw new NotFoundException("This walletTypeId is not existed!!!");
+
+                if (systemWalletDTO.createBy != null && systemWalletDTO.createBy.Length >= 0)
+                {
+                    if (systemWalletDTO.createBy.Equals("string"))
+                        systemWalletDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(systemWalletDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (systemWalletDTO.updateBy != null && systemWalletDTO.updateBy.Length >= 0)
+                {
+                    if (systemWalletDTO.updateBy.Equals("string"))
+                        systemWalletDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(systemWalletDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
+                systemWalletDTO.isDeleted = false;
+
+                SystemWallet dto = _mapper.Map<SystemWallet>(systemWalletDTO);
+                newId.id = await _systemWalletRepository.CreateSystemWallet(dto);
+                if (newId.id.Equals(""))
+                    throw new CreateObjectException("Can not create SystemWallet Object!");
+                return newId;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
 
@@ -50,21 +94,28 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 result = await _systemWalletRepository.DeleteSystemWalletById(systemWalletId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not delete SystemWallet Object!");
+                    throw new DeleteObjectException("Can not delete SystemWallet Object!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
         //GET ALL
-        public async Task<List<SystemWalletDTO>> GetAllSystemWallets()
+        public async Task<List<SystemWalletDTO>> GetAllSystemWallets(int pageIndex, int pageSize)
         {
-            List<SystemWallet> systemWalletList = await _systemWalletRepository.GetAllSystemWallets();
-            List<SystemWalletDTO> list = _mapper.Map<List<SystemWalletDTO>>(systemWalletList);
-            return list;
+            try
+            {
+                List<SystemWallet> systemWalletList = await _systemWalletRepository.GetAllSystemWallets(pageIndex, pageSize);
+                List<SystemWalletDTO> list = _mapper.Map<List<SystemWalletDTO>>(systemWalletList);
+                return list;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         //GET BY ID
@@ -77,12 +128,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 SystemWallet dto = await _systemWalletRepository.GetSystemWalletById(systemWalletId);
                 result = _mapper.Map<SystemWalletDTO>(dto);
                 if (result == null)
-                    throw new CreateObjectException("No SystemWallet Object Found!");
+                    throw new NotFoundException("No SystemWallet Object Found!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
@@ -92,15 +143,37 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                if (systemWalletDTO.walletTypeId == null || !await _validationService.CheckUUIDFormat(systemWalletDTO.walletTypeId))
+                    throw new InvalidFieldException("Invalid walletTypeId!!!");
+
+                if (!await _validationService.CheckExistenceId("WalletType", Guid.Parse(systemWalletDTO.walletTypeId)))
+                    throw new NotFoundException("This walletTypeId is not existed!!!");
+
+                if (systemWalletDTO.createBy != null && systemWalletDTO.createBy.Length >= 0)
+                {
+                    if (systemWalletDTO.createBy.Equals("string"))
+                        systemWalletDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(systemWalletDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (systemWalletDTO.updateBy != null && systemWalletDTO.updateBy.Length >= 0)
+                {
+                    if (systemWalletDTO.updateBy.Equals("string"))
+                        systemWalletDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(systemWalletDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
                 SystemWallet dto = _mapper.Map<SystemWallet>(systemWalletDTO);
                 result = await _systemWalletRepository.UpdateSystemWallet(dto, systemWalletId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not update SystemWallet Object!");
+                    throw new UpdateObjectException("Can not update SystemWallet Object!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
     }

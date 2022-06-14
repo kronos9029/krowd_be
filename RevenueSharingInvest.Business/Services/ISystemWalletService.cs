@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Business.Services
     public interface ISystemWalletService
     {
         //CREATE
-        public Task<int> CreateSystemWallet(SystemWalletDTO systemWalletDTO);
+        public Task<IdDTO> CreateSystemWallet(SystemWalletDTO systemWalletDTO);
 
         //READ
-        public Task<List<SystemWalletDTO>> GetAllSystemWallets();
+        public Task<List<SystemWalletDTO>> GetAllSystemWallets(int pageIndex, int pageSize);
         public Task<SystemWalletDTO> GetSystemWalletById(Guid systemWalletId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteSystemWalletById(Guid systemWalletId);
+        public Task<int> ClearAllSystemWalletData();
     }
 }

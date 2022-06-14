@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Business.Exceptions;
+using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -14,30 +15,83 @@ namespace RevenueSharingInvest.Business.Services.Impls
     public class ProjectEntityService : IProjectEntityService
     {
         private readonly IProjectEntityRepository _projectEntityRepository;
+        private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
 
-        public ProjectEntityService(IProjectEntityRepository projectEntityRepository, IMapper mapper)
+        public ProjectEntityService(IProjectEntityRepository projectEntityRepository, IValidationService validationService, IMapper mapper)
         {
             _projectEntityRepository = projectEntityRepository;
+            _validationService = validationService;
             _mapper = mapper;
         }
 
-        //CREATE
-        public async Task<int> CreateProjectEntity(ProjectEntityDTO projectEntityDTO)
+        //CLEAR DATA
+        public async Task<int> ClearAllProjectEntityData()
         {
             int result;
             try
             {
-                ProjectEntity dto = _mapper.Map<ProjectEntity>(projectEntityDTO);
-                result = await _projectEntityRepository.CreateProjectEntity(dto);
-                if (result == 0)
-                    throw new CreateObjectException("Can not create ProjectEntity Object!");
+                result = await _projectEntityRepository.ClearAllProjectEntityData();
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
+            }
+        }
+
+        //CREATE
+        public async Task<IdDTO> CreateProjectEntity(ProjectEntityDTO projectEntityDTO)
+        {
+            IdDTO newId = new IdDTO();
+            try
+            {
+                if (projectEntityDTO.projectId == null || !await _validationService.CheckUUIDFormat(projectEntityDTO.projectId))
+                    throw new InvalidFieldException("Invalid projectId!!!");
+
+                if (!await _validationService.CheckExistenceId("Project", Guid.Parse(projectEntityDTO.projectId)))
+                    throw new NotFoundException("This projectId is not existed!!!");
+
+                if (projectEntityDTO.image != null && (projectEntityDTO.image.Equals("string") || projectEntityDTO.image.Length == 0))
+                    projectEntityDTO.image = null;
+
+                if (!await _validationService.CheckText(projectEntityDTO.title))
+                    throw new InvalidFieldException("Invalid title!!!");
+
+                if (projectEntityDTO.description != null && (projectEntityDTO.description.Equals("string") || projectEntityDTO.description.Length == 0))
+                    projectEntityDTO.description = null;
+
+                if (!await _validationService.CheckText(projectEntityDTO.type) || (!projectEntityDTO.type.Equals("UPDATE") && !projectEntityDTO.type.Equals("HIGHLIGHT")))
+                    throw new InvalidFieldException("type must be 'UPDATE' or 'HIGHLIGHT'!!!");
+
+                if (projectEntityDTO.createBy != null && projectEntityDTO.createBy.Length >= 0)
+                {
+                    if (projectEntityDTO.createBy.Equals("string"))
+                        projectEntityDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(projectEntityDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (projectEntityDTO.updateBy != null && projectEntityDTO.updateBy.Length >= 0)
+                {
+                    if (projectEntityDTO.updateBy.Equals("string"))
+                        projectEntityDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(projectEntityDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
+                projectEntityDTO.isDeleted = false;
+
+                ProjectEntity dto = _mapper.Map<ProjectEntity>(projectEntityDTO);
+                newId.id = await _projectEntityRepository.CreateProjectEntity(dto);
+                if (newId.id.Equals(""))
+                    throw new CreateObjectException("Can not create ProjectEntity Object!");
+                return newId;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
 
@@ -50,21 +104,28 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 result = await _projectEntityRepository.DeleteProjectEntityById(projectEntityId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not delete ProjectEntity Object!");
+                    throw new DeleteObjectException("Can not delete ProjectEntity Object!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
         //GET ALL
-        public async Task<List<ProjectEntityDTO>> GetAllProjectEntitys()
+        public async Task<List<ProjectEntityDTO>> GetAllProjectEntities(int pageIndex, int pageSize)
         {
-            List<ProjectEntity> projectEntityList = await _projectEntityRepository.GetAllProjectEntitys();
-            List<ProjectEntityDTO> list = _mapper.Map<List<ProjectEntityDTO>>(projectEntityList);
-            return list;
+            try
+            {
+                List<ProjectEntity> projectEntityList = await _projectEntityRepository.GetAllProjectEntities(pageIndex, pageSize);
+                List<ProjectEntityDTO> list = _mapper.Map<List<ProjectEntityDTO>>(projectEntityList);
+                return list;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         //GET BY ID
@@ -77,12 +138,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 ProjectEntity dto = await _projectEntityRepository.GetProjectEntityById(projectEntityId);
                 result = _mapper.Map<ProjectEntityDTO>(dto);
                 if (result == null)
-                    throw new CreateObjectException("No ProjectEntity Object Found!");
+                    throw new NotFoundException("No ProjectEntity Object Found!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
@@ -92,15 +153,49 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                if (projectEntityDTO.projectId == null || !await _validationService.CheckUUIDFormat(projectEntityDTO.projectId))
+                    throw new InvalidFieldException("Invalid projectId!!!");
+
+                if (!await _validationService.CheckExistenceId("Project", Guid.Parse(projectEntityDTO.projectId)))
+                    throw new NotFoundException("This projectId is not existed!!!");
+
+                if (projectEntityDTO.image != null && (projectEntityDTO.image.Equals("string") || projectEntityDTO.image.Length == 0))
+                    projectEntityDTO.image = null;
+
+                if (!await _validationService.CheckText(projectEntityDTO.title))
+                    throw new InvalidFieldException("Invalid title!!!");
+
+                if (projectEntityDTO.description != null && (projectEntityDTO.description.Equals("string") || projectEntityDTO.description.Length == 0))
+                    projectEntityDTO.description = null;
+
+                if (!await _validationService.CheckText(projectEntityDTO.type) || (!projectEntityDTO.type.Equals("UPDATE") && !projectEntityDTO.type.Equals("HIGHLIGHT")))
+                    throw new InvalidFieldException("type must be 'UPDATE' or 'HIGHLIGHT'!!!");
+
+                if (projectEntityDTO.createBy != null && projectEntityDTO.createBy.Length >= 0)
+                {
+                    if (projectEntityDTO.createBy.Equals("string"))
+                        projectEntityDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(projectEntityDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (projectEntityDTO.updateBy != null && projectEntityDTO.updateBy.Length >= 0)
+                {
+                    if (projectEntityDTO.updateBy.Equals("string"))
+                        projectEntityDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(projectEntityDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
                 ProjectEntity dto = _mapper.Map<ProjectEntity>(projectEntityDTO);
                 result = await _projectEntityRepository.UpdateProjectEntity(dto, projectEntityId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not update ProjectEntity Object!");
+                    throw new UpdateObjectException("Can not update ProjectEntity Object!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
     }

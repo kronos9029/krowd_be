@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPackages()
+        public async Task<IActionResult> GetAllPackages(int pageIndex, int pageSize)
         {
             var result = new List<PackageDTO>();
-            result = await _packageService.GetAllPackages();
+            result = await _packageService.GetAllPackages(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdatePackage([FromBody] PackageDTO packageDTO, [FromQuery] Guid packageId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdatePackage([FromBody] PackageDTO packageDTO, Guid id)
         {
-            var result = await _packageService.UpdatePackage(packageDTO, packageId);
+            var result = await _packageService.UpdatePackage(packageDTO, id);
             return Ok(result);
         }
 

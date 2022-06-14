@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IProjectEntityRepository
     {
         //CREATE
-        public Task<int> CreateProjectEntity(ProjectEntity projectEntityDTO);
+        public Task<string> CreateProjectEntity(ProjectEntity projectEntityDTO);
 
         //READ
-        public Task<List<ProjectEntity>> GetAllProjectEntitys();
+        public Task<List<ProjectEntity>> GetAllProjectEntities(int pageIndex, int pageSize);
         public Task<ProjectEntity> GetProjectEntityById(Guid projectEntityId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteProjectEntityById(Guid projectEntityId);
+        public Task<int> ClearAllProjectEntityData();
     }
 }

@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IInvestorWalletRepository
     {
         //CREATE
-        public Task<int> CreateInvestorWallet(InvestorWallet investorWalletDTO);
+        public Task<string> CreateInvestorWallet(InvestorWallet investorWalletDTO);
 
         //READ
-        public Task<List<InvestorWallet>> GetAllInvestorWallets();
+        public Task<List<InvestorWallet>> GetAllInvestorWallets(int pageIndex, int pageSize);
         public Task<InvestorWallet> GetInvestorWalletById(Guid investorWalletId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteInvestorWalletById(Guid investorWalletId);
+        public Task<int> ClearAllInvestorWalletData();
     }
 }

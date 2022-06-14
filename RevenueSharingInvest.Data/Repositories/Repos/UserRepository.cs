@@ -184,13 +184,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     parameters.Add("PageSize", pageSize, DbType.Int16);
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<User>(query, parameters)).ToList();
-                }    
+                }
                 else
                 {
                     var query = "SELECT * FROM [User] WHERE IsDeleted = 0 ORDER BY RoleId, FirstName ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<User>(query)).ToList();
-                }    
+                }
             }
             catch (Exception e)
             {
