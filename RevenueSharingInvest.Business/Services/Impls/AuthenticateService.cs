@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models.Constant;
+using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -26,6 +27,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IBusinessRepository _businessRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly IInvestorService _investorService;
+        private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
         private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
         private readonly String ROLE_INVESTOR_ID = "ad5f37da-ca48-4dc5-9f4b-963d94b535e6";
@@ -33,11 +35,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly String ROLE_PROJECT_OWNER_ID = "2d80393a-3a3d-495d-8dd7-f9261f85cc8f";
         private readonly String INVESTOR_TYPE_ID = "";
 
-        public AuthenticateService(IOptions<AppSettings> appSettings, IUserRepository userRepository, IInvestorRepository investorRepository, IMapper mapper)
+        public AuthenticateService(IOptions<AppSettings> appSettings, IUserRepository userRepository, IInvestorRepository investorRepository, IValidationService validationService, IMapper mapper)
         {
             _appSettings = appSettings.Value;
             _userRepository = userRepository;
             _investorRepository = investorRepository;
+            _validationService = validationService;
             _mapper = mapper;
         }
 
@@ -145,6 +148,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUSINESS_MANAGER.ToString());
                 roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_BUSINESS_MANAGER_ID);
+            }            
+            else if (roleCheck.Equals(RoleEnum.PROJECT_OWNER.ToString()))
+            {
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.PROJECT_OWNER.ToString());
+                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_PROJECT_OWNER_ID);
             }
             else
             {
@@ -169,10 +177,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return response;
         }
 
-        protected async Task<bool> CheckRoleForUser(String userId, String roleId, String requiredRole)
+        protected async Task<bool> CheckRoleForUser(String userId, String requiredRole)
         {
+         /* if (!await _validationService.CheckExistenceId("[User]", Guid.Parse(userId)))
+                throw new NotFoundException("concac");*/
             User userObj = await _userRepository.GetUserById(Guid.Parse(userId));
-            Role roleObj = await _roleRepository.GetRoleById(Guid.Parse(roleId));
 
             Role role = await _roleRepository.GetRoleByName(requiredRole);
 
@@ -181,7 +190,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             else
             {
-                if (userObj.RoleId.ToString().Equals(roleObj.Id.ToString()) && userObj.RoleId.ToString().Equals(role.Id.ToString()))
+                if (userObj.RoleId.ToString().Equals(role.Id.ToString()) && userObj.RoleId.ToString().Equals(role.Id.ToString()))
                 {
                     return true;
                 }
