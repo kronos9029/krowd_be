@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/systemWallets")]
+    [Route("api/v1.0/System_Wallets")]
     [EnableCors]
     //[Authorize]
     public class SystemWalletController : ControllerBase
@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllSystemWallets()
+        public async Task<IActionResult> GetAllSystemWallets(int pageIndex, int pageSize)
         {
             var result = new List<SystemWalletDTO>();
-            result = await _systemWalletService.GetAllSystemWallets();
+            result = await _systemWalletService.GetAllSystemWallets(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateSystemWallet([FromBody] SystemWalletDTO systemWalletDTO, [FromQuery] Guid systemWalletId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateSystemWallet([FromBody] SystemWalletDTO systemWalletDTO, Guid id)
         {
-            var result = await _systemWalletService.UpdateSystemWallet(systemWalletDTO, systemWalletId);
+            var result = await _systemWalletService.UpdateSystemWallet(systemWalletDTO, id);
             return Ok(result);
         }
 
@@ -62,6 +63,13 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> DeleteSystemWallet(Guid id)
         {
             var result = await _systemWalletService.DeleteSystemWalletById(id);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> ClearAllSystemWalletData()
+        {
+            var result = await _systemWalletService.ClearAllSystemWalletData();
             return Ok(result);
         }
     }

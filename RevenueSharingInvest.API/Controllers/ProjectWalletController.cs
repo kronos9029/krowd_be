@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/projectWallets")]
+    [Route("api/v1.0/Project_Wallets")]
     [EnableCors]
     //[Authorize]
     public class ProjectWalletController : ControllerBase
@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProjectWallets()
+        public async Task<IActionResult> GetAllProjectWallets(int pageIndex, int pageSize)
         {
             var result = new List<ProjectWalletDTO>();
-            result = await _projectWalletService.GetAllProjectWallets();
+            result = await _projectWalletService.GetAllProjectWallets(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateProjectWallet([FromBody] ProjectWalletDTO projectWalletDTO, [FromQuery] Guid projectWalletId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateProjectWallet([FromBody] ProjectWalletDTO projectWalletDTO, Guid id)
         {
-            var result = await _projectWalletService.UpdateProjectWallet(projectWalletDTO, projectWalletId);
+            var result = await _projectWalletService.UpdateProjectWallet(projectWalletDTO, id);
             return Ok(result);
         }
 
@@ -62,6 +63,13 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> DeleteProjectWallet(Guid id)
         {
             var result = await _projectWalletService.DeleteProjectWalletById(id);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> ClearAllWalletServiceData()
+        {
+            var result = await _projectWalletService.ClearAllProjectWalletData();
             return Ok(result);
         }
     }

@@ -16,7 +16,8 @@ namespace RevenueSharingInvest.Business.Services.Common
         private readonly IValidationRepository _validationRepository;
         private readonly Regex regexMail = new(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
         private readonly Regex regexPhone = new(@"\(?\d{3}\)?-? *\d{3}-? *-?\d{4}");
-        private readonly Regex regexDate = new(@"(((0|1)[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/((19|20)\d\d))$");
+        //private readonly Regex regexDate = new(@"(((0|1)[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/((19|20)\d\d))$");
+        private readonly Regex regexDate = new(@"^([1-9]|([012][0-9])|(3[01]))/([0]{0,1}[1-9]|1[012])/\d\d\d\d (20|21|22|23|[0-1]?\d):[0-5]?\d:[0-5]?\d$"); //[dd/MM/yyyy HH:mm:ss]
         private readonly Regex regexUUID = new(@"(?im)^[{(]?[0-9A-F]{8}[-]?(?:[0-9A-F]{4}[-]?){3}[0-9A-F]{12}[)}]?$");
 
         public ValidationService(IMapper mapper, IValidationRepository validationRepository)

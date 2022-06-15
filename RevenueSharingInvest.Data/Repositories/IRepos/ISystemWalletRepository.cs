@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface ISystemWalletRepository
     {
         //CREATE
-        public Task<int> CreateSystemWallet(SystemWallet systemWalletDTO);
+        public Task<string> CreateSystemWallet(SystemWallet systemWalletDTO);
 
         //READ
-        public Task<List<SystemWallet>> GetAllSystemWallets();
+        public Task<List<SystemWallet>> GetAllSystemWallets(int pageIndex, int pageSize);
         public Task<SystemWallet> GetSystemWalletById(Guid systemWalletId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteSystemWalletById(Guid systemWalletId);
+        public Task<int> ClearAllSystemWalletData();
     }
 }

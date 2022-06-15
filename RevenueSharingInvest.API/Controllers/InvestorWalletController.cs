@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/investorWallets")]
+    [Route("api/v1.0/Investor_Wallets")]
     [EnableCors]
     //[Authorize]
     public class InvestorWalletController : ControllerBase
@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllInvestorWallets()
+        public async Task<IActionResult> GetAllInvestorWallets(int pageIndex, int pageSize)
         {
             var result = new List<InvestorWalletDTO>();
-            result = await _investorWalletService.GetAllInvestorWallets();
+            result = await _investorWalletService.GetAllInvestorWallets(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateInvestorWallet([FromBody] InvestorWalletDTO investorWalletDTO, [FromQuery] Guid investorWalletId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateInvestorWallet([FromBody] InvestorWalletDTO investorWalletDTO, Guid id)
         {
-            var result = await _investorWalletService.UpdateInvestorWallet(investorWalletDTO, investorWalletId);
+            var result = await _investorWalletService.UpdateInvestorWallet(investorWalletDTO, id);
             return Ok(result);
         }
 
@@ -62,6 +63,13 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> DeleteInvestorWallet(Guid id)
         {
             var result = await _investorWalletService.DeleteInvestorWalletById(id);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> ClearAllInvestorWalletData()
+        {
+            var result = await _investorWalletService.ClearAllInvestorWalletData();
             return Ok(result);
         }
     }

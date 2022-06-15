@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreateInvestorWallet(InvestorWallet investorWalletDTO)
+        public async Task<string> CreateInvestorWallet(InvestorWallet investorWalletDTO)
         {
             try
             {
@@ -32,9 +32,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @InvestorId, "
-                    + "         @Balance, "
+                    + "         0, "
                     + "         @WalletTypeId, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
@@ -44,7 +46,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("InvestorId", investorWalletDTO.InvestorId, DbType.Guid);
-                parameters.Add("Balance", investorWalletDTO.Balance, DbType.Double);
                 parameters.Add("WalletTypeId", investorWalletDTO.WalletTypeId, DbType.Guid);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", investorWalletDTO.CreateBy, DbType.Guid);
@@ -52,7 +53,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -87,13 +88,49 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<InvestorWallet>> GetAllInvestorWallets()
+        public async Task<List<InvestorWallet>> GetAllInvestorWallets(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM InvestorWallet WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<InvestorWallet>(query)).ToList();
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     InvestorId, "
+                    + "                     WalletTypeId ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM InvestorWallet "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         InvestorId, "
+                    + "         Balance, "
+                    + "         WalletTypeId, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<InvestorWallet>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM InvestorWallet WHERE IsDeleted = 0 ORDER BY InvestorId, WalletTypeId ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<InvestorWallet>(query)).ToList();
+                }               
             }
             catch (Exception e)
             {
@@ -126,10 +163,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "UPDATE InvestorWallet "
                     + "     SET "
                     + "         InvestorId = @InvestorId, "
-                    + "         Balance = @Balance, "
                     + "         WalletTypeId = @WalletTypeId, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
@@ -138,10 +172,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("InvestorId", investorWalletDTO.InvestorId, DbType.Guid);
-                parameters.Add("Balance", investorWalletDTO.Balance, DbType.Double);
                 parameters.Add("WalletTypeId", investorWalletDTO.WalletTypeId, DbType.Guid);
-                parameters.Add("CreateDate", investorWalletDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", investorWalletDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", investorWalletDTO.IsDeleted, DbType.Boolean);
@@ -155,6 +186,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllInvestorWalletData()
+        {
+            try
+            {
+                var query = "DELETE FROM InvestorWallet";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

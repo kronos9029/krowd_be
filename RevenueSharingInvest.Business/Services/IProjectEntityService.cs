@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Business.Services
     public interface IProjectEntityService
     {
         //CREATE
-        public Task<int> CreateProjectEntity(ProjectEntityDTO projectEntityDTO);
+        public Task<IdDTO> CreateProjectEntity(ProjectEntityDTO projectEntityDTO);
 
         //READ
-        public Task<List<ProjectEntityDTO>> GetAllProjectEntitys();
+        public Task<List<ProjectEntityDTO>> GetAllProjectEntities(int pageIndex, int pageSize);
         public Task<ProjectEntityDTO> GetProjectEntityById(Guid projectEntityId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteProjectEntityById(Guid projectEntityId);
+        public Task<int> ClearAllProjectEntityData();
     }
 }

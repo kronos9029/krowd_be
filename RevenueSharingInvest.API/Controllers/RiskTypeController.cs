@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllRiskTypes()
+        public async Task<IActionResult> GetAllRiskTypes(int pageIndex, int pageSize)
         {
             var result = new List<RiskTypeDTO>();
-            result = await _riskTypeService.GetAllRiskTypes();
+            result = await _riskTypeService.GetAllRiskTypes(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateRiskType([FromBody] RiskTypeDTO riskTypeDTO, [FromQuery] Guid riskTypeId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateRiskType([FromBody] RiskTypeDTO riskTypeDTO, Guid id)
         {
-            var result = await _riskTypeService.UpdateRiskType(riskTypeDTO, riskTypeId);
+            var result = await _riskTypeService.UpdateRiskType(riskTypeDTO, id);
             return Ok(result);
         }
 
@@ -62,6 +63,13 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> DeleteRiskType(Guid id)
         {
             var result = await _riskTypeService.DeleteRiskTypeById(id);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> ClearAllRiskTypeData()
+        {
+            var result = await _riskTypeService.ClearAllRiskTypeData();
             return Ok(result);
         }
     }

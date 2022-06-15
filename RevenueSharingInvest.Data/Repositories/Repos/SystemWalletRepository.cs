@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreateSystemWallet(SystemWallet systemWalletDTO)
+        public async Task<string> CreateSystemWallet(SystemWallet systemWalletDTO)
         {
             try
             {
@@ -31,8 +31,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
-                    + "         @Balance, "
+                    + "         0, "
                     + "         @WalletTypeId, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
@@ -41,7 +43,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("Balance", systemWalletDTO.Balance, DbType.Double);
                 parameters.Add("WalletTypeId", systemWalletDTO.WalletTypeId, DbType.Guid);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", systemWalletDTO.CreateBy, DbType.Guid);
@@ -49,7 +50,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", systemWalletDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -84,13 +85,47 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<SystemWallet>> GetAllSystemWallets()
+        public async Task<List<SystemWallet>> GetAllSystemWallets(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM SystemWallet WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<SystemWallet>(query)).ToList();
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     WalletTypeId ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM SystemWallet "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         Balance, "
+                    + "         WalletTypeId, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<SystemWallet>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM SystemWallet WHERE IsDeleted = 0 ORDER BY WalletTypeId ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<SystemWallet>(query)).ToList();
+                }               
             }
             catch (Exception e)
             {
@@ -122,10 +157,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE SystemWallet "
                     + "     SET "
-                    + "         Balance = @Balance, "
                     + "         WalletTypeId = @WalletTypeId, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
@@ -133,10 +165,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("Balance", systemWalletDTO.Balance, DbType.Double);
                 parameters.Add("WalletTypeId", systemWalletDTO.WalletTypeId, DbType.Guid);
-                parameters.Add("CreateDate", systemWalletDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", systemWalletDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", systemWalletDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", systemWalletDTO.IsDeleted, DbType.Boolean);
@@ -150,6 +179,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllSystemWalletData()
+        {
+            try
+            {
+                var query = "DELETE FROM SystemWallet";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

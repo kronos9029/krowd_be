@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IProjectWalletRepository
     {
         //CREATE
-        public Task<int> CreateProjectWallet(ProjectWallet projectWalletDTO);
+        public Task<string> CreateProjectWallet(ProjectWallet projectWalletDTO);
 
         //READ
-        public Task<List<ProjectWallet>> GetAllProjectWallets();
+        public Task<List<ProjectWallet>> GetAllProjectWallets(int pageIndex, int pageSize);
         public Task<ProjectWallet> GetProjectWalletById(Guid projectWalletId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteProjectWalletById(Guid projectWalletId);
+        public Task<int> ClearAllProjectWalletData();
     }
 }

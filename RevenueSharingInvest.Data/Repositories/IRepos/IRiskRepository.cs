@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IRiskRepository
     {
         //CREATE
-        public Task<int> CreateRisk(Risk riskDTO);
+        public Task<string> CreateRisk(Risk riskDTO);
 
         //READ
-        public Task<List<Risk>> GetAllRisks();
+        public Task<List<Risk>> GetAllRisks(int pageIndex, int pageSize);
         public Task<Risk> GetRiskById(Guid riskId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteRiskById(Guid riskId);
+        public Task<int> ClearAllRiskData();
     }
 }

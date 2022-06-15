@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Business.Services
     public interface IRiskService
     {
         //CREATE
-        public Task<int> CreateRisk(RiskDTO riskDTO);
+        public Task<IdDTO> CreateRisk(RiskDTO riskDTO);
 
         //READ
-        public Task<List<RiskDTO>> GetAllRisks();
+        public Task<List<RiskDTO>> GetAllRisks(int pageIndex, int pageSize);
         public Task<RiskDTO> GetRiskById(Guid riskId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteRiskById(Guid riskId);
+        public Task<int> ClearAllRiskData();
     }
 }
