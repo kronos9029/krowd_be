@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RevenueSharingInvest.Data.Models.Helpers;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
     [DbContext(typeof(KrowdContext))]
-    partial class KrowdContextModelSnapshot : ModelSnapshot
+    [Migration("20220616143530_Krowd_v1.4.4")]
+    partial class Krowd_v144
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

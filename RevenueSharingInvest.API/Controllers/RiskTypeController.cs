@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/riskTypes")]
+    [Route("api/v1.0/risk_types")]
     [EnableCors]
     //[Authorize]
     public class RiskTypeController : ControllerBase

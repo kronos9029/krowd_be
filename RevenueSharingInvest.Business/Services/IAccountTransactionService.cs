@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Business.Services
     public interface IAccountTransactionService
     {
         //CREATE
-        public Task<int> CreateAccountTransaction(AccountTransactionDTO accountTransactionDTO);
+        public Task<IdDTO> CreateAccountTransaction(AccountTransactionDTO accountTransactionDTO);
 
         //READ
-        public Task<List<AccountTransactionDTO>> GetAllAccountTransactions();
+        public Task<List<AccountTransactionDTO>> GetAllAccountTransactions(int pageIndex, int pageSize);
         public Task<AccountTransactionDTO> GetAccountTransactionById(Guid accountTransactionId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteAccountTransactionById(Guid accountTransactionId);
+        public Task<int> ClearAllAccountTransactionData();
     }
 }

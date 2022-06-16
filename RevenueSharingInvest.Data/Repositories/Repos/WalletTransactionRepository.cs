@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreateWalletTransaction(WalletTransaction walletTransactionDTO)
+        public async Task<string> CreateWalletTransaction(WalletTransaction walletTransactionDTO)
         {
             try
             {
@@ -39,6 +39,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @PaymentId, "
                     + "         @SystemWalletId, "
@@ -73,7 +75,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", walletTransactionDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -108,13 +110,55 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<WalletTransaction>> GetAllWalletTransactions()
+        public async Task<List<WalletTransaction>> GetAllWalletTransactions(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM WalletTransaction WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<WalletTransaction>(query)).ToList();
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     Type ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM WalletTransaction "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         PaymentId, "
+                    + "         SystemWalletId, "
+                    + "         ProjectWalletId, "
+                    + "         InvestorWalletId, "
+                    + "         Amount, "
+                    + "         Description, "
+                    + "         Type, "
+                    + "         FromWalletId, "
+                    + "         ToWalletId, "
+                    + "         Fee, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<WalletTransaction>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM WalletTransaction WHERE IsDeleted = 0 ORDER BY Type ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<WalletTransaction>(query)).ToList();
+                }               
             }
             catch (Exception e)
             {
@@ -156,8 +200,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         FromWalletId = @FromWalletId, "
                     + "         ToWalletId = @ToWalletId, "
                     + "         Fee = @Fee, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
@@ -175,8 +217,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("FromWalletId", walletTransactionDTO.FromWalletId, DbType.Guid);
                 parameters.Add("ToWalletId", walletTransactionDTO.ToWalletId, DbType.Guid);
                 parameters.Add("Fee", walletTransactionDTO.Fee, DbType.Double);
-                parameters.Add("CreateDate", walletTransactionDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", walletTransactionDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", walletTransactionDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", walletTransactionDTO.IsDeleted, DbType.Boolean);
@@ -190,6 +230,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllWalletTransactionData()
+        {
+            try
+            {
+                var query = "DELETE FROM WalletTransaction";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

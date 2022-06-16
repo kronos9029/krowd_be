@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IPaymentRepository
     {
         //CREATE
-        public Task<int> CreatePayment(Payment paymentDTO);
+        public Task<string> CreatePayment(Payment paymentDTO);
 
         //READ
-        public Task<List<Payment>> GetAllPayments();
+        public Task<List<Payment>> GetAllPayments(int pageIndex, int pageSize);
         public Task<Payment> GetPaymentById(Guid paymentId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeletePaymentById(Guid paymentId);
+        public Task<int> ClearAllPaymentData();
     }
 }

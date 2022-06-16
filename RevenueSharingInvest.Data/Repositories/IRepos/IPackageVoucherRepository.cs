@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> CreatePackageVoucher(PackageVoucher packageVoucherDTO);
 
         //READ
-        public Task<List<PackageVoucher>> GetAllPackageVouchers();
+        public Task<List<PackageVoucher>> GetAllPackageVouchers(int pageIndex, int pageSize);
         public Task<PackageVoucher> GetPackageVoucherById(Guid packageId, Guid voucherId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeletePackageVoucherById(Guid packageId, Guid voucherId);
+        public Task<int> ClearAllPackageVoucherData();
     }
 }

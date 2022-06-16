@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Business.Services
     public interface IWalletTransactionService
     {
         //CREATE
-        public Task<int> CreateWalletTransaction(WalletTransactionDTO walletTransactionDTO);
+        public Task<IdDTO> CreateWalletTransaction(WalletTransactionDTO walletTransactionDTO);
 
         //READ
-        public Task<List<WalletTransactionDTO>> GetAllWalletTransactions();
+        public Task<List<WalletTransactionDTO>> GetAllWalletTransactions(int pageIndex, int pageSize);
         public Task<WalletTransactionDTO> GetWalletTransactionById(Guid walletTransactionId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteWalletTransactionById(Guid walletTransactionId);
+        public Task<int> ClearAllWalletTransactionData();
     }
 }

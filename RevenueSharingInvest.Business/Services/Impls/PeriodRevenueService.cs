@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Business.Exceptions;
+using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -14,30 +15,101 @@ namespace RevenueSharingInvest.Business.Services.Impls
     public class PeriodRevenueService : IPeriodRevenueService
     {
         private readonly IPeriodRevenueRepository _periodRevenueRepository;
+        private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
 
-        public PeriodRevenueService(IPeriodRevenueRepository periodRevenueRepository, IMapper mapper)
+        public PeriodRevenueService(IPeriodRevenueRepository periodRevenueRepository, IValidationService validationService, IMapper mapper)
         {
             _periodRevenueRepository = periodRevenueRepository;
+            _validationService = validationService;
             _mapper = mapper;
         }
 
-        //CREATE
-        public async Task<int> CreatePeriodRevenue(PeriodRevenueDTO periodRevenueDTO)
+        //CLEAR DATA
+        public async Task<int> ClearAllPeriodRevenueData()
         {
             int result;
             try
             {
-                PeriodRevenue dto = _mapper.Map<PeriodRevenue>(periodRevenueDTO);
-                result = await _periodRevenueRepository.CreatePeriodRevenue(dto);
-                if (result == 0)
-                    throw new CreateObjectException("Can not create PeriodRevenue Object!");
+                result = await _periodRevenueRepository.ClearAllPeriodRevenueData();
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
+            }
+        }
+
+        //CREATE
+        public async Task<IdDTO> CreatePeriodRevenue(PeriodRevenueDTO periodRevenueDTO)
+        {
+            IdDTO newId = new IdDTO();
+            try
+            {
+                if (periodRevenueDTO.projectId == null || !await _validationService.CheckUUIDFormat(periodRevenueDTO.projectId))
+                    throw new InvalidFieldException("Invalid projectId!!!");
+
+                if (!await _validationService.CheckExistenceId("Project", Guid.Parse(periodRevenueDTO.projectId)))
+                    throw new NotFoundException("This projectId is not existed!!!");
+
+                if (periodRevenueDTO.stageId == null || !await _validationService.CheckUUIDFormat(periodRevenueDTO.stageId))
+                    throw new InvalidFieldException("Invalid stageId!!!");
+
+                if (!await _validationService.CheckExistenceId("Stage", Guid.Parse(periodRevenueDTO.stageId)))
+                    throw new NotFoundException("This stageId is not existed!!!");
+
+                //if (periodRevenueDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
+                //if (periodRevenueDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
+                //if (periodRevenueDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
+                //if (periodRevenueDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
+                //if (periodRevenueDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
+                //if (periodRevenueDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
+                //if (periodRevenueDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
+                if (!await _validationService.CheckText(periodRevenueDTO.status))
+                    throw new InvalidFieldException("Invalid status!!!");
+
+                if (periodRevenueDTO.createBy != null && periodRevenueDTO.createBy.Length >= 0)
+                {
+                    if (periodRevenueDTO.createBy.Equals("string"))
+                        periodRevenueDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(periodRevenueDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (periodRevenueDTO.updateBy != null && periodRevenueDTO.updateBy.Length >= 0)
+                {
+                    if (periodRevenueDTO.updateBy.Equals("string"))
+                        periodRevenueDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(periodRevenueDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
+                periodRevenueDTO.isDeleted = false;
+
+                PeriodRevenue dto = _mapper.Map<PeriodRevenue>(periodRevenueDTO);
+                newId.id = await _periodRevenueRepository.CreatePeriodRevenue(dto);
+                if (newId.id.Equals(""))
+                    throw new CreateObjectException("Can not create PeriodRevenue Object!");
+                return newId;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
 
@@ -50,21 +122,28 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 result = await _periodRevenueRepository.DeletePeriodRevenueById(periodRevenueId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not delete PeriodRevenue Object!");
+                    throw new DeleteObjectException("Can not delete PeriodRevenue Object!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
         //GET ALL
-        public async Task<List<PeriodRevenueDTO>> GetAllPeriodRevenues()
+        public async Task<List<PeriodRevenueDTO>> GetAllPeriodRevenues(int pageIndex, int pageSize)
         {
-            List<PeriodRevenue> periodRevenueList = await _periodRevenueRepository.GetAllPeriodRevenues();
-            List<PeriodRevenueDTO> list = _mapper.Map<List<PeriodRevenueDTO>>(periodRevenueList);
-            return list;
+            try
+            {
+                List<PeriodRevenue> periodRevenueList = await _periodRevenueRepository.GetAllPeriodRevenues(pageIndex, pageSize);
+                List<PeriodRevenueDTO> list = _mapper.Map<List<PeriodRevenueDTO>>(periodRevenueList);
+                return list;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         //GET BY ID
@@ -73,16 +152,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
             PeriodRevenueDTO result;
             try
             {
-
                 PeriodRevenue dto = await _periodRevenueRepository.GetPeriodRevenueById(periodRevenueId);
                 result = _mapper.Map<PeriodRevenueDTO>(dto);
                 if (result == null)
-                    throw new CreateObjectException("No PeriodRevenue Object Found!");
+                    throw new NotFoundException("No PeriodRevenue Object Found!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
@@ -92,15 +170,67 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                if (periodRevenueDTO.projectId == null || !await _validationService.CheckUUIDFormat(periodRevenueDTO.projectId))
+                    throw new InvalidFieldException("Invalid projectId!!!");
+
+                if (!await _validationService.CheckExistenceId("Project", Guid.Parse(periodRevenueDTO.projectId)))
+                    throw new NotFoundException("This projectId is not existed!!!");
+
+                if (periodRevenueDTO.stageId == null || !await _validationService.CheckUUIDFormat(periodRevenueDTO.stageId))
+                    throw new InvalidFieldException("Invalid stageId!!!");
+
+                if (!await _validationService.CheckExistenceId("Stage", Guid.Parse(periodRevenueDTO.stageId)))
+                    throw new NotFoundException("This stageId is not existed!!!");
+
+                //if (periodRevenueDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
+                //if (periodRevenueDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
+                //if (periodRevenueDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
+                //if (periodRevenueDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
+                //if (periodRevenueDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
+                //if (periodRevenueDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
+                //if (periodRevenueDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
+                if (!await _validationService.CheckText(periodRevenueDTO.status))
+                    throw new InvalidFieldException("Invalid status!!!");
+
+                if (periodRevenueDTO.createBy != null && periodRevenueDTO.createBy.Length >= 0)
+                {
+                    if (periodRevenueDTO.createBy.Equals("string"))
+                        periodRevenueDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(periodRevenueDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (periodRevenueDTO.updateBy != null && periodRevenueDTO.updateBy.Length >= 0)
+                {
+                    if (periodRevenueDTO.updateBy.Equals("string"))
+                        periodRevenueDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(periodRevenueDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
                 PeriodRevenue dto = _mapper.Map<PeriodRevenue>(periodRevenueDTO);
                 result = await _periodRevenueRepository.UpdatePeriodRevenue(dto, periodRevenueId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not update PeriodRevenue Object!");
+                    throw new UpdateObjectException("Can not update PeriodRevenue Object!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
     }

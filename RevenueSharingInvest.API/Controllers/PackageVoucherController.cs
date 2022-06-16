@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/packageVouchers")]
+    [Route("api/v1.0/package_vouchers")]
     [EnableCors]
     //[Authorize]
     public class PackageVoucherController : ControllerBase
@@ -34,34 +34,35 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPackageVouchers()
+        public async Task<IActionResult> GetAllPackageVouchers(int pageIndex, int pageSize)
         {
             var result = new List<PackageVoucherDTO>();
-            result = await _packageVoucherService.GetAllPackageVouchers();
+            result = await _packageVoucherService.GetAllPackageVouchers(pageIndex, pageSize);
             return Ok(result);
         }
 
         [HttpGet]
-        [Route("{packageId},{voucherId}")]
-        public async Task<IActionResult> GetPackageVoucherById(Guid packageId, Guid voucherId)
+        [Route("{package_id},{voucher_id}")]
+        public async Task<IActionResult> GetPackageVoucherById(Guid package_id, Guid voucher_id)
         {
             PackageVoucherDTO dto = new PackageVoucherDTO();
-            dto = await _packageVoucherService.GetPackageVoucherById(packageId, voucherId);
+            dto = await _packageVoucherService.GetPackageVoucherById(package_id, voucher_id);
             return Ok(dto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdatePackageVoucher([FromBody] PackageVoucherDTO packageVoucherDTO, [FromQuery] Guid packageId, [FromQuery] Guid voucherId)
+        [Route("{package_id},{voucher_id}")]
+        public async Task<IActionResult> UpdatePackageVoucher([FromBody] PackageVoucherDTO packageVoucherDTO, Guid package_id, Guid voucher_id)
         {
-            var result = await _packageVoucherService.UpdatePackageVoucher(packageVoucherDTO, packageId, voucherId);
+            var result = await _packageVoucherService.UpdatePackageVoucher(packageVoucherDTO, package_id, voucher_id);
             return Ok(result);
         }
 
         [HttpDelete]
-        [Route("{packageId},{voucherId}")]
-        public async Task<IActionResult> DeletePackageVoucher(Guid packageId, Guid voucherId)
+        [Route("{package_id},{voucher_id}")]
+        public async Task<IActionResult> DeletePackageVoucher(Guid package_id, Guid voucher_id)
         {
-            var result = await _packageVoucherService.DeletePackageVoucherById(packageId, voucherId);
+            var result = await _packageVoucherService.DeletePackageVoucherById(package_id, voucher_id);
             return Ok(result);
         }
     }

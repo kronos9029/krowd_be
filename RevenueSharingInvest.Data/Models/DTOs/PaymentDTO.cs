@@ -9,13 +9,13 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class PaymentDTO
     {
         public string id { get; set; }
-        public string investmentId { get; set; }
         public string periodRevenueId { get; set; }
+        public string investmentId { get; set; }       
         public float amount { get; set; }
         public string description { get; set; }
         public string type { get; set; }
-        public float fromId { get; set; }
-        public float toId { get; set; }
+        public string fromId { get; set; }
+        public string toId { get; set; }
         public DateTime createDate { get; set; }
         public string createBy { get; set; }
         public DateTime updateDate { get; set; }

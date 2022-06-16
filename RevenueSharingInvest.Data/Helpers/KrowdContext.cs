@@ -331,12 +331,12 @@ namespace RevenueSharingInvest.Data.Models.Helpers
 
             modelBuilder.Entity<VoucherItem>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.HasOne(d => d.Voucher)
                     .WithMany(p => p.VoucherItems)
                     .HasForeignKey(d => d.VoucherId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    //.OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_VoucherItem_Voucher");
             });
 

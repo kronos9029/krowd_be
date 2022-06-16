@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreateInvestment(Investment investmentDTO)
+        public async Task<string> CreateInvestment(Investment investmentDTO)
         {
             try
             {
@@ -35,13 +35,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @InvestorId, "
                     + "         @ProjectId, "
                     + "         @PackageId, "
                     + "         @Quantity, "
                     + "         @TotalPrice, "
-                    + "         @LastPayment, "
+                    + "         null, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -54,14 +56,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("PackageId", investmentDTO.PackageId, DbType.Guid);
                 parameters.Add("Quantity", investmentDTO.Quantity, DbType.Int16);
                 parameters.Add("TotalPrice", investmentDTO.TotalPrice, DbType.Double);
-                parameters.Add("LastPayment", investmentDTO.LastPayment, DbType.DateTime);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", investmentDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", investmentDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -96,13 +97,52 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Investment>> GetAllInvestments()
+        public async Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM Investment WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<Investment>(query)).ToList();
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     ProjectId, "
+                    + "                     PackageId ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM Investment "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         InvestorId, "
+                    + "         ProjectId, "
+                    + "         PackageId, "
+                    + "         Quantity, "
+                    + "         TotalPrice, "
+                    + "         LastPayment, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Investment>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM Investment WHERE IsDeleted = 0 ORDER BY ProjectId, PackageId ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Investment>(query)).ToList();
+                }               
             }
             catch (Exception e)
             {
@@ -139,9 +179,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         PackageId = @PackageId, "
                     + "         Quantity = @Quantity, "
                     + "         TotalPrice = @TotalPrice, "
-                    + "         LastPayment = @LastPayment, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
@@ -154,13 +191,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("PackageId", investmentDTO.PackageId, DbType.Guid);
                 parameters.Add("Quantity", investmentDTO.Quantity, DbType.Int16);
                 parameters.Add("TotalPrice", investmentDTO.TotalPrice, DbType.Double);
-                parameters.Add("LastPayment", investmentDTO.LastPayment, DbType.DateTime);
-                parameters.Add("CreateDate", investmentDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", investmentDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", investmentDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", investmentDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", investmentDTO, DbType.Guid);
+                parameters.Add("Id", investmentId, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {
@@ -170,6 +204,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllInvestmentData()
+        {
+            try
+            {
+                var query = "DELETE FROM Investment";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

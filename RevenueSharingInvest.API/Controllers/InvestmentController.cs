@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllInvestments()
+        public async Task<IActionResult> GetAllInvestments(int pageIndex, int pageSize)
         {
             var result = new List<InvestmentDTO>();
-            result = await _investmentService.GetAllInvestments();
+            result = await _investmentService.GetAllInvestments(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateInvestment([FromBody] InvestmentDTO investmentDTO, [FromQuery] Guid investmentId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateInvestment([FromBody] InvestmentDTO investmentDTO, Guid id)
         {
-            var result = await _investmentService.UpdateInvestment(investmentDTO, investmentId);
+            var result = await _investmentService.UpdateInvestment(investmentDTO, id);
             return Ok(result);
         }
 

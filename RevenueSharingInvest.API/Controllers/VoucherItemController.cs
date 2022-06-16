@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/voucherItems")]
+    [Route("api/v1.0/voucher_items")]
     [EnableCors]
     //[Authorize]
     public class VoucherItemController : ControllerBase
@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllVoucherItems()
+        public async Task<IActionResult> GetAllVoucherItems(int pageIndex, int pageSize)
         {
             var result = new List<VoucherItemDTO>();
-            result = await _voucherItemService.GetAllVoucherItems();
+            result = await _voucherItemService.GetAllVoucherItems(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateVoucherItem([FromBody] VoucherItemDTO voucherItemDTO, [FromQuery] Guid voucherItemId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateVoucherItem([FromBody] VoucherItemDTO voucherItemDTO, Guid id)
         {
-            var result = await _voucherItemService.UpdateVoucherItem(voucherItemDTO, voucherItemId);
+            var result = await _voucherItemService.UpdateVoucherItem(voucherItemDTO, id);
             return Ok(result);
         }
 

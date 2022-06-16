@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreateAccountTransaction(AccountTransaction accountTransactionDTO)
+        public async Task<string> CreateAccountTransaction(AccountTransaction accountTransactionDTO)
         {
             try
             {
@@ -33,6 +33,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @FromUserId, "
                     + "         @ToUserId, "
@@ -55,7 +57,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", accountTransactionDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -90,13 +92,49 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<AccountTransaction>> GetAllAccountTransactions()
+        public async Task<List<AccountTransaction>> GetAllAccountTransactions(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM AccountTransaction WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<AccountTransaction>(query)).ToList();
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     Status ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM AccountTransaction "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         FromUserId, "
+                    + "         ToUserId, "
+                    + "         Description, "
+                    + "         Status, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<AccountTransaction>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM AccountTransaction WHERE IsDeleted = 0 ORDER BY Status ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<AccountTransaction>(query)).ToList();
+                }              
             }
             catch (Exception e)
             {
@@ -132,8 +170,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         ToUserId = @ToUserId, "
                     + "         Description = @Description, "
                     + "         Status = @Status, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
@@ -145,8 +181,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("ToUserId", accountTransactionDTO.ToUserId, DbType.Guid);
                 parameters.Add("Description", accountTransactionDTO.Description, DbType.String);
                 parameters.Add("Status", accountTransactionDTO.Status, DbType.String);
-                parameters.Add("CreateDate", accountTransactionDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", accountTransactionDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", accountTransactionDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", accountTransactionDTO.IsDeleted, DbType.Boolean);
@@ -160,6 +194,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllAccountTransactionData()
+        {
+            try
+            {
+                var query = "DELETE FROM AccountTransaction";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

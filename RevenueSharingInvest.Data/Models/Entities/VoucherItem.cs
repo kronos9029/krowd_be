@@ -14,8 +14,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
-        public Guid VoucherId { get; set; }
-        public Guid InvestmentId { get; set; }
+        public Guid? VoucherId { get; set; }
+        public Guid? InvestmentId { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? IssuedDate { get; set; }
         [Column(TypeName = "datetime")]

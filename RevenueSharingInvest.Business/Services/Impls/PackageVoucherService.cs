@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Business.Exceptions;
+using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -14,13 +15,30 @@ namespace RevenueSharingInvest.Business.Services.Impls
     public class PackageVoucherService : IPackageVoucherService
     {
         private readonly IPackageVoucherRepository _packageVoucherRepository;
+        private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
 
-        public PackageVoucherService(IPackageVoucherRepository packageVoucherRepository, IMapper mapper)
+        public PackageVoucherService(IPackageVoucherRepository packageVoucherRepository, IValidationService validationService, IMapper mapper)
         {
             _packageVoucherRepository = packageVoucherRepository;
+            _validationService = validationService;
             _mapper = mapper;
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllPackageVoucherData()
+        {
+            int result;
+            try
+            {
+                result = await _packageVoucherRepository.ClearAllPackageVoucherData();
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         //CREATE
@@ -29,6 +47,42 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                if (packageVoucherDTO.packageId == null || !await _validationService.CheckUUIDFormat(packageVoucherDTO.packageId))
+                    throw new InvalidFieldException("Invalid packageId!!!");
+
+                if (!await _validationService.CheckExistenceId("Package", Guid.Parse(packageVoucherDTO.packageId)))
+                    throw new NotFoundException("This packageId is not existed!!!");
+
+                if (packageVoucherDTO.voucherId == null || !await _validationService.CheckUUIDFormat(packageVoucherDTO.voucherId))
+                    throw new InvalidFieldException("Invalid voucherId!!!");
+
+                if (!await _validationService.CheckExistenceId("Voucher", Guid.Parse(packageVoucherDTO.voucherId)))
+                    throw new NotFoundException("This voucherId is not existed!!!");
+
+                if (packageVoucherDTO.quantity <= 0)
+                    throw new InvalidFieldException("quantity must be greater than 0!!!");
+
+                if (packageVoucherDTO.maxQuantity <= 0)
+                    throw new InvalidFieldException("maxQuantity must be greater than 0!!!");
+
+                if (packageVoucherDTO.createBy != null && packageVoucherDTO.createBy.Length >= 0)
+                {
+                    if (packageVoucherDTO.createBy.Equals("string"))
+                        packageVoucherDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(packageVoucherDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (packageVoucherDTO.updateBy != null && packageVoucherDTO.updateBy.Length >= 0)
+                {
+                    if (packageVoucherDTO.updateBy.Equals("string"))
+                        packageVoucherDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(packageVoucherDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
+                packageVoucherDTO.isDeleted = false;
+
                 PackageVoucher dto = _mapper.Map<PackageVoucher>(packageVoucherDTO);
                 result = await _packageVoucherRepository.CreatePackageVoucher(dto);
                 if (result == 0)
@@ -37,7 +91,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
@@ -47,24 +101,30 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-
                 result = await _packageVoucherRepository.DeletePackageVoucherById(packageId, voucherId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not delete PackageVoucher Object!");
+                    throw new DeleteObjectException("Can not delete PackageVoucher Object!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
         //GET ALL
-        public async Task<List<PackageVoucherDTO>> GetAllPackageVouchers()
+        public async Task<List<PackageVoucherDTO>> GetAllPackageVouchers(int pageIndex, int pageSize)
         {
-            List<PackageVoucher> packageVoucherList = await _packageVoucherRepository.GetAllPackageVouchers();
-            List<PackageVoucherDTO> list = _mapper.Map<List<PackageVoucherDTO>>(packageVoucherList);
-            return list;
+            try
+            {
+                List<PackageVoucher> packageVoucherList = await _packageVoucherRepository.GetAllPackageVouchers(pageIndex, pageSize);
+                List<PackageVoucherDTO> list = _mapper.Map<List<PackageVoucherDTO>>(packageVoucherList);
+                return list;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         //GET BY ID
@@ -73,16 +133,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
             PackageVoucherDTO result;
             try
             {
-
                 PackageVoucher dto = await _packageVoucherRepository.GetPackageVoucherById(packageId, voucherId);
                 result = _mapper.Map<PackageVoucherDTO>(dto);
                 if (result == null)
-                    throw new CreateObjectException("No PackageVoucher Object Found!");
+                    throw new NotFoundException("No PackageVoucher Object Found!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
 
@@ -92,15 +151,49 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                if (packageVoucherDTO.packageId == null || !await _validationService.CheckUUIDFormat(packageVoucherDTO.packageId))
+                    throw new InvalidFieldException("Invalid packageId!!!");
+
+                if (!await _validationService.CheckExistenceId("Package", Guid.Parse(packageVoucherDTO.packageId)))
+                    throw new NotFoundException("This packageId is not existed!!!");
+
+                if (packageVoucherDTO.voucherId == null || !await _validationService.CheckUUIDFormat(packageVoucherDTO.voucherId))
+                    throw new InvalidFieldException("Invalid voucherId!!!");
+
+                if (!await _validationService.CheckExistenceId("Voucher", Guid.Parse(packageVoucherDTO.voucherId)))
+                    throw new NotFoundException("This voucherId is not existed!!!");
+
+                if (packageVoucherDTO.quantity <= 0)
+                    throw new InvalidFieldException("quantity must be greater than 0!!!");
+
+                if (packageVoucherDTO.maxQuantity <= 0)
+                    throw new InvalidFieldException("maxQuantity must be greater than 0!!!");
+
+                if (packageVoucherDTO.createBy != null && packageVoucherDTO.createBy.Length >= 0)
+                {
+                    if (packageVoucherDTO.createBy.Equals("string"))
+                        packageVoucherDTO.createBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(packageVoucherDTO.createBy))
+                        throw new InvalidFieldException("Invalid createBy!!!");
+                }
+
+                if (packageVoucherDTO.updateBy != null && packageVoucherDTO.updateBy.Length >= 0)
+                {
+                    if (packageVoucherDTO.updateBy.Equals("string"))
+                        packageVoucherDTO.updateBy = null;
+                    else if (!await _validationService.CheckUUIDFormat(packageVoucherDTO.updateBy))
+                        throw new InvalidFieldException("Invalid updateBy!!!");
+                }
+
                 PackageVoucher dto = _mapper.Map<PackageVoucher>(packageVoucherDTO);
                 result = await _packageVoucherRepository.UpdatePackageVoucher(dto, packageId, voucherId);
                 if (result == 0)
-                    throw new CreateObjectException("Can not update PackageVoucher Object!");
+                    throw new UpdateObjectException("Can not update PackageVoucher Object!");
                 return result;
             }
             catch (Exception e)
             {
-                throw new NotImplementedException();
+                throw new Exception(e.Message);
             }
         }
     }

@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Business.Services
     public interface IVoucherService
     {
         //CREATE
-        public Task<int> CreateVoucher(VoucherDTO voucherDTO);
+        public Task<IdDTO> CreateVoucher(VoucherDTO voucherDTO);
 
         //READ
-        public Task<List<VoucherDTO>> GetAllVouchers();
+        public Task<List<VoucherDTO>> GetAllVouchers(int pageIndex, int pageSize);
         public Task<VoucherDTO> GetVoucherById(Guid voucherId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteVoucherById(Guid voucherId);
+        public Task<int> ClearAllVoucherData();
     }
 }

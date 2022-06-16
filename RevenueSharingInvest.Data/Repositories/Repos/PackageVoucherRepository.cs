@@ -92,13 +92,48 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<PackageVoucher>> GetAllPackageVouchers()
+        public async Task<List<PackageVoucher>> GetAllPackageVouchers(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM PackageVoucher WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<PackageVoucher>(query)).ToList();
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     PackageId ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM PackageVoucher "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         PackageId, "
+                    + "         VoucherId, "
+                    + "         Quantity, "
+                    + "         MaxQuantity, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<PackageVoucher>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM PackageVoucher WHERE IsDeleted = 0 ORDER BY PackageId ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<PackageVoucher>(query)).ToList();
+                }               
             }
             catch (Exception e)
             {
@@ -135,8 +170,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         VoucherId = @VoucherId, "
                     + "         Quantity = Quantity, "
                     + "         MaxQuantity = MaxQuantity, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
@@ -149,8 +182,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("VoucherId", packageVoucherDTO.VoucherId, DbType.Guid);
                 parameters.Add("Quantity", packageVoucherDTO.Quantity, DbType.Int16);
                 parameters.Add("MaxQuantity", packageVoucherDTO.MaxQuantity, DbType.Int16);
-                parameters.Add("CreateDate", packageVoucherDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", packageVoucherDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", packageVoucherDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", packageVoucherDTO.IsDeleted, DbType.Boolean);
@@ -165,6 +196,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllPackageVoucherData()
+        {
+            try
+            {
+                var query = "DELETE FROM PackageVoucher";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }
