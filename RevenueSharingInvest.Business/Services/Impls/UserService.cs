@@ -64,6 +64,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IdDTO newId = new IdDTO();
             try
             {
+                //if (userDTO.packageId == null || !await _validationService.CheckUUIDFormat(userDTO.packageId))
+                //    throw new InvalidFieldException("Invalid packageId!!!");
+
+                //if (!await _validationService.CheckExistenceId("Package", Guid.Parse(userDTO.packageId)))
+                //    throw new NotFoundException("This packageId is not existed!!!");
+
+                //if (userDTO.investmentTargetCapital <= 0)
+                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+
                 if (userDTO.roleId == null || !await _validationService.CheckUUIDFormat(userDTO.roleId))
                     throw new InvalidFieldException("Invalid roleId!!!");
 

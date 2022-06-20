@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreatePayment(Payment paymentDTO)
+        public async Task<string> CreatePayment(Payment paymentDTO)
         {
             try
             {
@@ -36,6 +36,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @InvestmentId, "
                     + "         @PeriodRevenueId, "
@@ -64,7 +66,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", paymentDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -99,13 +101,52 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Payment>> GetAllPayments()
+        public async Task<List<Payment>> GetAllPayments(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM Payment WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<Payment>(query)).ToList();
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     Type ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM Payment "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         InvestmentId, "
+                    + "         PeriodRevenueId, "
+                    + "         Amount, "
+                    + "         Description, "
+                    + "         Type, "
+                    + "         FromId, "
+                    + "         ToId, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Payment>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM Payment WHERE IsDeleted = 0 ORDER BY Type ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Payment>(query)).ToList();
+                }               
             }
             catch (Exception e)
             {
@@ -144,8 +185,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Type = @Type, "
                     + "         FromId = @FromId, "
                     + "         ToId = @ToId, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
@@ -160,8 +199,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Type", paymentDTO.Type, DbType.String);
                 parameters.Add("FromId", paymentDTO.FromId, DbType.Guid);
                 parameters.Add("ToId", paymentDTO.ToId, DbType.Guid);
-                parameters.Add("CreateDate", paymentDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", paymentDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", paymentDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", paymentDTO.IsDeleted, DbType.Boolean);
@@ -175,6 +212,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllPaymentData()
+        {
+            try
+            {
+                var query = "DELETE FROM Payment";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

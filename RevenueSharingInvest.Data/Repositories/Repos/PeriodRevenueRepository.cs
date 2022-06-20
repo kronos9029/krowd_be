@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreatePeriodRevenue(PeriodRevenue periodRevenueDTO)
+        public async Task<string> CreatePeriodRevenue(PeriodRevenue periodRevenueDTO)
         {
             try
             {
@@ -39,16 +39,18 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @ProjectId, "
                     + "         @StageId, "
-                    + "         @ActualAmount, "
-                    + "         @PessimisticExpectedAmount, "
-                    + "         @NormalExpectedAmount, "
-                    + "         @OptimisticExpectedAmount, "
-                    + "         @PessimisticExpectedRatio, "
-                    + "         @NormalExpectedRatio, "
-                    + "         @OptimisticExpectedRatio, "
+                    + "         0, "
+                    + "         0, "
+                    + "         0, "
+                    + "         0, "
+                    + "         0, "
+                    + "         0, "
+                    + "         0, "
                     + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
@@ -59,13 +61,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", periodRevenueDTO.ProjectId, DbType.Guid);
                 parameters.Add("StageId", periodRevenueDTO.StageId, DbType.Guid);
-                parameters.Add("ActualAmount", periodRevenueDTO.ActualAmount, DbType.Double);
-                parameters.Add("PessimisticExpectedAmount", periodRevenueDTO.PessimisticExpectedAmount, DbType.Double);
-                parameters.Add("NormalExpectedAmount", periodRevenueDTO.NormalExpectedAmount, DbType.Double);
-                parameters.Add("OptimisticExpectedAmount", periodRevenueDTO.OptimisticExpectedAmount, DbType.Double);
-                parameters.Add("PessimisticExpectedRatio", periodRevenueDTO.PessimisticExpectedRatio, DbType.Double);
-                parameters.Add("NormalExpectedRatio", periodRevenueDTO.NormalExpectedRatio, DbType.Double);
-                parameters.Add("OptimisticExpectedRatio", periodRevenueDTO.OptimisticExpectedRatio, DbType.Double);
                 parameters.Add("Status", periodRevenueDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", periodRevenueDTO.CreateBy, DbType.Guid);
@@ -73,7 +68,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", periodRevenueDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -108,13 +103,56 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<PeriodRevenue>> GetAllPeriodRevenues()
+        public async Task<List<PeriodRevenue>> GetAllPeriodRevenues(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM PeriodRevenue WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<PeriodRevenue>(query)).ToList();
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     ProjectId, "
+                    + "                     StageId ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM PeriodRevenue "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         ProjectId, "
+                    + "         StageId, "
+                    + "         ActualAmount, "
+                    + "         PessimisticExpectedAmount, "
+                    + "         NormalExpectedAmount, "
+                    + "         OptimisticExpectedAmount, "
+                    + "         PessimisticExpectedRatio, "
+                    + "         NormalExpectedRatio, "
+                    + "         OptimisticExpectedRatio, "
+                    + "         Status, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<PeriodRevenue>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM PeriodRevenue WHERE IsDeleted = 0 ORDER BY ProjectId, StageId ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<PeriodRevenue>(query)).ToList();
+                }               
             }
             catch (Exception e)
             {
@@ -148,38 +186,32 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SET "
                     + "         ProjectId = @ProjectId, "
                     + "         StageId = @StageId, "
-                    + "         ActualAmount = @ActualAmount, "
-                    + "         PessimisticExpectedAmount = @PessimisticExpectedAmount, "
-                    + "         NormalExpectedAmount = @NormalExpectedAmount, "
-                    + "         OptimisticExpectedAmount = @OptimisticExpectedAmount, "
-                    + "         PessimisticExpectedRatio = @PessimisticExpectedRatio, "
-                    + "         NormalExpectedRatio = @NormalExpectedRatio, "
-                    + "         OptimisticExpectedRatio = @OptimisticExpectedRatio, "
+                    //+ "         ActualAmount = @ActualAmount, "
+                    //+ "         PessimisticExpectedAmount = @PessimisticExpectedAmount, "
+                    //+ "         NormalExpectedAmount = @NormalExpectedAmount, "
+                    //+ "         OptimisticExpectedAmount = @OptimisticExpectedAmount, "
+                    //+ "         PessimisticExpectedRatio = @PessimisticExpectedRatio, "
+                    //+ "         NormalExpectedRatio = @NormalExpectedRatio, "
+                    //+ "         OptimisticExpectedRatio = @OptimisticExpectedRatio, "
                     + "         Status = @Status, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
                     + "     WHERE "
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", periodRevenueDTO.ProjectId, DbType.Guid);
                 parameters.Add("StageId", periodRevenueDTO.StageId, DbType.Guid);
-                parameters.Add("ActualAmount", periodRevenueDTO.ActualAmount, DbType.Double);
-                parameters.Add("PessimisticExpectedAmount", periodRevenueDTO.PessimisticExpectedAmount, DbType.Double);
-                parameters.Add("NormalExpectedAmount", periodRevenueDTO.NormalExpectedAmount, DbType.Double);
-                parameters.Add("OptimisticExpectedAmount", periodRevenueDTO.OptimisticExpectedAmount, DbType.Double);
-                parameters.Add("PessimisticExpectedRatio", periodRevenueDTO.PessimisticExpectedRatio, DbType.Double);
-                parameters.Add("NormalExpectedRatio", periodRevenueDTO.NormalExpectedRatio, DbType.Double);
-                parameters.Add("OptimisticExpectedRatio", periodRevenueDTO.OptimisticExpectedRatio, DbType.Double);
+                //parameters.Add("ActualAmount", periodRevenueDTO.ActualAmount, DbType.Double);
+                //parameters.Add("PessimisticExpectedAmount", periodRevenueDTO.PessimisticExpectedAmount, DbType.Double);
+                //parameters.Add("NormalExpectedAmount", periodRevenueDTO.NormalExpectedAmount, DbType.Double);
+                //parameters.Add("OptimisticExpectedAmount", periodRevenueDTO.OptimisticExpectedAmount, DbType.Double);
+                //parameters.Add("PessimisticExpectedRatio", periodRevenueDTO.PessimisticExpectedRatio, DbType.Double);
+                //parameters.Add("NormalExpectedRatio", periodRevenueDTO.NormalExpectedRatio, DbType.Double);
+                //parameters.Add("OptimisticExpectedRatio", periodRevenueDTO.OptimisticExpectedRatio, DbType.Double);
                 parameters.Add("Status", periodRevenueDTO.Status, DbType.String);
-                parameters.Add("CreateDate", periodRevenueDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", periodRevenueDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", periodRevenueDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", periodRevenueDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", periodRevenueId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -190,6 +222,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllPeriodRevenueData()
+        {
+            try
+            {
+                var query = "DELETE FROM PeriodRevenue";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

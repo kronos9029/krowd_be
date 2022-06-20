@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IPeriodRevenueRepository
     {
         //CREATE
-        public Task<int> CreatePeriodRevenue(PeriodRevenue periodRevenueDTO);
+        public Task<string> CreatePeriodRevenue(PeriodRevenue periodRevenueDTO);
 
         //READ
-        public Task<List<PeriodRevenue>> GetAllPeriodRevenues();
+        public Task<List<PeriodRevenue>> GetAllPeriodRevenues(int pageIndex, int pageSize);
         public Task<PeriodRevenue> GetPeriodRevenueById(Guid periodRevenueId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeletePeriodRevenueById(Guid periodRevenueId);
+        public Task<int> ClearAllPeriodRevenueData();
     }
 }

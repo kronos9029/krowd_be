@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreateVoucher(Voucher voucherDTO)
+        public async Task<string> CreateVoucher(Voucher voucherDTO)
         {
             try
             {
@@ -38,6 +38,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @Name, "
                     + "         @Code, "
@@ -62,15 +64,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Image", voucherDTO.Image, DbType.String);
                 parameters.Add("Quantity", voucherDTO.Quantity, DbType.Int16);
                 parameters.Add("Status", voucherDTO.Status, DbType.String);
-                parameters.Add("StartDate", voucherDTO.StartDate, DbType.DateTime);
-                parameters.Add("EndDate", voucherDTO.EndDate, DbType.DateTime);
+                parameters.Add("StartDate", Convert.ToDateTime(voucherDTO.StartDate), DbType.DateTime);
+                parameters.Add("EndDate", Convert.ToDateTime(voucherDTO.StartDate), DbType.DateTime);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", voucherDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", voucherDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -105,13 +107,55 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Voucher>> GetAllVouchers()
+        public async Task<List<Voucher>> GetAllVouchers(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM Voucher WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<Voucher>(query)).ToList();
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     ProjectId, "
+                    + "                     Name ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM Voucher "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         Name, "
+                    + "         Code, "
+                    + "         ProjectId, "
+                    + "         Description, "
+                    + "         Image, "
+                    + "         Quantity, "
+                    + "         Status, "
+                    + "         StartDate, "
+                    + "         EndDate, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Voucher>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM Voucher WHERE IsDeleted = 0 ORDER BY ProjectId, Name ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Voucher>(query)).ToList();
+                }               
             }
             catch (Exception e)
             {
@@ -152,8 +196,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Status = @Status, "
                     + "         StartDate = @StartDate, "
                     + "         EndDate = @EndDate, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
@@ -170,8 +212,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Status", voucherDTO.Status, DbType.String);
                 parameters.Add("StartDate", voucherDTO.StartDate, DbType.DateTime);
                 parameters.Add("EndDate", voucherDTO.EndDate, DbType.DateTime);
-                parameters.Add("CreateDate", voucherDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", voucherDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", voucherDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", voucherDTO.IsDeleted, DbType.Boolean);
@@ -185,6 +225,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllVoucherData()
+        {
+            try
+            {
+                var query = "DELETE FROM Voucher";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

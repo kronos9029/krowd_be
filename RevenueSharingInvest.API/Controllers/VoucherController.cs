@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllVouchers()
+        public async Task<IActionResult> GetAllVouchers(int pageIndex, int pageSize)
         {
             var result = new List<VoucherDTO>();
-            result = await _voucherService.GetAllVouchers();
+            result = await _voucherService.GetAllVouchers(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateVoucher([FromBody] VoucherDTO voucherDTO, [FromQuery] Guid voucherId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateVoucher([FromBody] VoucherDTO voucherDTO, Guid id)
         {
-            var result = await _voucherService.UpdateVoucher(voucherDTO, voucherId);
+            var result = await _voucherService.UpdateVoucher(voucherDTO, id);
             return Ok(result);
         }
 

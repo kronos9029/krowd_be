@@ -8,6 +8,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
 {
     public class InvestmentDTO
     {
+        public string id { get; set; }
         public string investorId { get; set; }
         public string projectId { get; set; }
         public string packageId { get; set; }

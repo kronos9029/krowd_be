@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/periodRevenueHistories")]
+    [Route("api/v1.0/period_revenue_histories")]
     [EnableCors]
     //[Authorize]
     public class PeriodRevenueHistoryController : ControllerBase
@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPeriodRevenueHistorys()
+        public async Task<IActionResult> GetAllPeriodRevenueHistorys(int pageIndex, int pageSize)
         {
             var result = new List<PeriodRevenueHistoryDTO>();
-            result = await _periodRevenueHistoryService.GetAllPeriodRevenueHistories();
+            result = await _periodRevenueHistoryService.GetAllPeriodRevenueHistories(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdatePeriodRevenueHistory([FromBody] PeriodRevenueHistoryDTO periodRevenueHistoryDTO, [FromQuery] Guid periodRevenueHistoryId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdatePeriodRevenueHistory([FromBody] PeriodRevenueHistoryDTO periodRevenueHistoryDTO, Guid id)
         {
-            var result = await _periodRevenueHistoryService.UpdatePeriodRevenueHistory(periodRevenueHistoryDTO, periodRevenueHistoryId);
+            var result = await _periodRevenueHistoryService.UpdatePeriodRevenueHistory(periodRevenueHistoryDTO, id);
             return Ok(result);
         }
 

@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IInvestmentRepository
     {
         //CREATE
-        public Task<int> CreateInvestment(Investment investmentDTO);
+        public Task<string> CreateInvestment(Investment investmentDTO);
 
         //READ
-        public Task<List<Investment>> GetAllInvestments();
+        public Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize);
         public Task<Investment> GetInvestmentById(Guid investmentId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteInvestmentById(Guid investmentId);
+        public Task<int> ClearAllInvestmentData();
     }
 }

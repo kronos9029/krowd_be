@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/Investor_Wallets")]
+    [Route("api/v1.0/investor_wallets")]
     [EnableCors]
     //[Authorize]
     public class InvestorWalletController : ControllerBase

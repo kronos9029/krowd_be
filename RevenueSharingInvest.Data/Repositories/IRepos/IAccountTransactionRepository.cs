@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IAccountTransactionRepository
     {
         //CREATE
-        public Task<int> CreateAccountTransaction(AccountTransaction accountTransactionDTO);
+        public Task<string> CreateAccountTransaction(AccountTransaction accountTransactionDTO);
 
         //READ
-        public Task<List<AccountTransaction>> GetAllAccountTransactions();
+        public Task<List<AccountTransaction>> GetAllAccountTransactions(int pageIndex, int pageSize);
         public Task<AccountTransaction> GetAccountTransactionById(Guid accountTransactionId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteAccountTransactionById(Guid accountTransactionId);
+        public Task<int> ClearAllAccountTransactionData();
     }
 }

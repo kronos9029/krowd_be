@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IVoucherItemRepository
     {
         //CREATE
-        public Task<int> CreateVoucherItem(VoucherItem voucherItemDTO);
+        public Task<string> CreateVoucherItem(VoucherItem voucherItemDTO);
 
         //READ
-        public Task<List<VoucherItem>> GetAllVoucherItems();
+        public Task<List<VoucherItem>> GetAllVoucherItems(int pageIndex, int pageSize);
         public Task<VoucherItem> GetVoucherItemById(Guid voucherItemId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteVoucherItemById(Guid voucherItemId);
+        public Task<int> ClearAllVoucherItemData();
     }
 }

@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Business.Services
     public interface IPaymentService
     {
         //CREATE
-        public Task<int> CreatePayment(PaymentDTO paymentDTO);
+        public Task<IdDTO> CreatePayment(PaymentDTO paymentDTO);
 
         //READ
-        public Task<List<PaymentDTO>> GetAllPayments();
+        public Task<List<PaymentDTO>> GetAllPayments(int pageIndex, int pageSize);
         public Task<PaymentDTO> GetPaymentById(Guid paymentId);
 
         //UPDATE
@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeletePaymentById(Guid paymentId);
+        public Task<int> ClearAllPaymentData();
     }
 }

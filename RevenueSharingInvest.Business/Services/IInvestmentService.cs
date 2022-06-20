@@ -10,10 +10,10 @@ namespace RevenueSharingInvest.Business.Services
     public interface IInvestmentService
     {
         //CREATE
-        public Task<int> CreateInvestment(InvestmentDTO investmentDTO);
+        public Task<IdDTO> CreateInvestment(InvestmentDTO investmentDTO);
 
         //READ
-        public Task<List<InvestmentDTO>> GetAllInvestments();
+        public Task<List<InvestmentDTO>> GetAllInvestments(int pageIndex, int pageSize);
         public Task<InvestmentDTO> GetInvestmentById(Guid investmentId);
         //public Task<List<InvestorDTO>> GetProjectMember(String projectID);
 
@@ -22,5 +22,6 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteInvestmentById(Guid investmentId);
+        public Task<int> ClearAllInvestmentData();
     }
 }

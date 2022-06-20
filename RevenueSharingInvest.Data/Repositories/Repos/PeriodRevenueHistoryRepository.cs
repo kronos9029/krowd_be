@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreatePeriodRevenueHistory(PeriodRevenueHistory periodRevenueHistoryDTO)
+        public async Task<string> CreatePeriodRevenueHistory(PeriodRevenueHistory periodRevenueHistoryDTO)
         {
             try
             {
@@ -33,6 +33,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @Name, "
                     + "         @PeriodRevenueId, "
@@ -55,7 +57,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", periodRevenueHistoryDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
             }
             catch (Exception e)
             {
@@ -90,13 +92,51 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<PeriodRevenueHistory>> GetAllPeriodRevenueHistories()
+        public async Task<List<PeriodRevenueHistory>> GetAllPeriodRevenueHistories(int pageIndex, int pageSize)
         {
             try
             {
-                string query = "SELECT * FROM PeriodRevenueHistory WHERE IsDeleted = 0";
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<PeriodRevenueHistory>(query)).ToList();
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     PeriodRevenueId, "
+                    + "                     Name ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM PeriodRevenueHistory "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         Name, "
+                    + "         PeriodRevenueId, "
+                    + "         Description, "
+                    + "         Status, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<PeriodRevenueHistory>(query, parameters)).ToList();
+                }
+
+                else
+                {
+                    var query = "SELECT * FROM PeriodRevenueHistory WHERE IsDeleted = 0 ORDER BY PeriodRevenueId, Name ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<PeriodRevenueHistory>(query)).ToList();
+                }              
             }
             catch (Exception e)
             {
@@ -132,8 +172,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         PeriodRevenueId = @PeriodRevenueId, "
                     + "         Description = @Description, "
                     + "         Status = @Status, "
-                    + "         CreateDate = @CreateDate, "
-                    + "         CreateBy = @CreateBy, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
@@ -145,8 +183,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("PeriodRevenueId", periodRevenueHistoryDTO.PeriodRevenueId, DbType.Guid);
                 parameters.Add("Description", periodRevenueHistoryDTO.Description, DbType.String);
                 parameters.Add("Status", periodRevenueHistoryDTO.Status, DbType.String);
-                parameters.Add("CreateDate", periodRevenueHistoryDTO.CreateDate, DbType.DateTime);
-                parameters.Add("CreateBy", periodRevenueHistoryDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", periodRevenueHistoryDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", periodRevenueHistoryDTO.IsDeleted, DbType.Boolean);
@@ -160,6 +196,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //CLEAR DATA
+        public async Task<int> ClearAllPeriodRevenueHistoryData()
+        {
+            try
+            {
+                var query = "DELETE FROM PeriodRevenueHistory";
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

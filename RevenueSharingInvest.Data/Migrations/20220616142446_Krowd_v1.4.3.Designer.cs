@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RevenueSharingInvest.Data.Models.Helpers;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
     [DbContext(typeof(KrowdContext))]
-    partial class KrowdContextModelSnapshot : ModelSnapshot
+    [Migration("20220616142446_Krowd_v1.4.3")]
+    partial class Krowd_v143
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1195,8 +1197,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("AvailableDate")
                         .HasColumnType("datetime");
@@ -1210,7 +1211,7 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("ExpireDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("InvestmentId")
+                    b.Property<Guid>("InvestmentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool?>("IsDeleted")
@@ -1228,7 +1229,7 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("VoucherId")
+                    b.Property<Guid>("VoucherId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -1631,12 +1632,16 @@ namespace RevenueSharingInvest.Data.Migrations
                 {
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Investment", "Investment")
                         .WithMany("VoucherItems")
-                        .HasForeignKey("InvestmentId");
+                        .HasForeignKey("InvestmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Voucher", "Voucher")
                         .WithMany("VoucherItems")
                         .HasForeignKey("VoucherId")
-                        .HasConstraintName("FK_VoucherItem_Voucher");
+                        .HasConstraintName("FK_VoucherItem_Voucher")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Investment");
 

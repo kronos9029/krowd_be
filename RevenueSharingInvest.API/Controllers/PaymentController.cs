@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPayments()
+        public async Task<IActionResult> GetAllPayments(int pageIndex, int pageSize)
         {
             var result = new List<PaymentDTO>();
-            result = await _paymentService.GetAllPayments();
+            result = await _paymentService.GetAllPayments(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdatePayment([FromBody] PaymentDTO paymentDTO, [FromQuery] Guid paymentId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdatePayment([FromBody] PaymentDTO paymentDTO, Guid id)
         {
-            var result = await _paymentService.UpdatePayment(paymentDTO, paymentId);
+            var result = await _paymentService.UpdatePayment(paymentDTO, id);
             return Ok(result);
         }
 

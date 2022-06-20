@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/walletTransactions")]
+    [Route("api/v1.0/wallet_transactions")]
     [EnableCors]
     //[Authorize]
     public class WalletTransactionController : ControllerBase
@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllWalletTransactions()
+        public async Task<IActionResult> GetAllWalletTransactions(int pageIndex, int pageSize)
         {
             var result = new List<WalletTransactionDTO>();
-            result = await _walletTransactionService.GetAllWalletTransactions();
+            result = await _walletTransactionService.GetAllWalletTransactions(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateWalletTransaction([FromBody] WalletTransactionDTO walletTransactionDTO, [FromQuery] Guid walletTransactionId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateWalletTransaction([FromBody] WalletTransactionDTO walletTransactionDTO, Guid id)
         {
-            var result = await _walletTransactionService.UpdateWalletTransaction(walletTransactionDTO, walletTransactionId);
+            var result = await _walletTransactionService.UpdateWalletTransaction(walletTransactionDTO, id);
             return Ok(result);
         }
 

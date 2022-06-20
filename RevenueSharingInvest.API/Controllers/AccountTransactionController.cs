@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/accountTransactions")]
+    [Route("api/v1.0/account_transactions")]
     [EnableCors]
     //[Authorize]
     public class AccountTransactionController : ControllerBase
@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAccountTransactions()
+        public async Task<IActionResult> GetAllAccountTransactions(int pageIndex, int pageSize)
         {
             var result = new List<AccountTransactionDTO>();
-            result = await _accountTransactionService.GetAllAccountTransactions();
+            result = await _accountTransactionService.GetAllAccountTransactions(pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -51,9 +51,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateAccountTransaction([FromBody] AccountTransactionDTO accountTransactionDTO, [FromQuery] Guid accountTransactionId)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateAccountTransaction([FromBody] AccountTransactionDTO accountTransactionDTO, Guid id)
         {
-            var result = await _accountTransactionService.UpdateAccountTransaction(accountTransactionDTO, accountTransactionId);
+            var result = await _accountTransactionService.UpdateAccountTransaction(accountTransactionDTO, id);
             return Ok(result);
         }
 

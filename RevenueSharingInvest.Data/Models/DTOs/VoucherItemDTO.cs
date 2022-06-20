@@ -11,10 +11,10 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string id { get; set; }
         public string voucherId { get; set; }
         public string investmentId { get; set; }
-        public DateTime issuedDate { get; set; }
-        public DateTime expireDate { get; set; }
-        public DateTime redeemDate { get; set; }
-        public DateTime availableDate { get; set; }
+        public string issuedDate { get; set; }
+        public string expireDate { get; set; }
+        public string redeemDate { get; set; }
+        public string availableDate { get; set; }
         public DateTime createDate { get; set; }
         public string createBy { get; set; }
         public DateTime updateDate { get; set; }
