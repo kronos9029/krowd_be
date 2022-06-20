@@ -171,11 +171,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<AllProjectDTO> GetAllProjects(int pageIndex, int pageSize, Guid businessId, string temp_field_role)
+        public async Task<AllProjectDTO> GetAllProjects(int pageIndex, int pageSize, string businessId, string temp_field_role)
         {
             try
             {
                 AllProjectDTO result = new AllProjectDTO();
+
+                if (businessId != null)
+                {
+                    if (!await _validationService.CheckUUIDFormat(businessId))
+                        throw new InvalidFieldException("Invalid businessId!!!");
+
+                    if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
+                        throw new NotFoundException("This businessId is not existed!!!");
+                }
 
                 result.numOfProject = await _projectRepository.CountProject(businessId, temp_field_role);
 
