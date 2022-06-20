@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNtCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,29 +12,31 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
     [Route("api/v1.0/projects")]
     [EnableCors]
-        [Authorize]
+    [Authorize]
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IAuthenticateService _authenticateService;
+        string userId;
         public ProjectController(IProjectService projectService, IHttpContextAccessor httpContextAccessor, IAuthenticateService authenticateService)
         {
             _projectService = projectService;
             this.httpContextAccessor = httpContextAccessor;
             _authenticateService = authenticateService;
+            userId = httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateProject([FromBody] ProjectDTO projectDTO)
         {
-            string userId = httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
 
             if(await _authenticateService.CheckRoleForUser(userId, RoleEnum.BUSINESS_MANAGER.ToString()))
             {
@@ -65,8 +67,6 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> UpdateProject([FromBody] ProjectDTO projectDTO, Guid id)
         {
-            string userId = httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
-
             if (await _authenticateService.CheckRoleForUser(userId, RoleEnum.BUSINESS_MANAGER.ToString()))
             {
                 var result = await _projectService.UpdateProject(projectDTO, id);
