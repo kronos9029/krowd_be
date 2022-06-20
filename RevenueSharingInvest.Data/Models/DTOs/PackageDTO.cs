@@ -19,7 +19,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public int maxForPurchasing { get; set; }
         public string openDate { get; set; }
         public string closeDate { get; set; }
-        public string businessLicense { get; set; }
         public DateTime createDate { get; set; }
         public string createBy { get; set; }
         public DateTime updateDate { get; set; }

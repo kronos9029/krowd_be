@@ -31,7 +31,7 @@ namespace RevenueSharingInvest.Business.Exceptions
 
         private static Task HandleException(HttpContext context, Exception ex)
         {
-            var errorMessageObject = new ErrorResponse { Message = ex.Message, Code = "GE" };
+            var errorMessageObject = new ErrorResponse { Message = ex.Message, Code = "500" };
             var statusCode = (int)HttpStatusCode.InternalServerError;
             switch (ex)
             {
