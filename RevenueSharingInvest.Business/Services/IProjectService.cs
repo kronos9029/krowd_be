@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.Business.Services
         public Task<IdDTO> CreateProject(ProjectDTO projectDTO);
 
         //READ
-        public Task<List<ProjectDTO>> GetAllProjects(int pageIndex, int pageSize);
+        public Task<AllProjectDTO> GetAllProjects(int pageIndex, int pageSize, Guid businessId, string temp_field_role);
         public Task<ProjectDTO> GetProjectById(Guid projectId);
 
         //UPDATE

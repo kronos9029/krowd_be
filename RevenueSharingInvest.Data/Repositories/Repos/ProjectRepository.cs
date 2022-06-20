@@ -140,10 +140,36 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Project>> GetAllProjects(int pageIndex, int pageSize)
+        public async Task<List<Project>> GetAllProjects(int pageIndex, int pageSize, Guid businessId, string role)
         {
             try
             {
+
+                var parameters = new DynamicParameters();
+                var whereCondition = "";
+                if (businessId.Equals(""))
+                {
+                    if (role.Equals("ADMIN"))
+                    {
+                        whereCondition = "";
+                    }
+                    if (role.Equals("INVESTOR"))
+                    {
+                        whereCondition = "WHERE IsDeleted = 0 AND Status = 2 AND Status = 3 AND Status = 4";
+                    }
+                }
+                else
+                {
+                    if (role.Equals("ADMIN") || role.Equals("BUSINESS"))
+                    {
+                        whereCondition = "WHERE BusinessId = @BusinessId";
+                    }
+                    if (role.Equals("INVESTOR"))
+                    {
+                        whereCondition = "WHERE BusinessId = @BusinessId AND IsDeleted = 0 AND (Status = 2 OR Status = 3 OR Status = 4)";
+                    }
+                    parameters.Add("BusinessId", businessId, DbType.Guid);
+                }
                 if (pageIndex != 0 && pageSize != 0)
                 {
                     var query = "WITH X AS ( "
@@ -154,8 +180,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     Name ASC ) AS Num, "
                     + "             * "
                     + "         FROM Project "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    +           whereCondition
+                    + "         ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         ManagerId, " //Id của chủ dự án
@@ -189,7 +215,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     WHERE "
                     + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
                     + "         AND @PageIndex * @PageSize";
-                    var parameters = new DynamicParameters();
                     parameters.Add("PageIndex", pageIndex, DbType.Int16);
                     parameters.Add("PageSize", pageSize, DbType.Int16);
                     using var connection = CreateConnection();
@@ -197,9 +222,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM Project WHERE IsDeleted = 0 ORDER BY BusinessId ASC, Name ASC";
+                    var query = "SELECT * FROM Project " + whereCondition + " ORDER BY BusinessId ASC, Name ASC";
                     using var connection = CreateConnection();
-                    return (await connection.QueryAsync<Project>(query)).ToList();
+                    return (await connection.QueryAsync<Project>(query, parameters)).ToList();
                 }              
             }
             catch (Exception e)
@@ -301,6 +326,47 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "DELETE FROM Project";
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<int> CountProject(Guid businessId, string role)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+                var whereCondition = "";
+                if (businessId.Equals(""))
+                {
+                    if (role.Equals("ADMIN"))
+                    {
+                        whereCondition = "";
+                    }
+                    if (role.Equals("INVESTOR"))
+                    {
+                        whereCondition = "WHERE IsDeleted = 0 AND Status = 2 AND Status = 3 AND Status = 4";
+                    }
+                }
+                else
+                {
+                    if (role.Equals("ADMIN") || role.Equals("BUSINESS"))
+                    {
+                        whereCondition = "WHERE BusinessId = @BusinessId";
+                    }
+                    if (role.Equals("INVESTOR"))
+                    {
+                        whereCondition = "WHERE BusinessId = @BusinessId AND IsDeleted = 0 AND (Status = 2 OR Status = 3 OR Status = 4)";
+                    }                    
+                    parameters.Add("BusinessId", businessId, DbType.Guid);
+                }
+
+                var query = "SELECT COUNT(*) FROM Project " + whereCondition;
+                
+                using var connection = CreateConnection();
+                return ((int)connection.ExecuteScalar(query, parameters));
             }
             catch (Exception e)
             {

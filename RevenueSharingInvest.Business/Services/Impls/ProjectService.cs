@@ -171,13 +171,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<ProjectDTO>> GetAllProjects(int pageIndex, int pageSize)
+        public async Task<AllProjectDTO> GetAllProjects(int pageIndex, int pageSize, Guid businessId, string temp_field_role)
         {
             try
             {
-                List<Project> projectList = await _projectRepository.GetAllProjects(pageIndex, pageSize);
-                List<ProjectDTO> list = _mapper.Map<List<ProjectDTO>>(projectList);
-                return list;
+                AllProjectDTO result = new AllProjectDTO();
+
+                result.numOfProject = await _projectRepository.CountProject(businessId, temp_field_role);
+
+                List<Project> projectList = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, temp_field_role);
+                result.listOfProject = _mapper.Map<List<ProjectDTO>>(projectList);
+
+                return result;
             }
             catch (Exception e)
             {

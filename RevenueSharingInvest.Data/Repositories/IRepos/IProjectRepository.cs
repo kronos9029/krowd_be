@@ -13,8 +13,9 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<string> CreateProject(Project projectDTO);
 
         //READ
-        public Task<List<Project>> GetAllProjects(int pageIndex, int pageSize);
+        public Task<List<Project>> GetAllProjects(int pageIndex, int pageSize, Guid businessId, string role);
         public Task<Project> GetProjectById(Guid projectId);
+        public Task<int> CountProject(Guid businessId, string role);
 
         //UPDATE
         public Task<int> UpdateProject(Project projectDTO, Guid projectId);
