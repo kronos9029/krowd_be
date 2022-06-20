@@ -177,7 +177,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return response;
         }
 
-        protected async Task<bool> CheckRoleForUser(String userId, String requiredRole)
+        public async Task<bool> CheckRoleForUser(String userId, String requiredRole)
         {
          /* if (!await _validationService.CheckExistenceId("[User]", Guid.Parse(userId)))
                 throw new NotFoundException("concac");*/
@@ -190,7 +190,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             else
             {
-                if (userObj.RoleId.ToString().Equals(role.Id.ToString()) && userObj.RoleId.ToString().Equals(role.Id.ToString()))
+                if (userObj.RoleId.ToString().Equals(role.Id.ToString()))
                 {
                     return true;
                 }
@@ -200,5 +200,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
             }
         }
+
     }
 }
