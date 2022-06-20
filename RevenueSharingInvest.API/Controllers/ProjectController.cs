@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNtCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,14 +12,12 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
     [Route("api/v1.0/projects")]
     [EnableCors]
-    [Authorize]
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
@@ -35,15 +33,16 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateProject([FromBody] ProjectDTO projectDTO)
         {
 
-            if(await _authenticateService.CheckRoleForUser(userId, RoleEnum.BUSINESS_MANAGER.ToString()))
+            if(await _authenticateService.CheckRoleForAction(userId, RoleEnum.BUSINESS_MANAGER.ToString()))
             {
                 var result = await _projectService.CreateProject(projectDTO);
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission To Do This");
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
         }
 
         [HttpGet]
@@ -65,42 +64,45 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateProject([FromBody] ProjectDTO projectDTO, Guid id)
         {
-            if (await _authenticateService.CheckRoleForUser(userId, RoleEnum.BUSINESS_MANAGER.ToString()))
+            if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.BUSINESS_MANAGER.ToString()))
             {
                 var result = await _projectService.UpdateProject(projectDTO, id);
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission To Do This");
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
         }
 
         [HttpDelete]
         [Route("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteProject(Guid id)
         {
             string userId = httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
 
-            if (await _authenticateService.CheckRoleForUser(userId, RoleEnum.ADMIN.ToString()))
+            if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.ADMIN.ToString()) && await _authenticateService.CheckIdForAction(userId, id))
             {
                 var result = await _projectService.DeleteProjectById(id);
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission To Do This");
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
 
         }
 
         [HttpDelete]
+        [Authorize]
         public async Task<IActionResult> ClearAllProjectData()
         {
             string userId = httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
 
-            if (await _authenticateService.CheckRoleForUser(userId, RoleEnum.ADMIN.ToString()))
+            if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.ADMIN.ToString()))
             {
                 var result = await _projectService.ClearAllProjectData();
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission To Do This");
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
 
         }
     }

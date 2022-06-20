@@ -9,7 +9,8 @@ namespace RevenueSharingInvest.Business.Services
 {
     public interface IAuthenticateService
     {
-        public Task<bool> CheckRoleForUser(String userId, String requiredRole);
+        public Task<bool> CheckRoleForAction(String userId, String requiredRole);
+        public Task<bool> CheckIdForAction(String userId, Guid projectId);
         public Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken);
         public Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken);
     }

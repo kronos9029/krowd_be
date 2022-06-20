@@ -28,6 +28,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IRoleRepository _roleRepository;
         private readonly IInvestorService _investorService;
         private readonly IValidationService _validationService;
+        private readonly IProjectRepository _projectRepository;
         private readonly IMapper _mapper;
         private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
         private readonly String ROLE_INVESTOR_ID = "ad5f37da-ca48-4dc5-9f4b-963d94b535e6";
@@ -35,12 +36,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly String ROLE_PROJECT_OWNER_ID = "2d80393a-3a3d-495d-8dd7-f9261f85cc8f";
         private readonly String INVESTOR_TYPE_ID = "";
 
-        public AuthenticateService(IOptions<AppSettings> appSettings, IUserRepository userRepository, IInvestorRepository investorRepository, IValidationService validationService, IMapper mapper)
+        public AuthenticateService(IOptions<AppSettings> appSettings, 
+            IUserRepository userRepository, 
+            IInvestorRepository investorRepository, 
+            IValidationService validationService,
+            IProjectRepository projectRepository,
+        IMapper mapper)
         {
             _appSettings = appSettings.Value;
             _userRepository = userRepository;
             _investorRepository = investorRepository;
             _validationService = validationService;
+            _projectRepository = projectRepository;
             _mapper = mapper;
         }
 
@@ -177,7 +184,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return response;
         }
 
-        public async Task<bool> CheckRoleForUser(String userId, String requiredRole)
+        public async Task<bool> CheckRoleForAction(String userId, String requiredRole)
         {
          /* if (!await _validationService.CheckExistenceId("[User]", Guid.Parse(userId)))
                 throw new NotFoundException("concac");*/
@@ -199,6 +206,31 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     return false;
                 }
             }
+        }
+
+        public async Task<bool> CheckIdForAction(String userId, Guid projectId)
+        {
+            User userObj = await _userRepository.GetUserById(Guid.Parse(userId));
+
+            Project projectObj = await _projectRepository.GetProjectById(projectId);
+
+            if(userObj == null)
+            {
+                throw new NotFoundException("User Not Found!!");
+            }
+            else if(projectObj == null)
+            {
+                throw new NotFoundException("Project Not Found!!");
+            }
+            if (projectObj.CreateBy.ToString().Equals(userObj.Id))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
         }
 
     }
