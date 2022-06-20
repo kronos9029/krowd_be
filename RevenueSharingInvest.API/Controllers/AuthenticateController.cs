@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/authenticates")]
+    [Route("api/v1.0/authenticate")]
     [EnableCors]
     //[Authorize]
     public class AuthenticateController : ControllerBase
@@ -31,7 +30,6 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        [ServiceFilter(typeof(ClientIpCheckActionFilter))]
         public async Task<IActionResult> GetTokenWebBusiness([FromQuery] string token)
         {
             var result = await _authenticateService.GetTokenWebBusiness(token);
