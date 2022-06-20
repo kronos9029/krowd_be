@@ -215,6 +215,15 @@ namespace RevenueSharingInvest.API
                 };
             });
 
+            services.AddScoped<ClientIpCheckActionFilter>(container =>
+            {
+                var loggerFactory = container.GetRequiredService<ILoggerFactory>();
+                var logger = loggerFactory.CreateLogger<ClientIpCheckActionFilter>();
+
+                return new ClientIpCheckActionFilter(
+                    Configuration["AdminSafeList"], logger);
+            });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "RevenueSharingInvest.API", Version = "v1" });
@@ -269,6 +278,8 @@ namespace RevenueSharingInvest.API
             app.UseMiddleware<AuthorizeMiddleware>();
 
             app.UseAuthorization();
+
+            app.UseMiddleware<AdminSafeListMiddleware>(Configuration["AdminSafeList"]);
 
             app.UseEndpoints(endpoints =>
             {
