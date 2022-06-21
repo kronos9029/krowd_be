@@ -23,6 +23,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
+        [Route("investor")]
         public async Task<IActionResult> GetTokenInvestor([FromQuery] string token)
         {
             var result = await _authenticateService.GetTokenInvestor(token);
@@ -30,6 +31,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
+        [Route("business")]
         public async Task<IActionResult> GetTokenWebBusiness([FromQuery] string token)
         {
             var result = await _authenticateService.GetTokenWebBusiness(token);
