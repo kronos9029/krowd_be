@@ -34,8 +34,9 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("business")]
         public async Task<IActionResult> GetTokenWebBusiness([FromQuery] string token)
         {
-            var result = await _authenticateService.GetTokenWebBusiness(token);
-            return Ok(result);
+            var remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
+            //var result = await _authenticateService.GetTokenWebBusiness(token);
+            return Ok(remoteIpAddress.ToString());
         }
     }
 }
