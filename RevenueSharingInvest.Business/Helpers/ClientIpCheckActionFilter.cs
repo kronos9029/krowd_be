@@ -38,20 +38,20 @@ namespace RevenueSharingInvest.Business.Helpers
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var remoteIp = GetLocalIPAddress();
-            var ip = _safelist.Split(';');
+            var Ipv4 = GetLocalIPAddress();
+            var ipSafe = _safelist.Split(';');
             var badIp = true;
 
-            if (remoteIp.IsIPv4MappedToIPv6)
+            if (Ipv4.IsIPv4MappedToIPv6)
             {
-                remoteIp = remoteIp.MapToIPv4();
+                Ipv4 = Ipv4.MapToIPv4();
             }
 
-            foreach (var address in ip)
+            foreach (var address in ipSafe)
             {
                 var testIp = IPAddress.Parse(address);
 
-                if (testIp.Equals(remoteIp))
+                if (testIp.Equals(Ipv4))
                 {
                     badIp = false;
                     break;
