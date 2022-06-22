@@ -156,9 +156,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUSINESS_MANAGER.ToString());
                 roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_BUSINESS_MANAGER_ID);
             }            
-            else if (roleCheck.Equals(RoleEnum.PROJECT_OWNER.ToString()))
+            else if (roleCheck.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
             {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.PROJECT_OWNER.ToString());
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.PROJECT_MANAGER.ToString());
                 roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_PROJECT_OWNER_ID);
             }
             else

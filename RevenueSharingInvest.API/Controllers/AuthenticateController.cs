@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
 using System;
 using System.Collections.Generic;
@@ -27,10 +28,14 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("investor")]
         public async Task<IActionResult> GetTokenInvestor([FromQuery] string token)
         {
-            var result = await _authenticateService.GetTokenInvestor(token);
-            return Ok(result);
+/*            var result = await _authenticateService.GetTokenInvestor(token);
+            return Ok(result);*/
+            var remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
+            //var result = await _authenticateService.GetTokenWebBusiness(token);
+            return Ok(remoteIpAddress.ToString());
         }
 
+        [ServiceFilter(typeof(ClientIpCheckActionFilter))]
         [HttpPost]
         [Route("business")]
         public async Task<IActionResult> GetTokenWebBusiness([FromQuery] string token)
