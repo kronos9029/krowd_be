@@ -186,6 +186,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_INVESTOR_ID);
             }
 
+            int hours;
+
+            if (roleCheck.Equals(RoleEnum.ADMIN.ToString()))
+            {
+                hours = 1;
+            }
+            else
+            {
+                hours = 8760;
+            }
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
@@ -194,7 +205,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                    roleId,
                    roleClaim
                 }),
-                Expires = DateTime.UtcNow.AddDays(30),
+
+                Expires = DateTime.UtcNow.AddHours(hours),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 
