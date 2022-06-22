@@ -49,7 +49,7 @@ namespace RevenueSharingInvest.API.Controllers
             {
                 if (ip.AddressFamily == AddressFamily.InterNetwork)
                 {
-                    return ip.ToString();
+                    return host.HostName.ToString();
                 }
             }
             throw new Exception("No network adapters with an IPv4 address in the system!");
