@@ -8,9 +8,9 @@ namespace RevenueSharingInvest.Business.Models.Constant
 {
     public enum RoleEnum
     {
-        Admin,
-        Investor,
-        BusinessManager,
-        ProjectManager
+        ADMIN,
+        INVESTOR,
+        BUSINESS_MANAGER,
+        PROJECT_MANAGER
     }
 }
