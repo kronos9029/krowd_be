@@ -134,6 +134,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return response;
         }
 
+        public async Task<AuthenticateResponse> GetTokenAdmin(string firebaseToken)
+        {
+            FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
+            string uid = decryptedToken.Uid;
+
+            UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+            string email = userRecord.Email;
+
+
+            AuthenticateResponse response = new();
+
+            response.email = email;
+            response.uid = uid;
+            response = GenerateToken(response, RoleEnum.ADMIN.ToString());
+
+
+            return response;
+        }
+
         private AuthenticateResponse GenerateToken(AuthenticateResponse response, string roleCheck)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

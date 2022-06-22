@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
@@ -29,21 +28,27 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("investor")]
         public async Task<IActionResult> GetTokenInvestor([FromQuery] string token)
         {
-/*            var result = await _authenticateService.GetTokenInvestor(token);
-            return Ok(result);*/
-            var localIpAddress = HttpContext.Connection.LocalIpAddress;
-            //var result = await _authenticateService.GetTokenWebBusiness(token);
-            return Ok(localIpAddress.ToString());
+            var result = await _authenticateService.GetTokenInvestor(token);
+            return Ok(result);
         }
 
-        [ServiceFilter(typeof(ClientIpCheckActionFilter))]
         [HttpPost]
         [Route("business")]
         public async Task<IActionResult> GetTokenWebBusiness([FromQuery] string token)
         {
-            var remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
-            //var result = await _authenticateService.GetTokenWebBusiness(token);
-            return Ok(remoteIpAddress.ToString());
+            var result = await _authenticateService.GetTokenWebBusiness(token);
+            return Ok(result);
         }
+
+        [ServiceFilter(typeof(ClientIpCheckActionFilter))]
+        [HttpPost]
+        [Route("admin")]
+        public async Task<IActionResult> GetTokenAdmin([FromQuery] string token)
+        {
+            var result = await _authenticateService.GetTokenAdmin(token);
+            return Ok(result);
+        }
+
+
     }
 }

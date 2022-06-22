@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,10 +23,22 @@ namespace RevenueSharingInvest.Business.Helpers
             _logger = logger;
         }
 
+        private static dynamic GetLocalIPAddress()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    return ip;
+                }
+            }
+            throw new Exception("No network adapters with an IPv4 address in the system!");
+        }
+
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var remoteIp = context.HttpContext.Connection.RemoteIpAddress;
-            _logger.LogDebug("Remote IpAddress: {RemoteIp}", remoteIp);
+            var remoteIp = GetLocalIPAddress();
             var ip = _safelist.Split(';');
             var badIp = true;
 
@@ -47,7 +60,6 @@ namespace RevenueSharingInvest.Business.Helpers
 
             if (badIp)
             {
-                _logger.LogWarning("Forbidden Request from IP: {RemoteIp}", remoteIp);
                 context.Result = new StatusCodeResult(StatusCodes.Status403Forbidden);
                 return;
             }
