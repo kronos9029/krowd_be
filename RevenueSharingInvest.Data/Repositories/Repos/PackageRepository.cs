@@ -71,8 +71,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", packageDTO.Description, DbType.String);
                 parameters.Add("MinForPurchasing", packageDTO.MinForPurchasing, DbType.Int16);
                 parameters.Add("MaxForPurchasing", packageDTO.MaxForPurchasing, DbType.Int16);
-                parameters.Add("OpenDate", packageDTO.OpenDate, DbType.DateTime);
-                parameters.Add("CloseDate", packageDTO.CloseDate, DbType.DateTime);
+                parameters.Add("OpenDate", Convert.ToDateTime(packageDTO.OpenDate), DbType.DateTime);
+                parameters.Add("CloseDate", Convert.ToDateTime(packageDTO.CloseDate), DbType.DateTime);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", packageDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);

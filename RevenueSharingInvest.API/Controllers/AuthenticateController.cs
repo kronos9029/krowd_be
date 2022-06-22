@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.Business.Services;
@@ -12,7 +13,7 @@ namespace RevenueSharingInvest.API.Controllers
     [ApiController]
     [Route("api/v1.0/authenticate")]
     [EnableCors]
-    //[Authorize]
+    [AllowAnonymous]
     public class AuthenticateController : ControllerBase
     {
         private readonly IAuthenticateService _authenticateService;

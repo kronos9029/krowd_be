@@ -196,6 +196,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
+                    + "         IsDeleted = @IsDeleted "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -212,6 +213,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Status", periodRevenueDTO.Status, DbType.String);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", periodRevenueDTO.UpdateBy, DbType.Guid);
+                parameters.Add("IsDeleted", periodRevenueDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", periodRevenueId, DbType.Guid);
 
                 using (var connection = CreateConnection())

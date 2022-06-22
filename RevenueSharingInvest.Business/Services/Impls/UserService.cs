@@ -31,7 +31,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
         private readonly String ROLE_INVESTOR_ID = "ad5f37da-ca48-4dc5-9f4b-963d94b535e6";
         private readonly String ROLE_BUSINESS_MANAGER_ID = "015ae3c5-eee9-4f5c-befb-57d41a43d9df";
-        private readonly String ROLE_PROJECT_OWNER_ID = "2d80393a-3a3d-495d-8dd7-f9261f85cc8f";
+        private readonly String ROLE_PROJECT_MANAGER_ID = "2d80393a-3a3d-495d-8dd7-f9261f85cc8f";
         private readonly String INVESTOR_TYPE_ID = "";
 
         public UserService(IOptions<AppSettings> appSettings, IUserRepository userRepository, IInvestorRepository investorRepository, IValidationService validationService, IMapper mapper)
@@ -77,12 +77,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new InvalidFieldException("Invalid roleId!!!");
 
                 if (!userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID)
-                    && !userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID)
+                    && !userDTO.roleId.Equals(ROLE_PROJECT_MANAGER_ID)
                     && !userDTO.roleId.Equals(ROLE_ADMIN_ID)
                     && !userDTO.roleId.Equals(ROLE_INVESTOR_ID))
                     throw new NotFoundException("This RoleId is not existed!!!");
 
-                if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID))
+                if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_MANAGER_ID))
                 {
                     if (userDTO.businessId == null)
                         throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
@@ -122,7 +122,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(userDTO.gender))
                     throw new InvalidFieldException("Invalid gender!!!");
 
-                if (userDTO.dateOfBirth == null || userDTO.dateOfBirth.Length == 0 || !await _validationService.CheckDate(userDTO.dateOfBirth))
+                if (userDTO.dateOfBirth == null || userDTO.dateOfBirth.Length == 0 || !await _validationService.CheckDOB(userDTO.dateOfBirth))
                     throw new InvalidFieldException("Invalid dateOfBirth!!!");
 
                 if (!await _validationService.CheckText(userDTO.taxIdentificationNumber))
@@ -200,6 +200,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 List<User> userList = await _userRepository.GetAllUsers(pageIndex, pageSize);
                 List<UserDTO> list = _mapper.Map<List<UserDTO>>(userList);
+
+                foreach (UserDTO item in list)
+                {
+                    if (item.dateOfBirth != null)
+                    {
+                        item.dateOfBirth = await _validationService.FormatDateOutput(item.dateOfBirth);
+                    }
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
+
                 return list;
             }
             catch (Exception e)
@@ -214,11 +225,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
             UserDTO result;
             try
             {
-
                 User dto = await _userRepository.GetUserById(userId);
                 result = _mapper.Map<UserDTO>(dto);
                 if (result == null)
                     throw new NotFoundException("No User Object Found!");
+
+                if (result.dateOfBirth != null)
+                {
+                    result.dateOfBirth = await _validationService.FormatDateOutput(result.dateOfBirth);
+                }
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+
                 return result;
             }
             catch (Exception e)
@@ -237,12 +255,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new InvalidFieldException("Invalid roleId!!!");
 
                 if (!userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID)
-                    && !userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID)
+                    && !userDTO.roleId.Equals(ROLE_PROJECT_MANAGER_ID)
                     && !userDTO.roleId.Equals(ROLE_ADMIN_ID)
                     && !userDTO.roleId.Equals(ROLE_INVESTOR_ID))
                     throw new NotFoundException("This RoleId is not existed!!!");
 
-                if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_OWNER_ID))
+                if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_MANAGER_ID))
                 {
                     if (userDTO.businessId == null)
                         throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
@@ -282,7 +300,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(userDTO.gender))
                     throw new InvalidFieldException("Invalid gender!!!");
 
-                if (userDTO.dateOfBirth == null || userDTO.dateOfBirth.Length == 0 || !await _validationService.CheckDate(userDTO.dateOfBirth))
+                if (userDTO.dateOfBirth == null || userDTO.dateOfBirth.Length == 0 || !await _validationService.CheckDOB(userDTO.dateOfBirth))
                     throw new InvalidFieldException("Invalid dateOfBirth!!!");
 
                 if (!await _validationService.CheckText(userDTO.taxIdentificationNumber))

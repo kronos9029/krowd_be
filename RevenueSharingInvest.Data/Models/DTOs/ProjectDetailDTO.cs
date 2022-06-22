@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Models.DTOs
 {
-    public class NewProjectDTO
+    public class ProjectDetailDTO
     {
         public ProjectDTO project { get; set; }
         public List<StageDTO> stageList { get; set; }
         public List<PackageDTO> packageList { get; set; }
-        //public List<PeriodRevenueDTO> periodRevenueList { get; set; }
-        //public ProjectEntityDTO projectEntity { get; set; }
+        public List<RiskDTO> riskList { get; set; }
     }
 }

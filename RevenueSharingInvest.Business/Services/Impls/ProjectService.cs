@@ -17,7 +17,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IProjectRepository _projectRepository;
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
-        private readonly String ROLE_PROJECT_OWNER_ID = "2d80393a-3a3d-495d-8dd7-f9261f85cc8f";
+        private readonly String ROLE_PROJECT_MANAGER_ID = "2d80393a-3a3d-495d-8dd7-f9261f85cc8f";
 
         public ProjectService(IProjectRepository projectRepository, IValidationService validationService, IMapper mapper)
         {
@@ -50,7 +50,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (projectDTO.managerId == null || !await _validationService.CheckUUIDFormat(projectDTO.managerId))
                     throw new InvalidFieldException("Invalid managerId!!!");
 
-                if (!await _validationService.CheckExistenceUserWithRole(ROLE_PROJECT_OWNER_ID, Guid.Parse(projectDTO.managerId)))
+                if (!await _validationService.CheckExistenceUserWithRole(ROLE_PROJECT_MANAGER_ID, Guid.Parse(projectDTO.managerId)))
                     throw new NotFoundException("This ManagerId is not existed!!!");
 
                 if (projectDTO.businessId == null || !await _validationService.CheckUUIDFormat(projectDTO.businessId))
@@ -111,8 +111,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckDate((projectDTO.startDate)))
                     throw new InvalidFieldException("Invalid startDate!!!");
 
+                projectDTO.startDate = await _validationService.FormatDateInput(projectDTO.startDate);
+
                 if (!await _validationService.CheckDate((projectDTO.endDate)))
                     throw new InvalidFieldException("Invalid endDate!!!");
+
+                projectDTO.endDate = await _validationService.FormatDateInput(projectDTO.endDate);
 
                 if (!await _validationService.CheckText(projectDTO.businessLicense))
                     throw new InvalidFieldException("Invalid businessLicense!!!");
@@ -171,13 +175,39 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<ProjectDTO>> GetAllProjects(int pageIndex, int pageSize)
+        public async Task<AllProjectDTO> GetAllProjects(int pageIndex, int pageSize, string businessId, string temp_field_role)
         {
             try
             {
-                List<Project> projectList = await _projectRepository.GetAllProjects(pageIndex, pageSize);
-                List<ProjectDTO> list = _mapper.Map<List<ProjectDTO>>(projectList);
-                return list;
+                AllProjectDTO result = new AllProjectDTO();
+
+                if (businessId != null)
+                {
+                    if (!await _validationService.CheckUUIDFormat(businessId))
+                        throw new InvalidFieldException("Invalid businessId!!!");
+
+                    if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
+                        throw new NotFoundException("This businessId is not existed!!!");
+                }
+
+                result.numOfProject = await _projectRepository.CountProject(businessId, temp_field_role);
+
+                List<Project> list = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, temp_field_role);
+                result.listOfProject = _mapper.Map<List<ProjectDTO>>(list);
+
+                foreach (ProjectDTO item in result.listOfProject)
+                {
+                    item.startDate = await _validationService.FormatDateOutput(item.startDate);
+                    item.endDate = await _validationService.FormatDateOutput(item.endDate);
+                    if (item.approvedDate != null)
+                    {
+                        item.approvedDate = await _validationService.FormatDateOutput(item.approvedDate);
+                    }
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
+
+                return result;
             }
             catch (Exception e)
             {
@@ -196,6 +226,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = _mapper.Map<ProjectDTO>(dto);
                 if (result == null)
                     throw new NotFoundException("No Project Object Found!");
+
+                result.startDate = await _validationService.FormatDateOutput(result.startDate);
+                result.endDate = await _validationService.FormatDateOutput(result.endDate);
+                if (result.approvedDate != null)
+                {
+                    result.approvedDate = await _validationService.FormatDateOutput(result.approvedDate);
+                }
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+
                 return result;
             }
             catch (Exception e)
@@ -213,7 +253,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (projectDTO.managerId == null || !await _validationService.CheckUUIDFormat(projectDTO.managerId))
                     throw new InvalidFieldException("Invalid managerId!!!");
 
-                if (!await _validationService.CheckExistenceUserWithRole(ROLE_PROJECT_OWNER_ID, Guid.Parse(projectDTO.managerId)))
+                if (!await _validationService.CheckExistenceUserWithRole(ROLE_PROJECT_MANAGER_ID, Guid.Parse(projectDTO.managerId)))
                     throw new NotFoundException("This ManagerId is not existed!!!");
 
                 if (projectDTO.businessId == null || !await _validationService.CheckUUIDFormat(projectDTO.businessId))
@@ -273,8 +313,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckDate((projectDTO.startDate)))
                     throw new InvalidFieldException("Invalid startDate!!!");
 
+                projectDTO.startDate = await _validationService.FormatDateInput(projectDTO.startDate);
+
                 if (!await _validationService.CheckDate((projectDTO.endDate)))
                     throw new InvalidFieldException("Invalid endDate!!!");
+
+                projectDTO.endDate = await _validationService.FormatDateInput(projectDTO.endDate);
 
                 if (!await _validationService.CheckText(projectDTO.businessLicense))
                     throw new InvalidFieldException("Invalid businessLicense!!!");

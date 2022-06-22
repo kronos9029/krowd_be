@@ -107,6 +107,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 List<RiskType> riskTypeList = await _riskTypeRepository.GetAllRiskTypes(pageIndex, pageSize);
                 List<RiskTypeDTO> list = _mapper.Map<List<RiskTypeDTO>>(riskTypeList);
+
+                foreach (RiskTypeDTO item in list)
+                {
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
+
                 return list;
             }
             catch (Exception e)
@@ -126,6 +133,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = _mapper.Map<RiskTypeDTO>(dto);
                 if (result == null)
                     throw new NotFoundException("No RiskType Object Found!");
+
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+
                 return result;
             }
             catch (Exception e)

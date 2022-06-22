@@ -153,6 +153,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 List<RevenueSharingInvest.Data.Models.Entities.Business> businessList = await _businessRepository.GetAllBusiness(pageIndex, pageSize);
                 List<BusinessDTO> list = _mapper.Map<List<BusinessDTO>>(businessList);
+
+                foreach (BusinessDTO item in list)
+                {
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
+
                 return list;
             }
             catch (Exception e)
@@ -172,6 +179,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = _mapper.Map<BusinessDTO>(dto);
                 if (result == null)
                     throw new NotFoundException("No Business Object Found!");
+
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+
                 return result;
             }
             catch (Exception e)
