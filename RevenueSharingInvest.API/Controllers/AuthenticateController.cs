@@ -13,12 +13,22 @@ namespace RevenueSharingInvest.API.Controllers
     [ApiController]
     [Route("api/v1.0/authenticate")]
     [EnableCors]
-    [AllowAnonymous]
+    //[Authorize]
     public class AuthenticateController : ControllerBase
     {
+        private readonly IAuthenticateService _authenticateService;
 
-        public AuthenticateController()
+        public AuthenticateController(IAuthenticateService authenticateService)
         {
+            _authenticateService = authenticateService;
+        }
+
+        [HttpPost]
+        [Route("investor")]
+        public async Task<IActionResult> GetTokenInvestor([FromQuery] string token)
+        {
+            var result = await _authenticateService.GetTokenInvestor(token);
+            return Ok(result);
         }
 
         [HttpPost]
@@ -26,6 +36,7 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> GetTokenWebBusiness([FromQuery] string token)
         {
             var remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
+            //var result = await _authenticateService.GetTokenWebBusiness(token);
             return Ok(remoteIpAddress.ToString());
         }
     }

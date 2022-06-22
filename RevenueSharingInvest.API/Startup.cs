@@ -62,6 +62,10 @@ namespace RevenueSharingInvest.API
             // services.AddScoped<IDiameterRepository, DiameterRepository>();
 
             ////////// 
+            ///
+
+            //AUTHENTICATE
+            services.AddScoped<IAuthenticateService, AuthenticateService>();
 
             //ACCOUNT TRANSACTION
             services.AddScoped<IAccountTransactionService, AccountTransactionService>();
