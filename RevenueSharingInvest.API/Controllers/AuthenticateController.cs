@@ -31,23 +31,9 @@ namespace RevenueSharingInvest.API.Controllers
         {
 /*            var result = await _authenticateService.GetTokenInvestor(token);
             return Ok(result);*/
-            var remoteIpAddress = HttpContext.Connection.LocalIpAddress;
+            var localIpAddress = HttpContext.Connection.LocalIpAddress;
             //var result = await _authenticateService.GetTokenWebBusiness(token);
-            string ip = GetClientIp(HttpContext);
-            return Ok(ip);
-        }
-        private String GetClientIp(HttpContext context)
-        {
-            string ip = string.Empty;
-            if (!string.IsNullOrEmpty(context.Request.Headers["X-Forwarded-For"]))
-            {
-                ip = context.Request.Headers["X-Forwarded-For"];
-            }
-            else
-            {
-                ip = context.Request.HttpContext.Features.Get<IHttpConnectionFeature>().RemoteIpAddress.ToString();
-            }
-            return ip;
+            return Ok(localIpAddress);
         }
 
         [ServiceFilter(typeof(ClientIpCheckActionFilter))]
