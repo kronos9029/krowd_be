@@ -33,7 +33,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);*/
             var localIpAddress = HttpContext.Connection.LocalIpAddress;
             //var result = await _authenticateService.GetTokenWebBusiness(token);
-            return Ok(localIpAddress);
+            return Ok(localIpAddress.ToString());
         }
 
         [ServiceFilter(typeof(ClientIpCheckActionFilter))]
