@@ -19,9 +19,9 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public float normalExpectedRatio { get; set; }
         public float optimisticExpectedRatio { get; set; }
         public string status { get; set; }
-        public DateTime createDate { get; set; }
+        public string createDate { get; set; }
         public string createBy { get; set; }
-        public DateTime updateDate { get; set; }
+        public string updateDate { get; set; }
         public string updateBy { get; set; }
         public bool isDeleted { get; set; }
 

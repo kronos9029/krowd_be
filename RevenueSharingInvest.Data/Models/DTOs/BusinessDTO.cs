@@ -20,9 +20,9 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public int numOfSuccessfulProject { get; set; }
         public float successfulRate { get; set; }
         public int status { get; set; }
-        public DateTime createDate { get; set; }
+        public string createDate { get; set; }
         public string createBy { get; set; }
-        public DateTime updateDate { get; set; }
+        public string updateDate { get; set; }
         public string updateBy { get; set; }
         public bool isDeleted { get; set; }
     }

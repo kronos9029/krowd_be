@@ -63,14 +63,22 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckDate((voucherItemDTO.issuedDate)))
                     throw new InvalidFieldException("Invalid issuedDate!!!");
 
+                voucherItemDTO.issuedDate = await _validationService.FormatDateInput(voucherItemDTO.issuedDate);
+
                 if (!await _validationService.CheckDate((voucherItemDTO.expireDate)))
                     throw new InvalidFieldException("Invalid expireDate!!!");
+
+                voucherItemDTO.expireDate = await _validationService.FormatDateInput(voucherItemDTO.expireDate);
 
                 if (!await _validationService.CheckDate((voucherItemDTO.redeemDate)))
                     throw new InvalidFieldException("Invalid redeemDate!!!");
 
+                voucherItemDTO.redeemDate = await _validationService.FormatDateInput(voucherItemDTO.redeemDate);
+
                 if (!await _validationService.CheckDate((voucherItemDTO.availableDate)))
                     throw new InvalidFieldException("Invalid availableDate!!!");
+
+                voucherItemDTO.availableDate = await _validationService.FormatDateInput(voucherItemDTO.availableDate);
 
                 if (voucherItemDTO.createBy != null && voucherItemDTO.createBy.Length >= 0)
                 {
@@ -126,6 +134,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 List<VoucherItem> voucherItemList = await _voucherItemRepository.GetAllVoucherItems(pageIndex, pageSize);
                 List<VoucherItemDTO> list = _mapper.Map<List<VoucherItemDTO>>(voucherItemList);
+
+                foreach (VoucherItemDTO item in list)
+                {
+                    item.issuedDate = await _validationService.FormatDateOutput(item.issuedDate);
+                    item.expireDate = await _validationService.FormatDateOutput(item.expireDate);
+                    item.redeemDate = await _validationService.FormatDateOutput(item.redeemDate);
+                    item.availableDate = await _validationService.FormatDateOutput(item.availableDate);
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
+
                 return list;
             }
             catch (Exception e)
@@ -144,6 +163,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = _mapper.Map<VoucherItemDTO>(dto);
                 if (result == null)
                     throw new NotFoundException("No VoucherItem Object Found!");
+
+                result.issuedDate = await _validationService.FormatDateOutput(result.issuedDate);
+                result.expireDate = await _validationService.FormatDateOutput(result.expireDate);
+                result.redeemDate = await _validationService.FormatDateOutput(result.redeemDate);
+                result.availableDate = await _validationService.FormatDateOutput(result.availableDate);
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+
                 return result;
             }
             catch (Exception e)
@@ -170,18 +197,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckExistenceId("Investment", Guid.Parse(voucherItemDTO.investmentId)))
                     throw new NotFoundException("This investmentId is not existed!!!");
 
-
                 if (!await _validationService.CheckDate((voucherItemDTO.issuedDate)))
                     throw new InvalidFieldException("Invalid issuedDate!!!");
+
+                voucherItemDTO.issuedDate = await _validationService.FormatDateInput(voucherItemDTO.issuedDate);
 
                 if (!await _validationService.CheckDate((voucherItemDTO.expireDate)))
                     throw new InvalidFieldException("Invalid expireDate!!!");
 
+                voucherItemDTO.expireDate = await _validationService.FormatDateInput(voucherItemDTO.expireDate);
+
                 if (!await _validationService.CheckDate((voucherItemDTO.redeemDate)))
                     throw new InvalidFieldException("Invalid redeemDate!!!");
 
+                voucherItemDTO.redeemDate = await _validationService.FormatDateInput(voucherItemDTO.redeemDate);
+
                 if (!await _validationService.CheckDate((voucherItemDTO.availableDate)))
                     throw new InvalidFieldException("Invalid availableDate!!!");
+
+                voucherItemDTO.availableDate = await _validationService.FormatDateInput(voucherItemDTO.availableDate);
 
                 if (voucherItemDTO.createBy != null && voucherItemDTO.createBy.Length >= 0)
                 {

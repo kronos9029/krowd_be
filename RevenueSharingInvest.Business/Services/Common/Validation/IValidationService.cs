@@ -13,8 +13,11 @@ namespace RevenueSharingInvest.Business.Services.Common
         public Task<bool> CheckUUIDFormat(string uuid);
         public Task<bool> CheckEmail(string email);
         public Task<bool> CheckDate(string date);
+        public Task<bool> CheckDOB(string dob);
         public Task<bool> CheckPhoneNumber(string phoneNum);
         public Task<bool> CheckInt(int number);
         public Task<bool> CheckText(string text);
+        public Task<string> FormatDateInput(string dateString);
+        public Task<string> FormatDateOutput(string dateString);
     }
 }

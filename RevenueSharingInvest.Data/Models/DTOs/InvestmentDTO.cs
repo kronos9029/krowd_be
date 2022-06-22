@@ -14,10 +14,10 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string packageId { get; set; }
         public int quantity { get; set; }
         public float totalPrice { get; set; }
-        public DateTime lastPayment { get; set; }
-        public DateTime createDate { get; set; }
+        public string lastPayment { get; set; }
+        public string createDate { get; set; }
         public string createBy { get; set; }
-        public DateTime updateDate { get; set; }
+        public string updateDate { get; set; }
         public string updateBy { get; set; }
         public bool isDeleted { get; set; }
     }

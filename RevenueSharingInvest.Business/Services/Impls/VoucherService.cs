@@ -74,8 +74,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckDate((voucherDTO.startDate)))
                     throw new InvalidFieldException("Invalid startDate!!!");
 
+                voucherDTO.startDate = await _validationService.FormatDateInput(voucherDTO.startDate);
+
                 if (!await _validationService.CheckDate((voucherDTO.endDate)))
                     throw new InvalidFieldException("Invalid endDate!!!");
+
+                voucherDTO.endDate = await _validationService.FormatDateInput(voucherDTO.endDate);
 
                 if (voucherDTO.createBy != null && voucherDTO.createBy.Length >= 0)
                 {
@@ -131,6 +135,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 List<Voucher> voucherList = await _voucherRepository.GetAllVouchers(pageIndex, pageSize);
                 List<VoucherDTO> list = _mapper.Map<List<VoucherDTO>>(voucherList);
+
+                foreach (VoucherDTO item in list)
+                {
+                    item.startDate = await _validationService.FormatDateOutput(item.startDate);
+                    item.endDate = await _validationService.FormatDateOutput(item.endDate);
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
+
                 return list;
             }
             catch (Exception e)
@@ -149,6 +162,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = _mapper.Map<VoucherDTO>(dto);
                 if (result == null)
                     throw new NotFoundException("No Voucher Object Found!");
+
+                result.startDate = await _validationService.FormatDateOutput(result.startDate);
+                result.endDate = await _validationService.FormatDateOutput(result.endDate);
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+
                 return result;
             }
             catch (Exception e)
@@ -190,8 +209,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckDate((voucherDTO.startDate)))
                     throw new InvalidFieldException("Invalid startDate!!!");
 
+                voucherDTO.startDate = await _validationService.FormatDateInput(voucherDTO.startDate);
+
                 if (!await _validationService.CheckDate((voucherDTO.endDate)))
                     throw new InvalidFieldException("Invalid endDate!!!");
+
+                voucherDTO.endDate = await _validationService.FormatDateInput(voucherDTO.endDate);
 
                 if (voucherDTO.createBy != null && voucherDTO.createBy.Length >= 0)
                 {

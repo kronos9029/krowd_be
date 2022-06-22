@@ -110,6 +110,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 List<SystemWallet> systemWalletList = await _systemWalletRepository.GetAllSystemWallets(pageIndex, pageSize);
                 List<SystemWalletDTO> list = _mapper.Map<List<SystemWalletDTO>>(systemWalletList);
+
+                foreach (SystemWalletDTO item in list)
+                {
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
+
                 return list;
             }
             catch (Exception e)
@@ -129,6 +136,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = _mapper.Map<SystemWalletDTO>(dto);
                 if (result == null)
                     throw new NotFoundException("No SystemWallet Object Found!");
+
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+
                 return result;
             }
             catch (Exception e)
