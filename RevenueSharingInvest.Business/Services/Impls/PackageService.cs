@@ -71,14 +71,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (packageDTO.minForPurchasing <= 0)
                     throw new InvalidFieldException("minForPurchasing must be greater than 0!!!");
 
-                if (packageDTO.maxForPurchasing <= 0)
-                    throw new InvalidFieldException("maxForPurchasing must be greater than 0!!!");
+                if (packageDTO.maxForPurchasing <= 0 || packageDTO.maxForPurchasing < packageDTO.minForPurchasing)
+                    throw new InvalidFieldException("maxForPurchasing must be greater than 0 and greater than minForPurchasing!!!");
 
                 if (!await _validationService.CheckDate((packageDTO.openDate)))
                     throw new InvalidFieldException("Invalid openDate!!!");
 
+                packageDTO.openDate = await _validationService.FormatDateInput(packageDTO.openDate);
+
                 if (!await _validationService.CheckDate((packageDTO.closeDate)))
                     throw new InvalidFieldException("Invalid endDate!!!");
+
+                packageDTO.closeDate = await _validationService.FormatDateInput(packageDTO.closeDate);
 
                 packageDTO.approvedBy = null;
 
@@ -136,6 +140,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 List<Package> packageList = await _packageRepository.GetAllPackages(pageIndex, pageSize);
                 List<PackageDTO> list = _mapper.Map<List<PackageDTO>>(packageList);
+
+                foreach (PackageDTO item in list)
+                {
+                    item.openDate = await _validationService.FormatDateOutput(item.openDate);
+                    item.closeDate = await _validationService.FormatDateOutput(item.closeDate);
+                    if (item.approvedDate != null)
+                    {
+                        item.approvedDate = await _validationService.FormatDateOutput(item.approvedDate);
+                    }
+                    item.closeDate = await _validationService.FormatDateOutput(item.closeDate);
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
+                //foreach (PackageDTO item in list)
+                //{
+                //    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                //    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                //}
                 return list;
             }
             catch (Exception e)
@@ -152,9 +174,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
 
                 Package dto = await _packageRepository.GetPackageById(packageId);
-                result = _mapper.Map<PackageDTO>(dto);
+                result = _mapper.Map<PackageDTO>(dto);                              
                 if (result == null)
                     throw new NotFoundException("No Package Object Found!");
+
+                result.openDate = await _validationService.FormatDateOutput(result.openDate);
+                result.closeDate = await _validationService.FormatDateOutput(result.closeDate);
+                if (result.approvedDate != null)
+                {
+                    result.approvedDate = await _validationService.FormatDateOutput(result.approvedDate);
+                }
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+
                 return result;
             }
             catch (Exception e)
@@ -199,8 +231,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckDate((packageDTO.openDate)))
                     throw new InvalidFieldException("Invalid openDate!!!");
 
+                packageDTO.openDate = await _validationService.FormatDateInput(packageDTO.openDate);
+
                 if (!await _validationService.CheckDate((packageDTO.closeDate)))
                     throw new InvalidFieldException("Invalid endDate!!!");
+
+                packageDTO.closeDate = await _validationService.FormatDateInput(packageDTO.closeDate);
 
                 packageDTO.approvedBy = null;
 

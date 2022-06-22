@@ -120,6 +120,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 List<ProjectEntity> projectEntityList = await _projectEntityRepository.GetAllProjectEntities(pageIndex, pageSize);
                 List<ProjectEntityDTO> list = _mapper.Map<List<ProjectEntityDTO>>(projectEntityList);
+
+                foreach (ProjectEntityDTO item in list)
+                {
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
+
                 return list;
             }
             catch (Exception e)
@@ -139,6 +146,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = _mapper.Map<ProjectEntityDTO>(dto);
                 if (result == null)
                     throw new NotFoundException("No ProjectEntity Object Found!");
+
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+
                 return result;
             }
             catch (Exception e)

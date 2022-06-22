@@ -107,6 +107,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 List<InvestorType> investorTypeList = await _investorTypeRepository.GetAllInvestorTypes(pageIndex, pageSize);
                 List<InvestorTypeDTO> list = _mapper.Map<List<InvestorTypeDTO>>(investorTypeList);
+
+                foreach (InvestorTypeDTO item in list)
+                {
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
+
                 return list;
             }
             catch (Exception e)
@@ -126,6 +133,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = _mapper.Map<InvestorTypeDTO>(dto);
                 if (result == null)
                     throw new NotFoundException("No InvestorType Object Found!");
+
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+
                 return result;
             }
             catch (Exception e)

@@ -107,6 +107,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 List<Area> areaList = await _areaRepository.GetAllAreas(pageIndex, pageSize);
                 List<AreaDTO> list = _mapper.Map<List<AreaDTO>>(areaList);
+                foreach (AreaDTO item in list)
+                {
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
                 return list;
             }
             catch (Exception e)
@@ -126,6 +131,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = _mapper.Map<AreaDTO>(dto);
                 if (result == null)
                     throw new NotFoundException("No Area Object Found!");
+
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+
                 return result;
             }
             catch (Exception e)

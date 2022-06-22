@@ -19,11 +19,11 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public int maxForPurchasing { get; set; }
         public string openDate { get; set; }
         public string closeDate { get; set; }
-        public DateTime createDate { get; set; }
+        public string createDate { get; set; }
         public string createBy { get; set; }
-        public DateTime updateDate { get; set; }
+        public string updateDate { get; set; }
         public string updateBy { get; set; }
-        public DateTime approvedDate { get; set; }
+        public string approvedDate { get; set; }
         public string approvedBy { get; set; }
         public bool isDeleted { get; set; }
     }

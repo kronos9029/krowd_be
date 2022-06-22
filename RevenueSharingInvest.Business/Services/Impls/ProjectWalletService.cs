@@ -113,6 +113,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 List<ProjectWallet> projectWalletList = await _projectWalletRepository.GetAllProjectWallets(pageIndex, pageSize);
                 List<ProjectWalletDTO> list = _mapper.Map<List<ProjectWalletDTO>>(projectWalletList);
+
+                foreach (ProjectWalletDTO item in list)
+                {
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
+
                 return list;
             }
             catch (Exception e)
@@ -132,6 +139,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = _mapper.Map<ProjectWalletDTO>(dto);
                 if (result == null)
                     throw new NotFoundException("No ProjectWallet Object Found!");
+
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+
                 return result;
             }
             catch (Exception e)
