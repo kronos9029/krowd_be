@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
@@ -30,9 +31,23 @@ namespace RevenueSharingInvest.API.Controllers
         {
 /*            var result = await _authenticateService.GetTokenInvestor(token);
             return Ok(result);*/
-            var remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
+            var remoteIpAddress = HttpContext.Connection.LocalIpAddress;
             //var result = await _authenticateService.GetTokenWebBusiness(token);
-            return Ok(remoteIpAddress.ToString());
+            string ip = GetClientIp(HttpContext);
+            return Ok(ip);
+        }
+        private String GetClientIp(HttpContext context)
+        {
+            string ip = string.Empty;
+            if (!string.IsNullOrEmpty(context.Request.Headers["X-Forwarded-For"]))
+            {
+                ip = context.Request.Headers["X-Forwarded-For"];
+            }
+            else
+            {
+                ip = context.Request.HttpContext.Features.Get<IHttpConnectionFeature>().RemoteIpAddress.ToString();
+            }
+            return ip;
         }
 
         [ServiceFilter(typeof(ClientIpCheckActionFilter))]
