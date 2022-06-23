@@ -62,6 +62,10 @@ namespace RevenueSharingInvest.API
             // services.AddScoped<IDiameterRepository, DiameterRepository>();
 
             ////////// 
+            ///
+
+            //AUTHENTICATE
+            services.AddScoped<IAuthenticateService, AuthenticateService>();
 
             //ACCOUNT TRANSACTION
             services.AddScoped<IAccountTransactionService, AccountTransactionService>();
@@ -176,6 +180,16 @@ namespace RevenueSharingInvest.API
             services.AddScoped<IValidationRepository, ValidationRepository>();
             services.AddScoped<IValidationService, ValidationService>();
             //////////        
+           
+            // ADMIN SAFE LIST
+            services.AddScoped<ClientIpCheckActionFilter>(container =>
+            {
+                var loggerFactory = container.GetRequiredService<ILoggerFactory>();
+                var logger = loggerFactory.CreateLogger<ClientIpCheckActionFilter>();
+
+                return new ClientIpCheckActionFilter(
+                    Configuration["AdminSafeList"], logger);
+            });
 
             //CORS
             services.AddCors(options =>      
@@ -244,6 +258,8 @@ namespace RevenueSharingInvest.API
                      }
                  });
             });
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

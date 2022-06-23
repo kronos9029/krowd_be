@@ -453,6 +453,5 @@ $RECYCLE.BIN/
 !.vscode/launch.json
 !.vscode/extensions.json
 
-#Files
-BaseRepository.cs
-KrowdContext.cs
+##Files
+RevenueSharingInvest.Data/Helpers/BaseRepository.cs
