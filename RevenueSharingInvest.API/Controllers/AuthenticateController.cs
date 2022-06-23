@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
@@ -39,7 +40,8 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> GetTokenWebBusiness([FromQuery] string token)
         {
             //var result = await _authenticateService.GetTokenWebBusiness(token);
-            return Ok(GetLocalIPAddress());
+            string clientIp = GetClientIPAddress(HttpContext);
+            return Ok(clientIp);
         }
 
         private static String GetLocalIPAddress()
@@ -52,7 +54,22 @@ namespace RevenueSharingInvest.API.Controllers
                     return host.HostName.ToString();
                 }
             }
+
             throw new Exception("No network adapters with an IPv4 address in the system!");
+        }
+
+        public static string GetClientIPAddress(HttpContext context)
+        {
+            string ip = string.Empty;
+            if (!string.IsNullOrEmpty(context.Request.Headers["X-Forwarded-For"]))
+            {
+                ip = context.Request.Headers["X-Forwarded-For"];
+            }
+            else
+            {
+                ip = context.Request.HttpContext.Features.Get<IHttpConnectionFeature>().RemoteIpAddress.ToString();
+            }
+            return ip;
         }
 
         [ServiceFilter(typeof(ClientIpCheckActionFilter))]
