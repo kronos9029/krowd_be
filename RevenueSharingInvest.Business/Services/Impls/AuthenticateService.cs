@@ -90,14 +90,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.email = email;
                 response.id = userId;
                 response.uid = uid;
-                response = GenerateToken(response, RoleEnum.Investor.ToString());
+                response = GenerateToken(response, RoleEnum.INVESTOR.ToString());
             }
             else
             {
                 response.email = email;
                 response.id = userObject.Id;
                 response.uid = uid;
-                response = GenerateToken(response, RoleEnum.Investor.ToString());
+                response = GenerateToken(response, RoleEnum.INVESTOR.ToString());
             }
             return response;
         }
@@ -123,7 +123,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.email = email;
                 response.id = userObject.Id;
                 response.uid = uid;
-                response = GenerateToken(response, RoleEnum.BusinessManager.ToString());
+                response = GenerateToken(response, RoleEnum.BUSINESS_MANAGER.ToString());
             }
 
             return response;
@@ -136,21 +136,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             Claim roleClaim;
 
-            if (roleCheck.Equals(RoleEnum.Admin.ToString()))
+            if (roleCheck.Equals(RoleEnum.ADMIN.ToString()))
             {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Admin.ToString());
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.ADMIN.ToString());
             }
-            else if (roleCheck.Equals(RoleEnum.Investor.ToString()))
+            else if (roleCheck.Equals(RoleEnum.INVESTOR.ToString()))
             {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Investor.ToString());
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.INVESTOR.ToString());
             }
-            else if (roleCheck.Equals(RoleEnum.BusinessManager.ToString()))
+            else if (roleCheck.Equals(RoleEnum.BUSINESS_MANAGER.ToString()))
             {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BusinessManager.ToString());
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUSINESS_MANAGER.ToString());
             }
             else
             {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Investor.ToString());
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.INVESTOR.ToString());
             }
 
             var tokenDescriptor = new SecurityTokenDescriptor
