@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -23,22 +24,24 @@ namespace RevenueSharingInvest.Business.Helpers
             _logger = logger;
         }
 
-        private static dynamic GetLocalIPAddress()
+        private static dynamic GetClientIPAddress(HttpContext context)
         {
-            var host = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (var ip in host.AddressList)
+
+            if (!string.IsNullOrEmpty(context.Request.Headers["X-Forwarded-For"]))
             {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    return ip;
-                }
+                var ip = context.Request.Headers["X-Forwarded-For"];
+                return ip;
             }
-            throw new Exception("No network adapters with an IPv4 address in the system!");
+            else
+            {
+                var ip = context.Request.HttpContext.Features.Get<IHttpConnectionFeature>().RemoteIpAddress;
+                return ip;
+            }
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var Ipv4 = GetLocalIPAddress();
+            var Ipv4 = GetClientIPAddress(context.HttpContext);
             var ipSafe = _safelist.Split(';');
             var badIp = true;
 
@@ -60,8 +63,8 @@ namespace RevenueSharingInvest.Business.Helpers
 
             if (badIp)
             {
-                context.Result = new StatusCodeResult(StatusCodes.Status403Forbidden);
-                return;
+                //context.Result = new StatusCodeResult(StatusCodes.Status403Forbidden);
+                throw new Business.Exceptions.UnauthorizedAccessException("You Can Not Use This End Point!!");
             }
 
             base.OnActionExecuting(context);

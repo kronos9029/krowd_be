@@ -39,38 +39,10 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("business")]
         public async Task<IActionResult> GetTokenWebBusiness([FromQuery] string token)
         {
-            //var result = await _authenticateService.GetTokenWebBusiness(token);
-            string clientIp = GetClientIPAddress(HttpContext);
-            return Ok(clientIp);
+            var result = await _authenticateService.GetTokenWebBusiness(token);
+            return Ok(result);
         }
 
-        private static String GetLocalIPAddress()
-        {
-            var host = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (var ip in host.AddressList)
-            {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    return host.HostName.ToString();
-                }
-            }
-
-            throw new Exception("No network adapters with an IPv4 address in the system!");
-        }
-
-        public static string GetClientIPAddress(HttpContext context)
-        {
-            string ip = string.Empty;
-            if (!string.IsNullOrEmpty(context.Request.Headers["X-Forwarded-For"]))
-            {
-                ip = context.Request.Headers["X-Forwarded-For"];
-            }
-            else
-            {
-                ip = context.Request.HttpContext.Features.Get<IHttpConnectionFeature>().RemoteIpAddress.ToString();
-            }
-            return ip;
-        }
 
         [ServiceFilter(typeof(ClientIpCheckActionFilter))]
         [HttpPost]
