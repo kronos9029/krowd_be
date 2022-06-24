@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Business.Services
     public interface IBusinessFieldService
     {
         //CREATE
-        public Task<int> CreateBusinessField(BusinessFieldDTO businessFieldDTO);
+        //public Task<int> CreateBusinessField(BusinessFieldDTO businessFieldDTO);
 
         //READ
         public Task<List<BusinessFieldDTO>> GetAllBusinessFields(int pageIndex, int pageSize);

@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IBusinessFieldRepository
     {
         //CREATE
-        public Task<int> CreateBusinessField(BusinessField businessFieldDTO);
+        public Task<int> CreateBusinessField(Guid businessId, Guid fieldId, Guid creatorId);
 
         //READ
         public Task<List<BusinessField>> GetAllBusinessFields(int pageIndex, int pageSize);
@@ -21,6 +21,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteBusinessFieldById(Guid businessId, Guid fieldId);
+        public void DeleteBusinessFieldByBusinessId(Guid businessId);
         public Task<int> ClearAllBusinessFieldData();
     }
 }

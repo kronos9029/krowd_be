@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<int> CreateBusinessField(BusinessField businessFieldDTO)
+        public async Task<int> CreateBusinessField(Guid businessId, Guid fieldId, Guid creatorId)
         {
             try
             {
@@ -41,12 +41,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("BusinessId", businessFieldDTO.BusinessId, DbType.Guid);
-                parameters.Add("FieldId", businessFieldDTO.FieldId, DbType.Guid);
+                parameters.Add("BusinessId", businessId, DbType.Guid);
+                parameters.Add("FieldId", fieldId, DbType.Guid);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", businessFieldDTO.CreateBy, DbType.Guid);
+                parameters.Add("CreateBy", creatorId, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", businessFieldDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", creatorId, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
@@ -194,6 +194,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "DELETE FROM BusisnessField";
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async void DeleteBusinessFieldByBusinessId(Guid businessId)
+        {
+            try
+            {
+                var query = "DELETE FROM BusisnessField WHERE BusinessId = @BusinessId";
+                var parameters = new DynamicParameters();
+                parameters.Add("BusinessId", businessId, DbType.Guid);
+                using var connection = CreateConnection();
+                await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
             {

@@ -45,52 +45,52 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<int> CreateBusinessField(BusinessFieldDTO businessFieldDTO)
-        {
-            int result;
-            try
-            {
-                if(businessFieldDTO.businessId == null || !await _validationService.CheckUUIDFormat(businessFieldDTO.businessId))
-                    throw new InvalidFieldException("Invalid businessId!!!");
+        //public async Task<int> CreateBusinessField(BusinessFieldDTO businessFieldDTO)
+        //{
+        //    int result;
+        //    try
+        //    {
+        //        if(businessFieldDTO.businessId == null || !await _validationService.CheckUUIDFormat(businessFieldDTO.businessId))
+        //            throw new InvalidFieldException("Invalid businessId!!!");
 
-                if(!await _validationService.CheckExistenceId("Business", Guid.Parse(businessFieldDTO.businessId)))
-                    throw new NotFoundException("This businessId is not existed!!!");
+        //        if(!await _validationService.CheckExistenceId("Business", Guid.Parse(businessFieldDTO.businessId)))
+        //            throw new NotFoundException("This businessId is not existed!!!");
 
-                if (businessFieldDTO.fieldId == null || !await _validationService.CheckUUIDFormat(businessFieldDTO.fieldId))
-                    throw new InvalidFieldException("Invalid fieldId!!!");
+        //        if (businessFieldDTO.fieldId == null || !await _validationService.CheckUUIDFormat(businessFieldDTO.fieldId))
+        //            throw new InvalidFieldException("Invalid fieldId!!!");
 
-                if (!await _validationService.CheckExistenceId("Field", Guid.Parse(businessFieldDTO.fieldId)))
-                    throw new NotFoundException("This fieldId is not existed!!!");
+        //        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(businessFieldDTO.fieldId)))
+        //            throw new NotFoundException("This fieldId is not existed!!!");
 
-                if (businessFieldDTO.createBy != null && businessFieldDTO.createBy.Length >= 0)
-                {
-                    if (businessFieldDTO.createBy.Equals("string"))
-                        businessFieldDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(businessFieldDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
-                }
+        //        if (businessFieldDTO.createBy != null && businessFieldDTO.createBy.Length >= 0)
+        //        {
+        //            if (businessFieldDTO.createBy.Equals("string"))
+        //                businessFieldDTO.createBy = null;
+        //            else if (!await _validationService.CheckUUIDFormat(businessFieldDTO.createBy))
+        //                throw new InvalidFieldException("Invalid createBy!!!");
+        //        }
 
-                if (businessFieldDTO.updateBy != null && businessFieldDTO.updateBy.Length >= 0)
-                {
-                    if (businessFieldDTO.updateBy.Equals("string"))
-                        businessFieldDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(businessFieldDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
+        //        if (businessFieldDTO.updateBy != null && businessFieldDTO.updateBy.Length >= 0)
+        //        {
+        //            if (businessFieldDTO.updateBy.Equals("string"))
+        //                businessFieldDTO.updateBy = null;
+        //            else if (!await _validationService.CheckUUIDFormat(businessFieldDTO.updateBy))
+        //                throw new InvalidFieldException("Invalid updateBy!!!");
+        //        }
 
-                businessFieldDTO.isDeleted = false;
+        //        businessFieldDTO.isDeleted = false;
 
-                BusinessField dto = _mapper.Map<BusinessField>(businessFieldDTO);
-                result = await _businessFieldRepository.CreateBusinessField(dto);
-                if (result == 0)
-                    throw new CreateObjectException("Can not create BusinessField Object!");
-                return result;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
+        //        BusinessField dto = _mapper.Map<BusinessField>(businessFieldDTO);
+        //        result = await _businessFieldRepository.CreateBusinessField(dto);
+        //        if (result == 0)
+        //            throw new CreateObjectException("Can not create BusinessField Object!");
+        //        return result;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new Exception(e.Message);
+        //    }
+        //}
 
         //DELETE    
         public async Task<int> DeleteBusinessFieldById(Guid businessId, Guid fieldId)

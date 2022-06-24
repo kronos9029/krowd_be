@@ -25,9 +25,9 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBusiness([FromBody] BusinessDTO businessDTO)
+        public async Task<IActionResult> CreateBusiness([FromBody] BusinessDTO businessDTO, [FromQuery] List<string> fieldIdList)
         {
-            var result = await _businessService.CreateBusiness(businessDTO);
+            var result = await _businessService.CreateBusiness(businessDTO, fieldIdList);
             return Ok(result);
         }
 

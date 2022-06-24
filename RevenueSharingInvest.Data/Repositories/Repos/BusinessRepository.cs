@@ -240,5 +240,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+
+        //DELETE BY BUSINESSID
+        public async void DeleteBusinessByBusinessId(Guid businessId)
+        {
+            try
+            {
+                var query = "DELETE FROM Busisness WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", businessId, DbType.Guid);
+                using var connection = CreateConnection();
+                await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

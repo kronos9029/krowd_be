@@ -24,12 +24,12 @@ namespace RevenueSharingInvest.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateBusinessField([FromBody] BusinessFieldDTO businessFieldDTO)
-        {
-            var result = await _businessFieldService.CreateBusinessField(businessFieldDTO);
-            return Ok(result);
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> CreateBusinessField([FromBody] BusinessFieldDTO businessFieldDTO)
+        //{
+        //    var result = await _businessFieldService.CreateBusinessField(businessFieldDTO);
+        //    return Ok(result);
+        //}
 
         [HttpGet]
         public async Task<IActionResult> GetAllBusinessFields(int pageIndex, int pageSize)

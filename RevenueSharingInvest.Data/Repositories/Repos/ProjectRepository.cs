@@ -140,7 +140,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Project>> GetAllProjects(int pageIndex, int pageSize, string businessId, string role)
+        public async Task<List<Project>> GetAllProjects(int pageIndex, int pageSize, string businessId, string managerId, string role)
         {
             try
             {
@@ -152,6 +152,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     if (role.Equals("ADMIN"))
                     {
                         whereCondition = "";
+                    }
+                    if (role.Equals("PROJECT"))
+                    {
+                        whereCondition = "WHERE ManagerId = @ManagerId";
+                        parameters.Add("ManagerId", Guid.Parse(managerId), DbType.Guid);
                     }
                     if (role.Equals("INVESTOR"))
                     {
@@ -333,7 +338,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public async Task<int> CountProject(string businessId, string role)
+        public async Task<int> CountProject(string businessId, string managerId, string role)
         {
             try
             {
@@ -344,6 +349,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     if (role.Equals("ADMIN"))
                     {
                         whereCondition = "";
+                    }
+                    if (role.Equals("PROJECT"))
+                    {
+                        whereCondition = "WHERE ManagerId = @ManagerId";
+                        parameters.Add("ManagerId", Guid.Parse(managerId), DbType.Guid);
                     }
                     if (role.Equals("INVESTOR"))
                     {

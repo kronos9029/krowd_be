@@ -15,14 +15,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
     public class BusinessService : IBusinessService
     {
         private readonly IBusinessRepository _businessRepository;
+        private readonly IBusinessFieldRepository _businessFieldRepository;
         private readonly IUserRepository _userRepository;
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
         private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
 
-        public BusinessService(IBusinessRepository businessRepository, IValidationService validationService, IUserRepository userRepository, IMapper mapper)
+        public BusinessService(IBusinessRepository businessRepository, IBusinessFieldRepository businessFieldRepository, IValidationService validationService, IUserRepository userRepository, IMapper mapper)
         {
             _businessRepository = businessRepository;
+            _businessFieldRepository = businessFieldRepository;
             _userRepository = userRepository;
             _validationService = validationService;
             _mapper = mapper;
@@ -70,11 +72,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
         //}
 
         //CREATE
-        public async Task<IdDTO> CreateBusiness(BusinessDTO businessDTO)
+        public async Task<IdDTO> CreateBusiness(BusinessDTO businessDTO, List<string> fieldIdList)
         {
             IdDTO newId = new IdDTO();
             try
             {
+            //Validate
+                //List<string> - List FieldId
+                if (fieldIdList.Count() == 0)
+                    throw new InvalidFieldException("fieldIdList contain at least 1 fieldId!!!");
+
+                foreach (string fieldId in fieldIdList)
+                {
+                    if (fieldId == null || !await _validationService.CheckUUIDFormat(fieldId))
+                        throw new InvalidFieldException("Invalid fieldId " + fieldId + " !!!");
+
+                    if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                        throw new NotFoundException("This fieldId " + fieldId + " is not existed!!!");
+                }
+                //BusinessDTO object
                 if (!await _validationService.CheckText(businessDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");
 
@@ -116,12 +132,27 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
 
                 businessDTO.isDeleted = false;
+            //
 
                 RevenueSharingInvest.Data.Models.Entities.Business dto = _mapper.Map<RevenueSharingInvest.Data.Models.Entities.Business>(businessDTO);
                 newId.id = await _businessRepository.CreateBusiness(dto);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create Business Object!");
-                return newId;
+                else
+                {
+                    foreach (string fieldId in fieldIdList)
+                    {
+                        if (await _businessFieldRepository.CreateBusinessField(Guid.Parse(newId.id), Guid.Parse(fieldId), Guid.Parse(newId.id)) == 0)//ráp authen sửa createBy và updateBy
+                        {
+                            //Xóa các object BusinessField vừa mới tạo
+                            _businessFieldRepository.DeleteBusinessFieldByBusinessId(Guid.Parse(newId.id));
+                            //Xóa object Business vừa mới tạo
+                            _businessRepository.DeleteBusinessByBusinessId(Guid.Parse(newId.id));
+                            throw new CreateObjectException("Can not create BusinessField Object has businessId: " + newId.id + " and fieldId: " + fieldId + " ! Create Business object failed!");
+                        }                           
+                    }
+                    return newId;
+                }               
             }
             catch (Exception e)
             {

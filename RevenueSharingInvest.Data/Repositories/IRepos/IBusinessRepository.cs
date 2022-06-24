@@ -21,6 +21,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteBusinessById(Guid businesssId);
+        public void DeleteBusinessByBusinessId(Guid businessId);
         public Task<int> ClearAllBusinessData();
     }
 }

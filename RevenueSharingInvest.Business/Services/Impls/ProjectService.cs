@@ -175,7 +175,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<AllProjectDTO> GetAllProjects(int pageIndex, int pageSize, string businessId, string temp_field_role)
+        public async Task<AllProjectDTO> GetAllProjects(int pageIndex, int pageSize, string businessId, string managerId, string temp_field_role)
         {
             try
             {
@@ -190,9 +190,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new NotFoundException("This businessId is not existed!!!");
                 }
 
-                result.numOfProject = await _projectRepository.CountProject(businessId, temp_field_role);
+                if (managerId != null)
+                {
+                    if (!await _validationService.CheckUUIDFormat(managerId))
+                        throw new InvalidFieldException("Invalid managerId!!!");
 
-                List<Project> list = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, temp_field_role);
+                    if (!await _validationService.CheckExistenceUserWithRole(ROLE_PROJECT_MANAGER_ID, Guid.Parse(managerId)))
+                        throw new NotFoundException("This managerId is not existed!!!");
+                }
+
+                result.numOfProject = await _projectRepository.CountProject(businessId, managerId, temp_field_role);
+
+                List<Project> list = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, managerId, temp_field_role);
                 result.listOfProject = _mapper.Map<List<ProjectDTO>>(list);
 
                 foreach (ProjectDTO item in result.listOfProject)

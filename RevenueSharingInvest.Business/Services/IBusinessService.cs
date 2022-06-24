@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Business.Services
     public interface IBusinessService
     {
         //CREATE
-        public Task<IdDTO> CreateBusiness(BusinessDTO businessDTO);
+        public Task<IdDTO> CreateBusiness(BusinessDTO businessDTO, List<string> fieldIdList);
         //public Task<int> AdminCreateBusiness(Data.Models.Entities.Business newBusiness, string email);
 
         //READ

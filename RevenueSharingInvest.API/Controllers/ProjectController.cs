@@ -44,10 +44,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProjects(int pageIndex, int pageSize, string businessId, string temp_field_role)
+        public async Task<IActionResult> GetAllProjects(int pageIndex, int pageSize, string businessId, string managerId, string temp_field_role)
         {
             var result = new AllProjectDTO();
-            result = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, temp_field_role);
+            result = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, managerId, temp_field_role);
             return Ok(result);
         }
 
