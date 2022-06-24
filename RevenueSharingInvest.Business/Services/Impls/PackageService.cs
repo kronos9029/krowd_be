@@ -149,7 +149,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     {
                         item.approvedDate = await _validationService.FormatDateOutput(item.approvedDate);
                     }
-                    item.closeDate = await _validationService.FormatDateOutput(item.closeDate);
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
                 }
