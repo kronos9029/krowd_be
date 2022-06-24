@@ -134,6 +134,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return response;
         }
 
+        public async Task<AuthenticateResponse> GetTokenAdmin(string firebaseToken)
+        {
+            FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
+            string uid = decryptedToken.Uid;
+
+            UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+            string email = userRecord.Email;
+
+
+            AuthenticateResponse response = new();
+
+            response.email = email;
+            response.uid = uid;
+            response = GenerateToken(response, RoleEnum.ADMIN.ToString());
+
+
+            return response;
+        }
+
         private AuthenticateResponse GenerateToken(AuthenticateResponse response, string roleCheck)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -142,29 +161,40 @@ namespace RevenueSharingInvest.Business.Services.Impls
             Claim roleClaim, roleId;
 
             if (roleCheck.Equals(RoleEnum.ADMIN.ToString()))
-            {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.ADMIN.ToString());
-                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_ADMIN_ID);
-            }
+                {
+                    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.ADMIN.ToString());
+                    roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_ADMIN_ID);
+                }
             else if (roleCheck.Equals(RoleEnum.INVESTOR.ToString()))
-            {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.INVESTOR.ToString());
-                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_INVESTOR_ID);
-            }
+                {
+                    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.INVESTOR.ToString());
+                    roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_INVESTOR_ID);
+                }
             else if (roleCheck.Equals(RoleEnum.BUSINESS_MANAGER.ToString()))
-            {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUSINESS_MANAGER.ToString());
-                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_BUSINESS_MANAGER_ID);
-            }            
+                {
+                    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUSINESS_MANAGER.ToString());
+                    roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_BUSINESS_MANAGER_ID);
+                }
             else if (roleCheck.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
+                {
+                    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.PROJECT_MANAGER.ToString());
+                    roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_PROJECT_OWNER_ID);
+                }
+            else
+                {
+                    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.INVESTOR.ToString());
+                    roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_INVESTOR_ID);
+                }
+
+            int hours;
+
+            if (roleCheck.Equals(RoleEnum.ADMIN.ToString()))
             {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.PROJECT_MANAGER.ToString());
-                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_PROJECT_OWNER_ID);
+                hours = 1;
             }
             else
             {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.INVESTOR.ToString());
-                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_INVESTOR_ID);
+                hours = 8760;
             }
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -175,7 +205,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                    roleId,
                    roleClaim
                 }),
-                Expires = DateTime.UtcNow.AddDays(30),
+
+                Expires = DateTime.UtcNow.AddHours(hours),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 

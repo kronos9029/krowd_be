@@ -203,10 +203,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 foreach (UserDTO item in list)
                 {
-                    if (item.dateOfBirth != null)
-                    {
-                        item.dateOfBirth = await _validationService.FormatDateOutput(item.dateOfBirth);
-                    }
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
                 }
@@ -230,10 +226,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (result == null)
                     throw new NotFoundException("No User Object Found!");
 
-                if (result.dateOfBirth != null)
-                {
-                    result.dateOfBirth = await _validationService.FormatDateOutput(result.dateOfBirth);
-                }
                 result.createDate = await _validationService.FormatDateOutput(result.createDate);
                 result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
 

@@ -21,23 +21,21 @@ namespace RevenueSharingInvest.API.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IAuthenticateService _authenticateService;
-        string userId;
         public ProjectController(IProjectService projectService, IHttpContextAccessor httpContextAccessor, IAuthenticateService authenticateService)
         {
             _projectService = projectService;
-            this.httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor;
             _authenticateService = authenticateService;
-            userId = httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
         }
 
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> CreateProject([FromBody] ProjectDTO projectDTO)
         {
-
-            //if(await _authenticateService.CheckRoleForAction(userId, RoleEnum.BUSINESS_MANAGER.ToString()))
+            //string userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
+            //if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.BUSINESS_MANAGER.ToString()))
             //{
                 var result = await _projectService.CreateProject(projectDTO);
                 return Ok(result);
@@ -64,45 +62,47 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> UpdateProject([FromBody] ProjectDTO projectDTO, Guid id)
         {
-            if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.BUSINESS_MANAGER.ToString()))
-            {
+            //string userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
+
+            //if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.BUSINESS_MANAGER.ToString()))
+            //{
                 var result = await _projectService.UpdateProject(projectDTO, id);
                 return Ok(result);
-            }
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
+            //}
+            //return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
         }
 
         [HttpDelete]
         [Route("{id}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> DeleteProject(Guid id)
         {
-            string userId = httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
+            //string userId = _httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
 
-            if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.ADMIN.ToString()) && await _authenticateService.CheckIdForAction(userId, id))
-            {
+            //if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.ADMIN.ToString()) && await _authenticateService.CheckIdForAction(userId, id))
+            //{
                 var result = await _projectService.DeleteProjectById(id);
                 return Ok(result);
-            }
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
+            //}
+            //return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
 
         }
 
         [HttpDelete]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> ClearAllProjectData()
         {
-            string userId = httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
+            //string userId = _httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
 
-            if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.ADMIN.ToString()))
-            {
+            //if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.ADMIN.ToString()))
+            //{
                 var result = await _projectService.ClearAllProjectData();
                 return Ok(result);
-            }
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
+            //}
+            //return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
 
         }
     }
