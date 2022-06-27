@@ -15,13 +15,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
     public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
+        private readonly IFieldRepository _fieldRepository;
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
         private readonly String ROLE_PROJECT_MANAGER_ID = "2d80393a-3a3d-495d-8dd7-f9261f85cc8f";
 
-        public ProjectService(IProjectRepository projectRepository, IValidationService validationService, IMapper mapper)
+        public ProjectService(IProjectRepository projectRepository, IFieldRepository fieldRepository, IValidationService validationService, IMapper mapper)
         {
             _projectRepository = projectRepository;
+            _fieldRepository = fieldRepository;
             _validationService = validationService;
             _mapper = mapper;
         }
@@ -206,6 +208,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 foreach (ProjectDTO item in result.listOfProject)
                 {
+                    item.fieldName = (await _fieldRepository.GetFieldById(Guid.Parse(item.fieldId))).Name;
                     item.startDate = await _validationService.FormatDateOutput(item.startDate);
                     item.endDate = await _validationService.FormatDateOutput(item.endDate);
                     if (item.approvedDate != null)

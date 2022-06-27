@@ -12,6 +12,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string managerId { get; set; }
         public string businessId { get; set; }
         public string fieldId { get; set; }
+        public string fieldName { get; set; }
         public string areaId { get; set; }
         public string name { get; set; }
         public string image { get; set; }
