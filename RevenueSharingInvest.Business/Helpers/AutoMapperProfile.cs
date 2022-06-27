@@ -29,6 +29,7 @@ namespace RevenueSharingInvest.Business.Helpers
             CreateMap<PeriodRevenue, PeriodRevenueDTO>().ReverseMap();
             CreateMap<ProjectEntity, ProjectEntityDTO>().ReverseMap();
             CreateMap<Project, ProjectDTO>().ReverseMap();
+            CreateMap<ProjectDTO, ProjectDetailDTO>().ReverseMap();
             CreateMap<ProjectWallet, ProjectWalletDTO>().ReverseMap();
             CreateMap<Risk, RiskDTO>().ReverseMap();
             CreateMap<RiskType, RiskTypeDTO>().ReverseMap();

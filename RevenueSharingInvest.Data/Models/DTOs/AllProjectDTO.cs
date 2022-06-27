@@ -9,6 +9,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class AllProjectDTO
     {
         public int numOfProject { get; set; }
-        public List<ProjectDTO> listOfProject { get; set; }
+        public List<ProjectDetailDTO> listOfProject { get; set; }
     }
 }

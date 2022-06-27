@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.CommonRepos;
+using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,6 +16,8 @@ namespace RevenueSharingInvest.Business.Services.Common
     public class ValidationService : IValidationService
     {
         private readonly IMapper _mapper;
+        private readonly IBusinessFieldRepository _businessFieldRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IValidationRepository _validationRepository;
         private readonly Regex regexMail = new(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
         private readonly Regex regexPhone = new(@"\(?\d{3}\)?-? *\d{3}-? *-?\d{4}");
@@ -21,9 +25,11 @@ namespace RevenueSharingInvest.Business.Services.Common
         private readonly Regex regexDate = new(@"^([1-9]|([012][0-9])|(3[01]))/([0]{0,1}[1-9]|1[012])/\d\d\d\d (20|21|22|23|[0-1]?\d):[0-5]?\d:[0-5]?\d$"); //[dd/MM/yyyy HH:mm:ss]
         private readonly Regex regexUUID = new(@"(?im)^[{(]?[0-9A-F]{8}[-]?(?:[0-9A-F]{4}[-]?){3}[0-9A-F]{12}[)}]?$");
 
-        public ValidationService(IMapper mapper, IValidationRepository validationRepository)
+        public ValidationService(IMapper mapper, IBusinessFieldRepository businessFieldRepository, IUserRepository userRepository, IValidationRepository validationRepository)
         {
             _mapper = mapper;
+            _businessFieldRepository = businessFieldRepository;
+            _userRepository = userRepository;
             _validationRepository = validationRepository;
         }
 
@@ -113,6 +119,21 @@ namespace RevenueSharingInvest.Business.Services.Common
             throw new NotImplementedException();
         }
 
+        public async Task<bool> CheckManagerOfBusiness(Guid managerId, Guid businessId)
+        {
+            bool result;           
+            try
+            {
+                User manager = await _userRepository.GetUserById(managerId);
+                result = (!businessId.Equals(manager.BusinessId)) ? false : true;
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         public async Task<bool> CheckPhoneNumber(string phoneNum)
         {
             bool result;
@@ -120,6 +141,20 @@ namespace RevenueSharingInvest.Business.Services.Common
             {
                 Match match = regexPhone.Match(phoneNum);
                 result = (phoneNum.Length == 0) ? false : match.Success;
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<bool> CheckProjectFieldInBusinessField(Guid businessId, Guid fieldId)
+        {
+            bool result;
+            try
+            {
+                result = (await _businessFieldRepository.GetBusinessFieldById(businessId, fieldId) == null) ? false : true;
                 return result;
             }
             catch (Exception e)
