@@ -107,11 +107,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<RevenueSharingInvest.Data.Models.Entities.Business>> GetAllBusiness(int pageIndex, int pageSize)
+        public async Task<List<RevenueSharingInvest.Data.Models.Entities.Business>> GetAllBusiness(int pageIndex, int pageSize, string role)
         {
             try
             {
-                if(pageIndex != 0 && pageSize != 0)
+                var whereCondition = "";
+
+                if (role.Equals("ADMIN"))
+                {
+                    whereCondition = "";
+                }
+                if (role.Equals("INVESTOR"))
+                {
+                    whereCondition = "WHERE IsDeleted = 0 AND Status = 0 ";
+                }
+
+                if (pageIndex != 0 && pageSize != 0)
                 {
                     var query = "WITH X AS ( "
                     + "         SELECT "
@@ -120,8 +131,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     Name ASC ) AS Num, "
                     + "             * "
                     + "         FROM Business "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    +           whereCondition
+                    + "         ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         Name, "
@@ -153,7 +164,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM Business WHERE IsDeleted = 0 ORDER BY Name ASC";
+                    var query = "SELECT * FROM Business " + whereCondition + " ORDER BY Name ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<RevenueSharingInvest.Data.Models.Entities.Business>(query)).ToList();
                 }              
@@ -251,6 +262,32 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Id", businessId, DbType.Guid);
                 using var connection = CreateConnection();
                 await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<int> CountBusiness(string role)
+        {
+            try
+            {
+                var whereCondition = "";
+                
+                if (role.Equals("ADMIN"))
+                {
+                    whereCondition = "";
+                }
+                if (role.Equals("INVESTOR"))
+                {
+                    whereCondition = "WHERE IsDeleted = 0 AND Status = 0 ";
+                }            
+
+                var query = "SELECT COUNT(*) FROM Business " + whereCondition;
+
+                using var connection = CreateConnection();
+                return ((int)connection.ExecuteScalar(query));
             }
             catch (Exception e)
             {

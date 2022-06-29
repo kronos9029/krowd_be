@@ -14,6 +14,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 {
     public class UserRepository : BaseRepository, IUserRepository
     {
+        private readonly String ROLE_BUSINESS_MANAGER_ID = "015ae3c5-eee9-4f5c-befb-57d41a43d9df";
+
         public UserRepository(IConfiguration configuration) : base(configuration)
         {
         }
@@ -309,6 +311,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<User> GetBusinessManagerByBusinessId(Guid businessId)
+        {
+            try
+            {
+                string query = "SELECT * FROM [User] WHERE BusinessId = @BusinessId AND RoleId = @RoleId";
+                var parameters = new DynamicParameters();
+                parameters.Add("BusinessId", businessId, DbType.Guid);
+                parameters.Add("RoleId", Guid.Parse(ROLE_BUSINESS_MANAGER_ID), DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<User>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
             }
         }
     }

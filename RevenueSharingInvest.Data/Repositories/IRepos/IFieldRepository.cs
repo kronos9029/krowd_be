@@ -15,6 +15,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //READ
         public Task<List<Field>> GetAllFields(int pageIndex, int pageSize);
         public Task<Field> GetFieldById(Guid fieldId);
+        public Task<List<Field>> GetCompanyFields(Guid businessId);
 
         //UPDATE
         public Task<int> UpdateField(Field fieldDTO, Guid fieldId);

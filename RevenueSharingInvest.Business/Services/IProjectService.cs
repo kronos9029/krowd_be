@@ -14,7 +14,7 @@ namespace RevenueSharingInvest.Business.Services
 
         //READ
         public Task<AllProjectDTO> GetAllProjects(int pageIndex, int pageSize, string businessId, string managerId, string temp_field_role);
-        public Task<ProjectDTO> GetProjectById(Guid projectId);
+        public Task<ProjectDetailDTO> GetProjectById(Guid projectId);
 
         //UPDATE
         public Task<int> UpdateProject(ProjectDTO projectDTO, Guid projectId);

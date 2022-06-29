@@ -252,25 +252,30 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET BY ID
-        public async Task<ProjectDTO> GetProjectById(Guid projectId)
+        public async Task<ProjectDetailDTO> GetProjectById(Guid projectId)
         {
-            ProjectDTO result;
+            ProjectDetailDTO result;
             try
             {
 
-                Project dto = await _projectRepository.GetProjectById(projectId);
-                result = _mapper.Map<ProjectDTO>(dto);
-                if (result == null)
+                Project project = await _projectRepository.GetProjectById(projectId);
+                ProjectDTO projectDTO = _mapper.Map<ProjectDTO>(project);
+                if (projectDTO == null)
                     throw new NotFoundException("No Project Object Found!");
 
-                result.startDate = await _validationService.FormatDateOutput(result.startDate);
-                result.endDate = await _validationService.FormatDateOutput(result.endDate);
-                if (result.approvedDate != null)
+                projectDTO.startDate = await _validationService.FormatDateOutput(projectDTO.startDate);
+                projectDTO.endDate = await _validationService.FormatDateOutput(projectDTO.endDate);
+                if (projectDTO.approvedDate != null)
                 {
-                    result.approvedDate = await _validationService.FormatDateOutput(result.approvedDate);
+                    projectDTO.approvedDate = await _validationService.FormatDateOutput(projectDTO.approvedDate);
                 }
-                result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+                projectDTO.createDate = await _validationService.FormatDateOutput(projectDTO.createDate);
+                projectDTO.updateDate = await _validationService.FormatDateOutput(projectDTO.updateDate);
+
+                result = _mapper.Map<ProjectDetailDTO>(projectDTO);
+                result.manager = _mapper.Map<UserDTO>(await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId)));
+                result.business = _mapper.Map<BusinessDTO>(await _businessRepository.GetBusinessById(Guid.Parse(projectDTO.businessId)));
+                result.field = _mapper.Map<FieldDTO>(await _fieldRepository.GetFieldById(Guid.Parse(projectDTO.fieldId)));
 
                 return result;
             }

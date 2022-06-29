@@ -16,6 +16,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<List<User>> GetAllUsers(int pageIndex, int pageSize);
         public Task<User> GetUserById(Guid userId);
         public Task<User> GetUserByEmail(string email);
+        public Task<User> GetBusinessManagerByBusinessId(Guid businessId);
 
         //UPDATE
         public Task<int> UpdateUser(User userDTO, Guid userId);
