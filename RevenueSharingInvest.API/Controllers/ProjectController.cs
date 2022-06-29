@@ -55,7 +55,7 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> GetProjectById(Guid id)
         {
-            ProjectDTO dto = new();
+            ProjectDetailDTO dto = new ProjectDetailDTO();
             dto = await _projectService.GetProjectById(id);
             return Ok(dto);
         }
