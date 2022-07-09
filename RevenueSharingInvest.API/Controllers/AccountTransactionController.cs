@@ -15,15 +15,17 @@ namespace RevenueSharingInvest.API.Controllers
     [ApiController]
     [Route("api/v1.0/account_transactions")]
     [EnableCors]
-    //[Authorize]
+    [Authorize]
     public class AccountTransactionController : ControllerBase
     {
         private readonly IAccountTransactionService _accountTransactionService;
         private readonly IHttpContextAccessor httpContextAccessor;
-        public AccountTransactionController(IAccountTransactionService accountTransactionService, IHttpContextAccessor httpContextAccessor)
+        private readonly IAuthenticateService _authenticateService;
+        public AccountTransactionController(IAccountTransactionService accountTransactionService, IHttpContextAccessor httpContextAccessor, IAuthenticateService authenticateService)
         {
             _accountTransactionService = accountTransactionService;
             this.httpContextAccessor = httpContextAccessor;
+            _authenticateService = authenticateService;
         }
 
         [HttpPost]

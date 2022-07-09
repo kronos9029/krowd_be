@@ -95,14 +95,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.id = Guid.Parse(newUserID);
                 response.uid = uid;
                 response.investorId = Guid.Parse(newInvestorID);
-                response = GenerateToken(response, RoleEnum.INVESTOR.ToString());
+                response = await GenerateTokenAsync(response, RoleEnum.INVESTOR.ToString());
             }
             else
             {
                 response.email = email;
                 response.id = userObject.Id;
                 response.uid = uid;
-                response = GenerateToken(response, RoleEnum.INVESTOR.ToString());
+                response = await GenerateTokenAsync(response, RoleEnum.INVESTOR.ToString());
             }
             return response;
         }
@@ -128,7 +128,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.email = email;
                 response.id = userObject.Id;
                 response.uid = uid;
-                response = GenerateToken(response, RoleEnum.BUSINESS_MANAGER.ToString());
+                response = await GenerateTokenAsync(response, RoleEnum.BUSINESS_MANAGER.ToString());
             }
 
             return response;
@@ -147,13 +147,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             response.email = email;
             response.uid = uid;
-            response = GenerateToken(response, RoleEnum.ADMIN.ToString());
+            response =  await GenerateTokenAsync(response, RoleEnum.ADMIN.ToString());
 
 
             return response;
         }
 
-        private AuthenticateResponse GenerateToken(AuthenticateResponse response, string roleCheck)
+        private async Task<AuthenticateResponse> GenerateTokenAsync(AuthenticateResponse response, string roleCheck)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
@@ -161,30 +161,30 @@ namespace RevenueSharingInvest.Business.Services.Impls
             Claim roleClaim, roleId;
 
             if (roleCheck.Equals(RoleEnum.ADMIN.ToString()))
-                {
-                    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.ADMIN.ToString());
-                    roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_ADMIN_ID);
-                }
+            {
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.ADMIN.ToString());
+                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_ADMIN_ID);
+            }
             else if (roleCheck.Equals(RoleEnum.INVESTOR.ToString()))
-                {
-                    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.INVESTOR.ToString());
-                    roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_INVESTOR_ID);
-                }
+            {
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.INVESTOR.ToString());
+                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_INVESTOR_ID);
+            }
             else if (roleCheck.Equals(RoleEnum.BUSINESS_MANAGER.ToString()))
-                {
-                    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUSINESS_MANAGER.ToString());
-                    roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_BUSINESS_MANAGER_ID);
-                }
+            {
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUSINESS_MANAGER.ToString());
+                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_BUSINESS_MANAGER_ID);
+            }
             else if (roleCheck.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
-                {
-                    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.PROJECT_MANAGER.ToString());
-                    roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_PROJECT_OWNER_ID);
-                }
+            {
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.PROJECT_MANAGER.ToString());
+                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_PROJECT_OWNER_ID);
+            }
             else
-                {
-                    roleClaim = new Claim(ClaimTypes.Role, RoleEnum.INVESTOR.ToString());
-                    roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_INVESTOR_ID);
-                }
+            {
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.INVESTOR.ToString());
+                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_INVESTOR_ID);
+            }
 
             int hours;
 
@@ -202,6 +202,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                    new Claim(ClaimTypes.SerialNumber, response.id.ToString()),
+                   new Claim("uid", response.uid),
                    roleId,
                    roleClaim
                 }),
@@ -211,6 +212,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
+
+
+            string storage = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(response.uid);
+
             response.token = tokenHandler.WriteToken(token);
             return response;
         }

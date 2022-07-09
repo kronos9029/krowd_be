@@ -13,10 +13,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RevenueSharingInvest.API.Helpers;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Business.Services.Common;
+using RevenueSharingInvest.Business.Services.Common.Firebase;
 using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Models.Helpers;
@@ -179,7 +181,10 @@ namespace RevenueSharingInvest.API
             // VALIDATION
             services.AddScoped<IValidationRepository, ValidationRepository>();
             services.AddScoped<IValidationService, ValidationService>();
-            //////////        
+            //////////       
+            ///
+            //Upload File To Firebase
+            services.AddScoped<IFileUploadService, FileUploadService>();
            
             // ADMIN SAFE LIST
             services.AddScoped<ClientIpCheckActionFilter>(container =>
@@ -196,22 +201,32 @@ namespace RevenueSharingInvest.API
                 options.AddDefaultPolicy(
                 builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
             ));
+
+            // Configure Strongly Typed Settings Objects
+            ///Secret key
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+            var appSettings = appSettingsSection.Get<AppSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+
+            ///Firebase storage
+            var firebaseSettingSection = Configuration.GetSection("FirebaseSettings");
+            services.Configure<FirebaseSettings>(firebaseSettingSection);
+            var firebaseSettings = firebaseSettingSection.Get<FirebaseSettings>(); 
+
+            //Firebase authentication
             FirebaseApp.Create(new AppOptions()
             {
                 Credential = GoogleCredential.GetApplicationDefault(),
-                ProjectId = "revenuesharinginvest-44354",
+                ProjectId = firebaseSettings.ProjectId,
+                ServiceAccountId = firebaseSettings.ServiceAccountId
             });
+
             services.AddControllers();
 
             services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 
-            // configure strongly typed settings objects
-            var appSettingsSection = Configuration.GetSection("AppSettings");
-            services.Configure<AppSettings>(appSettingsSection);
-
-            var appSettings = appSettingsSection.Get<AppSettings>();
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-
+            //JWT
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

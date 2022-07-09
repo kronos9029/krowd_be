@@ -2,12 +2,15 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.API.Controllers
@@ -20,17 +23,25 @@ namespace RevenueSharingInvest.API.Controllers
     {
         private readonly IAreaService _areaService;
         private readonly IHttpContextAccessor httpContextAccessor;
-        public AreaController(IAreaService areaService, IHttpContextAccessor httpContextAccessor)
+        private readonly IAuthenticateService _authenticateService;
+        public AreaController(IAreaService areaService, IHttpContextAccessor httpContextAccessor, IAuthenticateService authenticateService)
         {
             _areaService = areaService;
             this.httpContextAccessor = httpContextAccessor;
+            _authenticateService = authenticateService;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateArea([FromBody] AreaDTO areaDTO)
         {
-            var result = await _areaService.CreateArea(areaDTO);
-            return Ok(result);
+            string userId = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
+
+            //if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.ADMIN.ToString()))
+            //{
+                var result = await _areaService.CreateArea(areaDTO);
+                return Ok(result);
+            //}
+            //return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
         }
 
         [HttpGet]

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string id { get; set; }
         public string name { get; set; }
         public string phoneNum { get; set; }
-        public string image { get; set; }
+        public IFormFile image { get; set; }
         public string email { get; set; }
         public string description { get; set; }
         public string taxIdentificationNumber { get; set; }

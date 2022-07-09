@@ -52,7 +52,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateUser([FromBody] UserDTO userDTO, Guid id)
+        public async Task<IActionResult> UpdateUser([FromForm] UserDTO userDTO, Guid id)
         {
             var result = await _userService.UpdateUser(userDTO, id);
             return Ok(result);

@@ -6,6 +6,7 @@ using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Common;
+using RevenueSharingInvest.Business.Services.Common.Firebase;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -27,6 +28,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IBusinessRepository _businessRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly IValidationService _validationService;
+        private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
         private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
         private readonly String ROLE_INVESTOR_ID = "ad5f37da-ca48-4dc5-9f4b-963d94b535e6";
@@ -34,12 +36,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly String ROLE_PROJECT_MANAGER_ID = "2d80393a-3a3d-495d-8dd7-f9261f85cc8f";
         private readonly String INVESTOR_TYPE_ID = "";
 
-        public UserService(IOptions<AppSettings> appSettings, IUserRepository userRepository, IInvestorRepository investorRepository, IValidationService validationService, IMapper mapper)
+        public UserService(IOptions<AppSettings> appSettings, 
+            IUserRepository userRepository, 
+            IInvestorRepository investorRepository, 
+            IValidationService validationService,
+            IFileUploadService fileUploadService,
+            IMapper mapper)
         {
             _appSettings = appSettings.Value;
             _userRepository = userRepository;
             _investorRepository = investorRepository;
             _validationService = validationService;
+            _fileUploadService = fileUploadService;
             _mapper = mapper;
         }
 
@@ -164,8 +172,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 userDTO.isDeleted = false;
 
-                User dto = _mapper.Map<User>(userDTO);
-                newId.id = await _userRepository.CreateUser(dto);
+                User entity = _mapper.Map<User>(userDTO);
+
+                newId.id = await _userRepository.CreateUser(entity);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create User Object!");
                 return newId;
@@ -332,8 +341,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("Invalid updateBy!!!");
                 }
 
-                User dto = _mapper.Map<User>(userDTO);
-                result = await _userRepository.UpdateUser(dto, userId);
+                User entity = _mapper.Map<User>(userDTO);
+
+                if(userDTO.image != null)
+                {
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseUser(userDTO.image, userDTO.updateBy);
+                }
+
+                result = await _userRepository.UpdateUser(entity, userId);
                 if (result == 0)
                     throw new UpdateObjectException("Can not update User Object!");
                 return result;

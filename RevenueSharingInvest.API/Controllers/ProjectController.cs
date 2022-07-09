@@ -32,7 +32,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPost]
         //[Authorize]
-        public async Task<IActionResult> CreateProject([FromBody] ProjectDTO projectDTO)
+        public async Task<IActionResult> CreateProject([FromForm] ProjectDTO projectDTO)
         {
             //string userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
             //if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.BUSINESS_MANAGER.ToString()))
@@ -63,7 +63,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPut]
         [Route("{id}")]
         //[Authorize]
-        public async Task<IActionResult> UpdateProject([FromBody] ProjectDTO projectDTO, Guid id)
+        public async Task<IActionResult> UpdateProject([FromForm] ProjectDTO projectDTO, Guid id)
         {
             //string userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
 

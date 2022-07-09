@@ -3,13 +3,16 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using RevenueSharingInvest.API.Helpers;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Business.Services.Common.Firebase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.API.Controllers
@@ -21,10 +24,14 @@ namespace RevenueSharingInvest.API.Controllers
     public class AuthenticateController : ControllerBase
     {
         private readonly IAuthenticateService _authenticateService;
+        private readonly IFileUploadService _fileUploadService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthenticateController(IAuthenticateService authenticateService)
+        public AuthenticateController(IAuthenticateService authenticateService, IFileUploadService fileUploadService, IHttpContextAccessor httpContextAccessor)
         {
             _authenticateService = authenticateService;
+            _fileUploadService = fileUploadService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpPost]
@@ -51,7 +58,20 @@ namespace RevenueSharingInvest.API.Controllers
         {
             var result = await _authenticateService.GetTokenAdmin(token);
             return Ok(result);
-        }
+        }        
+        
+/*        [HttpPost]
+        [Route("upload-file")]
+        public async Task<IActionResult> UploadFile(IFormFile file)
+        {
+            string uid = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid").Value;
+
+            String link = await _fileUploadService.UploadImageToFirebase(file, uid);
+
+            
+
+            return Ok(link);
+        }*/
 
 
     }

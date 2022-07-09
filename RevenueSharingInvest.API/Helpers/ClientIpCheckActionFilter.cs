@@ -11,7 +11,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RevenueSharingInvest.Business.Helpers
+namespace RevenueSharingInvest.API.Helpers
 {
     public class ClientIpCheckActionFilter : ActionFilterAttribute
     {

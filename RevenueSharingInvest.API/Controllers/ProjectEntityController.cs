@@ -27,7 +27,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProjectEntity([FromBody] ProjectEntityDTO projectEntityDTO)
+        public async Task<IActionResult> CreateProjectEntity([FromForm] ProjectEntityDTO projectEntityDTO)
         {
             var result = await _projectEntityService.CreateProjectEntity(projectEntityDTO);
             return Ok(result);
@@ -52,7 +52,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateProjectEntity([FromBody] ProjectEntityDTO projectEntityDTO, Guid id)
+        public async Task<IActionResult> UpdateProjectEntity([FromForm] ProjectEntityDTO projectEntityDTO, Guid id)
         {
             var result = await _projectEntityService.UpdateProjectEntity(projectEntityDTO, id);
             return Ok(result);

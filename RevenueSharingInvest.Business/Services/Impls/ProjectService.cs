@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Common;
+using RevenueSharingInvest.Business.Services.Common.Firebase;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -17,14 +18,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IProjectRepository _projectRepository;
         private readonly IFieldRepository _fieldRepository;
         private readonly IValidationService _validationService;
+        private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
         private readonly String ROLE_PROJECT_MANAGER_ID = "2d80393a-3a3d-495d-8dd7-f9261f85cc8f";
 
-        public ProjectService(IProjectRepository projectRepository, IFieldRepository fieldRepository, IValidationService validationService, IMapper mapper)
+        public ProjectService(IProjectRepository projectRepository, 
+            IFieldRepository fieldRepository, 
+            IValidationService validationService, 
+            IFileUploadService fileUploadService,
+            IMapper mapper)
         {
             _projectRepository = projectRepository;
             _fieldRepository = fieldRepository;
             _validationService = validationService;
+            _fileUploadService = fileUploadService;
             _mapper = mapper;
         }
 
@@ -146,8 +153,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 projectDTO.isDeleted = false;
 
-                Project dto = _mapper.Map<Project>(projectDTO);
-                newId.id = await _projectRepository.CreateProject(dto);
+                Project entity = _mapper.Map<Project>(projectDTO);
+
+                if(projectDTO.image != null)
+                {
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, projectDTO.createBy);
+                }
+
+                newId.id = await _projectRepository.CreateProject(entity);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create Project Object!");
                 return newId;
@@ -356,8 +369,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("Invalid updateBy!!!");
                 }
 
-                Project dto = _mapper.Map<Project>(projectDTO);
-                result = await _projectRepository.UpdateProject(dto, projectId);
+                Project entity = _mapper.Map<Project>(projectDTO);
+
+                if (projectDTO.image != null)
+                {
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, projectDTO.updateBy);
+                }
+
+                result = await _projectRepository.UpdateProject(entity, projectId);
                 if (result == 0)
                     throw new UpdateObjectException("Can not update Project Object!");
                 return result;

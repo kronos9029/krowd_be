@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Common;
+using RevenueSharingInvest.Business.Services.Common.Firebase;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -18,15 +19,22 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IBusinessFieldRepository _businessFieldRepository;
         private readonly IUserRepository _userRepository;
         private readonly IValidationService _validationService;
+        private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
         private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
 
-        public BusinessService(IBusinessRepository businessRepository, IBusinessFieldRepository businessFieldRepository, IValidationService validationService, IUserRepository userRepository, IMapper mapper)
+        public BusinessService(IBusinessRepository businessRepository, 
+            IBusinessFieldRepository businessFieldRepository, 
+            IValidationService validationService, 
+            IUserRepository userRepository,
+            IFileUploadService fileUploadService,
+            IMapper mapper)
         {
             _businessRepository = businessRepository;
             _businessFieldRepository = businessFieldRepository;
             _userRepository = userRepository;
             _validationService = validationService;
+            _fileUploadService = fileUploadService;
             _mapper = mapper;
         }
 
@@ -132,10 +140,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
 
                 businessDTO.isDeleted = false;
-            //
+                //
+                RevenueSharingInvest.Data.Models.Entities.Business entity = _mapper.Map<RevenueSharingInvest.Data.Models.Entities.Business>(businessDTO);
 
-                RevenueSharingInvest.Data.Models.Entities.Business dto = _mapper.Map<RevenueSharingInvest.Data.Models.Entities.Business>(businessDTO);
-                newId.id = await _businessRepository.CreateBusiness(dto);
+                if (businessDTO.image != null)
+                {
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, businessDTO.createBy);
+                }
+
+                newId.id = await _businessRepository.CreateBusiness(entity);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create Business Object!");
                 else
@@ -268,8 +281,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("Invalid updateBy!!!");
                 }
 
-                RevenueSharingInvest.Data.Models.Entities.Business dto = _mapper.Map<RevenueSharingInvest.Data.Models.Entities.Business>(businessDTO);
-                result = await _businessRepository.UpdateBusiness(dto, businessId);
+                RevenueSharingInvest.Data.Models.Entities.Business entity = _mapper.Map<RevenueSharingInvest.Data.Models.Entities.Business>(businessDTO);
+
+                if (businessDTO.image != null)
+                {
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, businessDTO.updateBy);
+                }
+
+                result = await _businessRepository.UpdateBusiness(entity, businessId);
                 if (result == 0)
                     throw new UpdateObjectException("Can not update Business Object!");
                 return result;

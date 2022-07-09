@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Common;
+using RevenueSharingInvest.Business.Services.Common.Firebase;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -16,13 +17,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
     {
         private readonly IProjectEntityRepository _projectEntityRepository;
         private readonly IValidationService _validationService;
+        private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
 
 
-        public ProjectEntityService(IProjectEntityRepository projectEntityRepository, IValidationService validationService, IMapper mapper)
+        public ProjectEntityService(IProjectEntityRepository projectEntityRepository, 
+            IValidationService validationService, 
+            IFileUploadService fileUploadService,
+            IMapper mapper)
         {
             _projectEntityRepository = projectEntityRepository;
             _validationService = validationService;
+            _fileUploadService = fileUploadService;
             _mapper = mapper;
         }
 
@@ -83,8 +89,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 projectEntityDTO.isDeleted = false;
 
-                ProjectEntity dto = _mapper.Map<ProjectEntity>(projectEntityDTO);
-                newId.id = await _projectEntityRepository.CreateProjectEntity(dto);
+                ProjectEntity entity = _mapper.Map<ProjectEntity>(projectEntityDTO);
+
+                if(projectEntityDTO.image != null)
+                {
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseProjectEntity(projectEntityDTO.image, projectEntityDTO.createBy);
+                }
+
+                newId.id = await _projectEntityRepository.CreateProjectEntity(entity);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create ProjectEntity Object!");
                 return newId;
@@ -198,8 +210,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("Invalid updateBy!!!");
                 }
 
-                ProjectEntity dto = _mapper.Map<ProjectEntity>(projectEntityDTO);
-                result = await _projectEntityRepository.UpdateProjectEntity(dto, projectEntityId);
+                ProjectEntity entity = _mapper.Map<ProjectEntity>(projectEntityDTO);
+
+                if (projectEntityDTO.image != null)
+                {
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseProjectEntity(projectEntityDTO.image, projectEntityDTO.updateBy);
+                }
+
+                result = await _projectEntityRepository.UpdateProjectEntity(entity, projectEntityId);
                 if (result == 0)
                     throw new UpdateObjectException("Can not update ProjectEntity Object!");
                 return result;
