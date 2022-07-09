@@ -10,10 +10,9 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class ProjectDTO
     {
         public string id { get; set; }
-        public string managerId { get; set; }
         public string businessId { get; set; }
+        public string managerId { get; set; }
         public string fieldId { get; set; }
-        public string fieldName { get; set; }
         public string areaId { get; set; }
         public string name { get; set; }
         public IFormFile image { get; set; }

@@ -17,6 +17,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
     {
         private readonly IBusinessRepository _businessRepository;
         private readonly IBusinessFieldRepository _businessFieldRepository;
+        private readonly IFieldRepository _fieldRepository;
         private readonly IUserRepository _userRepository;
         private readonly IValidationService _validationService;
         private readonly IFileUploadService _fileUploadService;
@@ -27,11 +28,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IBusinessFieldRepository businessFieldRepository, 
             IValidationService validationService, 
             IUserRepository userRepository,
+            IFieldRepository fieldRepository,
             IFileUploadService fileUploadService,
             IMapper mapper)
         {
             _businessRepository = businessRepository;
             _businessFieldRepository = businessFieldRepository;
+            _fieldRepository = fieldRepository;
             _userRepository = userRepository;
             _validationService = validationService;
             _fileUploadService = fileUploadService;
@@ -191,20 +194,35 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<BusinessDTO>> GetAllBusiness(int pageIndex, int pageSize)
+        public async Task<AllBusinessDTO> GetAllBusiness(int pageIndex, int pageSize, string temp_field_role)
         {
             try
             {
-                List<RevenueSharingInvest.Data.Models.Entities.Business> businessList = await _businessRepository.GetAllBusiness(pageIndex, pageSize);
-                List<BusinessDTO> list = _mapper.Map<List<BusinessDTO>>(businessList);
+                if (!temp_field_role.Equals("ADMIN") && !temp_field_role.Equals("INVESTOR"))
+                    throw new InvalidFieldException("ADMIN or INVESTOR!");
 
-                foreach (BusinessDTO item in list)
+                AllBusinessDTO result = new AllBusinessDTO();
+                result.listOfBusiness = new List<BusinessDetailDTO>();
+                BusinessDetailDTO resultItem = new BusinessDetailDTO();
+                resultItem.fieldList = new List<FieldDTO>();
+
+                result.numOfBusiness = await _businessRepository.CountBusiness(temp_field_role);
+
+                List<RevenueSharingInvest.Data.Models.Entities.Business> listEntity = await _businessRepository.GetAllBusiness(pageIndex, pageSize, temp_field_role);
+                List<BusinessDTO> listDTO = _mapper.Map<List<BusinessDTO>>(listEntity);
+
+                foreach (BusinessDTO item in listDTO)
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+
+                    resultItem = _mapper.Map<BusinessDetailDTO>(item);
+                    resultItem.manager = _mapper.Map<UserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(item.id)));
+                    resultItem.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(item.id)));
+                    result.listOfBusiness.Add(resultItem);
                 }
 
-                return list;
+                return result;
             }
             catch (Exception e)
             {
@@ -213,19 +231,23 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET BY ID
-        public async Task<BusinessDTO> GetBusinessById(Guid businessId)
+        public async Task<BusinessDetailDTO> GetBusinessById(Guid businessId)
         {
-            BusinessDTO result;
+            BusinessDetailDTO result;
             try
             {
 
-                RevenueSharingInvest.Data.Models.Entities.Business dto = await _businessRepository.GetBusinessById(businessId);
-                result = _mapper.Map<BusinessDTO>(dto);
-                if (result == null)
+                RevenueSharingInvest.Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(businessId);
+                BusinessDTO businessDTO = _mapper.Map<BusinessDTO>(business);
+                if (businessDTO == null)
                     throw new NotFoundException("No Business Object Found!");
 
-                result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+                businessDTO.createDate = await _validationService.FormatDateOutput(businessDTO.createDate);
+                businessDTO.updateDate = await _validationService.FormatDateOutput(businessDTO.updateDate);
+
+                result = _mapper.Map<BusinessDetailDTO>(businessDTO);
+                result.manager = _mapper.Map<UserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(businessDTO.id)));
+                result.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(businessDTO.id)));
 
                 return result;
             }

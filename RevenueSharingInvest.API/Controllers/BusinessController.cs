@@ -34,10 +34,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllBusinesses(int pageIndex, int pageSize)
+        public async Task<IActionResult> GetAllBusinesses(int pageIndex, int pageSize, string temp_field_role)
         {
-            var result = new List<BusinessDTO>();
-            result = await _businessService.GetAllBusiness(pageIndex, pageSize);
+            var result = new AllBusinessDTO();
+            result = await _businessService.GetAllBusiness(pageIndex, pageSize, temp_field_role);
             return Ok(result);
         }
 
@@ -45,7 +45,7 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> GetBusinessById(Guid id)
         {
-            BusinessDTO dto = new BusinessDTO();
+            BusinessDetailDTO dto = new BusinessDetailDTO();
             dto = await _businessService.GetBusinessById(id);
             return Ok(dto);
         }
