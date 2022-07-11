@@ -27,4 +27,9 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string updateBy { get; set; }
         public bool isDeleted { get; set; }
     }
+
+    public class CreateBusinessDTO : BusinessDTO
+    {
+        public IFormFile newImage { get; set; }
+    }
 }
