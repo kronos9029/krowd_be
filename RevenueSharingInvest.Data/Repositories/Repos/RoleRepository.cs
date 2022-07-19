@@ -133,6 +133,28 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        public async Task<Role> GetRoleByUserId(Guid userId)
+        {
+            try
+            {
+                var query = "SELECT "
+                    + "         R.* "
+                    + "     FROM "
+                    + "         Role R "
+                    + "         JOIN [User] U ON R.Id = U.RoleId"
+                    + "     WHERE "
+                    + "         U.Id = @UserId";
+                var parameters = new DynamicParameters();
+                parameters.Add("UserId", userId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Role>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //UPDATE
         public async Task<int> UpdateRole(Role roleDTO, Guid roleId)
         {

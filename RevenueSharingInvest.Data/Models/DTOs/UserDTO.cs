@@ -9,14 +9,17 @@ namespace RevenueSharingInvest.Data.Models.DTOs
 {
     public class UserDTO
     {
-        public string id { get; set; }
+        public string lastName { get; set; }
+        public string firstName { get; set; }
+    }
+
+    public class CreateUpdateUserDTO : UserDTO
+    {
+        public IFormFile image { get; set; }
         public string businessId { get; set; }
         public string roleId { get; set; }
         public string description { get; set; }
-        public string lastName { get; set; }
-        public string firstName { get; set; }
         public string phoneNum { get; set; }
-        public IFormFile image { get; set; }
         public string idCard { get; set; }
         public string email { get; set; }
         public string gender { get; set; }
@@ -27,6 +30,80 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string address { get; set; }
         public string bankName { get; set; }
         public string bankAccount { get; set; }
+    }
+
+    public class GetUserDTO : UserDTO
+    {
+        public string id { get; set; }
+        public GetBusinessDTO business { get; set; }
+        public RoleDTO role { get; set; }
+        public string description { get; set; }
+        public string phoneNum { get; set; }
+        public string idCard { get; set; }
+        public string email { get; set; }
+        public string gender { get; set; }
+        public string dateOfBirth { get; set; }
+        public string taxIdentificationNumber { get; set; }
+        public string city { get; set; }
+        public string district { get; set; }
+        public string address { get; set; }
+        public string bankName { get; set; }
+        public string bankAccount { get; set; }
+        public string image { get; set; }
+        public int status { get; set; }
+        public string createDate { get; set; }
+        public string createBy { get; set; }
+        public string updateDate { get; set; }
+        public string updateBy { get; set; }
+        public bool isDeleted { get; set; }
+    }
+
+    public class ProjectMemberUserDTO : UserDTO
+    {
+        public string image { get; set; }
+        public string investDate { get; set; }
+    }
+
+    public class BusinessManagerUserDTO : UserDTO
+    {
+        public string id { get; set; }
+        public string description { get; set; }
+        public string phoneNum { get; set; }
+        public string idCard { get; set; }
+        public string email { get; set; }
+        public string gender { get; set; }
+        public string dateOfBirth { get; set; }
+        public string taxIdentificationNumber { get; set; }
+        public string city { get; set; }
+        public string district { get; set; }
+        public string address { get; set; }
+        public string bankName { get; set; }
+        public string bankAccount { get; set; }
+        public string image { get; set; }
+        public int status { get; set; }
+        public string createDate { get; set; }
+        public string createBy { get; set; }
+        public string updateDate { get; set; }
+        public string updateBy { get; set; }
+        public bool isDeleted { get; set; }
+    }
+
+    public class ProjectManagerUserDTO : UserDTO
+    {
+        public string id { get; set; }
+        public string description { get; set; }
+        public string phoneNum { get; set; }
+        public string idCard { get; set; }
+        public string email { get; set; }
+        public string gender { get; set; }
+        public string dateOfBirth { get; set; }
+        public string taxIdentificationNumber { get; set; }
+        public string city { get; set; }
+        public string district { get; set; }
+        public string address { get; set; }
+        public string bankName { get; set; }
+        public string bankAccount { get; set; }
+        public string image { get; set; }
         public int status { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }

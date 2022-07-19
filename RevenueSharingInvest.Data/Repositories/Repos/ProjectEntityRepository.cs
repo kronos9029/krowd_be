@@ -26,7 +26,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "INSERT INTO ProjectEntity ("
                     + "         ProjectId, "
                     + "         Title, "
-                    + "         Image, "
+                    + "         Link, "
+                    + "         Content, "
                     + "         Description, "
                     + "         Type, "
                     + "         CreateDate, "
@@ -39,7 +40,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     VALUES ( "
                     + "         @ProjectId, "
                     + "         @Title, "
-                    + "         @Image, "
+                    + "         @Link, "
+                    + "         @Content, "
                     + "         @Description, "
                     + "         @Type, "
                     + "         @CreateDate, "
@@ -51,7 +53,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", projectEntityDTO.ProjectId, DbType.Guid);
                 parameters.Add("Title", projectEntityDTO.Title, DbType.String);
-                parameters.Add("Image", projectEntityDTO.Image, DbType.String);
+                parameters.Add("Link", projectEntityDTO.Link, DbType.String);
+                parameters.Add("Content", projectEntityDTO.Content, DbType.String);
                 parameters.Add("Description", projectEntityDTO.Description, DbType.String);
                 parameters.Add("Type", projectEntityDTO.Type, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
@@ -114,7 +117,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id, "
                     + "         ProjectId, "
                     + "         Title, "
-                    + "         Image, "
+                    + "         Link, "
+                    + "         Content, "
                     + "         Description, "
                     + "         Type, "
                     + "         CreateDate, "
@@ -172,7 +176,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SET "
                     + "         ProjectId = @ProjectId, "
                     + "         Title = @Title, "
-                    + "         Image = @Image, "
+                    + "         Link = @Link, "
+                    + "         Content = @Content, "
                     + "         Description = @Description, "
                     + "         Type = @Type, "
                     + "         UpdateDate = @UpdateDate, "
@@ -184,7 +189,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", projectEntityDTO.ProjectId, DbType.Guid);
                 parameters.Add("Title", projectEntityDTO.Title, DbType.String);
-                parameters.Add("Image", projectEntityDTO.Image, DbType.String);
+                parameters.Add("Link", projectEntityDTO.Link, DbType.String);
+                parameters.Add("Content", projectEntityDTO.Content, DbType.String);
                 parameters.Add("Description", projectEntityDTO.Description, DbType.String);
                 parameters.Add("Type", projectEntityDTO.Type, DbType.String);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
@@ -215,6 +221,28 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<List<ProjectEntity>> GetProjectEntityByTypeAndProjectId(Guid projectId, string type)
+        {
+            try
+            {
+                string query = "SELECT " 
+                    + "             * " 
+                    + "         FROM " 
+                    + "             ProjectEntity "
+                    + "         WHERE " 
+                    + "             ProjectId = @ProjectId AND Type = @Type AND IsDeleted = 0";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                parameters.Add("Type", type, DbType.String);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<ProjectEntity>(query, parameters)).ToList();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
             }
         }
     }

@@ -27,7 +27,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProjectEntity([FromForm] ProjectEntityDTO projectEntityDTO)
+        public async Task<IActionResult> CreateProjectEntity([FromForm] CreateUpdateProjectEntityDTO projectEntityDTO)
         {
             var result = await _projectEntityService.CreateProjectEntity(projectEntityDTO);
             return Ok(result);
@@ -36,7 +36,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllProjectEntities(int pageIndex, int pageSize)
         {
-            var result = new List<ProjectEntityDTO>();
+            var result = new List<GetProjectEntityDTO>();
             result = await _projectEntityService.GetAllProjectEntities(pageIndex, pageSize);
             return Ok(result);
         }
@@ -45,14 +45,14 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> GetProjectEntityById(Guid id)
         {
-            ProjectEntityDTO dto = new ProjectEntityDTO();
+            GetProjectEntityDTO dto = new GetProjectEntityDTO();
             dto = await _projectEntityService.GetProjectEntityById(id);
             return Ok(dto);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateProjectEntity([FromForm] ProjectEntityDTO projectEntityDTO, Guid id)
+        public async Task<IActionResult> UpdateProjectEntity([FromForm] CreateUpdateProjectEntityDTO projectEntityDTO, Guid id)
         {
             var result = await _projectEntityService.UpdateProjectEntity(projectEntityDTO, id);
             return Ok(result);

@@ -16,6 +16,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<List<Role>> GetAllRoles();
         public Task<Role> GetRoleById(Guid roleId);
         public Task<Role> GetRoleByName(string roleName);
+        public Task<Role> GetRoleByUserId(Guid userId);
 
         //UPDATE
         public Task<int> UpdateRole(Role roleDTO, Guid roleId);

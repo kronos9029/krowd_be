@@ -27,7 +27,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] UserDTO userDTO)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUpdateUserDTO userDTO)
         {
             var result = await _userService.CreateUser(userDTO);
             return Ok(result);
@@ -36,7 +36,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllUsers(int pageIndex, int pageSize)
         {
-            var result = new List<UserDTO>();
+            var result = new AllUserDTO();
             result = await _userService.GetAllUsers(pageIndex, pageSize);
             return Ok(result);
         }
@@ -45,14 +45,14 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> GetUserById(Guid id)
         {
-            UserDTO dto = new UserDTO();
+            UserDTO dto = new GetUserDTO();
             dto = await _userService.GetUserById(id);
             return Ok(dto);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateUser([FromForm] UserDTO userDTO, Guid id)
+        public async Task<IActionResult> UpdateUser([FromForm] CreateUpdateUserDTO userDTO, Guid id)
         {
             var result = await _userService.UpdateUser(userDTO, id);
             return Ok(result);

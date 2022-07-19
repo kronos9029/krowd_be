@@ -25,7 +25,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBusiness([FromForm] BusinessDTO businessDTO, [FromQuery] List<string> fieldIdList)
+        public async Task<IActionResult> CreateBusiness([FromForm] CreateUpdateBusinessDTO businessDTO, [FromQuery] List<string> fieldIdList)
         {
 
 
@@ -45,14 +45,14 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> GetBusinessById(Guid id)
         {
-            BusinessDetailDTO dto = new BusinessDetailDTO();
+            GetBusinessDTO dto = new GetBusinessDTO();
             dto = await _businessService.GetBusinessById(id);
             return Ok(dto);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateBusiness([FromForm] BusinessDTO businessDTO, Guid id)
+        public async Task<IActionResult> UpdateBusiness([FromForm] CreateUpdateBusinessDTO businessDTO, Guid id)
         {
             var result = await _businessService.UpdateBusiness(businessDTO, id);
             return Ok(result);
