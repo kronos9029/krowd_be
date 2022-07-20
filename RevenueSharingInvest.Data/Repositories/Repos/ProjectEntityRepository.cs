@@ -182,7 +182,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Type = @Type, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -195,7 +194,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Type", projectEntityDTO.Type, DbType.String);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", projectEntityDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", projectEntityDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", projectEntityId, DbType.Guid);
 
                 using (var connection = CreateConnection())

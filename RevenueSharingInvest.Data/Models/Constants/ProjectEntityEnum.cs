@@ -16,6 +16,7 @@ namespace RevenueSharingInvest.Data.Models.Constants
         MEDIA,
         FAQ,
         REVIEW,
-        ABOUT
+        ABOUT,
+        EXTENSION
     }
 }
