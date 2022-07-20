@@ -1,18 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Models.DTOs
 {
-    public class ProjectEntityDTO
+    public class ProjectEntityDTO : FirebasePath
     {
         public string id { get; set; }
         public string projectId { get; set; }
         public string title { get; set; }
-        public IFormFile image { get; set; }
+        public IFormFile? image { get; set; }
         public string description { get; set; }
         public string type { get; set; }
         public string createDate { get; set; }
@@ -21,4 +17,5 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string updateBy { get; set; }
         public bool isDeleted { get; set; }
     }
+
 }
