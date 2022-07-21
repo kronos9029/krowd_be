@@ -372,14 +372,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "SELECT DISTINCT"
-                    + "         U.* "
+                var query = "SELECT "
+                    + "         U.LastName, U.FirstName, U.Image, MIN(INM.CreateDate) AS InvestDate "
                     + "     FROM "
                     + "         [User] U "
-                    + "         JOIN Investment INV ON U.Id = INV.InvestorId "
+                    + "         JOIN Investor INS ON U.Id = INS.UserId "
+                    + "         JOIN Investment INM ON INS.Id = INM.InvestorId "
                     + "     WHERE "
-                    + "         INV.ProjectId = @ProjectId "
-                    + "     ORDER BY CreateDate ASC";
+                    + "         INM.ProjectId = @ProjectId "
+                    + "     GROUP BY U.LastName, U.FirstName, U.Image";
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", projectId, DbType.Guid);
                 using var connection = CreateConnection();

@@ -30,6 +30,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Content, "
                     + "         Description, "
                     + "         Type, "
+                    + "         Priority, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -44,6 +45,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @Content, "
                     + "         @Description, "
                     + "         @Type, "
+                    + "         @Priority, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -57,6 +59,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Content", projectEntityDTO.Content, DbType.String);
                 parameters.Add("Description", projectEntityDTO.Description, DbType.String);
                 parameters.Add("Type", projectEntityDTO.Type, DbType.String);
+                parameters.Add("Priority", projectEntityDTO.Priority, DbType.Int16);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", projectEntityDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
@@ -71,22 +74,74 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //CREATE BY ID
+        public async Task<int> CreateProjectEntityById(ProjectEntity projectEntityDTO)
+        {
+            try
+            {
+                var query = "INSERT INTO ProjectEntity ("
+                    + "         Id, "
+                    + "         ProjectId, "
+                    + "         Title, "
+                    + "         Link, "
+                    + "         Content, "
+                    + "         Description, "
+                    + "         Type, "
+                    + "         Priority, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted ) "
+                    + "     VALUES ( "
+                    + "         @Id, "
+                    + "         @ProjectId, "
+                    + "         @Title, "
+                    + "         @Link, "
+                    + "         @Content, "
+                    + "         @Description, "
+                    + "         @Type, "
+                    + "         @Priority, "
+                    + "         @CreateDate, "
+                    + "         @CreateBy, "
+                    + "         @UpdateDate, "
+                    + "         @UpdateBy, "
+                    + "         0 )";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", projectEntityDTO.Id, DbType.Guid);
+                parameters.Add("ProjectId", projectEntityDTO.ProjectId, DbType.Guid);
+                parameters.Add("Title", projectEntityDTO.Title, DbType.String);
+                parameters.Add("Link", projectEntityDTO.Link, DbType.String);
+                parameters.Add("Content", projectEntityDTO.Content, DbType.String);
+                parameters.Add("Description", projectEntityDTO.Description, DbType.String);
+                parameters.Add("Type", projectEntityDTO.Type, DbType.String);
+                parameters.Add("Priority", projectEntityDTO.Priority, DbType.Int16);
+                parameters.Add("CreateDate", projectEntityDTO.CreateDate, DbType.DateTime);
+                parameters.Add("CreateBy", projectEntityDTO.CreateBy, DbType.Guid);
+                parameters.Add("UpdateDate", projectEntityDTO.UpdateDate, DbType.DateTime);
+                parameters.Add("UpdateBy", projectEntityDTO.UpdateBy, DbType.Guid);
+
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //DELETE
         public async Task<int> DeleteProjectEntityById(Guid projectEntityId)//thiếu para UpdateBy
         {
             try
             {
-                var query = "UPDATE ProjectEntity "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
+                var query = "DELETE FROM "
+                    + "         ProjectEntity "
                     + "     WHERE "
                     + "         Id=@Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", projectEntityDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", projectEntityId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
@@ -108,7 +163,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         SELECT "
                     + "             ROW_NUMBER() OVER ( "
                     + "                 ORDER BY "
-                    + "                     ProjectId ASC ) AS Num, "
+                    + "                     ProjectId ASC, "
+                    + "                     Priority ASC ) AS Num, "
                     + "             * "
                     + "         FROM ProjectEntity "
                     + "         WHERE "
@@ -120,6 +176,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Link, "
                     + "         Content, "
                     + "         Description, "
+                    + "         Priority, "
                     + "         Type, "
                     + "         CreateDate, "
                     + "         CreateBy, "
@@ -139,7 +196,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM ProjectEntity WHERE IsDeleted = 0 ORDER BY ProjectId ASC";
+                    var query = "SELECT * FROM ProjectEntity WHERE IsDeleted = 0 ORDER BY ProjectId ASC, Priority ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<ProjectEntity>(query)).ToList();
                 }               
@@ -222,7 +279,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public async Task<List<ProjectEntity>> GetProjectEntityByTypeAndProjectId(Guid projectId, string type)
+        public async Task<List<ProjectEntity>> GetProjectEntityByProjectIdAndType(Guid projectId, string type)
         {
             try
             {
@@ -231,12 +288,90 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         FROM " 
                     + "             ProjectEntity "
                     + "         WHERE " 
-                    + "             ProjectId = @ProjectId AND Type = @Type AND IsDeleted = 0";
+                    + "             ProjectId = @ProjectId " 
+                    + "             AND Type = @Type " 
+                    + "             AND IsDeleted = 0 "
+                    + "         ORDER BY "
+                    + "             Priority ASC ";
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", projectId, DbType.Guid);
                 parameters.Add("Type", type, DbType.String);
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<ProjectEntity>(query, parameters)).ToList();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<int> CountProjectEntityByProjectIdAndType(Guid projectId, string type)
+        {
+            try
+            {
+                string query = "SELECT "
+                    + "             COUNT(*) "
+                    + "         FROM "
+                    + "             ProjectEntity "
+                    + "         WHERE "
+                    + "             ProjectId = @ProjectId " 
+                    + "             AND Type = @Type " 
+                    + "             AND IsDeleted = 0";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                parameters.Add("Type", type, DbType.String);
+                using var connection = CreateConnection();
+                return ((int)connection.ExecuteScalar(query, parameters));
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //DELETE BY TYPE AND PROJECT_ID
+        public async Task<int> DeleteProjectEntityByProjectIdAndType(Guid projectId, string type)
+        {
+            try
+            {
+                var query = "DELETE FROM "
+                    + "         ProjectEntity "
+                    + "     WHERE "
+                    + "         ProjectId = @ProjectId "
+                    + "         AND Type = @Type";
+                using var connection = CreateConnection();
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                parameters.Add("Type", type, DbType.String);
+
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<int> UpdateProjectEntityPriority(Guid projectEntityId, int priority)
+        {
+            try
+            {
+                var query = "UPDATE ProjectEntity "
+                    + "     SET "
+                    + "         Priority = @Priority, "
+                    + "         UpdateDate = @UpdateDate "
+                    + "     WHERE "
+                    + "         Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Priority", priority, DbType.Int16);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("Id", projectEntityId, DbType.Guid);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
             }
             catch (Exception e)
             {

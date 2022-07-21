@@ -58,6 +58,13 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        [HttpPut]
+        public async Task<IActionResult> UpdateProjectEntityPriority([FromQuery] List<string> idList)
+        {
+            var result = await _projectEntityService.UpdateProjectEntityPriority(idList);
+            return Ok(result);
+        }
+
         [HttpDelete]
         [Route("{id}")]
         public async Task<IActionResult> DeleteProjectEntity(Guid id)
