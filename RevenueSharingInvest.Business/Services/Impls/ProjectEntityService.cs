@@ -219,24 +219,35 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<int> UpdateProjectEntityPriority(List<string> idList)
+        public async Task<int> UpdateProjectEntityPriority(List<ProjectEntityUpdateDTO> idList)
         {
             ProjectEntity entity = new ProjectEntity();
             List<ProjectEntity> entityList = new List<ProjectEntity>();
+            Guid projectIdCheck;
+            string typeCheck;
             try
             {
-                for (int i = 0; i < idList.Count; i++)
+                projectIdCheck = (await _projectEntityRepository.GetProjectEntityById(Guid.Parse(idList[0].id))).ProjectId;
+                typeCheck = (await _projectEntityRepository.GetProjectEntityById(Guid.Parse(idList[0].id))).Type;
+                foreach (ProjectEntityUpdateDTO item in idList)
                 {
-                    entity = await _projectEntityRepository.GetProjectEntityById(Guid.Parse(idList[i]));
+                    entity = await _projectEntityRepository.GetProjectEntityById(Guid.Parse(item.id));
                     if (entity == null)
-                        throw new NotFoundException("Id " + idList[i] + " ProjectEntity Object not found!");
+                        throw new NotFoundException("Id " + item.id + " ProjectEntity Object not found!");
+                    if (!entity.ProjectId.Equals(projectIdCheck))
+                        throw new InvalidFieldException("The ProjectEntity objects do not have the same ProjectId !");
+                    if (!entity.Type.Equals(typeCheck))
+                        throw new InvalidFieldException("The ProjectEntity objects do not have the same Type !");
                     entityList.Add(entity);
+                }
 
-                    if (await _projectEntityRepository.UpdateProjectEntityPriority(Guid.Parse(idList[i]), i + 1) == 0)
+                foreach (ProjectEntityUpdateDTO item in idList)
+                {
+                    if (await _projectEntityRepository.UpdateProjectEntityPriority(Guid.Parse(item.id), item.priority) == 0)
                     {
-                        foreach (ProjectEntity item in entityList)
+                        foreach (ProjectEntity i in entityList)
                         {
-                            await _projectEntityRepository.UpdateProjectEntityPriority(item.Id, item.Priority);
+                            await _projectEntityRepository.UpdateProjectEntityPriority(i.Id, i.Priority);
                         }
                         throw new UpdateObjectException("Can not update ProjectEntity Object!");
                     }

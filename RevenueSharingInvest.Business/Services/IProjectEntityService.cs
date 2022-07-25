@@ -18,7 +18,7 @@ namespace RevenueSharingInvest.Business.Services
 
         //UPDATE
         public Task<int> UpdateProjectEntity(CreateUpdateProjectEntityDTO projectEntityDTO, Guid projectEntityId);
-        public Task<int> UpdateProjectEntityPriority(List<string> idList);
+        public Task<int> UpdateProjectEntityPriority(List<ProjectEntityUpdateDTO> idList);
 
         //DELETE
         public Task<int> DeleteProjectEntityById(Guid projectEntityId);

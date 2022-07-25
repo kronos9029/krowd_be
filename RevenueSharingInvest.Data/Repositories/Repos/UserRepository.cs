@@ -373,7 +373,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             try
             {
                 var query = "SELECT "
-                    + "         U.LastName, U.FirstName, U.Image, MIN(INM.CreateDate) AS InvestDate "
+                    + "         U.LastName, U.FirstName, U.Image, MIN(INM.CreateDate)"
                     + "     FROM "
                     + "         [User] U "
                     + "         JOIN Investor INS ON U.Id = INS.UserId "
