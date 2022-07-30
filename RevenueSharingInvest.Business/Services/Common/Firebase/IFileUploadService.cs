@@ -13,6 +13,6 @@ namespace RevenueSharingInvest.Business.Services.Common.Firebase
         public Task<string> UploadImageToFirebaseProject(IFormFile file, string uid);
         public Task<string> UploadImageToFirebaseProjectEntity(IFormFile file, string uid);
         public Task<string> UploadImageToFirebaseUser(IFormFile file, string uid);
-        public Task<Dictionary<string, string>> UploadFilesWithPath(ProjectEntityDTO projectEntity);
+        public Task<List<string>> UploadFilesWithPath(FirebaseRequest request);
     }
 }

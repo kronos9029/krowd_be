@@ -42,7 +42,22 @@ namespace RevenueSharingInvest.Business.Helpers
             CreateMap<WalletType, WalletTypeDTO>().ReverseMap();
             ///
             CreateMap<ProjectDTO, ProjectDetailDTO>().ReverseMap();
-            CreateMap<BusinessDTO, BusinessDetailDTO>().ReverseMap();
+            
+            CreateMap<Project, GetProjectDTO>().ReverseMap();
+            CreateMap<Project, CreateUpdateProjectDTO>().ReverseMap();
+           
+            CreateMap<Data.Models.Entities.Business, GetBusinessDTO>().ReverseMap();
+            CreateMap<Data.Models.Entities.Business, CreateUpdateBusinessDTO>().ReverseMap();
+            
+            CreateMap<User, GetUserDTO>().ReverseMap();
+            CreateMap<User, BusinessManagerUserDTO>().ReverseMap();
+            CreateMap<User, ProjectManagerUserDTO>().ReverseMap();
+            CreateMap<User, ProjectMemberUserDTO>().ReverseMap();
+            CreateMap<User, CreateUpdateUserDTO>().ReverseMap();
+            
+            CreateMap<ProjectEntity, GetProjectEntityDTO>().ReverseMap();
+            CreateMap<ProjectEntity, ProjectComponentProjectEntityDTO>().ReverseMap();
+            CreateMap<ProjectEntity, CreateUpdateProjectEntityDTO>().ReverseMap();
         }
     }
 }

@@ -2,6 +2,7 @@
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Business.Services.Common.Firebase;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -20,9 +21,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IUserRepository _userRepository;
         private readonly IBusinessRepository _businessRepository;
         private readonly IBusinessFieldRepository _businessFieldRepository;
+        private readonly IAreaRepository _areaRepository;
+        private readonly IProjectEntityRepository _projectEntityRepository;
+
         private readonly IValidationService _validationService;
         private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
+
+        private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
         private readonly String ROLE_PROJECT_MANAGER_ID = "2d80393a-3a3d-495d-8dd7-f9261f85cc8f";
 
         public ProjectService(
@@ -30,7 +36,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IFieldRepository fieldRepository, 
             IBusinessFieldRepository businessFieldRepository, 
             IUserRepository userRepository, 
-            IBusinessRepository businessRepository, 
+            IBusinessRepository businessRepository,
+            IAreaRepository areaRepository,
+            IProjectEntityRepository projectEntityRepository,
             IValidationService validationService, 
             IFileUploadService fileUploadService,
             IMapper mapper)
@@ -40,6 +48,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _businessFieldRepository = businessFieldRepository;
             _userRepository = userRepository;
             _businessRepository = businessRepository;
+            _areaRepository = areaRepository;
+            _projectEntityRepository = projectEntityRepository;
+
             _validationService = validationService;
             _fileUploadService = fileUploadService;
             _mapper = mapper;
@@ -61,7 +72,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreateProject(ProjectDTO projectDTO)
+        public async Task<IdDTO> CreateProject(CreateUpdateProjectDTO projectDTO)
         {
             IdDTO newId = new IdDTO();
             try
@@ -127,8 +138,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (projectDTO.numOfStage <= 0)
                     throw new InvalidFieldException("numOfStage must be greater than 0!!!");
 
-                if (projectDTO.remainAmount <= 0)
-                    throw new InvalidFieldException("remainAmount must be greater than 0!!!");
+                //if (projectDTO.remainAmount <= 0)
+                    //throw new InvalidFieldException("remainAmount must be greater than 0!!!");
                 ///
 
                 if (!await _validationService.CheckDate((projectDTO.startDate)))
@@ -144,34 +155,34 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(projectDTO.businessLicense))
                     throw new InvalidFieldException("Invalid businessLicense!!!");
 
-                if (projectDTO.status < 0 || projectDTO.status > 5)
-                    throw new InvalidFieldException("Status must be 0(NOT_APPROVED_YET) or 1(DENIED) or 2(CALLING_FOR_INVESTMENT) or 3(CALLING_TIME_IS_OVER) or 4(ACTIVE) or 5(CLOSED)!!!");
+                //if (projectDTO.status < 0 || projectDTO.status > 5)
+                //    throw new InvalidFieldException("Status must be 0(NOT_APPROVED_YET) or 1(DENIED) or 2(CALLING_FOR_INVESTMENT) or 3(CALLING_TIME_IS_OVER) or 4(ACTIVE) or 5(CLOSED)!!!");
 
-                projectDTO.approvedBy = null;
+                //projectDTO.approvedBy = null;
 
-                if (projectDTO.createBy != null && projectDTO.createBy.Length >= 0)
-                {
-                    if (projectDTO.createBy.Equals("string"))
-                        projectDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(projectDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
-                }
+                //if (projectDTO.createBy != null && projectDTO.createBy.Length >= 0)
+                //{
+                //    if (projectDTO.createBy.Equals("string"))
+                //        projectDTO.createBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(projectDTO.createBy))
+                //        throw new InvalidFieldException("Invalid createBy!!!");
+                //}
 
-                if (projectDTO.updateBy != null && projectDTO.updateBy.Length >= 0)
-                {
-                    if (projectDTO.updateBy.Equals("string"))
-                        projectDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(projectDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
+                //if (projectDTO.updateBy != null && projectDTO.updateBy.Length >= 0)
+                //{
+                //    if (projectDTO.updateBy.Equals("string"))
+                //        projectDTO.updateBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(projectDTO.updateBy))
+                //        throw new InvalidFieldException("Invalid updateBy!!!");
+                //}
 
-                projectDTO.isDeleted = false;
+                //projectDTO.isDeleted = false;
 
                 Project entity = _mapper.Map<Project>(projectDTO);
 
                 if(projectDTO.image != null)
                 {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, projectDTO.createBy);
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, ROLE_ADMIN_ID);
                 }
 
                 newId.id = await _projectRepository.CreateProject(entity);
@@ -208,9 +219,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             try
             {
-                AllProjectDTO result = new AllProjectDTO();
-                result.listOfProject = new List<ProjectDetailDTO>();
-                ProjectDetailDTO resultItem = new ProjectDetailDTO();
+                if (!temp_field_role.Equals("ADMIN") && !temp_field_role.Equals("INVESTOR") && !temp_field_role.Equals("PROJECT") && !temp_field_role.Equals("BUSINESS"))
+                    throw new InvalidFieldException("ADMIN or INVESTOR or PROJECT or BUSINESS!");
 
                 if (businessId != null)
                 {
@@ -230,12 +240,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new NotFoundException("This managerId is not existed!!!");
                 }
 
+                AllProjectDTO result = new AllProjectDTO();
+                result.listOfProject = new List<GetProjectDTO>();
+                //ProjectDetailDTO resultItem = new ProjectDetailDTO();
+
                 result.numOfProject = await _projectRepository.CountProject(businessId, managerId, temp_field_role);
 
                 List<Project> listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, managerId, temp_field_role);
-                List<ProjectDTO> listDTO = _mapper.Map<List<ProjectDTO>>(listEntity);
+                List<GetProjectDTO> listDTO = _mapper.Map<List<GetProjectDTO>>(listEntity);
 
-                foreach (ProjectDTO item in listDTO)
+                foreach (GetProjectDTO item in listDTO)
                 {
                     item.startDate = await _validationService.FormatDateOutput(item.startDate);
                     item.endDate = await _validationService.FormatDateOutput(item.endDate);
@@ -246,13 +260,27 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
 
-                    resultItem = _mapper.Map<ProjectDetailDTO>(item);
-                    resultItem.manager = _mapper.Map<UserDTO>(await _userRepository.GetUserById(Guid.Parse(item.managerId)));
-                    resultItem.business = _mapper.Map<BusinessDTO>(await _businessRepository.GetBusinessById(Guid.Parse(item.businessId)));
-                    resultItem.field = _mapper.Map<FieldDTO>(await _fieldRepository.GetFieldById(Guid.Parse(item.fieldId)));
-                    result.listOfProject.Add(resultItem);
-                }
+                    item.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByProjectId(Guid.Parse(item.id)));
+                    if (item.business != null)
+                    {
+                        item.business.manager = _mapper.Map<BusinessManagerUserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(item.business.id)));
+                        item.business.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(item.business.id)));
+                    }
+                    item.manager = _mapper.Map<ProjectManagerUserDTO>(await _userRepository.GetProjectManagerByProjectId(Guid.Parse(item.id)));
+                    item.field = _mapper.Map<FieldDTO>(await _fieldRepository.GetProjectFieldByProjectId(Guid.Parse(item.id)));
+                    item.area = _mapper.Map<AreaDTO>(await _areaRepository.GetAreaByProjectId(Guid.Parse(item.id)));
+                    item.projectEntity = new List<TypeProjectEntityDTO>();              
+                    for (int type = 0; type < Enum.GetNames(typeof(ProjectEntityEnum)).Length; type++)
+                    {
+                        TypeProjectEntityDTO typeProjectEntityDTO = new TypeProjectEntityDTO();
+                        typeProjectEntityDTO.type = Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(type);
+                        typeProjectEntityDTO.typeItemList = _mapper.Map<List<ProjectComponentProjectEntityDTO>>(await _projectEntityRepository.GetProjectEntityByTypeAndProjectId(Guid.Parse(item.id), Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(type)));
+                        item.projectEntity.Add(typeProjectEntityDTO);
+                    }                    
+                    item.memberList = _mapper.Map<List<ProjectMemberUserDTO>>(await _userRepository.GetProjectMembers(Guid.Parse(item.id)));
 
+                    result.listOfProject.Add(item);
+                }
                 return result;
             }
             catch (Exception e)
@@ -262,14 +290,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET BY ID
-        public async Task<ProjectDetailDTO> GetProjectById(Guid projectId)
+        public async Task<GetProjectDTO> GetProjectById(Guid projectId)
         {
-            ProjectDetailDTO result;
             try
             {
-
                 Project project = await _projectRepository.GetProjectById(projectId);
-                ProjectDTO projectDTO = _mapper.Map<ProjectDTO>(project);
+                GetProjectDTO projectDTO = _mapper.Map<GetProjectDTO>(project);
                 if (projectDTO == null)
                     throw new NotFoundException("No Project Object Found!");
 
@@ -282,12 +308,26 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 projectDTO.createDate = await _validationService.FormatDateOutput(projectDTO.createDate);
                 projectDTO.updateDate = await _validationService.FormatDateOutput(projectDTO.updateDate);
 
-                result = _mapper.Map<ProjectDetailDTO>(projectDTO);
-                result.manager = _mapper.Map<UserDTO>(await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId)));
-                result.business = _mapper.Map<BusinessDTO>(await _businessRepository.GetBusinessById(Guid.Parse(projectDTO.businessId)));
-                result.field = _mapper.Map<FieldDTO>(await _fieldRepository.GetFieldById(Guid.Parse(projectDTO.fieldId)));
+                projectDTO.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByProjectId(Guid.Parse(projectDTO.id)));
+                if (projectDTO.business != null)
+                {
+                    projectDTO.business.manager = _mapper.Map<BusinessManagerUserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(projectDTO.business.id)));
+                    projectDTO.business.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(projectDTO.business.id)));
+                }
+                projectDTO.manager = _mapper.Map<ProjectManagerUserDTO>(await _userRepository.GetProjectManagerByProjectId(Guid.Parse(projectDTO.id)));
+                projectDTO.field = _mapper.Map<FieldDTO>(await _fieldRepository.GetProjectFieldByProjectId(Guid.Parse(projectDTO.id)));
+                projectDTO.area = _mapper.Map<AreaDTO>(await _areaRepository.GetAreaByProjectId(Guid.Parse(projectDTO.id)));
+                projectDTO.projectEntity = new List<TypeProjectEntityDTO>();
+                for (int type = 0; type < Enum.GetNames(typeof(ProjectEntityEnum)).Length; type++)
+                {
+                    TypeProjectEntityDTO typeProjectEntityDTO = new TypeProjectEntityDTO();
+                    typeProjectEntityDTO.type = Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(type);
+                    typeProjectEntityDTO.typeItemList = _mapper.Map<List<ProjectComponentProjectEntityDTO>>(await _projectEntityRepository.GetProjectEntityByTypeAndProjectId(Guid.Parse(projectDTO.id), Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(type)));
+                    projectDTO.projectEntity.Add(typeProjectEntityDTO);
+                }
+                projectDTO.memberList = _mapper.Map<List<ProjectMemberUserDTO>>(await _userRepository.GetProjectMembers(Guid.Parse(projectDTO.id)));
 
-                return result;
+                return projectDTO;
             }
             catch (Exception e)
             {
@@ -296,7 +336,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdateProject(ProjectDTO projectDTO, Guid projectId)
+        public async Task<int> UpdateProject(CreateUpdateProjectDTO projectDTO, Guid projectId)
         {
             int result;
             try
@@ -361,8 +401,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (projectDTO.numOfStage <= 0)
                     throw new InvalidFieldException("numOfStage must be greater than 0!!!");
 
-                if (projectDTO.remainAmount <= 0)
-                    throw new InvalidFieldException("remainAmount must be greater than 0!!!");
+                //if (projectDTO.remainAmount <= 0)
+                //    throw new InvalidFieldException("remainAmount must be greater than 0!!!");
                 ///
 
                 if (!await _validationService.CheckDate((projectDTO.startDate)))
@@ -378,32 +418,32 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(projectDTO.businessLicense))
                     throw new InvalidFieldException("Invalid businessLicense!!!");
 
-                if (projectDTO.status < 0 || projectDTO.status > 5)
-                    throw new InvalidFieldException("Status must be 0(NOT_APPROVED_YET) or 1(DENIED) or 2(CALLING_FOR_INVESTMENT) or 3(CALLING_TIME_IS_OVER) or 4(ACTIVE) or 5(CLOSED)!!!");
+                //if (projectDTO.status < 0 || projectDTO.status > 5)
+                //    throw new InvalidFieldException("Status must be 0(NOT_APPROVED_YET) or 1(DENIED) or 2(CALLING_FOR_INVESTMENT) or 3(CALLING_TIME_IS_OVER) or 4(ACTIVE) or 5(CLOSED)!!!");
 
-                projectDTO.approvedBy = null;
+                //projectDTO.approvedBy = null;
 
-                if (projectDTO.createBy != null && projectDTO.createBy.Length >= 0)
-                {
-                    if (projectDTO.createBy.Equals("string"))
-                        projectDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(projectDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
-                }
+                //if (projectDTO.createBy != null && projectDTO.createBy.Length >= 0)
+                //{
+                //    if (projectDTO.createBy.Equals("string"))
+                //        projectDTO.createBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(projectDTO.createBy))
+                //        throw new InvalidFieldException("Invalid createBy!!!");
+                //}
 
-                if (projectDTO.updateBy != null && projectDTO.updateBy.Length >= 0)
-                {
-                    if (projectDTO.updateBy.Equals("string"))
-                        projectDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(projectDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
+                //if (projectDTO.updateBy != null && projectDTO.updateBy.Length >= 0)
+                //{
+                //    if (projectDTO.updateBy.Equals("string"))
+                //        projectDTO.updateBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(projectDTO.updateBy))
+                //        throw new InvalidFieldException("Invalid updateBy!!!");
+                //}
 
                 Project entity = _mapper.Map<Project>(projectDTO);
 
                 if (projectDTO.image != null)
                 {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, projectDTO.updateBy);
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, ROLE_ADMIN_ID);
                 }
 
                 result = await _projectRepository.UpdateProject(entity, projectId);

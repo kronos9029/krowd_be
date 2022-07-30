@@ -2,6 +2,7 @@
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Business.Services.Common.Firebase;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -48,9 +49,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreateProjectEntity(ProjectEntityDTO projectEntityDTO)
+        public async Task<IdDTO> CreateProjectEntity(CreateUpdateProjectEntityDTO projectEntityDTO)
         {
             IdDTO newId = new IdDTO();
+            bool typeCheck = false;
+            string typeErrorMessage = "";
             try
             {
                 if (projectEntityDTO.projectId == null || !await _validationService.CheckUUIDFormat(projectEntityDTO.projectId))
@@ -59,42 +62,44 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckExistenceId("Project", Guid.Parse(projectEntityDTO.projectId)))
                     throw new NotFoundException("This projectId is not existed!!!");
 
-                if (projectEntityDTO.image != null && (projectEntityDTO.image.Equals("string") || projectEntityDTO.image.Length == 0))
-                    projectEntityDTO.image = null;
-
                 if (!await _validationService.CheckText(projectEntityDTO.title))
                     throw new InvalidFieldException("Invalid title!!!");
+
+                if (projectEntityDTO.content != null && (projectEntityDTO.content.Equals("string") || projectEntityDTO.content.Length == 0))
+                    projectEntityDTO.content = null;
 
                 if (projectEntityDTO.description != null && (projectEntityDTO.description.Equals("string") || projectEntityDTO.description.Length == 0))
                     projectEntityDTO.description = null;
 
-                if (!await _validationService.CheckText(projectEntityDTO.type) || (!projectEntityDTO.type.Equals("UPDATE") && !projectEntityDTO.type.Equals("HIGHLIGHT")))
-                    throw new InvalidFieldException("type must be 'UPDATE' or 'HIGHLIGHT'!!!");
-
-                if (projectEntityDTO.createBy != null && projectEntityDTO.createBy.Length >= 0)
+                for (int type = 0; type < Enum.GetNames(typeof(ProjectEntityEnum)).Length; type++)
                 {
-                    if (projectEntityDTO.createBy.Equals("string"))
-                        projectEntityDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(projectEntityDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
+                    if (projectEntityDTO.type.Equals(Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(type)))
+                        typeCheck = true;
+                    typeErrorMessage = typeErrorMessage + " '" + Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(type) + "' or";
                 }
+                typeErrorMessage = typeErrorMessage.Remove(typeErrorMessage.Length - 3);
+                if (!typeCheck)
+                    throw new InvalidFieldException("Type must be" + typeErrorMessage + " !!!");
 
-                if (projectEntityDTO.updateBy != null && projectEntityDTO.updateBy.Length >= 0)
-                {
-                    if (projectEntityDTO.updateBy.Equals("string"))
-                        projectEntityDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(projectEntityDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
+                //if (projectEntityDTO.createBy != null && projectEntityDTO.createBy.Length >= 0)
+                //{
+                //    if (projectEntityDTO.createBy.Equals("string"))
+                //        projectEntityDTO.createBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(projectEntityDTO.createBy))
+                //        throw new InvalidFieldException("Invalid createBy!!!");
+                //}
 
-                projectEntityDTO.isDeleted = false;
+                //if (projectEntityDTO.updateBy != null && projectEntityDTO.updateBy.Length >= 0)
+                //{
+                //    if (projectEntityDTO.updateBy.Equals("string"))
+                //        projectEntityDTO.updateBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(projectEntityDTO.updateBy))
+                //        throw new InvalidFieldException("Invalid updateBy!!!");
+                //}
+
+                //projectEntityDTO.isDeleted = false;
 
                 ProjectEntity entity = _mapper.Map<ProjectEntity>(projectEntityDTO);
-
-                if(projectEntityDTO.image != null)
-                {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseProjectEntity(projectEntityDTO.image, projectEntityDTO.createBy);
-                }
 
                 newId.id = await _projectEntityRepository.CreateProjectEntity(entity);
                 if (newId.id.Equals(""))
@@ -126,14 +131,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<ProjectEntityDTO>> GetAllProjectEntities(int pageIndex, int pageSize)
+        public async Task<List<GetProjectEntityDTO>> GetAllProjectEntities(int pageIndex, int pageSize)
         {
             try
             {
                 List<ProjectEntity> projectEntityList = await _projectEntityRepository.GetAllProjectEntities(pageIndex, pageSize);
-                List<ProjectEntityDTO> list = _mapper.Map<List<ProjectEntityDTO>>(projectEntityList);
+                List<GetProjectEntityDTO> list = _mapper.Map<List<GetProjectEntityDTO>>(projectEntityList);
 
-                foreach (ProjectEntityDTO item in list)
+                foreach (GetProjectEntityDTO item in list)
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
@@ -148,14 +153,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET BY ID
-        public async Task<ProjectEntityDTO> GetProjectEntityById(Guid projectEntityId)
+        public async Task<GetProjectEntityDTO> GetProjectEntityById(Guid projectEntityId)
         {
-            ProjectEntityDTO result;
+            GetProjectEntityDTO result;
             try
             {
 
                 ProjectEntity dto = await _projectEntityRepository.GetProjectEntityById(projectEntityId);
-                result = _mapper.Map<ProjectEntityDTO>(dto);
+                result = _mapper.Map<GetProjectEntityDTO>(dto);
                 if (result == null)
                     throw new NotFoundException("No ProjectEntity Object Found!");
 
@@ -171,9 +176,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdateProjectEntity(ProjectEntityDTO projectEntityDTO, Guid projectEntityId)
+        public async Task<int> UpdateProjectEntity(CreateUpdateProjectEntityDTO projectEntityDTO, Guid projectEntityId)
         {
             int result;
+            bool typeCheck = false;
+            string typeErrorMessage = "";
             try
             {
                 if (projectEntityDTO.projectId == null || !await _validationService.CheckUUIDFormat(projectEntityDTO.projectId))
@@ -182,40 +189,26 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckExistenceId("Project", Guid.Parse(projectEntityDTO.projectId)))
                     throw new NotFoundException("This projectId is not existed!!!");
 
-                if (projectEntityDTO.image != null && (projectEntityDTO.image.Equals("string") || projectEntityDTO.image.Length == 0))
-                    projectEntityDTO.image = null;
-
                 if (!await _validationService.CheckText(projectEntityDTO.title))
                     throw new InvalidFieldException("Invalid title!!!");
+
+                if (projectEntityDTO.content != null && (projectEntityDTO.content.Equals("string") || projectEntityDTO.content.Length == 0))
+                    projectEntityDTO.content = null;
 
                 if (projectEntityDTO.description != null && (projectEntityDTO.description.Equals("string") || projectEntityDTO.description.Length == 0))
                     projectEntityDTO.description = null;
 
-                if (!await _validationService.CheckText(projectEntityDTO.type) || (!projectEntityDTO.type.Equals("UPDATE") && !projectEntityDTO.type.Equals("HIGHLIGHT")))
-                    throw new InvalidFieldException("type must be 'UPDATE' or 'HIGHLIGHT'!!!");
-
-                if (projectEntityDTO.createBy != null && projectEntityDTO.createBy.Length >= 0)
+                for (int type = 0; type < Enum.GetNames(typeof(ProjectEntityEnum)).Length; type++)
                 {
-                    if (projectEntityDTO.createBy.Equals("string"))
-                        projectEntityDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(projectEntityDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
+                    if (projectEntityDTO.type.Equals(Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(type)))
+                        typeCheck = true;
+                    typeErrorMessage = typeErrorMessage + " '" + Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(type) + "' or";
                 }
-
-                if (projectEntityDTO.updateBy != null && projectEntityDTO.updateBy.Length >= 0)
-                {
-                    if (projectEntityDTO.updateBy.Equals("string"))
-                        projectEntityDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(projectEntityDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
+                typeErrorMessage = typeErrorMessage.Remove(typeErrorMessage.Length - 3);
+                if (!typeCheck)
+                    throw new InvalidFieldException(typeErrorMessage + " !!!");
 
                 ProjectEntity entity = _mapper.Map<ProjectEntity>(projectEntityDTO);
-
-                if (projectEntityDTO.image != null)
-                {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseProjectEntity(projectEntityDTO.image, projectEntityDTO.updateBy);
-                }
 
                 result = await _projectEntityRepository.UpdateProjectEntity(entity, projectEntityId);
                 if (result == 0)

@@ -294,5 +294,49 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+
+        public async Task<Models.Entities.Business> GetBusinessByUserId(Guid userId)
+        {
+            try
+            {
+                var query = "SELECT " 
+                    + "         B.* " 
+                    + "     FROM " 
+                    + "         Business B " 
+                    + "         JOIN [User] U ON B.Id = U.BusinessId " 
+                    + "     WHERE " 
+                    + "         U.Id = @UserId";
+                var parameters = new DynamicParameters();
+                parameters.Add("UserId", userId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Models.Entities.Business>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<Models.Entities.Business> GetBusinessByProjectId(Guid projectId)
+        {
+            try
+            {
+                var query = "SELECT "
+                    + "         B.* "
+                    + "     FROM "
+                    + "         Business B "
+                    + "         JOIN Project P ON B.Id = P.BusinessId "
+                    + "     WHERE "
+                    + "         P.Id = @ProjectId";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Models.Entities.Business>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

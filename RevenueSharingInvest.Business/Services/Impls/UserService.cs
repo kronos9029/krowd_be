@@ -27,9 +27,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IInvestorRepository _investorRepository;
         private readonly IBusinessRepository _businessRepository;
         private readonly IRoleRepository _roleRepository;
+        private readonly IFieldRepository _fieldRepository;
+
         private readonly IValidationService _validationService;
         private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
+
         private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
         private readonly String ROLE_INVESTOR_ID = "ad5f37da-ca48-4dc5-9f4b-963d94b535e6";
         private readonly String ROLE_BUSINESS_MANAGER_ID = "015ae3c5-eee9-4f5c-befb-57d41a43d9df";
@@ -38,14 +41,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
         public UserService(IOptions<AppSettings> appSettings, 
             IUserRepository userRepository, 
-            IInvestorRepository investorRepository, 
-            IValidationService validationService,
+            IInvestorRepository investorRepository,
+            IBusinessRepository businessRepository,
+            IRoleRepository roleRepository,
+            IFieldRepository fieldRepository,
+        IValidationService validationService,
             IFileUploadService fileUploadService,
             IMapper mapper)
         {
             _appSettings = appSettings.Value;
             _userRepository = userRepository;
             _investorRepository = investorRepository;
+            _businessRepository = businessRepository;
+            _roleRepository = roleRepository;
+            _fieldRepository = fieldRepository;
             _validationService = validationService;
             _fileUploadService = fileUploadService;
             _mapper = mapper;
@@ -67,7 +76,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreateUser(UserDTO userDTO)
+        public async Task<IdDTO> CreateUser(CreateUpdateUserDTO userDTO)
         {
             IdDTO newId = new IdDTO();
             try
@@ -151,28 +160,33 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(userDTO.bankAccount))
                     throw new InvalidFieldException("Invalid bankAccount!!!");
 
-                if (userDTO.status < 0 || userDTO.status > 2)
-                    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
+                //if (userDTO.status < 0 || userDTO.status > 2)
+                //    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
 
-                if (userDTO.createBy != null && userDTO.createBy.Length >= 0)
-                {
-                    if (userDTO.createBy.Equals("string"))
-                        userDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(userDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
-                }
+                //if (userDTO.createBy != null && userDTO.createBy.Length >= 0)
+                //{
+                //    if (userDTO.createBy.Equals("string"))
+                //        userDTO.createBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(userDTO.createBy))
+                //        throw new InvalidFieldException("Invalid createBy!!!");
+                //}
 
-                if (userDTO.updateBy != null && userDTO.updateBy.Length >= 0)
-                {
-                    if (userDTO.updateBy.Equals("string"))
-                        userDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(userDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
+                //if (userDTO.updateBy != null && userDTO.updateBy.Length >= 0)
+                //{
+                //    if (userDTO.updateBy.Equals("string"))
+                //        userDTO.updateBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(userDTO.updateBy))
+                //        throw new InvalidFieldException("Invalid updateBy!!!");
+                //}
 
-                userDTO.isDeleted = false;
+                //userDTO.isDeleted = false;
 
                 User entity = _mapper.Map<User>(userDTO);
+
+                if (userDTO.image != null)
+                {
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseUser(userDTO.image, ROLE_ADMIN_ID);//sửa role admin sau
+                }
 
                 newId.id = await _userRepository.CreateUser(entity);
                 if (newId.id.Equals(""))
@@ -203,41 +217,34 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<UserDTO>> GetAllUsers(int pageIndex, int pageSize)
+        public async Task<AllUserDTO> GetAllUsers(int pageIndex, int pageSize)
         {
             try
             {
-                List<User> userList = await _userRepository.GetAllUsers(pageIndex, pageSize);
-                List<UserDTO> list = _mapper.Map<List<UserDTO>>(userList);
+                AllUserDTO result = new AllUserDTO();
+                result.listOfUser = new List<GetUserDTO>();
 
-                foreach (UserDTO item in list)
+                result.numOfUser = await _userRepository.CountUser();
+
+                List<User> listEntity = await _userRepository.GetAllUsers(pageIndex, pageSize);
+                List<GetUserDTO> listDTO = _mapper.Map<List<GetUserDTO>>(listEntity);
+
+                foreach (GetUserDTO item in listDTO)
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
-                }
 
-                return list;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
+                    item.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(item.id)));
+                    if (item.business != null)
+                    {
+                        item.business.manager = _mapper.Map<BusinessManagerUserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(item.business.id)));
+                        item.business.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(item.business.id)));
+                    }                    
 
-        //GET BY ID
-        public async Task<UserDTO> GetUserById(Guid userId)
-        {
-            UserDTO result;
-            try
-            {
-                User dto = await _userRepository.GetUserById(userId);
-                result = _mapper.Map<UserDTO>(dto);
-                if (result == null)
-                    throw new NotFoundException("No User Object Found!");
+                    item.role = _mapper.Map<RoleDTO>(await _roleRepository.GetRoleByUserId(Guid.Parse(item.id)));
 
-                result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
-
+                    result.listOfUser.Add(item);
+                }               
                 return result;
             }
             catch (Exception e)
@@ -246,8 +253,32 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
+        //GET BY ID
+        public async Task<GetUserDTO> GetUserById(Guid userId)
+        {
+            try
+            {
+                User user = await _userRepository.GetUserById(userId);
+                GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
+                if (userDTO == null)
+                    throw new NotFoundException("No User Object Found!");
+
+                userDTO.createDate = await _validationService.FormatDateOutput(userDTO.createDate);
+                userDTO.updateDate = await _validationService.FormatDateOutput(userDTO.updateDate);
+
+                userDTO.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(userDTO.id)));
+                userDTO.role = _mapper.Map<RoleDTO>(await _roleRepository.GetRoleByUserId(Guid.Parse(userDTO.id)));
+
+                return userDTO;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         //UPDATE
-        public async Task<int> UpdateUser(UserDTO userDTO, Guid userId)
+        public async Task<int> UpdateUser(CreateUpdateUserDTO userDTO, Guid userId)
         {
             int result;
             try
@@ -322,30 +353,30 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(userDTO.bankAccount))
                     throw new InvalidFieldException("Invalid bankAccount!!!");
 
-                if (userDTO.status < 0 || userDTO.status > 2)
-                    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
+                //if (userDTO.status < 0 || userDTO.status > 2)
+                //    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
 
-                if (userDTO.createBy != null && userDTO.createBy.Length >= 0)
-                {
-                    if (userDTO.createBy.Equals("string"))
-                        userDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(userDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
-                }
+                //if (userDTO.createBy != null && userDTO.createBy.Length >= 0)
+                //{
+                //    if (userDTO.createBy.Equals("string"))
+                //        userDTO.createBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(userDTO.createBy))
+                //        throw new InvalidFieldException("Invalid createBy!!!");
+                //}
 
-                if (userDTO.updateBy != null && userDTO.updateBy.Length >= 0)
-                {
-                    if (userDTO.updateBy.Equals("string"))
-                        userDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(userDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
+                //if (userDTO.updateBy != null && userDTO.updateBy.Length >= 0)
+                //{
+                //    if (userDTO.updateBy.Equals("string"))
+                //        userDTO.updateBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(userDTO.updateBy))
+                //        throw new InvalidFieldException("Invalid updateBy!!!");
+                //}
 
                 User entity = _mapper.Map<User>(userDTO);
 
                 if(userDTO.image != null)
                 {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseUser(userDTO.image, userDTO.updateBy);
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseUser(userDTO.image, ROLE_ADMIN_ID);
                 }
 
                 result = await _userRepository.UpdateUser(entity, userId);

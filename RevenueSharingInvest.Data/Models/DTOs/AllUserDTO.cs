@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Models.DTOs
 {
-    public class AllBusinessDTO
+    public class AllUserDTO
     {
-        public int numOfBusiness { get; set; }
-        public List<GetBusinessDTO> listOfBusiness { get; set; }
+        public int numOfUser { get; set; }
+        public List<GetUserDTO> listOfUser { get; set; }
     }
 }

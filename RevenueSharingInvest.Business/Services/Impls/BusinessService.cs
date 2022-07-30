@@ -19,9 +19,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IBusinessFieldRepository _businessFieldRepository;
         private readonly IFieldRepository _fieldRepository;
         private readonly IUserRepository _userRepository;
+
         private readonly IValidationService _validationService;
         private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
+
         private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
 
         public BusinessService(IBusinessRepository businessRepository, 
@@ -83,7 +85,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         //}
 
         //CREATE
-        public async Task<IdDTO> CreateBusiness(BusinessDTO businessDTO, List<string> fieldIdList)
+        public async Task<IdDTO> CreateBusiness(CreateUpdateBusinessDTO businessDTO, List<string> fieldIdList)
         {
             IdDTO newId = new IdDTO();
             try
@@ -123,32 +125,32 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(businessDTO.address))
                     throw new InvalidFieldException("Invalid address!!!");
 
-                if (businessDTO.status < 0 || businessDTO.status > 2)
-                    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
+                //if (businessDTO.status < 0 || businessDTO.status > 2)
+                //    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
 
-                if (businessDTO.createBy != null && businessDTO.createBy.Length >= 0)
-                {
-                    if (businessDTO.createBy.Equals("string"))
-                        businessDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(businessDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
-                }
+                //if (businessDTO.createBy != null && businessDTO.createBy.Length >= 0)
+                //{
+                //    if (businessDTO.createBy.Equals("string"))
+                //        businessDTO.createBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(businessDTO.createBy))
+                //        throw new InvalidFieldException("Invalid createBy!!!");
+                //}
 
-                if (businessDTO.updateBy != null && businessDTO.updateBy.Length >= 0)
-                {
-                    if (businessDTO.updateBy.Equals("string"))
-                        businessDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(businessDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
+                //if (businessDTO.updateBy != null && businessDTO.updateBy.Length >= 0)
+                //{
+                //    if (businessDTO.updateBy.Equals("string"))
+                //        businessDTO.updateBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(businessDTO.updateBy))
+                //        throw new InvalidFieldException("Invalid updateBy!!!");
+                //}
 
-                businessDTO.isDeleted = false;
+                //businessDTO.isDeleted = false;
                 //
                 RevenueSharingInvest.Data.Models.Entities.Business entity = _mapper.Map<RevenueSharingInvest.Data.Models.Entities.Business>(businessDTO);
 
                 if (businessDTO.image != null)
                 {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, businessDTO.createBy);
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, ROLE_ADMIN_ID);//sửa role admin sau
                 }
 
                 newId.id = await _businessRepository.CreateBusiness(entity);
@@ -202,24 +204,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new InvalidFieldException("ADMIN or INVESTOR!");
 
                 AllBusinessDTO result = new AllBusinessDTO();
-                result.listOfBusiness = new List<BusinessDetailDTO>();
-                BusinessDetailDTO resultItem = new BusinessDetailDTO();
-                resultItem.fieldList = new List<FieldDTO>();
+                result.listOfBusiness = new List<GetBusinessDTO>();
+                //GetBusinessDTO resultItem = new GetBusinessDTO();
+                //resultItem.fieldList = new List<FieldDTO>();
 
                 result.numOfBusiness = await _businessRepository.CountBusiness(temp_field_role);
 
                 List<RevenueSharingInvest.Data.Models.Entities.Business> listEntity = await _businessRepository.GetAllBusiness(pageIndex, pageSize, temp_field_role);
-                List<BusinessDTO> listDTO = _mapper.Map<List<BusinessDTO>>(listEntity);
+                List<GetBusinessDTO> listDTO = _mapper.Map<List<GetBusinessDTO>>(listEntity);
 
-                foreach (BusinessDTO item in listDTO)
+                foreach (GetBusinessDTO item in listDTO)
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
 
-                    resultItem = _mapper.Map<BusinessDetailDTO>(item);
-                    resultItem.manager = _mapper.Map<UserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(item.id)));
-                    resultItem.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(item.id)));
-                    result.listOfBusiness.Add(resultItem);
+                    item.manager = _mapper.Map<BusinessManagerUserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(item.id)));
+                    item.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(item.id)));
+
+                    result.listOfBusiness.Add(item);
                 }
 
                 return result;
@@ -231,25 +233,23 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET BY ID
-        public async Task<BusinessDetailDTO> GetBusinessById(Guid businessId)
+        public async Task<GetBusinessDTO> GetBusinessById(Guid businessId)
         {
-            BusinessDetailDTO result;
             try
             {
 
                 RevenueSharingInvest.Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(businessId);
-                BusinessDTO businessDTO = _mapper.Map<BusinessDTO>(business);
+                GetBusinessDTO businessDTO = _mapper.Map<GetBusinessDTO>(business);
                 if (businessDTO == null)
                     throw new NotFoundException("No Business Object Found!");
 
                 businessDTO.createDate = await _validationService.FormatDateOutput(businessDTO.createDate);
                 businessDTO.updateDate = await _validationService.FormatDateOutput(businessDTO.updateDate);
 
-                result = _mapper.Map<BusinessDetailDTO>(businessDTO);
-                result.manager = _mapper.Map<UserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(businessDTO.id)));
-                result.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(businessDTO.id)));
+                businessDTO.manager = _mapper.Map<BusinessManagerUserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(businessDTO.id)));
+                businessDTO.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(businessDTO.id)));
 
-                return result;
+                return businessDTO;
             }
             catch (Exception e)
             {
@@ -258,7 +258,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdateBusiness(BusinessDTO businessDTO, Guid businessId)
+        public async Task<int> UpdateBusiness(CreateUpdateBusinessDTO businessDTO, Guid businessId)
         {
             int result;
             try
@@ -284,30 +284,30 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(businessDTO.address))
                     throw new InvalidFieldException("Invalid address!!!");
 
-                if (businessDTO.status < 0 || businessDTO.status > 2)
-                    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
+                //if (businessDTO.status < 0 || businessDTO.status > 2)
+                //    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
 
-                if (businessDTO.createBy != null && businessDTO.createBy.Length >= 0)
-                {
-                    if (businessDTO.createBy.Equals("string"))
-                        businessDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(businessDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
-                }
+                //if (businessDTO.createBy != null && businessDTO.createBy.Length >= 0)
+                //{
+                //    if (businessDTO.createBy.Equals("string"))
+                //        businessDTO.createBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(businessDTO.createBy))
+                //        throw new InvalidFieldException("Invalid createBy!!!");
+                //}
 
-                if (businessDTO.updateBy != null && businessDTO.updateBy.Length >= 0)
-                {
-                    if (businessDTO.updateBy.Equals("string"))
-                        businessDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(businessDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
+                //if (businessDTO.updateBy != null && businessDTO.updateBy.Length >= 0)
+                //{
+                //    if (businessDTO.updateBy.Equals("string"))
+                //        businessDTO.updateBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(businessDTO.updateBy))
+                //        throw new InvalidFieldException("Invalid updateBy!!!");
+                //}
 
                 RevenueSharingInvest.Data.Models.Entities.Business entity = _mapper.Map<RevenueSharingInvest.Data.Models.Entities.Business>(businessDTO);
 
                 if (businessDTO.image != null)
                 {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, businessDTO.updateBy);
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, ROLE_ADMIN_ID);
                 }
 
                 result = await _businessRepository.UpdateBusiness(entity, businessId);

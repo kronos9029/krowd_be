@@ -15,6 +15,8 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //READ
         public Task<List<RevenueSharingInvest.Data.Models.Entities.Business>> GetAllBusiness(int pageIndex, int pageSize, string role);
         public Task<RevenueSharingInvest.Data.Models.Entities.Business> GetBusinessById(Guid businesssId);
+        public Task<RevenueSharingInvest.Data.Models.Entities.Business> GetBusinessByUserId(Guid userId);
+        public Task<RevenueSharingInvest.Data.Models.Entities.Business> GetBusinessByProjectId(Guid projectId);
         public Task<int> CountBusiness(string role);
 
         //UPDATE

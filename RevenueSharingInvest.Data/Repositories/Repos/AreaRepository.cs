@@ -199,5 +199,27 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+
+        public async Task<Area> GetAreaByProjectId(Guid projectId)
+        {
+            try
+            {
+                var query = "SELECT "
+                    + "         A.* "
+                    + "     FROM "
+                    + "         Area A "
+                    + "         JOIN Project P ON A.Id = P.AreaId "
+                    + "     WHERE "
+                    + "         P.Id = @ProjectId";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Area>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

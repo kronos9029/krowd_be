@@ -15,6 +15,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //READ
         public Task<List<ProjectEntity>> GetAllProjectEntities(int pageIndex, int pageSize);
         public Task<ProjectEntity> GetProjectEntityById(Guid projectEntityId);
+        public Task<List<ProjectEntity>> GetProjectEntityByTypeAndProjectId(Guid projectId, string type);
 
         //UPDATE
         public Task<int> UpdateProjectEntity(ProjectEntity projectEntityDTO, Guid projectEntityId);

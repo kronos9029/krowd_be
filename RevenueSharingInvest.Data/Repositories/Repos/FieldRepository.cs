@@ -222,5 +222,27 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+
+        public async Task<Field> GetProjectFieldByProjectId(Guid projectId)
+        {
+            try
+            {
+                var query = "SELECT "
+                    + "         F.* "
+                    + "     FROM "
+                    + "         Field F "
+                    + "         JOIN Project P ON F.Id = P.FieldId "
+                    + "     WHERE "
+                    + "         P.Id = @ProjectId";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Field>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

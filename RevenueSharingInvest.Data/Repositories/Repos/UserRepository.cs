@@ -330,5 +330,65 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        public async Task<int> CountUser()
+        {
+            try
+            {
+                var query = "SELECT COUNT(*) FROM [User] ";
+
+                using var connection = CreateConnection();
+                return ((int)connection.ExecuteScalar(query));
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<User> GetProjectManagerByProjectId(Guid projectId)
+        {
+            try
+            {
+                var query = "SELECT "
+                    + "         U.* "
+                    + "     FROM "
+                    + "         [User] U "
+                    + "         JOIN Project P ON U.Id = P.ManagerId "
+                    + "     WHERE "
+                    + "         P.Id = @ProjectId";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<User>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<List<User>> GetProjectMembers(Guid projectId)
+        {
+            try
+            {
+                var query = "SELECT DISTINCT"
+                    + "         U.* "
+                    + "     FROM "
+                    + "         [User] U "
+                    + "         JOIN Investment INV ON U.Id = INV.InvestorId "
+                    + "     WHERE "
+                    + "         INV.ProjectId = @ProjectId "
+                    + "     ORDER BY CreateDate ASC";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<User>(query, parameters)).ToList();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

@@ -8,7 +8,8 @@ namespace RevenueSharingInvest.Business.Models.Constant
 {
     public enum ProjectStatusEnum
     {
-        NOT_APPROVED_YET,
+        DRAFT,
+        APPROVING,
         DENIED,
         CALLING_FOR_INVESTMENT,
         CALLING_TIME_IS_OVER,

@@ -19,16 +19,16 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadImageToFirebase([FromForm] FirebaseEntity firebaseEntity)
+        public async Task<IActionResult> UploadImageToFirebase([FromForm] FirebaseRequest firebaseRequest)
         {
-            var result = await _fileUploadService.UploadImageWithPath(firebaseEntity);
+            var result = await _fileUploadService.UploadFilesWithPath(firebaseRequest);
             return Ok(result);
         }
 
-        [HttpDelete]
+/*        [HttpDelete]
         public async Task<IActionResult> DeleteImagesFromFirebase(FirebaseEntity firebaseEntity)
         {
             return Ok(_fileUploadService.DeleteImagesFromFirebase(firebaseEntity));
-        }
+        }*/
     }
 }
