@@ -11,17 +11,21 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     {
         //CREATE
         public Task<string> CreateProjectEntity(ProjectEntity projectEntityDTO);
+        public Task<int> CreateProjectEntityById(ProjectEntity projectEntityDTO);
 
         //READ
         public Task<List<ProjectEntity>> GetAllProjectEntities(int pageIndex, int pageSize);
         public Task<ProjectEntity> GetProjectEntityById(Guid projectEntityId);
-        public Task<List<ProjectEntity>> GetProjectEntityByTypeAndProjectId(Guid projectId, string type);
+        public Task<List<ProjectEntity>> GetProjectEntityByProjectIdAndType(Guid projectId, string type);
+        public Task<int> CountProjectEntityByProjectIdAndType(Guid projectId, string type);
 
         //UPDATE
         public Task<int> UpdateProjectEntity(ProjectEntity projectEntityDTO, Guid projectEntityId);
+        public Task<int> UpdateProjectEntityPriority(Guid projectEntityId, int priority);
 
         //DELETE
-        public Task<int> DeleteProjectEntityById(Guid projectEntityId);
+        public Task<int> DeleteProjectEntityById(Guid projectId);
+        public Task<int> DeleteProjectEntityByProjectIdAndType(Guid projectId, string type);
         public Task<int> ClearAllProjectEntityData();
 
         //Firebase

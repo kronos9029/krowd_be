@@ -22,8 +22,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IMapper _mapper;
 
 
-        public ProjectEntityService(IProjectEntityRepository projectEntityRepository, 
-            IValidationService validationService, 
+        public ProjectEntityService(IProjectEntityRepository projectEntityRepository,
+            IValidationService validationService,
             IFileUploadService fileUploadService,
             IMapper mapper)
         {
@@ -81,25 +81,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!typeCheck)
                     throw new InvalidFieldException("Type must be" + typeErrorMessage + " !!!");
 
-                //if (projectEntityDTO.createBy != null && projectEntityDTO.createBy.Length >= 0)
-                //{
-                //    if (projectEntityDTO.createBy.Equals("string"))
-                //        projectEntityDTO.createBy = null;
-                //    else if (!await _validationService.CheckUUIDFormat(projectEntityDTO.createBy))
-                //        throw new InvalidFieldException("Invalid createBy!!!");
-                //}
-
-                //if (projectEntityDTO.updateBy != null && projectEntityDTO.updateBy.Length >= 0)
-                //{
-                //    if (projectEntityDTO.updateBy.Equals("string"))
-                //        projectEntityDTO.updateBy = null;
-                //    else if (!await _validationService.CheckUUIDFormat(projectEntityDTO.updateBy))
-                //        throw new InvalidFieldException("Invalid updateBy!!!");
-                //}
-
-                //projectEntityDTO.isDeleted = false;
-
                 ProjectEntity entity = _mapper.Map<ProjectEntity>(projectEntityDTO);
+
+                entity.Priority = (await _projectEntityRepository.CountProjectEntityByProjectIdAndType(entity.Id, entity.Type)) + 1;
 
                 newId.id = await _projectEntityRepository.CreateProjectEntity(entity);
                 if (newId.id.Equals(""))
@@ -116,12 +100,26 @@ namespace RevenueSharingInvest.Business.Services.Impls
         public async Task<int> DeleteProjectEntityById(Guid projectEntityId)
         {
             int result;
+            ProjectEntity entity = new ProjectEntity();
+            List<ProjectEntity> entityList = new List<ProjectEntity>();
             try
             {
-
+                entity = await _projectEntityRepository.GetProjectEntityById(projectEntityId);
                 result = await _projectEntityRepository.DeleteProjectEntityById(projectEntityId);
                 if (result == 0)
                     throw new DeleteObjectException("Can not delete ProjectEntity Object!");
+                entityList = await _projectEntityRepository.GetProjectEntityByProjectIdAndType(entity.ProjectId, entity.Type);
+                for (int i = 0; i < entityList.Count; i++)
+                {
+                    if (await _projectEntityRepository.UpdateProjectEntityPriority(entityList[i].Id, i + 1) == 0)
+                    {
+                        for (int j = 0; j <= i ; j++)
+                        {
+                            await _projectEntityRepository.UpdateProjectEntityPriority(entityList[j].Id, entityList[j].Priority);
+                        }
+                        throw new UpdateObjectException("Can not update ProjectEntity priority!");
+                    }
+                }
                 return result;
             }
             catch (Exception e)
@@ -214,6 +212,47 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (result == 0)
                     throw new UpdateObjectException("Can not update ProjectEntity Object!");
                 return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<int> UpdateProjectEntityPriority(List<ProjectEntityUpdateDTO> idList)
+        {
+            ProjectEntity entity = new ProjectEntity();
+            List<ProjectEntity> entityList = new List<ProjectEntity>();
+            Guid projectIdCheck;
+            string typeCheck;
+            try
+            {
+                projectIdCheck = (await _projectEntityRepository.GetProjectEntityById(Guid.Parse(idList[0].id))).ProjectId;
+                typeCheck = (await _projectEntityRepository.GetProjectEntityById(Guid.Parse(idList[0].id))).Type;
+                foreach (ProjectEntityUpdateDTO item in idList)
+                {
+                    entity = await _projectEntityRepository.GetProjectEntityById(Guid.Parse(item.id));
+                    if (entity == null)
+                        throw new NotFoundException("Id " + item.id + " ProjectEntity Object not found!");
+                    if (!entity.ProjectId.Equals(projectIdCheck))
+                        throw new InvalidFieldException("The ProjectEntity objects do not have the same ProjectId !");
+                    if (!entity.Type.Equals(typeCheck))
+                        throw new InvalidFieldException("The ProjectEntity objects do not have the same Type !");
+                    entityList.Add(entity);
+                }
+
+                foreach (ProjectEntityUpdateDTO item in idList)
+                {
+                    if (await _projectEntityRepository.UpdateProjectEntityPriority(Guid.Parse(item.id), item.priority) == 0)
+                    {
+                        foreach (ProjectEntity i in entityList)
+                        {
+                            await _projectEntityRepository.UpdateProjectEntityPriority(i.Id, i.Priority);
+                        }
+                        throw new UpdateObjectException("Can not update ProjectEntity Object!");
+                    }
+                }
+                return idList.Count;
             }
             catch (Exception e)
             {

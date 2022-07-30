@@ -15,7 +15,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
-        public Guid? ProjectId { get; set; }
+        public Guid ProjectId { get; set; }
         [StringLength(50)]
         public string Title { get; set; }        
         [StringLength(int.MaxValue)]
@@ -24,6 +24,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string Description { get; set; }
         [StringLength(int.MaxValue)]
         public string Link { get; set; }
+        public int Priority { get; set; }
         public string Type { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }

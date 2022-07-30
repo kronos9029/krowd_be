@@ -14,6 +14,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class ProjectComponentProjectEntityDTO : ProjectEntityDTO
     {
         public string id { get; set; }
+        public int priority { get; set; }
     }
     public class CreateUpdateProjectEntityDTO : ProjectEntityDTO
     {
@@ -24,6 +25,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class GetProjectEntityDTO : ProjectEntityDTO
     {
         public string id { get; set; }
+        public int priority { get; set; }
         public string projectId { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
