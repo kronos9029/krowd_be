@@ -2,10 +2,12 @@
 using Firebase.Storage;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
 using System.Collections.Generic;
@@ -22,6 +24,21 @@ namespace RevenueSharingInvest.Business.Services.Common.Firebase
         {
             _firebaseSettings = firebaseSettings.Value;
             _projectEntityRepository = projectEntityRepository;
+        }
+
+        private ProjectEntity ParseToProjectentity(FirebaseRequest request, Guid newId, string url)
+        {
+            ProjectEntity entity = new();
+
+            entity.Id = newId;
+            entity.ProjectId = Guid.Parse(request.entityId);
+            entity.CreateBy = Guid.Parse(request.createBy);
+            entity.UpdateBy = Guid.Parse(request.updateBy);
+            entity.Link = url;
+            entity.Type = request.type;
+            entity.Description = request.description;
+
+            return entity;
         }
 
         public async Task<List<string>> UploadFilesWithPath(FirebaseRequest request)
@@ -100,28 +117,36 @@ namespace RevenueSharingInvest.Business.Services.Common.Firebase
             {
                 foreach(var file in request.files)
                 {
-                    string newGuid = Guid.NewGuid().ToString();
+                    Guid newGuid = Guid.NewGuid();
 
                     string[] type = file.ContentType.Split("/");
 
                     if (type[0].ToLower().Equals(CategoryEnum.Images.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Project.ToString() +"" +"/"+ StoragePathEnum.ProjectEntity.ToString() + "/" + request.entityId + "/" + CategoryEnum.Images;
+                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + CategoryEnum.Images;
                     } else if (type[0].ToLower().Equals(CategoryEnum.Videos.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Project.ToString() + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + request.entityId + "/" + CategoryEnum.Videos;
+                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + CategoryEnum.Videos;
                     } else if (type[0].ToLower().Equals(CategoryEnum.Applications.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Project.ToString() + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + request.entityId + "/" + CategoryEnum.Applications;
+                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + CategoryEnum.Applications;
                     }
 
-                    string url = await uploadTask.Child(path).Child(newGuid).PutAsync(file.OpenReadStream());
+                    string url = await uploadTask.Child(path).Child(newGuid.ToString()).PutAsync(file.OpenReadStream());
+
+                    ProjectEntity projectEntity = ParseToProjectentity(request, newGuid, url);
+
+                    _ = _projectEntityRepository.CreateProjectEntityFromFirebase(projectEntity);
 
                     urls.Add(url);
 
                 }
             } else if (request.entityName.ToLower().Equals(StoragePathEnum.User.ToString().ToLower()))
             {
+                if(request.files.Count > 1) {
+                    throw new FileException("One User Only Have One Avatar!!");
+                }
+
                 foreach(var file in request.files)
                 {
                     string newGuid = Guid.NewGuid().ToString();
@@ -130,13 +155,13 @@ namespace RevenueSharingInvest.Business.Services.Common.Firebase
 
                     if (type[0].ToLower().Equals(CategoryEnum.Images.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Project.ToString() +"" +"/"+ StoragePathEnum.ProjectEntity.ToString() + "/" + request.entityId + "/" + CategoryEnum.Images;
+                        path = StoragePathEnum.User.ToString() + request.entityId + "/" + CategoryEnum.Images;
                     } else if (type[0].ToLower().Equals(CategoryEnum.Videos.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Project.ToString() + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + request.entityId + "/" + CategoryEnum.Videos;
+                        path = StoragePathEnum.User.ToString() + request.entityId + "/" + CategoryEnum.Videos;
                     } else if (type[0].ToLower().Equals(CategoryEnum.Applications.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Project.ToString() + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + request.entityId + "/" + CategoryEnum.Applications;
+                        path = StoragePathEnum.User.ToString() + request.entityId + "/" + CategoryEnum.Applications;
                     }
 
                     string url = await uploadTask.Child(path).Child(newGuid).PutAsync(file.OpenReadStream());
@@ -181,6 +206,8 @@ namespace RevenueSharingInvest.Business.Services.Common.Firebase
 
                 
             }*/
+
+
 
             await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.DeleteUserAsync(request.createBy);
 

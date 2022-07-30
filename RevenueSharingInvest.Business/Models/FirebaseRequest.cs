@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using RevenueSharingInvest.Data.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Models
 {
-    public class FirebaseRequest
+    public class FirebaseRequest : CreateUpdateProjectEntityDTO
     {
         public string createBy { get; set; }
         public string createDate { get; set; }
