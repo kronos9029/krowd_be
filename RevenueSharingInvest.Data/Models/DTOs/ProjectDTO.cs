@@ -45,7 +45,8 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public float remainAmount { get; set; }
         public string approvedDate { get; set; }
         public string approvedBy { get; set; }
-        public int status { get; set; }
+        public string status { get; set; }
+        public List<string> tagList { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
         public string updateDate { get; set; }

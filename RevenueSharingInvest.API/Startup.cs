@@ -181,6 +181,9 @@ namespace RevenueSharingInvest.API
             // VALIDATION
             services.AddScoped<IValidationRepository, ValidationRepository>();
             services.AddScoped<IValidationService, ValidationService>();
+
+            // PROJECT TAG
+            services.AddScoped<IProjectTagService, ProjectTagService>();
             //////////       
             ///
             //Upload File To Firebase

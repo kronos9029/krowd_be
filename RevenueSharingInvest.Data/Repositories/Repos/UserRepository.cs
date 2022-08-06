@@ -69,7 +69,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @Address, "
                     + "         @BankName, "
                     + "         @BankAccount, "
-                    + "         0, "
+                    + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -94,6 +94,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Address", userDTO.Address, DbType.String);
                 parameters.Add("BankName", userDTO.BankName, DbType.String);
                 parameters.Add("BankAccount", userDTO.BankAccount, DbType.String);
+                parameters.Add("Status", userDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", userDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
@@ -257,7 +258,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Address = @Address, "
                     + "         BankName = @BankName, "
                     + "         BankAccount = @BankAccount, "
-                    + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted "
@@ -282,7 +282,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Address", userDTO.Address, DbType.String);
                 parameters.Add("BankName", userDTO.BankName, DbType.String);
                 parameters.Add("BankAccount", userDTO.BankAccount, DbType.String);
-                parameters.Add("Status", userDTO.Status, DbType.Int16);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", userDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", userDTO.IsDeleted, DbType.Boolean);

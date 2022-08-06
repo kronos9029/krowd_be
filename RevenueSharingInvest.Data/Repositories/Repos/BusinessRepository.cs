@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
 using System.Collections.Generic;
@@ -52,7 +53,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0, "
                     + "         null, "
                     + "         null, "
-                    + "         0, "
+                    + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -66,6 +67,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", businessDTO.Description, DbType.String);
                 parameters.Add("TaxIdentificationNumber", businessDTO.TaxIdentificationNumber, DbType.String);
                 parameters.Add("Address", businessDTO.Address, DbType.String);
+                parameters.Add("Status", businessDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", businessDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
@@ -107,11 +109,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<RevenueSharingInvest.Data.Models.Entities.Business>> GetAllBusiness(int pageIndex, int pageSize, string role)
+        public async Task<List<RevenueSharingInvest.Data.Models.Entities.Business>> GetAllBusiness(int pageIndex, int pageSize, int? orderBy, int? order, string role)
         {
             try
             {
                 var whereCondition = "";
+                var orderByCondition = "ORDER BY CreateDate";
+                var orderCondition = "";
 
                 if (role.Equals("ADMIN"))
                 {
@@ -119,7 +123,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 if (role.Equals("INVESTOR"))
                 {
-                    whereCondition = "WHERE IsDeleted = 0 AND Status = 0 ";
+                    whereCondition = "WHERE IsDeleted = 0 AND Status = " + Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(0);
+                }
+                if (orderBy != null)
+                {
+                    orderByCondition = "ORDER BY " + Enum.GetNames(typeof(BusinessOrderFieldEnum)).ElementAt((int)orderBy);
+                }
+                if (order != null)
+                {
+                    orderCondition = Enum.GetNames(typeof(OrderEnum)).ElementAt((int)order);
                 }
 
                 if (pageIndex != 0 && pageSize != 0)
@@ -127,8 +139,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     var query = "WITH X AS ( "
                     + "         SELECT "
                     + "             ROW_NUMBER() OVER ( "
-                    + "                 ORDER BY "
-                    + "                     Name ASC ) AS Num, "
+                    +                   orderByCondition
+                    +                       orderCondition + " ) AS Num, "
                     + "             * "
                     + "         FROM Business "
                     +           whereCondition
@@ -164,7 +176,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM Business " + whereCondition + " ORDER BY Name ASC";
+                    var query = "SELECT * FROM Business " + whereCondition + " " + orderByCondition + " " + orderCondition;
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<RevenueSharingInvest.Data.Models.Entities.Business>(query)).ToList();
                 }              
@@ -205,7 +217,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Description = @Description, "
                     + "         TaxIdentificationNumber = @TaxIdentificationNumber, "
                     + "         Address = @Address, "
-                    + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted"
@@ -220,7 +231,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", businessDTO.Description, DbType.String);
                 parameters.Add("TaxIdentificationNumber", businessDTO.TaxIdentificationNumber, DbType.String);
                 parameters.Add("Address", businessDTO.Address, DbType.String);
-                parameters.Add("Status", businessDTO.Status, DbType.Int16);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", businessDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", businessDTO.IsDeleted, DbType.Boolean);
@@ -281,7 +291,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 if (role.Equals("INVESTOR"))
                 {
-                    whereCondition = "WHERE IsDeleted = 0 AND Status = 0 ";
+                    whereCondition = "WHERE IsDeleted = 0 AND Status = " + Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(0);
                 }            
 
                 var query = "SELECT COUNT(*) FROM Business " + whereCondition;

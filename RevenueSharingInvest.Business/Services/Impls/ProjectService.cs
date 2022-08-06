@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Business.Exceptions;
+using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Business.Services.Common.Firebase;
 using RevenueSharingInvest.Data.Models.Constants;
@@ -25,6 +26,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IProjectEntityRepository _projectEntityRepository;
 
         private readonly IValidationService _validationService;
+        private readonly IProjectTagService _projectTagService;
         private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
 
@@ -39,7 +41,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IBusinessRepository businessRepository,
             IAreaRepository areaRepository,
             IProjectEntityRepository projectEntityRepository,
-            IValidationService validationService, 
+            IValidationService validationService,
+            IProjectTagService projectTagService,
             IFileUploadService fileUploadService,
             IMapper mapper)
         {
@@ -52,6 +55,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _projectEntityRepository = projectEntityRepository;
 
             _validationService = validationService;
+            _projectTagService = projectTagService;
             _fileUploadService = fileUploadService;
             _mapper = mapper;
         }
@@ -155,9 +159,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(projectDTO.businessLicense))
                     throw new InvalidFieldException("Invalid businessLicense!!!");
 
-                //if (projectDTO.status < 0 || projectDTO.status > 5)
-                //    throw new InvalidFieldException("Status must be 0(NOT_APPROVED_YET) or 1(DENIED) or 2(CALLING_FOR_INVESTMENT) or 3(CALLING_TIME_IS_OVER) or 4(ACTIVE) or 5(CLOSED)!!!");
-
                 //projectDTO.approvedBy = null;
 
                 //if (projectDTO.createBy != null && projectDTO.createBy.Length >= 0)
@@ -180,7 +181,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 Project entity = _mapper.Map<Project>(projectDTO);
 
-                if(projectDTO.image != null)
+                entity.Status = Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(0);
+
+                if (projectDTO.image != null)
                 {
                     entity.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, ROLE_ADMIN_ID);
                 }
@@ -278,6 +281,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         item.projectEntity.Add(typeProjectEntityDTO);
                     }                    
                     item.memberList = _mapper.Map<List<ProjectMemberUserDTO>>(await _userRepository.GetProjectMembers(Guid.Parse(item.id)));
+                    item.tagList = await _projectTagService.GetProjectTagList(item);
 
                     result.listOfProject.Add(item);
                 }
@@ -326,6 +330,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     projectDTO.projectEntity.Add(typeProjectEntityDTO);
                 }
                 projectDTO.memberList = _mapper.Map<List<ProjectMemberUserDTO>>(await _userRepository.GetProjectMembers(Guid.Parse(projectDTO.id)));
+                projectDTO.tagList = await _projectTagService.GetProjectTagList(projectDTO);
 
                 return projectDTO;
             }

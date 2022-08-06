@@ -13,8 +13,9 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<string> CreatePackage(Package packageDTO);
 
         //READ
-        public Task<List<Package>> GetAllPackages(int pageIndex, int pageSize);
+        public Task<List<Package>> GetAllPackagesByProjectId(int pageIndex, int pageSize, Guid projectId);
         public Task<Package> GetPackageById(Guid packageId);
+        public Task<int> CountPackageByProjectId(Guid projectId);
 
         //UPDATE
         public Task<int> UpdatePackage(Package packageDTO, Guid packageId);
