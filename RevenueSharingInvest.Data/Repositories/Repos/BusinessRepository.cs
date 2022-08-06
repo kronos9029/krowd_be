@@ -140,7 +140,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         SELECT "
                     + "             ROW_NUMBER() OVER ( "
                     +                   orderByCondition
-                    +                       orderCondition + " ) AS Num, "
+                    + "                 " + orderCondition + " ) AS Num, "
                     + "             * "
                     + "         FROM Business "
                     +           whereCondition
