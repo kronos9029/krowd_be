@@ -6,6 +6,7 @@ using RevenueSharingInvest.Data.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.API.Controllers
@@ -27,7 +28,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBusiness([FromForm] CreateUpdateBusinessDTO businessDTO, [FromQuery] List<string> fieldIdList)
         {
-
+            string userId = httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
 
             var result = await _businessService.CreateBusiness(businessDTO, fieldIdList);
             return Ok(result);
@@ -72,5 +73,14 @@ namespace RevenueSharingInvest.API.Controllers
             var result = await _businessService.ClearAllBusinessData();
             return Ok(result);
         }
+
+        private ThisUserObj GetThisUserInfo(HttpContext httpContext)
+        {
+            ThisUserObj currentUser = new();
+
+            currentUser.userId =  httpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
+            currentUser.username = 
+        }
+
     }
 }

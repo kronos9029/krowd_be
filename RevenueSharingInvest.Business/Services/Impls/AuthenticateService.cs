@@ -102,6 +102,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.email = email;
                 response.id = userObject.Id;
                 response.uid = uid;
+                response.investorId = Guid.Parse(await _investorRepository.GetInvestorByEmail(email));
                 response = await GenerateTokenAsync(response, RoleEnum.INVESTOR.ToString());
             }
             return response;
@@ -163,27 +164,27 @@ namespace RevenueSharingInvest.Business.Services.Impls
             if (roleCheck.Equals(RoleEnum.ADMIN.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.ADMIN.ToString());
-                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_ADMIN_ID);
+                roleId = new Claim("roleId", ROLE_ADMIN_ID);
             }
             else if (roleCheck.Equals(RoleEnum.INVESTOR.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.INVESTOR.ToString());
-                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_INVESTOR_ID);
+                roleId = new Claim("roleId", ROLE_INVESTOR_ID);
             }
             else if (roleCheck.Equals(RoleEnum.BUSINESS_MANAGER.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUSINESS_MANAGER.ToString());
-                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_BUSINESS_MANAGER_ID);
+                roleId = new Claim("roleId", ROLE_BUSINESS_MANAGER_ID);
             }
             else if (roleCheck.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.PROJECT_MANAGER.ToString());
-                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_PROJECT_OWNER_ID);
+                roleId = new Claim("roleId", ROLE_PROJECT_OWNER_ID);
             }
             else
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.INVESTOR.ToString());
-                roleId = new Claim(ClaimTypes.AuthenticationInstant, ROLE_INVESTOR_ID);
+                roleId = new Claim("roleId", ROLE_INVESTOR_ID);
             }
 
             int hours;
@@ -220,54 +221,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return response;
         }
 
-        public async Task<bool> CheckRoleForAction(String userId, String requiredRole)
-        {
-         /* if (!await _validationService.CheckExistenceId("[User]", Guid.Parse(userId)))
-                throw new NotFoundException("concac");*/
-            User userObj = await _userRepository.GetUserById(Guid.Parse(userId));
-
-            Role role = await _roleRepository.GetRoleByName(requiredRole);
-
-            if(role == null){
-                throw new NotFoundException("No Role Found!!");
-            }
-            else
-            {
-                if (userObj.RoleId.ToString().Equals(role.Id.ToString()))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-
-        public async Task<bool> CheckIdForAction(String userId, Guid projectId)
-        {
-            User userObj = await _userRepository.GetUserById(Guid.Parse(userId));
-
-            Project projectObj = await _projectRepository.GetProjectById(projectId);
-
-            if(userObj == null)
-            {
-                throw new NotFoundException("User Not Found!!");
-            }
-            else if(projectObj == null)
-            {
-                throw new NotFoundException("Project Not Found!!");
-            }
-            if (projectObj.CreateBy.ToString().Equals(userObj.Id))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
-        }
 
     }
 }
