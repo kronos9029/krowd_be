@@ -50,7 +50,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string bankName { get; set; }
         public string bankAccount { get; set; }
         public string image { get; set; }
-        public int status { get; set; }
+        public string status { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
         public string updateDate { get; set; }
@@ -80,7 +80,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string bankName { get; set; }
         public string bankAccount { get; set; }
         public string image { get; set; }
-        public int status { get; set; }
+        public string status { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
         public string updateDate { get; set; }
@@ -104,7 +104,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string bankName { get; set; }
         public string bankAccount { get; set; }
         public string image { get; set; }
-        public int status { get; set; }
+        public string status { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
         public string updateDate { get; set; }

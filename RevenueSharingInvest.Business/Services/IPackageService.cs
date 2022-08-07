@@ -10,14 +10,14 @@ namespace RevenueSharingInvest.Business.Services
     public interface IPackageService
     {
         //CREATE
-        public Task<IdDTO> CreatePackage(PackageDTO packageDTO);
+        public Task<IdDTO> CreatePackage(CreateUpdatePackageDTO packageDTO);
 
         //READ
-        public Task<List<PackageDTO>> GetAllPackages(int pageIndex, int pageSize);
-        public Task<PackageDTO> GetPackageById(Guid packageId);
+        public Task<AllProjectPackageDTO> GetAllPackagesByProjectId(int pageIndex, int pageSize, string projectId);
+        public Task<GetPackageDTO> GetPackageById(Guid packageId);
 
         //UPDATE
-        public Task<int> UpdatePackage(PackageDTO packageDTO, Guid packageId);
+        public Task<int> UpdatePackage(CreateUpdatePackageDTO packageDTO, Guid packageId);
 
         //DELETE
         public Task<int> DeletePackageById(Guid packageId);

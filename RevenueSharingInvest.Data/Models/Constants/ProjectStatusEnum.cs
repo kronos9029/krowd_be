@@ -11,9 +11,9 @@ namespace RevenueSharingInvest.Business.Models.Constant
         DRAFT,
         WAITING_FOR_APPROVAL,
         DENIED,
-        CALLING_FOR_INVESTMENT,
-        CALLING_TIME_IS_OVER,
         ACTIVE,
+        CALLING_FOR_INVESTMENT,
+        CALLING_TIME_IS_OVER,       
         CLOSED
     }
 }

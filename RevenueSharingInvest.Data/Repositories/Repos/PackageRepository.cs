@@ -29,13 +29,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Price, "
                     + "         Image, "
                     + "         Quantity, "
+                    + "         RemainingQuantity, "
                     + "         Description, "
-                    + "         MinForPurchasing, "
-                    + "         MaxForPurchasing, "
-                    + "         OpenDate, "
-                    + "         CloseDate, "
-                    + "         ApprovedDate, "
-                    + "         ApprovedBy, "
+                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -49,13 +45,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @Price, "
                     + "         @Image, "
                     + "         @Quantity, "
+                    + "         @RemainingQuantity, "
                     + "         @Description, "
-                    + "         @MinForPurchasing, "
-                    + "         @MaxForPurchasing, "
-                    + "         @OpenDate, "
-                    + "         @CloseDate, "
-                    + "         null, "
-                    + "         null, "
+                    + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -68,11 +60,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Price", packageDTO.Price, DbType.Double);
                 parameters.Add("Image", packageDTO.Image, DbType.String);
                 parameters.Add("Quantity", packageDTO.Quantity, DbType.Int16);
+                parameters.Add("RemainingQuantity", packageDTO.RemainingQuantity, DbType.Int16);
                 parameters.Add("Description", packageDTO.Description, DbType.String);
-                parameters.Add("MinForPurchasing", packageDTO.MinForPurchasing, DbType.Int16);
-                parameters.Add("MaxForPurchasing", packageDTO.MaxForPurchasing, DbType.Int16);
-                parameters.Add("OpenDate", Convert.ToDateTime(packageDTO.OpenDate), DbType.DateTime);
-                parameters.Add("CloseDate", Convert.ToDateTime(packageDTO.CloseDate), DbType.DateTime);
+                parameters.Add("Status", packageDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", packageDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
@@ -92,17 +82,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "UPDATE Package "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
+                var query = "DELETE FROM Package WHERE Id = @Id";
+
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", packageDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", packageId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
@@ -114,7 +97,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Package>> GetAllPackages(int pageIndex, int pageSize)
+        public async Task<List<Package>> GetAllPackagesByProjectId(int pageIndex, int pageSize, Guid projectId)
         {
             try
             {
@@ -129,7 +112,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "             * "
                     + "         FROM Package "
                     + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "             ProjectId = @ProjectId "
+                    + "             AND IsDeleted = 0 ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         Name, "
@@ -137,13 +121,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Price, "
                     + "         Image, "
                     + "         Quantity, "
+                    + "         RemainingQuantity, "
                     + "         Description, "
-                    + "         MinForPurchasing, "
-                    + "         MaxForPurchasing, "
-                    + "         OpenDate, "
-                    + "         CloseDate, "
-                    + "         ApprovedDate, "
-                    + "         ApprovedBy, "
+                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -155,6 +135,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
                     + "         AND @PageIndex * @PageSize";
                     var parameters = new DynamicParameters();
+                    parameters.Add("ProjectId", projectId, DbType.Guid);
                     parameters.Add("PageIndex", pageIndex, DbType.Int16);
                     parameters.Add("PageSize", pageSize, DbType.Int16);
                     using var connection = CreateConnection();
@@ -162,9 +143,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM Package WHERE IsDeleted = 0 ORDER BY ProjectId, Name ASC";
+                    var query = "SELECT * FROM Package WHERE ProjectId = @ProjectId AND IsDeleted = 0 ORDER BY ProjectId, Name ASC";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("ProjectId", projectId, DbType.Guid);
                     using var connection = CreateConnection();
-                    return (await connection.QueryAsync<Package>(query)).ToList();
+                    return (await connection.QueryAsync<Package>(query, parameters)).ToList();
                 }               
             }
             catch (Exception e)
@@ -202,14 +185,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Price = @Price, "
                     + "         Image = @Image, "
                     + "         Quantity = @Quantity, "
+                    + "         RemainingQuantity = @RemainingQuantity, "
                     + "         Description = @Description, "
-                    + "         MinForPurchasing = @MinForPurchasing, "
-                    + "         MaxForPurchasing = @MaxForPurchasing, "
-                    + "         OpenDate = @OpenDate, "
-                    + "         CloseDate = @CloseDate, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -219,14 +198,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Price", packageDTO.Price, DbType.Double);
                 parameters.Add("Image", packageDTO.Image, DbType.String);
                 parameters.Add("Quantity", packageDTO.Quantity, DbType.Int16);
+                parameters.Add("RemainingQuantity", packageDTO.RemainingQuantity, DbType.Int16);
                 parameters.Add("Description", packageDTO.Description, DbType.String);
-                parameters.Add("MinForPurchasing", packageDTO.MinForPurchasing, DbType.Int16);
-                parameters.Add("MaxForPurchasing", packageDTO.MaxForPurchasing, DbType.Int16);
-                parameters.Add("OpenDate", packageDTO.OpenDate, DbType.DateTime);
-                parameters.Add("CloseDate", packageDTO.CloseDate, DbType.DateTime);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", packageDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", packageDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", packageId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -248,6 +223,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "DELETE FROM Package";
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<int> CountPackageByProjectId(Guid projectId)
+        {
+            try
+            {
+                var query = "SELECT COUNT(*) FROM Package WHERE ProjectId = @ProjectId AND IsDeleted = 0 ";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return ((int)connection.ExecuteScalar(query, parameters));
             }
             catch (Exception e)
             {

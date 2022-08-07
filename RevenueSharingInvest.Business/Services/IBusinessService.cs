@@ -14,7 +14,7 @@ namespace RevenueSharingInvest.Business.Services
         //public Task<int> AdminCreateBusiness(Data.Models.Entities.Business newBusiness, string email);
 
         //READ
-        public Task<AllBusinessDTO> GetAllBusiness(int pageIndex, int pageSize, string temp_field_role);
+        public Task<AllBusinessDTO> GetAllBusiness(int pageIndex, int pageSize, int? orderBy, int? order, string temp_field_role);
         public Task<GetBusinessDTO> GetBusinessById(Guid businessId);
 
         //UPDATE

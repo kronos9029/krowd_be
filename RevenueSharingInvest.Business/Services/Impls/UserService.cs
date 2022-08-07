@@ -7,6 +7,7 @@ using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Business.Services.Common.Firebase;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -160,9 +161,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(userDTO.bankAccount))
                     throw new InvalidFieldException("Invalid bankAccount!!!");
 
-                //if (userDTO.status < 0 || userDTO.status > 2)
-                //    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
-
                 //if (userDTO.createBy != null && userDTO.createBy.Length >= 0)
                 //{
                 //    if (userDTO.createBy.Equals("string"))
@@ -182,6 +180,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 //userDTO.isDeleted = false;
 
                 User entity = _mapper.Map<User>(userDTO);
+
+                entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
 
                 if (userDTO.image != null)
                 {

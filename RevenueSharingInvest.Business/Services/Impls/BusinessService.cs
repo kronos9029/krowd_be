@@ -2,6 +2,7 @@
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Business.Services.Common.Firebase;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -125,9 +126,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(businessDTO.address))
                     throw new InvalidFieldException("Invalid address!!!");
 
-                //if (businessDTO.status < 0 || businessDTO.status > 2)
-                //    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
-
                 //if (businessDTO.createBy != null && businessDTO.createBy.Length >= 0)
                 //{
                 //    if (businessDTO.createBy.Equals("string"))
@@ -147,6 +145,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 //businessDTO.isDeleted = false;
                 //
                 RevenueSharingInvest.Data.Models.Entities.Business entity = _mapper.Map<RevenueSharingInvest.Data.Models.Entities.Business>(businessDTO);
+
+                entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
 
                 if (businessDTO.image != null)
                 {
@@ -196,21 +196,41 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<AllBusinessDTO> GetAllBusiness(int pageIndex, int pageSize, string temp_field_role)
+        public async Task<AllBusinessDTO> GetAllBusiness(int pageIndex, int pageSize, int? orderBy, int? order, string temp_field_role)
         {
+            string orderByErrorMessage = "";
+            string orderErrorMessage = "";
             try
             {
                 if (!temp_field_role.Equals("ADMIN") && !temp_field_role.Equals("INVESTOR"))
                     throw new InvalidFieldException("ADMIN or INVESTOR!");
 
+                if (orderBy != null && (orderBy < 0 || orderBy > Enum.GetNames(typeof(BusinessOrderFieldEnum)).Length - 1))
+                {
+                    for (int field = 0; field < Enum.GetNames(typeof(BusinessOrderFieldEnum)).Length; field++)
+                    {
+                        orderByErrorMessage = orderByErrorMessage + " " + field +":" + Enum.GetNames(typeof(BusinessOrderFieldEnum)).ElementAt(field) + " or";
+                    }
+                    orderByErrorMessage = orderByErrorMessage.Remove(orderByErrorMessage.Length - 2);
+                    throw new InvalidFieldException("orderBy must be" + orderByErrorMessage + " !!!");
+                }
+
+                if (order != null && (order < 0 || order > Enum.GetNames(typeof(OrderEnum)).Length - 1))
+                {
+                    for (int o = 0; o < Enum.GetNames(typeof(OrderEnum)).Length; o++)
+                    {
+                        orderErrorMessage = orderErrorMessage + " " + o + ":" + Enum.GetNames(typeof(OrderEnum)).ElementAt(o) + " or";
+                    }
+                    orderErrorMessage = orderErrorMessage.Remove(orderErrorMessage.Length - 2);
+                    throw new InvalidFieldException("order must be" + orderErrorMessage + " !!!");
+                }
+
                 AllBusinessDTO result = new AllBusinessDTO();
                 result.listOfBusiness = new List<GetBusinessDTO>();
-                //GetBusinessDTO resultItem = new GetBusinessDTO();
-                //resultItem.fieldList = new List<FieldDTO>();
 
                 result.numOfBusiness = await _businessRepository.CountBusiness(temp_field_role);
 
-                List<RevenueSharingInvest.Data.Models.Entities.Business> listEntity = await _businessRepository.GetAllBusiness(pageIndex, pageSize, temp_field_role);
+                List<RevenueSharingInvest.Data.Models.Entities.Business> listEntity = await _businessRepository.GetAllBusiness(pageIndex, pageSize, orderBy, order, temp_field_role);
                 List<GetBusinessDTO> listDTO = _mapper.Map<List<GetBusinessDTO>>(listEntity);
 
                 foreach (GetBusinessDTO item in listDTO)

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -73,7 +74,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @BusinessLicense, "
                     + "         null, "
                     + "         null, "
-                    + "         0, "
+                    + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -99,6 +100,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("StartDate", Convert.ToDateTime(projectDTO.StartDate), DbType.DateTime);               
                 parameters.Add("EndDate", Convert.ToDateTime(projectDTO.EndDate), DbType.DateTime);
                 parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
+                parameters.Add("Status", projectDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", projectDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
@@ -160,7 +162,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     }
                     if (role.Equals("INVESTOR"))
                     {
-                        whereCondition = "WHERE IsDeleted = 0 AND (Status = 2 OR Status = 3 OR Status = 4)";
+                        whereCondition = "WHERE IsDeleted = 0 AND (Status = " + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + " OR Status " + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(4) + " OR Status = " + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + ")";
                     }
                 }
                 else
@@ -171,7 +173,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     }
                     if (role.Equals("INVESTOR"))
                     {
-                        whereCondition = "WHERE BusinessId = @BusinessId AND IsDeleted = 0 AND (Status = 2 OR Status = 3 OR Status = 4)";
+                        whereCondition = "WHERE BusinessId = @BusinessId AND IsDeleted = 0 AND (Status = " + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + " OR Status " + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(4) + " OR Status = " + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + ")";
                     }
                     parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
                 }
@@ -280,7 +282,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         StartDate = @StartDate, "
                     + "         EndDate = @EndDate, "
                     + "         BusinessLicense = @BusinessLicense, "                    
-                    + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted "
@@ -305,8 +306,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("RemainAmount", projectDTO.RemainAmount, DbType.Double);
                 parameters.Add("StartDate", Convert.ToDateTime(projectDTO.StartDate), DbType.DateTime);
                 parameters.Add("EndDate", Convert.ToDateTime(projectDTO.EndDate), DbType.DateTime);
-                parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
-                parameters.Add("Status", projectDTO.Status, DbType.Int16);               
+                parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);          
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", projectDTO.IsDeleted, DbType.Boolean);
@@ -357,7 +357,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     }
                     if (role.Equals("INVESTOR"))
                     {
-                        whereCondition = "WHERE IsDeleted = 0 AND (Status = 2 OR Status = 3 OR Status = 4)";
+                        whereCondition = "WHERE IsDeleted = 0 AND (Status = " + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + " OR Status " + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(4) + " OR Status = " + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + ")";
                     }
                 }
                 else
@@ -368,7 +368,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     }
                     if (role.Equals("INVESTOR"))
                     {
-                        whereCondition = "WHERE BusinessId = @BusinessId AND IsDeleted = 0 AND (Status = 2 OR Status = 3 OR Status = 4)";
+                        whereCondition = "WHERE BusinessId = @BusinessId AND IsDeleted = 0 AND (Status = " + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + " OR Status " + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(4) + " OR Status = " + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + ")";
                     }                    
                     parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
                 }
