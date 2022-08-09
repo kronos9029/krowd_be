@@ -13,7 +13,14 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string firstName { get; set; }
     }
 
-    public class CreateUpdateUserDTO : UserDTO
+    public class CreateUserDTO : UserDTO
+    {
+        public string roleId { get; set; }
+        public string email { get; set; }
+        public string image { get; set; }
+    }
+
+    public class UpdateUserDTO : UserDTO
     {
         public IFormFile image { get; set; }
         public string businessId { get; set; }

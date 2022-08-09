@@ -34,7 +34,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllBusinesses(int pageIndex, int pageSize, int? orderBy, int? order, string temp_field_role)
+        public async Task<IActionResult> GetAllBusinesses(int pageIndex, int pageSize, string? orderBy, string? order, string temp_field_role)
         {
             var result = new AllBusinessDTO();
             result = await _businessService.GetAllBusiness(pageIndex, pageSize, orderBy, order, temp_field_role);

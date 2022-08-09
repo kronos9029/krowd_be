@@ -9,11 +9,12 @@ namespace RevenueSharingInvest.Business.Models.Constant
     public enum ProjectStatusEnum
     {
         DRAFT,
-        WAITING_FOR_APPROVAL,
-        DENIED,
-        ACTIVE,
+        WAITING_FOR_APPROVED,
         CALLING_FOR_INVESTMENT,
-        CALLING_TIME_IS_OVER,       
+        DENIED,
+        CALLING_TIME_IS_OVER,
+        WAITING_TO_ACTIVATE,
+        ACTIVE,
         CLOSED
     }
 }

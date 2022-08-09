@@ -27,7 +27,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUpdateUserDTO userDTO)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO userDTO)
         {
             var result = await _userService.CreateUser(userDTO);
             return Ok(result);
@@ -52,7 +52,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateUser([FromForm] CreateUpdateUserDTO userDTO, Guid id)
+        public async Task<IActionResult> UpdateUser([FromForm] UpdateUserDTO userDTO, Guid id)
         {
             var result = await _userService.UpdateUser(userDTO, id);
             return Ok(result);

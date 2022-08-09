@@ -77,7 +77,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreateUser(CreateUpdateUserDTO userDTO)
+        public async Task<IdDTO> CreateUser(CreateUserDTO userDTO)
         {
             IdDTO newId = new IdDTO();
             try
@@ -100,24 +100,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     && !userDTO.roleId.Equals(ROLE_INVESTOR_ID))
                     throw new NotFoundException("This RoleId is not existed!!!");
 
-                if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_MANAGER_ID))
-                {
-                    if (userDTO.businessId == null)
-                        throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
+                //if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_MANAGER_ID))
+                //{
+                //    if (userDTO.businessId == null)
+                //        throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
 
-                    if (!await _validationService.CheckUUIDFormat(userDTO.businessId))
-                        throw new InvalidFieldException("Invalid businessId!!!");
+                //    if (!await _validationService.CheckUUIDFormat(userDTO.businessId))
+                //        throw new InvalidFieldException("Invalid businessId!!!");
 
-                    if (!await _validationService.CheckExistenceId("Business", Guid.Parse(userDTO.businessId)))
-                        throw new NotFoundException("This BusinessId is not existed!!!");
-                }
-                else
-                {
-                    userDTO.businessId = null;
-                }               
-
-                if (userDTO.description != null && (userDTO.description.Equals("string") || userDTO.description.Length == 0))
-                    userDTO.description = null;
+                //    if (!await _validationService.CheckExistenceId("Business", Guid.Parse(userDTO.businessId)))
+                //        throw new NotFoundException("This BusinessId is not existed!!!");
+                //}
+                //else
+                //{
+                //}               
 
                 if (!await _validationService.CheckText(userDTO.lastName))
                     throw new InvalidFieldException("Invalid lastName!!!");
@@ -128,38 +124,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (userDTO.image != null && (userDTO.image.Equals("string") || userDTO.image.Length == 0))
                     userDTO.image = null;
 
-                if (userDTO.phoneNum == null || userDTO.phoneNum.Length == 0 || !await _validationService.CheckPhoneNumber(userDTO.phoneNum))
-                    throw new InvalidFieldException("Invalid phoneNum!!!");
-
-                if (!await _validationService.CheckText(userDTO.idCard))
-                    throw new InvalidFieldException("Invalid idCard!!!");
-
                 if (userDTO.email == null || userDTO.email.Length == 0 || !await _validationService.CheckEmail(userDTO.email))
                     throw new InvalidFieldException("Invalid email!!!");
-
-                if (!await _validationService.CheckText(userDTO.gender))
-                    throw new InvalidFieldException("Invalid gender!!!");
-
-                if (userDTO.dateOfBirth == null || userDTO.dateOfBirth.Length == 0 || !await _validationService.CheckDOB(userDTO.dateOfBirth))
-                    throw new InvalidFieldException("Invalid dateOfBirth!!!");
-
-                if (!await _validationService.CheckText(userDTO.taxIdentificationNumber))
-                    throw new InvalidFieldException("Invalid taxIdentificationNumber!!!");
-
-                if (!await _validationService.CheckText(userDTO.city))
-                    throw new InvalidFieldException("Invalid city!!!");
-
-                if (!await _validationService.CheckText(userDTO.district))
-                    throw new InvalidFieldException("Invalid district!!!");
-
-                if (!await _validationService.CheckText(userDTO.address))
-                    throw new InvalidFieldException("Invalid address!!!");
-
-                if (!await _validationService.CheckText(userDTO.bankName))
-                    throw new InvalidFieldException("Invalid bankName!!!");
-
-                if (!await _validationService.CheckText(userDTO.bankAccount))
-                    throw new InvalidFieldException("Invalid bankAccount!!!");
 
                 //if (userDTO.createBy != null && userDTO.createBy.Length >= 0)
                 //{
@@ -183,10 +149,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
 
-                if (userDTO.image != null)
-                {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseUser(userDTO.image, ROLE_ADMIN_ID);//sửa role admin sau
-                }
+                //if (userDTO.image != null)
+                //{
+                //    entity.Image = await _fileUploadService.UploadImageToFirebaseUser(userDTO.image, ROLE_ADMIN_ID);//sửa role admin sau
+                //}
 
                 newId.id = await _userRepository.CreateUser(entity);
                 if (newId.id.Equals(""))
@@ -278,7 +244,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdateUser(CreateUpdateUserDTO userDTO, Guid userId)
+        public async Task<int> UpdateUser(UpdateUserDTO userDTO, Guid userId)
         {
             int result;
             try

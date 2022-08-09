@@ -32,6 +32,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
         private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
         private readonly String ROLE_PROJECT_MANAGER_ID = "2d80393a-3a3d-495d-8dd7-f9261f85cc8f";
+        private readonly String ROLE_INVESTOR_ID = "ad5f37da-ca48-4dc5-9f4b-963d94b535e6";
 
         public ProjectService(
             IProjectRepository projectRepository, 
@@ -67,6 +68,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
             try
             {
                 result = await _projectRepository.ClearAllProjectData();
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        //COUNT PROJECTS
+        public async Task<int> CountProjects(string businessId, string managerId, string areaId, string fieldId, string investorId, string temp_field_role)
+        {
+            int result;
+            try
+            {
+                result = await _projectRepository.CountProject(businessId, managerId, areaId, fieldId, investorId, temp_field_role);
                 return result;
             }
             catch (Exception e)
@@ -218,38 +234,197 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<AllProjectDTO> GetAllProjects(int pageIndex, int pageSize, string businessId, string managerId, string temp_field_role)
+        public async Task<AllProjectDTO> GetAllProjects(int pageIndex, int pageSize, string businessId, string managerId, string areaId, string fieldId, string investorId, string temp_field_role)
         {
             try
             {
-                if (!temp_field_role.Equals("ADMIN") && !temp_field_role.Equals("INVESTOR") && !temp_field_role.Equals("PROJECT") && !temp_field_role.Equals("BUSINESS"))
-                    throw new InvalidFieldException("ADMIN or INVESTOR or PROJECT or BUSINESS!");
+                if (!temp_field_role.Equals("ADMIN") && !temp_field_role.Equals("INVESTOR") && !temp_field_role.Equals("PROJECT") && !temp_field_role.Equals("BUSINESS") && !temp_field_role.Equals("GUEST"))
+                    throw new InvalidFieldException("ADMIN or INVESTOR or PROJECT or BUSINESS or GUEST!");
 
-                if (businessId != null)
+                //if (businessId != null)
+                //{
+                //    if (!await _validationService.CheckUUIDFormat(businessId))
+                //        throw new InvalidFieldException("Invalid businessId!!!");
+
+                //    if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
+                //        throw new NotFoundException("This businessId is not existed!!!");
+                //}
+
+                //if (managerId != null)
+                //{
+                //    if (!await _validationService.CheckUUIDFormat(managerId))
+                //        throw new InvalidFieldException("Invalid managerId!!!");
+
+                //    if (!await _validationService.CheckExistenceUserWithRole(ROLE_PROJECT_MANAGER_ID, Guid.Parse(managerId)))
+                //        throw new NotFoundException("This managerId is not existed!!!");
+                //}
+
+                if (temp_field_role.Equals("ADMIN"))
                 {
+                    if (businessId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(businessId))
+                            throw new InvalidFieldException("Invalid businessId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
+                            throw new NotFoundException("This businessId is not existed!!!");
+                    }
+
+                    if (areaId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(areaId))
+                            throw new InvalidFieldException("Invalid areaId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Area", Guid.Parse(areaId)))
+                            throw new NotFoundException("This areaId is not existed!!!");
+                    }
+
+                    if (fieldId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(fieldId))
+                            throw new InvalidFieldException("Invalid fieldId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                            throw new NotFoundException("This fieldId is not existed!!!");
+                    }
+                }
+
+                if (temp_field_role.Equals("BUSINESS"))
+                {
+                    if (businessId == null)
+                        throw new InvalidFieldException("businessId can not be empty!!!");
+
                     if (!await _validationService.CheckUUIDFormat(businessId))
                         throw new InvalidFieldException("Invalid businessId!!!");
 
                     if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
                         throw new NotFoundException("This businessId is not existed!!!");
+
+                    if (areaId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(areaId))
+                            throw new InvalidFieldException("Invalid areaId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Area", Guid.Parse(areaId)))
+                            throw new NotFoundException("This areaId is not existed!!!");
+                    }
+
+                    if (fieldId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(fieldId))
+                            throw new InvalidFieldException("Invalid fieldId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                            throw new NotFoundException("This fieldId is not existed!!!");
+                    }
                 }
 
-                if (managerId != null)
+                if (temp_field_role.Equals("PROJECT"))
                 {
+                    if (managerId == null)
+                        throw new InvalidFieldException("managerId can not be empty!!!");
+
                     if (!await _validationService.CheckUUIDFormat(managerId))
                         throw new InvalidFieldException("Invalid managerId!!!");
 
                     if (!await _validationService.CheckExistenceUserWithRole(ROLE_PROJECT_MANAGER_ID, Guid.Parse(managerId)))
                         throw new NotFoundException("This managerId is not existed!!!");
+
+                    if (areaId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(areaId))
+                            throw new InvalidFieldException("Invalid areaId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Area", Guid.Parse(areaId)))
+                            throw new NotFoundException("This areaId is not existed!!!");
+                    }
+
+                    if (fieldId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(fieldId))
+                            throw new InvalidFieldException("Invalid fieldId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                            throw new NotFoundException("This fieldId is not existed!!!");
+                    }
+                }
+
+                if (temp_field_role.Equals("INVESTOR"))
+                {
+                    if (investorId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(investorId))
+                            throw new InvalidFieldException("Invalid investorId!!!");
+
+                        if (!await _validationService.CheckExistenceUserWithRole(ROLE_INVESTOR_ID, Guid.Parse(investorId)))
+                            throw new NotFoundException("This investorId is not existed!!!");
+                    }
+
+                    if (businessId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(businessId))
+                            throw new InvalidFieldException("Invalid businessId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
+                            throw new NotFoundException("This businessId is not existed!!!");
+                    }
+
+                    if (areaId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(areaId))
+                            throw new InvalidFieldException("Invalid areaId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Area", Guid.Parse(areaId)))
+                            throw new NotFoundException("This areaId is not existed!!!");
+                    }
+
+                    if (fieldId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(fieldId))
+                            throw new InvalidFieldException("Invalid fieldId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                            throw new NotFoundException("This fieldId is not existed!!!");
+                    }
+                }
+
+                if (temp_field_role.Equals("GUEST"))
+                {
+                    if (businessId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(businessId))
+                            throw new InvalidFieldException("Invalid businessId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
+                            throw new NotFoundException("This businessId is not existed!!!");
+                    }
+
+                    if (areaId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(areaId))
+                            throw new InvalidFieldException("Invalid areaId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Area", Guid.Parse(areaId)))
+                            throw new NotFoundException("This areaId is not existed!!!");
+                    }
+
+                    if (fieldId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(fieldId))
+                            throw new InvalidFieldException("Invalid fieldId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                            throw new NotFoundException("This fieldId is not existed!!!");
+                    }
                 }
 
                 AllProjectDTO result = new AllProjectDTO();
                 result.listOfProject = new List<GetProjectDTO>();
                 //ProjectDetailDTO resultItem = new ProjectDetailDTO();
 
-                result.numOfProject = await _projectRepository.CountProject(businessId, managerId, temp_field_role);
+                result.numOfProject = await _projectRepository.CountProject(businessId, managerId, areaId, fieldId, investorId, temp_field_role);
 
-                List<Project> listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, managerId, temp_field_role);
+                List<Project> listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, managerId, areaId, fieldId, investorId, temp_field_role);
                 List<GetProjectDTO> listDTO = _mapper.Map<List<GetProjectDTO>>(listEntity);
 
                 foreach (GetProjectDTO item in listDTO)
