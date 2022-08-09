@@ -258,13 +258,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
 
                 var whereCondition = "";
-                var isDeletedCondition = "AND IsDeleted = 0";
+                var isDeletedCondition = " AND IsDeleted = 0 ";
 
-                var businessIdCondition = "AND BusinessId = @BusinessId";
-                var managerIdCondition = "AND ManagerId = @ManagerId";
-                var areaIdCondition = "AND AreaId = @AreaId";
-                var fieldIdCondition = "AND FieldId = @FieldId";
-                var investorIdCondition = "Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId)";
+                var businessIdCondition = " AND BusinessId = @BusinessId ";
+                var managerIdCondition = " AND ManagerId = @ManagerId ";
+                var areaIdCondition = " AND AreaId = @AreaId ";
+                var fieldIdCondition = " AND FieldId = @FieldId ";
+                var investorIdCondition = " Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId) ";
 
                 if (temp_field_role.Equals("ADMIN"))
                 {
@@ -581,13 +581,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
 
                 var whereCondition = "";
-                var isDeletedCondition = "AND IsDeleted = 0";
+                var isDeletedCondition = " AND IsDeleted = 0 ";
 
-                var businessIdCondition = "AND BusinessId = @BusinessId";
-                var managerIdCondition = "AND ManagerId = @ManagerId";
-                var areaIdCondition = "AND AreaId = @AreaId";
-                var fieldIdCondition = "AND FieldId = @FieldId";
-                var investorIdCondition = "Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId)";
+                var businessIdCondition = " AND BusinessId = @BusinessId ";
+                var managerIdCondition = " AND ManagerId = @ManagerId ";
+                var areaIdCondition = " AND AreaId = @AreaId ";
+                var fieldIdCondition = " AND FieldId = @FieldId ";
+                var investorIdCondition = " Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId) ";
 
                 if (temp_field_role.Equals("ADMIN"))
                 {

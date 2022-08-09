@@ -58,7 +58,7 @@ namespace RevenueSharingInvest.API.Controllers
         {
             if (countOnly)
             {
-                var countResult = 0;
+                var countResult = new ProjectCountDTO();
                 countResult = await _projectService.CountProjects(businessId, managerId, areaId, fieldId, investorId, temp_field_role);
                 return Ok(countResult);
             }

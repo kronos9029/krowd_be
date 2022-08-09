@@ -77,12 +77,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //COUNT PROJECTS
-        public async Task<int> CountProjects(string businessId, string managerId, string areaId, string fieldId, string investorId, string temp_field_role)
+        public async Task<ProjectCountDTO> CountProjects(string businessId, string managerId, string areaId, string fieldId, string investorId, string temp_field_role)
         {
-            int result;
+            ProjectCountDTO result = new ProjectCountDTO();
             try
             {
-                result = await _projectRepository.CountProject(businessId, managerId, areaId, fieldId, investorId, temp_field_role);
+                result.numOfProject = await _projectRepository.CountProject(businessId, managerId, areaId, fieldId, investorId, temp_field_role);
                 return result;
             }
             catch (Exception e)
