@@ -53,7 +53,8 @@ namespace RevenueSharingInvest.Business.Helpers
             CreateMap<User, BusinessManagerUserDTO>().ReverseMap();
             CreateMap<User, ProjectManagerUserDTO>().ReverseMap();
             CreateMap<User, ProjectMemberUserDTO>().ForMember(des => des.investDate, act => act.MapFrom(src => src.CreateDate)).ReverseMap();
-            CreateMap<User, CreateUpdateUserDTO>().ReverseMap();
+            CreateMap<User, CreateUserDTO>().ReverseMap();
+            CreateMap<User, UpdateUserDTO>().ReverseMap();
             
             CreateMap<ProjectEntity, GetProjectEntityDTO>().ReverseMap();
             CreateMap<ProjectEntity, ProjectComponentProjectEntityDTO>().ReverseMap();

@@ -356,7 +356,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         if (!await _validationService.CheckUUIDFormat(investorId))
                             throw new InvalidFieldException("Invalid investorId!!!");
 
-                        if (!await _validationService.CheckExistenceUserWithRole(ROLE_INVESTOR_ID, Guid.Parse(investorId)))
+                        if (!await _validationService.CheckExistenceId("Investor", Guid.Parse(investorId)))
                             throw new NotFoundException("This investorId is not existed!!!");
                     }
 
