@@ -32,6 +32,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.API
@@ -46,6 +47,7 @@ namespace RevenueSharingInvest.API
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+       
         public void ConfigureServices(IServiceCollection services)
         {
             // Read the connection string from appsettings.
@@ -277,7 +279,9 @@ namespace RevenueSharingInvest.API
                  });
             });
 
-
+            services.AddControllersWithViews()
+                            .AddJsonOptions(options =>
+                            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

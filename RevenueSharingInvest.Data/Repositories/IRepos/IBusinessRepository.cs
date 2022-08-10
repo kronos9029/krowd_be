@@ -17,10 +17,12 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<RevenueSharingInvest.Data.Models.Entities.Business> GetBusinessById(Guid businesssId);
         public Task<RevenueSharingInvest.Data.Models.Entities.Business> GetBusinessByUserId(Guid userId);
         public Task<RevenueSharingInvest.Data.Models.Entities.Business> GetBusinessByProjectId(Guid projectId);
+        public Task<RevenueSharingInvest.Data.Models.Entities.Business> GetBusinessByEmail(string email);
         public Task<int> CountBusiness(string role);
 
         //UPDATE
         public Task<int> UpdateBusiness(RevenueSharingInvest.Data.Models.Entities.Business businessDTO, Guid businesssId);
+        public Task<int> UpdateBusinessStatus(Guid businessId, String status);
 
         //DELETE
         public Task<int> DeleteBusinessById(Guid businesssId);

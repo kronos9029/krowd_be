@@ -275,6 +275,43 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 throw new Exception(e.Message);
             }
+        }        
+        
+        public async Task<GetUserDTO> GetUserByEmail(String email)
+        {
+            try
+            {
+                User user = await _userRepository.GetUserByEmail(email);
+                GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
+                if (userDTO == null)
+                    throw new NotFoundException("No User Object Found!");
+
+                userDTO.createDate = await _validationService.FormatDateOutput(userDTO.createDate);
+                userDTO.updateDate = await _validationService.FormatDateOutput(userDTO.updateDate);
+
+                userDTO.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(userDTO.id)));
+                userDTO.role = _mapper.Map<RoleDTO>(await _roleRepository.GetRoleByUserId(Guid.Parse(userDTO.id)));
+
+                return userDTO;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<List<User>> GetUserByBusinessId(Guid businessId)
+        {
+            try
+            {
+                List<User> listEntity = await _userRepository.GetUserByBusinessId(businessId);
+
+                return listEntity;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         //UPDATE
@@ -521,20 +558,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
         //    return response;
         //}
 
-/*        protected string GenerateOtp()
-        {
-            char[] charArr = "0123456789".ToCharArray();
-            string strrandom = string.Empty;
-            Random objran = new();
-            for (int i = 0; i < 4; i++)
-            {
-                //It will not allow Repetation of Characters
-                int pos = objran.Next(1, charArr.Length);
-                if (!strrandom.Contains(charArr.GetValue(pos).ToString())) strrandom += charArr.GetValue(pos);
-                else i--;
-            }
-            return strrandom;
-        }*/
+        /*        protected string GenerateOtp()
+                {
+                    char[] charArr = "0123456789".ToCharArray();
+                    string strrandom = string.Empty;
+                    Random objran = new();
+                    for (int i = 0; i < 4; i++)
+                    {
+                        //It will not allow Repetation of Characters
+                        int pos = objran.Next(1, charArr.Length);
+                        if (!strrandom.Contains(charArr.GetValue(pos).ToString())) strrandom += charArr.GetValue(pos);
+                        else i--;
+                    }
+                    return strrandom;
+                }*/
 
         private string GenerateOTP(Guid UserId)
         {
@@ -543,19 +580,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return OTP[0];
         }
 
-/*        public async Task<bool> VerifyOTP(String OTP, String email)
-        {
-            User userObj = await _userRepository.GetUserByEmail(email);
+        /*        public async Task<bool> VerifyOTP(String OTP, String email)
+                {
+                    User userObj = await _userRepository.GetUserByEmail(email);
 
-            if (userObj.Id.ToString().Contains(OTP))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }*/
+                    if (userObj.Id.ToString().Contains(OTP))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }*/
 
     }
 }

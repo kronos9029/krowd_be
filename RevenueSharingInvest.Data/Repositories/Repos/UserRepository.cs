@@ -390,5 +390,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+
+
+        public async Task<List<User>> GetUserByBusinessId(Guid businessId)
+        {
+            try
+            {
+                var query = "SELECT * FROM [User] u LEFT JOIN Business b ON b.Id = u.BusinessId WHERE b.Id = @BusinessId";
+                var parameters = new DynamicParameters();
+                parameters.Add("BusinessId", businessId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<User>(query, parameters)).ToList();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

@@ -19,6 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<User> GetBusinessManagerByBusinessId(Guid businessId);
         public Task<User> GetProjectManagerByProjectId(Guid projectId);
         public Task<List<User>> GetProjectMembers(Guid projectId);
+        public Task<List<User>> GetUserByBusinessId(Guid businessId);
         public Task<int> CountUser();
 
         //UPDATE

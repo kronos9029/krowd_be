@@ -39,16 +39,11 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAccountTransaction([FromBody] AccountTransactionDTO accountTransactionDTO)
         {
-            string userId = httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
 
-            
-            if( await _authenticateService.CheckRoleForAction(userId, RoleEnum.INVESTOR.ToString())){
                 var result = await _accountTransactionService.CreateAccountTransaction(accountTransactionDTO);
                 return Ok(result);
-            }
+            
 
-
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission To Do This");
         }
 
         [HttpGet]
