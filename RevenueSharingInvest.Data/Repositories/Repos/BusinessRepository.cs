@@ -123,7 +123,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 if (role.Equals("INVESTOR"))
                 {
-                    whereCondition = "WHERE IsDeleted = 0 AND Status = " + Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(0);
+                    whereCondition = "WHERE IsDeleted = 0 AND Status = " + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
                 }
                 if (orderBy != null)
                 {
@@ -291,7 +291,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 if (role.Equals("INVESTOR"))
                 {
-                    whereCondition = "WHERE IsDeleted = 0 AND Status = " + Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(0);
+                    whereCondition = "WHERE IsDeleted = 0 AND Status = " + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
                 }            
 
                 var query = "SELECT COUNT(*) FROM Business " + whereCondition;

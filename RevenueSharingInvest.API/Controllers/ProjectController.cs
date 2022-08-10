@@ -53,19 +53,21 @@ namespace RevenueSharingInvest.API.Controllers
             string areaId,
             string fieldId,
             string investorId,
+            string name,
+            string status,
             string temp_field_role
             )
         {
             if (countOnly)
             {
                 var countResult = new ProjectCountDTO();
-                countResult = await _projectService.CountProjects(businessId, managerId, areaId, fieldId, investorId, temp_field_role);
+                countResult = await _projectService.CountProjects(businessId, managerId, areaId, fieldId, investorId, name, status, temp_field_role);
                 return Ok(countResult);
             }
             else
             {
                 var resultProjectList = new AllProjectDTO();
-                resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, managerId, areaId, fieldId, investorId, temp_field_role);
+                resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, managerId, areaId, fieldId, investorId, name, status, temp_field_role);
                 return Ok(resultProjectList);
             }           
         }

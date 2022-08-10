@@ -82,15 +82,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IdDTO newId = new IdDTO();
             try
             {
-                //if (userDTO.packageId == null || !await _validationService.CheckUUIDFormat(userDTO.packageId))
-                //    throw new InvalidFieldException("Invalid packageId!!!");
-
-                //if (!await _validationService.CheckExistenceId("Package", Guid.Parse(userDTO.packageId)))
-                //    throw new NotFoundException("This packageId is not existed!!!");
-
-                //if (userDTO.investmentTargetCapital <= 0)
-                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
-
                 if (userDTO.roleId == null || !await _validationService.CheckUUIDFormat(userDTO.roleId))
                     throw new InvalidFieldException("Invalid roleId!!!");
 
@@ -98,22 +89,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     && !userDTO.roleId.Equals(ROLE_PROJECT_MANAGER_ID)
                     && !userDTO.roleId.Equals(ROLE_ADMIN_ID)
                     && !userDTO.roleId.Equals(ROLE_INVESTOR_ID))
-                    throw new NotFoundException("This RoleId is not existed!!!");
-
-                //if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_MANAGER_ID))
-                //{
-                //    if (userDTO.businessId == null)
-                //        throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
-
-                //    if (!await _validationService.CheckUUIDFormat(userDTO.businessId))
-                //        throw new InvalidFieldException("Invalid businessId!!!");
-
-                //    if (!await _validationService.CheckExistenceId("Business", Guid.Parse(userDTO.businessId)))
-                //        throw new NotFoundException("This BusinessId is not existed!!!");
-                //}
-                //else
-                //{
-                //}               
+                    throw new NotFoundException("This RoleId is not existed!!!");       
 
                 if (!await _validationService.CheckText(userDTO.lastName))
                     throw new InvalidFieldException("Invalid lastName!!!");
@@ -147,12 +123,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 User entity = _mapper.Map<User>(userDTO);
 
-                entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
-
-                //if (userDTO.image != null)
-                //{
-                //    entity.Image = await _fileUploadService.UploadImageToFirebaseUser(userDTO.image, ROLE_ADMIN_ID);//sửa role admin sau
-                //}
+                if (entity.RoleId.Equals(ROLE_BUSINESS_MANAGER_ID))
+                {
+                    entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1);
+                }
+                else
+                {
+                    entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
+                }
 
                 newId.id = await _userRepository.CreateUser(entity);
                 if (newId.id.Equals(""))
