@@ -54,20 +54,20 @@ namespace RevenueSharingInvest.API.Controllers
             string fieldId,
             string investorId,
             string name,
-            ProjectStatusEnum status,
+            string status,
             string temp_field_role
             )
         {
             if (countOnly)
             {
                 var countResult = new ProjectCountDTO();
-                countResult = await _projectService.CountProjects(businessId, managerId, areaId, fieldId, investorId, name, status.ToString(), temp_field_role);
+                countResult = await _projectService.CountProjects(businessId, managerId, areaId, fieldId, investorId, name, status, temp_field_role);
                 return Ok(countResult);
             }
             else
             {
                 var resultProjectList = new AllProjectDTO();
-                resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, managerId, areaId, fieldId, investorId, name, status.ToString(), temp_field_role);
+                resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, managerId, areaId, fieldId, investorId, name, status, temp_field_role);
                 return Ok(resultProjectList);
             }           
         }
