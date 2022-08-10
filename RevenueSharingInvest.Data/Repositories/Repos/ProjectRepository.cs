@@ -267,7 +267,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var areaIdCondition = " AND AreaId = @AreaId ";
                 var fieldIdCondition = " AND FieldId = @FieldId ";
                 var investorIdCondition = " Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId) ";
-                var nameCondition = " AND Name LIKE '%@Name%' ";
+                var nameCondition = " AND Name LIKE '%" + name + "%' ";
                 var statusCondition = " AND Status = @Status ";
 
                 if (temp_field_role.Equals("ADMIN"))
@@ -290,7 +290,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     if (name != null)
                     {
                         whereCondition = whereCondition + nameCondition;
-                        parameters.Add("Name", name, DbType.String);
                     }
                     if (status != null)
                     {
@@ -330,7 +329,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     if (name != null)
                     {
                         whereCondition = whereCondition + nameCondition;
-                        parameters.Add("Name", name, DbType.String);
                     }
                     if (status != null)
                     {
@@ -371,7 +369,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     if (name != null)
                     {
                         whereCondition = whereCondition + nameCondition;
-                        parameters.Add("Name", name, DbType.String);
                     }
                     if (status != null)
                     {
@@ -420,7 +417,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     if (name != null)
                     {
                         whereCondition = whereCondition + nameCondition;
-                        parameters.Add("Name", name, DbType.String);
                     }
                     if (status != null)
                     {
@@ -460,7 +456,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     if (name != null)
                     {
                         whereCondition = whereCondition + nameCondition;
-                        parameters.Add("Name", name, DbType.String);
                     }
                     if (status != null)
                     {
@@ -661,7 +656,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var areaIdCondition = " AND AreaId = @AreaId ";
                 var fieldIdCondition = " AND FieldId = @FieldId ";
                 var investorIdCondition = " Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId) ";
-                var nameCondition = " AND Name LIKE '%@Name%' ";
+                var nameCondition = " AND Name LIKE '%" + name + "%' ";
                 var statusCondition = " AND Status = @Status ";
 
                 if (temp_field_role.Equals("ADMIN"))
@@ -684,7 +679,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     if (name != null)
                     {
                         whereCondition = whereCondition + nameCondition;
-                        parameters.Add("Name", name, DbType.String);
                     }
                     if (status != null)
                     {
@@ -724,7 +718,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     if (name != null)
                     {
                         whereCondition = whereCondition + nameCondition;
-                        parameters.Add("Name", name, DbType.String);
                     }
                     if (status != null)
                     {
@@ -765,7 +758,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     if (name != null)
                     {
                         whereCondition = whereCondition + nameCondition;
-                        parameters.Add("Name", name, DbType.String);
                     }
                     if (status != null)
                     {
@@ -814,7 +806,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     if (name != null)
                     {
                         whereCondition = whereCondition + nameCondition;
-                        parameters.Add("Name", name, DbType.String);
                     }
                     if (status != null)
                     {
@@ -854,7 +845,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     if (name != null)
                     {
                         whereCondition = whereCondition + nameCondition;
-                        parameters.Add("Name", name, DbType.String);
                     }
                     if (status != null)
                     {

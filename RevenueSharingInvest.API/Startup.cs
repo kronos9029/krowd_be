@@ -32,6 +32,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.API
@@ -277,7 +278,9 @@ namespace RevenueSharingInvest.API
                  });
             });
 
-
+            services.AddControllersWithViews()
+                .AddJsonOptions(options =>
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

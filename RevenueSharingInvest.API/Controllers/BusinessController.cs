@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using System;
 using System.Collections.Generic;
@@ -34,10 +35,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllBusinesses(int pageIndex, int pageSize, string? orderBy, string? order, string temp_field_role)
+        public async Task<IActionResult> GetAllBusinesses(int pageIndex, int pageSize, BusinessOrderFieldEnum? orderBy, OrderEnum? order, string temp_field_role)
         {
             var result = new AllBusinessDTO();
-            result = await _businessService.GetAllBusiness(pageIndex, pageSize, orderBy, order, temp_field_role);
+            result = await _businessService.GetAllBusiness(pageIndex, pageSize, orderBy.ToString(), order.ToString(), temp_field_role);
             return Ok(result);
         }
 
