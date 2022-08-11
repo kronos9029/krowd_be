@@ -204,33 +204,61 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<AllBusinessDTO> GetAllBusiness(int pageIndex, int pageSize, int? orderBy, int? order, string fieldRole)
+        public async Task<AllBusinessDTO> GetAllBusiness(int pageIndex, int pageSize, string? orderBy, string? order, string temp_field_role)
         {
             string orderByErrorMessage = "";
+            bool checkOrderError = false;
             string orderErrorMessage = "";
             try
             {
                 if (!fieldRole.Equals("ADMIN") && !fieldRole.Equals("INVESTOR"))
                     throw new InvalidFieldException("ADMIN or INVESTOR!");
 
-                if (orderBy != null && (orderBy < 0 || orderBy > Enum.GetNames(typeof(BusinessOrderFieldEnum)).Length - 1))
+                //if (orderBy != null && (orderBy < 0 || orderBy > Enum.GetNames(typeof(BusinessOrderFieldEnum)).Length - 1))
+                //{
+                //    for (int field = 0; field < Enum.GetNames(typeof(BusinessOrderFieldEnum)).Length; field++)
+                //    {
+                //        orderByErrorMessage = orderByErrorMessage + " " + field +":" + Enum.GetNames(typeof(BusinessOrderFieldEnum)).ElementAt(field) + " or";
+                //    }
+                //    orderByErrorMessage = orderByErrorMessage.Remove(orderByErrorMessage.Length - 2);
+                //    throw new InvalidFieldException("orderBy must be" + orderByErrorMessage + " !!!");
+                //}
+
+                if (orderBy != null)
                 {
-                    for (int field = 0; field < Enum.GetNames(typeof(BusinessOrderFieldEnum)).Length; field++)
+                    //for (int item = 0; item < Enum.GetNames(typeof(OrderEnum)).Length; item++)
+                    //{
+                    //    if (orderBy.Equals(field))
+                    //    {
+                    //        checkOrderByError = true;
+                    //        orderBy = field;
+                    //    }                         
+                    //    orderByErrorMessage = orderByErrorMessage + " " + field + " or";
+                    //}
+                    if (!BusinessOrderFieldDictionary.column.ContainsKey(orderBy))
                     {
-                        orderByErrorMessage = orderByErrorMessage + " " + field +":" + Enum.GetNames(typeof(BusinessOrderFieldEnum)).ElementAt(field) + " or";
+                        foreach (KeyValuePair<string, string> pair in BusinessOrderFieldDictionary.column)
+                        {
+                            orderByErrorMessage = orderByErrorMessage + " " + pair.Key + " or";
+                        }
+                        orderByErrorMessage = orderByErrorMessage.Remove(orderByErrorMessage.Length - 2);
+                        throw new InvalidFieldException("orderBy must be" + orderByErrorMessage + " !!!");
                     }
-                    orderByErrorMessage = orderByErrorMessage.Remove(orderByErrorMessage.Length - 2);
-                    throw new InvalidFieldException("orderBy must be" + orderByErrorMessage + " !!!");
+                    else
+                        orderBy = BusinessOrderFieldDictionary.column.GetValueOrDefault(orderBy);
                 }
 
-                if (order != null && (order < 0 || order > Enum.GetNames(typeof(OrderEnum)).Length - 1))
+                if (order != null)
                 {
                     for (int o = 0; o < Enum.GetNames(typeof(OrderEnum)).Length; o++)
                     {
-                        orderErrorMessage = orderErrorMessage + " " + o + ":" + Enum.GetNames(typeof(OrderEnum)).ElementAt(o) + " or";
+                        if (order.Equals(Enum.GetNames(typeof(OrderEnum)).ElementAt(o)))
+                            checkOrderError = true;
+                        orderErrorMessage = orderErrorMessage + " " + Enum.GetNames(typeof(OrderEnum)).ElementAt(o) + " or";
                     }
                     orderErrorMessage = orderErrorMessage.Remove(orderErrorMessage.Length - 2);
-                    throw new InvalidFieldException("order must be" + orderErrorMessage + " !!!");
+                    if (!checkOrderError)
+                        throw new InvalidFieldException("order must be" + orderErrorMessage + " !!!");
                 }
 
                 AllBusinessDTO result = new AllBusinessDTO();

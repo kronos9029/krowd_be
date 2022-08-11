@@ -13,8 +13,32 @@ namespace RevenueSharingInvest.Business.Services
         public Task<IdDTO> CreateProject(CreateUpdateProjectDTO projectDTO);
 
         //READ
-        public Task<AllProjectDTO> GetAllProjects(int pageIndex, int pageSize, string businessId, string managerId, string temp_field_role);
+        public Task<AllProjectDTO> GetAllProjects
+        (
+            int pageIndex, 
+            int pageSize, 
+            string businessId, 
+            string managerId, 
+            string areaId, 
+            string fieldId, 
+            string investorId,
+            string name,
+            string status,
+            string temp_field_role
+        );
         public Task<GetProjectDTO> GetProjectById(Guid projectId);
+        public Task<ProjectCountDTO> CountProjects
+        (
+            string businessId, 
+            string managerId, 
+            string areaId, 
+            string fieldId, 
+            string investorId,
+            string name,
+            string status,
+            string temp_field_role
+        );
+        public Task<List<BusinessProjectDTO>> GetBusinessProjectsToAuthor(Guid businessId);
 
         //UPDATE
         public Task<int> UpdateProject(CreateUpdateProjectDTO projectDTO, Guid projectId);

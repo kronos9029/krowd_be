@@ -129,7 +129,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return response;
         }
 
-        public async Task<AuthenticateResponse> GetTokenWebProjectManager(string firebaseToken)
+        public async Task<AuthenticateResponse> GetTokenProjectManager(string firebaseToken)
         {
             FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
             string uid = decryptedToken.Uid;
@@ -182,8 +182,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
 
             Claim roleClaim, investorId;
-
-            List<Role> roles = await _roleRepository.GetAllRoles();
 
             if (roleCheck.Equals(RoleEnum.ADMIN.ToString()))
             {

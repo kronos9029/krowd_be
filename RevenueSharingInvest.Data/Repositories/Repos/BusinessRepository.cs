@@ -109,7 +109,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<RevenueSharingInvest.Data.Models.Entities.Business>> GetAllBusiness(int pageIndex, int pageSize, int? orderBy, int? order, string role)
+        public async Task<List<RevenueSharingInvest.Data.Models.Entities.Business>> GetAllBusiness(int pageIndex, int pageSize, string? orderBy, string? order, string role)
         {
             try
             {
@@ -127,11 +127,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 if (orderBy != null)
                 {
-                    orderByCondition = "ORDER BY " + Enum.GetNames(typeof(BusinessOrderFieldEnum)).ElementAt((int)orderBy);
+                    orderByCondition = "ORDER BY " + orderBy;
                 }
                 if (order != null)
                 {
-                    orderCondition = Enum.GetNames(typeof(OrderEnum)).ElementAt((int)order);
+                    orderCondition = order;
                 }
 
                 if (pageIndex != 0 && pageSize != 0)
@@ -321,7 +321,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 if (role.Equals("INVESTOR"))
                 {
-                    whereCondition = "WHERE IsDeleted = 0 AND Status = " + Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(0);
+                    whereCondition = "WHERE IsDeleted = 0 AND Status = " + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
                 }            
 
                 var query = "SELECT COUNT(*) FROM Business " + whereCondition;

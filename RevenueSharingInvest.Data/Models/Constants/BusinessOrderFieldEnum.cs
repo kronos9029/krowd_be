@@ -8,8 +8,8 @@ namespace RevenueSharingInvest.Data.Models.Constants
 {
     public enum BusinessOrderFieldEnum
     {
-        Name,
-        NumOfProject,
-        NumOfSuccessfulProject
+        NAME,
+        NUM_OF_PROJECT,
+        NUM_OF_SUCCESSFUL_PROJECT
     }
 }

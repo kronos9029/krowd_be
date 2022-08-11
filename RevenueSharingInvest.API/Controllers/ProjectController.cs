@@ -26,12 +26,14 @@ namespace RevenueSharingInvest.API.Controllers
         private readonly IRoleService _roleService;
         private readonly IBusinessService _businessService;
         private readonly IUserService _userService;
+        private readonly IInvestmentService _investmentService;
         public ProjectController(IProjectService projectService, 
             IHttpContextAccessor httpContextAccessor, 
             IAuthenticateService authenticateService,
             IRoleService roleService,
             IBusinessService businessService,
-            IUserService userService)
+            IUserService userService,
+            IInvestmentService investmentService)
         {
             _projectService = projectService;
             _httpContextAccessor = httpContextAccessor;
@@ -39,6 +41,7 @@ namespace RevenueSharingInvest.API.Controllers
             _roleService = roleService;
             _businessService = businessService;
             _userService = userService;
+            _investmentService = investmentService;
         }
 
         [HttpPost]
@@ -60,59 +63,135 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProjects(int pageIndex, int pageSize, string businessId, string managerId)
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllProjects(
+            bool countOnly,
+            int pageIndex,
+            int pageSize,
+            string businessId,
+            string managerId,
+            string areaId,
+            string fieldId,
+            string investorId,
+            string name,
+            string status
+            )
         {
+
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            RoleDTO roleDTO = await _roleService.GetRoleById(Guid.Parse(currentUser.roleId));
-            if(roleDTO != null)
+            if (countOnly)
             {
-                if (roleDTO.name.Equals(RoleEnum.ADMIN.ToString()))
+                var countResult = new ProjectCountDTO();
+
+                if(currentUser.roleId != null)
                 {
-                    var result = new AllProjectDTO();
-                    result = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, managerId, roleDTO.name);
-
-
-                    return Ok(result);
-                }
-                else if (roleDTO.name.Equals(RoleEnum.INVESTOR.ToString()))
+                    RoleDTO roleDTO = await _roleService.GetRoleById(Guid.Parse(currentUser.roleId));
+                    countResult = await _projectService.CountProjects(businessId, managerId, areaId, fieldId, investorId, name, status.ToString(), roleDTO.name);
+                    return Ok(countResult);
+                } else
                 {
-
-                }else if (roleDTO.name.Equals(RoleEnum.PROJECT_OWNER.ToString()))
-                {
-                    var result = new AllProjectDTO();
-                    result = await _projectService.GetAllProjects(pageIndex, pageSize, currentUser.businessId, currentUser.userId, roleDTO.name);
-
-
-                    return Ok(result);
-                }
-                else if (roleDTO.name.Equals(RoleEnum.BUSINESS_MANAGER.ToString()))
-                {
-                    var result = new AllProjectDTO();
-                    result = await _projectService.GetAllProjects(pageIndex, pageSize, currentUser.businessId, currentUser.userId, roleDTO.name);
-
-
-                    return Ok(result);
+                    countResult = await _projectService.CountProjects(businessId, managerId, areaId, fieldId, investorId, name, status.ToString(), "GUEST");
+                    return Ok(countResult);
                 }
 
             }
+            else
+            {
+
+                var resultProjectList = new AllProjectDTO();
+
+                if(currentUser.roleId != null)
+                {
+                    RoleDTO roleDTO = await _roleService.GetRoleById(Guid.Parse(currentUser.roleId));
+
+                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, managerId, areaId, fieldId, investorId, name, status.ToString(), roleDTO.name);
+                    return Ok(resultProjectList);
+                } else
+                {
+                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, managerId, areaId, fieldId, investorId, name, status.ToString(), "GUEST");
+                    return Ok(resultProjectList);
+                }
+
+            }           
+
             return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
         }
 
         [HttpGet]
         [Route("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetProjectById(Guid id)
         {
-/*            ThisUserObj userObj = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            GetProjectDTO dto = new GetProjectDTO();
 
-            RoleDTO roleDTO = await _roleService.GetRoleById(Guid.Parse(userObj.roleId));
-            if (roleDTO.name.Equals(RoleEnum.))
+            if (currentUser.roleId.Equals(currentUser.adminRoleId))
             {
 
-            }*/
-            GetProjectDTO dto = new GetProjectDTO();
-            dto = await _projectService.GetProjectById(id);
-            return Ok(dto);
+                dto = await _projectService.GetProjectById(id);
+                return Ok(dto);
+
+            } else if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+            {
+                if (currentUser.businessId == null || currentUser.businessId == "")
+                {
+                    throw new UnauthorizedAccessException("You Don't Have Permission Perform This Action!!");
+                }
+
+                List<BusinessProjectDTO> projectList = await _projectService.GetBusinessProjectsToAuthor(Guid.Parse(currentUser.businessId));
+                BusinessProjectDTO projectInfo = (BusinessProjectDTO)projectList
+                    .Where(project => project.BusinessId.ToString().Equals(currentUser.businessId)).FirstOrDefault();
+
+                if (projectInfo != null)
+                {
+                    dto = await _projectService.GetProjectById(id);
+                    return Ok(dto);
+                }
+            } else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            {
+                if (currentUser.businessId == null || currentUser.businessId == "")
+                {
+                    throw new UnauthorizedAccessException("You Don't Have Permission Perform This Action!!");
+                }
+
+                List<BusinessProjectDTO> projectList = await _projectService.GetBusinessProjectsToAuthor(Guid.Parse(currentUser.businessId));
+                BusinessProjectDTO projectInfo = (BusinessProjectDTO)projectList
+                    .Where(project => project.ManagerId.ToString().Equals(currentUser.userId)).FirstOrDefault();
+                
+                if (projectInfo != null)
+                {
+                    dto = await _projectService.GetProjectById(id);
+                    return Ok(dto);
+                }
+
+            } else if (currentUser.roleId.Equals(currentUser.investorRoleId))
+            {
+                List<InvestorInvestmentDTO> investorList = await _investmentService.GetInvestmentByProjectIdForAuthor(id);
+                InvestorInvestmentDTO investor = (InvestorInvestmentDTO)investorList
+                    .Where(investor => investor.UserId.ToString().Equals(currentUser.userId)).FirstOrDefault();
+
+                if (investor != null)
+                {
+                    dto = await _projectService.GetProjectById(id);
+                    return Ok(dto);
+                }
+            }
+            else
+            {
+                dto = await _projectService.GetProjectById(id);
+                if (dto.status.Equals(ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString()))
+                {
+                    return Ok(dto);
+                } else
+                {
+                    throw new UnauthorizedAccessException("You Don't Have Permission Perform This Action!!");
+                }
+                
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
+
         }
 
         [HttpPut]
@@ -161,12 +240,12 @@ namespace RevenueSharingInvest.API.Controllers
 
         }
 
-        private async Task<ThisUserObj> GetThisUserInfo(HttpContext httpContext)
+        private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
         {
             ThisUserObj currentUser = new();
 
-            currentUser.userId = httpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
-            currentUser.email = httpContext.User.Claims.First(c => c.Type == "email").Value;
+            currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
+            currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == "email").Value;
             currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == "investorId").Value;
 
             List<RoleDTO> roleList = await _roleService.GetAllRoles();

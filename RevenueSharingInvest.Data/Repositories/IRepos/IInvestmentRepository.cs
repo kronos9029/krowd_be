@@ -1,4 +1,5 @@
-﻿using RevenueSharingInvest.Data.Models.Entities;
+﻿using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //READ
         public Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize);
         public Task<Investment> GetInvestmentById(Guid investmentId);
+        public Task<List<InvestorInvestmentDTO>> GetInvestmentByProjectIdForAuthor(Guid projectId);
 
         //UPDATE
         public Task<int> UpdateInvestment(Investment investmentDTO, Guid investmentId);

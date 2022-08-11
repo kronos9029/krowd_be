@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.Business.Models.Constant;
@@ -18,7 +19,7 @@ namespace RevenueSharingInvest.API.Controllers
     [ApiController]
     [Route("api/v1.0/businesses")]
     [EnableCors]
-    //[Authorize]
+    [Authorize]
     public class BusinessController : ControllerBase
     {
         private readonly IBusinessService _businessService;
@@ -49,11 +50,9 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllBusinesses(int pageIndex, int pageSize, int? orderBy, int? order)
+        public async Task<IActionResult> GetAllBusinesses(int pageIndex, int pageSize, string? orderBy, string? order)
         {
             ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
-
-            RoleDTO role = await _roleService.GetRoleById(Guid.Parse(userInfo.roleId));
 
             if((userInfo.roleId.Equals(userInfo.investorRoleId) && userInfo.investorId != null) || userInfo.roleId.Equals(userInfo.adminRoleId))
             {

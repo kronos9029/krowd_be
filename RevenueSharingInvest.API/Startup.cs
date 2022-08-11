@@ -280,8 +280,8 @@ namespace RevenueSharingInvest.API
             });
 
             services.AddControllersWithViews()
-                            .AddJsonOptions(options =>
-                            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+                .AddJsonOptions(options =>
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

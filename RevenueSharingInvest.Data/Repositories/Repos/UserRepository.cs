@@ -26,23 +26,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             try
             {
                 var query = "INSERT INTO [User] ("
-                    + "         BusinessId, "
                     + "         RoleId, "
-                    + "         Description, "
                     + "         LastName, "
                     + "         FirstName, "
-                    + "         PhoneNum, "
                     + "         Image, "
-                    + "         IdCard, "
-                    + "         Email, "
-                    + "         Gender, "
-                    + "         DateOfBirth, "
-                    + "         TaxIdentificationNumber, "
-                    + "         City, "
-                    + "         District, "
-                    + "         Address, "                    
-                    + "         BankName, "                    
-                    + "         BankAccount, "                    
+                    + "         Email, "                    
                     + "         Status, "                    
                     + "         CreateDate, "
                     + "         CreateBy, "
@@ -52,23 +40,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
-                    + "         @BusinessId, "
                     + "         @RoleId, "
-                    + "         @Description, "
                     + "         @LastName, "
                     + "         @FirstName, "
-                    + "         @PhoneNum, "
                     + "         @Image, "
-                    + "         @IdCard, "
                     + "         @Email, "
-                    + "         @Gender, "
-                    + "         @DateOfBirth, "
-                    + "         @TaxIdentificationNumber, "
-                    + "         @City, "
-                    + "         @District, "
-                    + "         @Address, "
-                    + "         @BankName, "
-                    + "         @BankAccount, "
                     + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
@@ -77,23 +53,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("BusinessId", userDTO.BusinessId, DbType.Guid);
                 parameters.Add("RoleId", userDTO.RoleId, DbType.Guid);
-                parameters.Add("Description", userDTO.Description, DbType.String);
                 parameters.Add("LastName", userDTO.LastName, DbType.String);
                 parameters.Add("FirstName", userDTO.FirstName, DbType.String);
-                parameters.Add("PhoneNum", userDTO.PhoneNum, DbType.String);
                 parameters.Add("Image", userDTO.Image, DbType.String);
-                parameters.Add("IdCard", userDTO.IdCard, DbType.String);
                 parameters.Add("Email", userDTO.Email, DbType.String);
-                parameters.Add("Gender", userDTO.Gender, DbType.String);
-                parameters.Add("DateOfBirth", userDTO.DateOfBirth, DbType.String);
-                parameters.Add("TaxIdentificationNumber", userDTO.TaxIdentificationNumber, DbType.String);
-                parameters.Add("City", userDTO.City, DbType.String);
-                parameters.Add("District", userDTO.District, DbType.String);
-                parameters.Add("Address", userDTO.Address, DbType.String);
-                parameters.Add("BankName", userDTO.BankName, DbType.String);
-                parameters.Add("BankAccount", userDTO.BankAccount, DbType.String);
                 parameters.Add("Status", userDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", userDTO.CreateBy, DbType.Guid);

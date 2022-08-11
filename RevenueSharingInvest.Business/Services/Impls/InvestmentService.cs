@@ -170,6 +170,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
+        public async Task<List<InvestorInvestmentDTO>> GetInvestmentByProjectIdForAuthor(Guid projectId)
+        {
+            try
+                return await _investmentRepository.GetInvestmentByProjectIdForAuthor(projectId);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         //UPDATE
         public async Task<int> UpdateInvestment(InvestmentDTO investmentDTO, Guid investmentId)
         {
