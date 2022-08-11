@@ -211,7 +211,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             string orderErrorMessage = "";
             try
             {
-                if (!fieldRole.Equals("ADMIN") && !fieldRole.Equals("INVESTOR"))
+                if (!temp_field_role.Equals("ADMIN") && !temp_field_role.Equals("INVESTOR"))
                     throw new InvalidFieldException("ADMIN or INVESTOR!");
 
                 //if (orderBy != null && (orderBy < 0 || orderBy > Enum.GetNames(typeof(BusinessOrderFieldEnum)).Length - 1))
@@ -264,9 +264,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 AllBusinessDTO result = new AllBusinessDTO();
                 result.listOfBusiness = new List<GetBusinessDTO>();
 
-                result.numOfBusiness = await _businessRepository.CountBusiness(fieldRole);
+                result.numOfBusiness = await _businessRepository.CountBusiness(temp_field_role);
 
-                List<RevenueSharingInvest.Data.Models.Entities.Business> listEntity = await _businessRepository.GetAllBusiness(pageIndex, pageSize, orderBy, order, fieldRole);
+                List<RevenueSharingInvest.Data.Models.Entities.Business> listEntity = await _businessRepository.GetAllBusiness(pageIndex, pageSize, orderBy, order, temp_field_role);
                 List<GetBusinessDTO> listDTO = _mapper.Map<List<GetBusinessDTO>>(listEntity);
 
                 foreach (GetBusinessDTO item in listDTO)

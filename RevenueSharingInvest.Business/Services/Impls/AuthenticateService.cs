@@ -186,31 +186,31 @@ namespace RevenueSharingInvest.Business.Services.Impls
             if (roleCheck.Equals(RoleEnum.ADMIN.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.ADMIN.ToString());
-                investorId = new Claim("investorId", "");
+                investorId = new Claim(ClaimTypes.GroupSid, "");
 
             }
             else if (roleCheck.Equals(RoleEnum.INVESTOR.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.INVESTOR.ToString());
-                investorId = new Claim("investorId", response.investorId.ToString());
+                investorId = new Claim(ClaimTypes.GroupSid, response.investorId.ToString());
 
             }
             else if (roleCheck.Equals(RoleEnum.BUSINESS_MANAGER.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BUSINESS_MANAGER.ToString());
-                investorId = new Claim("investorId", "");
+                investorId = new Claim(ClaimTypes.GroupSid, "");
 
             }
             else if (roleCheck.Equals(RoleEnum.PROJECT_OWNER.ToString()))
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.PROJECT_OWNER.ToString());
-                investorId = new Claim("investorId", "");
+                investorId = new Claim(ClaimTypes.GroupSid, "");
 
             }
             else
             {
                 roleClaim = new Claim(ClaimTypes.Role, RoleEnum.INVESTOR.ToString());
-                investorId = new Claim("investorId", response.investorId.ToString());
+                investorId = new Claim(ClaimTypes.GroupSid, response.investorId.ToString());
 
             }
 
@@ -230,8 +230,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                    new Claim(ClaimTypes.SerialNumber, response.id.ToString()),
-                   new Claim("uid", response.uid),
-                   new Claim("email", response.email),
+                   new Claim(ClaimTypes.Email, response.email),
                    investorId,
                    roleClaim,
                 }),

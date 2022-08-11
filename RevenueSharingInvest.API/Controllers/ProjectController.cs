@@ -245,8 +245,8 @@ namespace RevenueSharingInvest.API.Controllers
             ThisUserObj currentUser = new();
 
             currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
-            currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == "email").Value;
-            currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == "investorId").Value;
+            currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
+            currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
 
             List<RoleDTO> roleList = await _roleService.GetAllRoles();
             GetUserDTO userDTO = await _userService.GetUserByEmail(currentUser.email);
