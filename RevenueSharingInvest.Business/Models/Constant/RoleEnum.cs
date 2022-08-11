@@ -11,6 +11,6 @@ namespace RevenueSharingInvest.Business.Models.Constant
         ADMIN,
         INVESTOR,
         BUSINESS_MANAGER,
-        PROJECT_MANAGER
+        PROJECT_OWNER
     }
 }

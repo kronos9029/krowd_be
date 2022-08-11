@@ -38,6 +38,7 @@ namespace RevenueSharingInvest.Business.Services
             string status,
             string temp_field_role
         );
+        public Task<List<BusinessProjectDTO>> GetBusinessProjectsToAuthor(Guid businessId);
 
         //UPDATE
         public Task<int> UpdateProject(CreateUpdateProjectDTO projectDTO, Guid projectId);

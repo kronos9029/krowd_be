@@ -152,6 +152,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 throw new Exception(e.Message, e);
             }
+        }        
+        
+        //GET BY EMAIL
+        public async Task<string> GetInvestorByEmail(string email)
+        {
+            try
+            {
+                string query = "SELECT Id FROM Investor WHERE Email = @Email";
+                var parameters = new DynamicParameters();
+                parameters.Add("Email", email, DbType.String);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<string>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
         }
 
         //UPDATE

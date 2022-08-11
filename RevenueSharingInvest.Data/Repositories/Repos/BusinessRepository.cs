@@ -201,6 +201,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 throw new Exception(e.Message, e);
             }
+        }        
+        
+        public async Task<RevenueSharingInvest.Data.Models.Entities.Business> GetBusinessByEmail(string email)
+        {
+            try
+            {
+                var query = "SELECT * FROM Business WHERE Email = @Email";
+                var parameters = new DynamicParameters();
+                parameters.Add("Email", email, DbType.String);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<RevenueSharingInvest.Data.Models.Entities.Business>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
         }
 
         //UPDATE - chưa update NumOfProject, NumOfSuccessfulProject, SuccessfulRate (update riêng)
@@ -236,12 +252,26 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("IsDeleted", businessDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", businesssId, DbType.Guid);
 
-                using (var connection = CreateConnection())
-                {
-                    return await connection.ExecuteAsync(query, parameters);
-                }
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<int> UpdateBusinessStatus(Guid businessId, String status)
+        {
+            try
+            {
+                var query = "UPDATE Business SET Status = @Status WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Status", status, DbType.String);
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
+
+            } catch(Exception e)
             {
                 throw new Exception(e.Message, e);
             }

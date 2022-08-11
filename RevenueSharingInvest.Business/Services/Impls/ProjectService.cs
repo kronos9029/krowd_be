@@ -600,6 +600,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
+        public async Task<List<BusinessProjectDTO>> GetBusinessProjectsToAuthor(Guid businessId)
+        {
+            try
+            {
+                return await _projectRepository.GetBusinessProjectsToAuthor(businessId);
+            }catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         //UPDATE
         public async Task<int> UpdateProject(CreateUpdateProjectDTO projectDTO, Guid projectId)
         {

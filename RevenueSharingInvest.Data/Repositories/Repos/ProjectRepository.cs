@@ -2,13 +2,13 @@
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
@@ -31,7 +31,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         AreaId, "
                     + "         Name, "
                     + "         Image, "
-                    + "         Description, "                  
+                    + "         Description, "
                     + "         Address, "
                     + "         InvestmentTargetCapital, "
                     + "         InvestedCapital, "
@@ -60,7 +60,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @AreaId, "
                     + "         @Name, "
                     + "         @Image, "
-                    + "         @Description, "                   
+                    + "         @Description, "
                     + "         @Address, "
                     + "         @InvestmentTargetCapital, "
                     + "         @InvestedCapital, "
@@ -89,7 +89,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Name", projectDTO.Name, DbType.String);
                 parameters.Add("Image", projectDTO.Image, DbType.String);
                 parameters.Add("Description", projectDTO.Description, DbType.String);
-                parameters.Add("Address", projectDTO.Description, DbType.String);               
+                parameters.Add("Address", projectDTO.Description, DbType.String);
                 parameters.Add("InvestmentTargetCapital", projectDTO.InvestmentTargetCapital, DbType.Double);
                 parameters.Add("InvestedCapital", projectDTO.InvestedCapital, DbType.Double);
                 parameters.Add("SharedRevenue", projectDTO.SharedRevenue, DbType.Double);
@@ -97,7 +97,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Duration", projectDTO.Duration, DbType.Int16);
                 parameters.Add("NumOfStage", projectDTO.NumOfStage, DbType.Int16);
                 parameters.Add("RemainAmount", projectDTO.RemainAmount, DbType.Double);
-                parameters.Add("StartDate", Convert.ToDateTime(projectDTO.StartDate), DbType.DateTime);               
+                parameters.Add("StartDate", Convert.ToDateTime(projectDTO.StartDate), DbType.DateTime);
                 parameters.Add("EndDate", Convert.ToDateTime(projectDTO.EndDate), DbType.DateTime);
                 parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
                 parameters.Add("Status", projectDTO.Status, DbType.String);
@@ -243,15 +243,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         //GET ALL
         public async Task<List<Project>> GetAllProjects
             (
-            int pageIndex, 
-            int pageSize, 
-            string businessId, 
-            string managerId, 
-            string areaId, 
-            string fieldId, 
-            string investorId, 
-            string name, 
-            string status, 
+            int pageIndex,
+            int pageSize,
+            string businessId,
+            string managerId,
+            string areaId,
+            string fieldId,
+            string investorId,
+            string name,
+            string status,
             string temp_field_role
             )
         {
@@ -306,9 +306,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
                         + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
                         + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "')";
-                    }                    
+                    }
 
-                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);           
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
                 if (temp_field_role.Equals("BUSINESS"))
@@ -386,7 +386,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
                         + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
                         + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "')";
-                    }   
+                    }
 
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
@@ -564,8 +564,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         AreaId = @AreaId, "
                     + "         Name = @Name, "
                     + "         Image = @Image, "
-                    + "         Description = @Description, "                  
-                    + "         Address = @Address, "                
+                    + "         Description = @Description, "
+                    + "         Address = @Address, "
                     + "         InvestmentTargetCapital = @InvestmentTargetCapital, "
                     + "         InvestedCapital = @InvestedCapital, "
                     + "         SharedRevenue = @SharedRevenue, "
@@ -575,7 +575,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         RemainAmount = @RemainAmount, "
                     + "         StartDate = @StartDate, "
                     + "         EndDate = @EndDate, "
-                    + "         BusinessLicense = @BusinessLicense, "                    
+                    + "         BusinessLicense = @BusinessLicense, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = @IsDeleted "
@@ -600,15 +600,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("RemainAmount", projectDTO.RemainAmount, DbType.Double);
                 parameters.Add("StartDate", Convert.ToDateTime(projectDTO.StartDate), DbType.DateTime);
                 parameters.Add("EndDate", Convert.ToDateTime(projectDTO.EndDate), DbType.DateTime);
-                parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);          
+                parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", projectDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", projectId, DbType.Guid);
 
                 using (var connection = CreateConnection())
-                {                   
-                    return await connection.ExecuteAsync(query, parameters);                  
+                {
+                    return await connection.ExecuteAsync(query, parameters);
                 }
             }
             catch (Exception e)
@@ -659,7 +659,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var nameCondition = " AND Name LIKE '%" + name + "%' ";
                 var statusCondition = " AND Status = @Status ";
 
-                if (temp_field_role.Equals("ADMIN"))
+                if (temp_field_role.Equals(RoleEnum.ADMIN.ToString()))
                 {
                     if (businessId != null)
                     {
@@ -700,7 +700,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
-                if (temp_field_role.Equals("BUSINESS"))
+                if (temp_field_role.Equals(RoleEnum.BUSINESS_MANAGER.ToString()))
                 {
                     whereCondition = whereCondition + businessIdCondition;
                     parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
@@ -740,7 +740,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
-                if (temp_field_role.Equals("PROJECT"))
+                if (temp_field_role.Equals(RoleEnum.PROJECT_OWNER.ToString()))
                 {
                     whereCondition = whereCondition + managerIdCondition;
                     parameters.Add("ManagerId", Guid.Parse(managerId), DbType.Guid);
@@ -780,7 +780,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
-                if (temp_field_role.Equals("INVESTOR"))
+                if (temp_field_role.Equals(RoleEnum.INVESTOR.ToString()))
                 {
                     if (businessId != null)
                     {
@@ -886,7 +886,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
 
                 var query = "SELECT COUNT(*) FROM Project " + whereCondition;
-                
+
                 using var connection = CreateConnection();
                 return ((int)connection.ExecuteScalar(query, parameters));
             }
@@ -895,5 +895,33 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+
+
+        public async Task<List<BusinessProjectDTO>> GetBusinessProjectsToAuthor(Guid businessId)
+        {
+            try
+            {
+                var query = "SELECT p.BusinessId, p.Id AS ProjectId, p.Name AS ProjectName, p.ManagerId " +
+                    "FROM Project p RIGHT JOIN [Business] b ON p.BusinessId = b.Id " +
+                    "WHERE b.Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", businessId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<BusinessProjectDTO>(query, parameters)).ToList();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+    }
+
+    public enum RoleEnum
+    {
+        ADMIN,
+        INVESTOR,
+        BUSINESS_MANAGER,
+        PROJECT_OWNER
     }
 }

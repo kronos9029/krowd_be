@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Business.Services
     public interface IBusinessService
     {
         //CREATE
-        public Task<IdDTO> CreateBusiness(CreateUpdateBusinessDTO businessDTO, List<string> fieldIdList);
+        public Task<IdDTO> CreateBusiness(CreateUpdateBusinessDTO businessDTO, List<string> fieldIdList, string adminId);
         //public Task<int> AdminCreateBusiness(Data.Models.Entities.Business newBusiness, string email);
 
         //READ
@@ -19,6 +19,7 @@ namespace RevenueSharingInvest.Business.Services
 
         //UPDATE
         public Task<int> UpdateBusiness(CreateUpdateBusinessDTO businessDTO, Guid businessId);
+        public Task<int> UpdateBusinessStatus(Guid businessId, String status);
 
         //DELETE
         public Task<int> DeleteBusinessById(Guid businessId);

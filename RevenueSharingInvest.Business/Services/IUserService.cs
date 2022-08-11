@@ -18,6 +18,8 @@ namespace RevenueSharingInvest.Business.Services
         //READ
         public Task<AllUserDTO> GetAllUsers(int pageIndex, int pageSize);
         public Task<GetUserDTO> GetUserById(Guid userId);
+        public Task<GetUserDTO> GetUserByEmail(String email);
+        public Task<List<User>> GetUserByBusinessId(Guid businessId);
 
         //UPDATE
         public Task<int> UpdateUser(UpdateUserDTO userDTO, Guid userId);

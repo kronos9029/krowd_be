@@ -16,6 +16,7 @@ namespace RevenueSharingInvest.Business.Services
         public Task<List<InvestmentDTO>> GetAllInvestments(int pageIndex, int pageSize);
         public Task<InvestmentDTO> GetInvestmentById(Guid investmentId);
         //public Task<List<InvestorDTO>> GetProjectMember(String projectID);
+        public Task<List<InvestorInvestmentDTO>> GetInvestmentByProjectIdForAuthor(Guid projectId);
 
         //UPDATE
         public Task<int> UpdateInvestment(InvestmentDTO investmentDTO, Guid investmentId);

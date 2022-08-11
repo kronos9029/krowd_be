@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -160,6 +161,25 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Id", investmentId, DbType.Guid);
                 using var connection = CreateConnection();
                 return await connection.QueryFirstOrDefaultAsync<Investment>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }        
+        //GET INVESTMENT FOR AUTHOR
+        public async Task<List<InvestorInvestmentDTO>> GetInvestmentByProjectIdForAuthor(Guid projectId)
+        {
+            try
+            {
+                string query = "SELECT DISTINCT u.Id AS InvestorId, u.UserId, i.ProjectId " +
+                    "FROM Investor u " +
+                    "JOIN Investment i ON u.Id = i.InvestorId " +
+                    "WHERE i.ProjectId = @ProjectId";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<InvestorInvestmentDTO>(query, parameters)).ToList();
             }
             catch (Exception e)
             {

@@ -25,8 +25,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
 
-        private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
-
         public BusinessService(IBusinessRepository businessRepository, 
             IBusinessFieldRepository businessFieldRepository, 
             IValidationService validationService, 
@@ -86,7 +84,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         //}
 
         //CREATE
-        public async Task<IdDTO> CreateBusiness(CreateUpdateBusinessDTO businessDTO, List<string> fieldIdList)
+        public async Task<IdDTO> CreateBusiness(CreateUpdateBusinessDTO businessDTO, List<string> fieldIdList, string roleId)
         {
             IdDTO newId = new IdDTO();
             try
@@ -150,7 +148,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (businessDTO.image != null)
                 {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, ROLE_ADMIN_ID);//sửa role admin sau
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, roleId);//sửa role admin sau
                 }
 
                 newId.id = await _businessRepository.CreateBusiness(entity);
@@ -184,7 +182,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-                result = await _businessRepository.DeleteBusinessById(businessId);
+                Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(businessId);
+
+                if (business.Status.Equals(ObjectStatusEnum.INACTIVE.ToString()))
+                {
+                    result = await _businessRepository.DeleteBusinessById(businessId);
+                } else
+                {
+                    result = 0;
+                }
+
+                
                 if (result == 0)
                     throw new DeleteObjectException("Can not delete Business Object!");
                 return result;
@@ -303,6 +311,30 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 throw new Exception(e.Message);
             }
+        }        
+        
+        public async Task<GetBusinessDTO> GetBusinessByEmail(string email)
+        {
+            try
+            {
+
+                RevenueSharingInvest.Data.Models.Entities.Business business = await _businessRepository.GetBusinessByEmail(email);
+                GetBusinessDTO businessDTO = _mapper.Map<GetBusinessDTO>(business);
+                if (businessDTO == null)
+                    throw new NotFoundException("No Business Object Found!");
+
+                businessDTO.createDate = await _validationService.FormatDateOutput(businessDTO.createDate);
+                businessDTO.updateDate = await _validationService.FormatDateOutput(businessDTO.updateDate);
+
+                businessDTO.manager = _mapper.Map<BusinessManagerUserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(businessDTO.id)));
+                businessDTO.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(businessDTO.id)));
+
+                return businessDTO;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         //UPDATE
@@ -311,6 +343,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(businessId);
+
+                if (business.Status.Equals(ObjectStatusEnum.BLOCKED))
+                {
+                    throw new UnauthorizedException("You Can Not Update This Business Because It Is Blocked!!");
+                }
+
                 if (!await _validationService.CheckText(businessDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");
 
@@ -355,7 +394,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (businessDTO.image != null)
                 {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, ROLE_ADMIN_ID);
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, businessId.ToString());
                 }
 
                 result = await _businessRepository.UpdateBusiness(entity, businessId);
@@ -364,6 +403,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 return result;
             }
             catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<int> UpdateBusinessStatus(Guid businessId, string status)
+        {
+            try
+            {
+
+
+                int result = await _businessRepository.UpdateBusinessStatus(businessId, status);
+                return result;
+            } catch(Exception e)
             {
                 throw new Exception(e.Message);
             }
