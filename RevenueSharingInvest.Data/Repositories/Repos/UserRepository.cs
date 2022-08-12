@@ -239,7 +239,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     FirstName ASC ) AS Num, "
                     +               selectCondition
                     + "         FROM " + fromCondition
-                    +           whereCondition
+                    +           whereCondition + " ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         BusinessId, "
