@@ -429,7 +429,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "' OR Status = '"
                         + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
                         + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "') AND "
+                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "') "
                         + isDeletedCondition;
                     }
 
@@ -465,7 +465,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     else
                     {
                         whereCondition = whereCondition + " AND (Status = '"
-                            + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "') AND "
+                            + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "') "
                             + isDeletedCondition;
                     }
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
@@ -818,7 +818,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "' OR Status = '"
                         + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
                         + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "') AND "
+                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "') "
                         + isDeletedCondition;
                     }
 
@@ -854,7 +854,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     else
                     {
                         whereCondition = whereCondition + " AND (Status = '"
-                            + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "') AND "
+                            + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "') "
                             + isDeletedCondition;
                     }
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
@@ -879,7 +879,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     }
 
                     whereCondition = whereCondition + " AND (Status = '"
-                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(1) + "') AND "
+                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(1) + "') "
                         + isDeletedCondition;
 
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);

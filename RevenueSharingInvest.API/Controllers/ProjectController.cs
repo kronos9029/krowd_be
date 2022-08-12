@@ -236,8 +236,8 @@ namespace RevenueSharingInvest.API.Controllers
             ThisUserObj currentUser = new();
 
             currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
-            currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == "email").Value;
-            currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == "investorId").Value;
+            currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
+            currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
 
             List<RoleDTO> roleList = await _roleService.GetAllRoles();
             GetUserDTO userDTO = await _userService.GetUserByEmail(currentUser.email);
@@ -251,15 +251,15 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     currentUser.adminRoleId = role.id;
                 }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(1)))
+                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(3)))
                 {
                     currentUser.investorRoleId = role.id;
                 }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(2)))
+                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(1)))
                 {
                     currentUser.businessManagerRoleId = role.id;
                 }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(3)))
+                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(2)))
                 {
                     currentUser.projectManagerRoleId = role.id;
                 }

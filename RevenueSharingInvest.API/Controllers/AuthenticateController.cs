@@ -51,7 +51,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
         
         [HttpPost]
-        [Route("project_manager")]
+        [Route("project-manager")]
         public async Task<IActionResult> GetTokenProJectManager([FromQuery] string token)
         {
             var result = await _authenticateService.GetTokenProjectManager(token);
