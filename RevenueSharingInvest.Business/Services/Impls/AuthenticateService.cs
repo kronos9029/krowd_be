@@ -123,6 +123,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.id = userObject.Id;
                 response.uid = uid;
                 response.businessId = userObject.BusinessId;
+                response.roleId = userObject.RoleId;
+                response.roleName = RoleEnum.BUSINESS_MANAGER.ToString();
+                response.image = userObject.Image;
+                response.fullName = userObject.FirstName + userObject.LastName;
                 response = await GenerateTokenAsync(response, RoleEnum.BUSINESS_MANAGER.ToString());
             }
 
