@@ -114,9 +114,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (businessDTO.email == null || businessDTO.email.Length == 0 || !await _validationService.CheckEmail(businessDTO.email))
                     throw new InvalidFieldException("Invalid email!!!");
-
+/*
                 if (businessDTO.description != null && (businessDTO.description.Equals("string") || businessDTO.description.Length == 0))
-                    businessDTO.description = null;
+                    businessDTO.description = null;*/
 
                 if (!await _validationService.CheckText(businessDTO.taxIdentificationNumber))
                     throw new InvalidFieldException("Invalid taxIdentificationNumber!!!");
@@ -146,10 +146,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
 
-                if (businessDTO.image != null)
+/*                if (businessDTO.image != null)
                 {
                     entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, roleId);//sửa role admin sau
-                }
+                }*/
 
                 newId.id = await _businessRepository.CreateBusiness(entity);
                 if (newId.id.Equals(""))
