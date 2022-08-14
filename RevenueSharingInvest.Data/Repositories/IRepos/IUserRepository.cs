@@ -24,6 +24,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //UPDATE
         public Task<int> UpdateUser(User userDTO, Guid userId);
+        public Task<int> UpdateBusinessIdForBuM(Guid? businessId, Guid businesManagerId);
 
         //DELETE
         public Task<int> DeleteUserById(Guid userId);

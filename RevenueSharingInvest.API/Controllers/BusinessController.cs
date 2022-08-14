@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Data.Models.Constants;
@@ -35,9 +36,14 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBusiness([FromForm] CreateUpdateBusinessDTO businessDTO, [FromQuery] List<string> fieldIdList)
+        public async Task<IActionResult> CreateBusiness([FromForm] CreateBusinessDTO businessDTO, [FromQuery] List<string> fieldIdList)
         {
             ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
+
+            if (!userInfo.businessId.Equals(""))
+            {
+                throw new CreateObjectException("This BUSINESS_MANAGER has a business already!!!");
+            }
 
             if(userInfo.roleId.Equals(userInfo.businessManagerRoleId))
             {
@@ -61,7 +67,7 @@ namespace RevenueSharingInvest.API.Controllers
                 return Ok(result);
             }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Perform This Action!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN and INVESTOR can perform this action!!");
         }
 
         [HttpGet]
@@ -82,7 +88,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateBusiness([FromForm] CreateUpdateBusinessDTO businessDTO)
+        public async Task<IActionResult> UpdateBusiness([FromForm] UpdateBusinessDTO businessDTO)
         {
             ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
 
@@ -90,7 +96,7 @@ namespace RevenueSharingInvest.API.Controllers
             {
                 if (userInfo.businessId.Equals(""))
                 {
-                    throw new UnauthorizedAccessException("Yoou Have To Create Business First!!");
+                    throw new System.UnauthorizedAccessException("You Have To Create Business First!!");
                 }
                 var result = await _businessService.UpdateBusiness(businessDTO, Guid.Parse(userInfo.businessId));
                 return Ok(result);

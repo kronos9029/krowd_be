@@ -17,7 +17,12 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string address { get; set; }
     }
 
-    public class CreateUpdateBusinessDTO : BusinessDTO
+    public class CreateBusinessDTO : BusinessDTO
+    {
+
+    }
+    
+    public class UpdateBusinessDTO : BusinessDTO
     {
         public IFormFile? image { get; set; }
     }

@@ -619,5 +619,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+
+        public async Task<int> UpdateBusinessIdForBuM(Guid? businessId, Guid businesManagerId)
+        {
+            try
+            {
+                var query = "UPDATE [User] SET BusinessId = @BusinessId WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", businesManagerId, DbType.Guid);
+                parameters.Add("BusinessId", businessId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }
