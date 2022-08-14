@@ -352,5 +352,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 throw new Exception(e.Message);
             }
         }
+
+        public async Task<Data.Models.Entities.Business> GetBusinessByProjectId(Guid projectId)
+        {
+            try
+            {
+                Data.Models.Entities.Business business = await _businessRepository.GetBusinessByProjectId(projectId);
+
+                return business;
+
+            }catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

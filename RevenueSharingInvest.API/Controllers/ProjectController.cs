@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Data.Models.DTOs;
@@ -127,7 +128,7 @@ namespace RevenueSharingInvest.API.Controllers
             {
                 if (currentUser.businessId == null || currentUser.businessId == "")
                 {
-                    throw new UnauthorizedAccessException("You Don't Have Permission Perform This Action!!");
+                    throw new System.UnauthorizedAccessException("You Don't Have Permission Perform This Action!!");
                 }
 
                 List<BusinessProjectDTO> projectList = await _projectService.GetBusinessProjectsToAuthor(Guid.Parse(currentUser.businessId));
@@ -143,7 +144,7 @@ namespace RevenueSharingInvest.API.Controllers
             {
                 if (currentUser.businessId == null || currentUser.businessId == "")
                 {
-                    throw new UnauthorizedAccessException("You Don't Have Permission Perform This Action!!");
+                    throw new System.UnauthorizedAccessException("You Don't Have Permission Perform This Action!!");
                 }
 
                 List<BusinessProjectDTO> projectList = await _projectService.GetBusinessProjectsToAuthor(Guid.Parse(currentUser.businessId));
@@ -176,7 +177,7 @@ namespace RevenueSharingInvest.API.Controllers
                     return Ok(dto);
                 } else
                 {
-                    throw new UnauthorizedAccessException("You Don't Have Permission Perform This Action!!");
+                    throw new System.UnauthorizedAccessException("You Don't Have Permission Perform This Action!!");
                 }
                 
             }
@@ -190,14 +191,34 @@ namespace RevenueSharingInvest.API.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateProject([FromForm] CreateUpdateProjectDTO projectDTO, Guid id)
         {
-            //string userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            //if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.BUSINESS_MANAGER.ToString()))
-            //{
-                var result = await _projectService.UpdateProject(projectDTO, id);
-                return Ok(result);
-            //}
-            //return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
+            if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+            {
+                Data.Models.Entities.Business businessDTO = await _businessService.GetBusinessByProjectId(id);
+
+                GetProjectDTO project = await _projectService.GetProjectById(id);
+
+                if (businessDTO == null || project == null)
+                {
+                    throw new NotFoundException("no Project With This ID Found!!");
+                } else if(businessDTO.Id.Equals(currentUser.businessId))
+                {
+                    if(project.status.Equals(ProjectStatusEnum.DRAFT.ToString()) || project.status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVED.ToString()))
+                    {
+                        var result = await _projectService.UpdateProject(projectDTO, id);
+                        return Ok(result);
+                    }   
+                }
+
+                
+            } else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            {
+
+            }
+
+
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
         }
 
         [HttpDelete]
@@ -205,14 +226,31 @@ namespace RevenueSharingInvest.API.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteProject(Guid id)
         {
-            //string userId = _httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            //if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.ADMIN.ToString()) && await _authenticateService.CheckIdForAction(userId, id))
-            //{
-                var result = await _projectService.DeleteProjectById(id);
-                return Ok(result);
-            //}
-            //return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
+            if (currentUser.roleId.Equals(currentUser.adminRoleId))
+            {
+                GetProjectDTO project = await _projectService.GetProjectById(id);
+
+                if (!project.status.Equals(ProjectStatusEnum.DRAFT.ToString()))
+                {
+                    var result = await _projectService.DeleteProjectById(id);
+                    return Ok(result);
+                }
+            } else if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+            {
+                GetProjectDTO project = await _projectService.GetProjectById(id);
+
+                if (project.status.Equals(ProjectStatusEnum.DRAFT.ToString()) 
+                    || project.status.Equals(ProjectStatusEnum.DENIED.ToString()) 
+                    || project.status.Equals(ProjectStatusEnum.CLOSED.ToString()))
+                {
+                    var result = await _projectService.DeleteProjectById(id);
+                    return Ok(result);
+                }
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
 
         }
 
