@@ -54,7 +54,7 @@ namespace RevenueSharingInvest.API.Controllers
         {
             ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
 
-            if((userInfo.roleId.Equals(userInfo.investorRoleId) && userInfo.investorId != null) || userInfo.roleId.Equals(userInfo.adminRoleId))
+            if((userInfo.roleId.Equals(userInfo.investorRoleId) && !userInfo.investorId.Equals("")) || userInfo.roleId.Equals(userInfo.adminRoleId))
             {
                 var result = new AllBusinessDTO();
                 result = await _businessService.GetAllBusiness(pageIndex, pageSize, orderBy, order, userInfo.roleId);
@@ -71,7 +71,7 @@ namespace RevenueSharingInvest.API.Controllers
             ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
             GetBusinessDTO dto = new GetBusinessDTO();
 
-            if((userInfo.roleId.Equals(userInfo.businessManagerRoleId) || userInfo.roleId.Equals(userInfo.projectManagerRoleId)) && userInfo.businessId != null)
+            if((userInfo.roleId.Equals(userInfo.businessManagerRoleId) || userInfo.roleId.Equals(userInfo.projectManagerRoleId)) && !userInfo.businessId.Equals(""))
             {
                 dto = await _businessService.GetBusinessById(Guid.Parse(userInfo.businessId));
                 return Ok(dto);
@@ -85,8 +85,13 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> UpdateBusiness([FromForm] CreateUpdateBusinessDTO businessDTO)
         {
             ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
+
             if (userInfo.roleId.Equals(userInfo.businessManagerRoleId))
             {
+                if (userInfo.businessId.Equals(""))
+                {
+                    throw new UnauthorizedAccessException("Yoou Have To Create Business First!!");
+                }
                 var result = await _businessService.UpdateBusiness(businessDTO, Guid.Parse(userInfo.businessId));
                 return Ok(result);
             }
@@ -99,6 +104,13 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> DeleteBusiness(Guid id)
         {
             ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
+
+            GetBusinessDTO businessDTO = await _businessService.GetBusinessById(id);
+
+            if(businessDTO == null)
+            {
+                throw new Business.Exceptions.NotFoundException("No Business With This ID Found!!");
+            }
 
             if (userInfo.roleId.Equals(userInfo.adminRoleId))
             {
@@ -137,6 +149,10 @@ namespace RevenueSharingInvest.API.Controllers
             if(userDTO.business != null)
             {
                 currentUser.businessId = userDTO.business.id;
+            }
+            else
+            {
+                currentUser.businessId = "";
             }
 
             foreach(RoleDTO role in roleList)

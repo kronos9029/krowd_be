@@ -247,6 +247,10 @@ namespace RevenueSharingInvest.API.Controllers
             {
                 currentUser.businessId = userDTO.business.id;
             }
+            else
+            {
+                currentUser.businessId = "";
+            }
 
             foreach (RoleDTO role in roleList)
             {
