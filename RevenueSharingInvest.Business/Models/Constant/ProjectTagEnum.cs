@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Models.Constant
 {
-    public enum RoleEnum
+    public enum ProjectTagEnum
     {
-        ADMIN,
-        BUSINESS_MANAGER,
-        PROJECT_MANAGER,
-        INVESTOR
+        NEW,
+        HOT,
+        RECOMMENDED
     }
 }

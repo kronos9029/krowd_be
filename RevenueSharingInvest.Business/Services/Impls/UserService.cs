@@ -2,11 +2,13 @@
 using FirebaseAdmin.Auth;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Business.Services.Common.Firebase;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -76,20 +78,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreateUser(CreateUpdateUserDTO userDTO)
+        public async Task<IdDTO> CreateUser(CreateUserDTO userDTO)
         {
             IdDTO newId = new IdDTO();
             try
             {
-                //if (userDTO.packageId == null || !await _validationService.CheckUUIDFormat(userDTO.packageId))
-                //    throw new InvalidFieldException("Invalid packageId!!!");
-
-                //if (!await _validationService.CheckExistenceId("Package", Guid.Parse(userDTO.packageId)))
-                //    throw new NotFoundException("This packageId is not existed!!!");
-
-                //if (userDTO.investmentTargetCapital <= 0)
-                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
-
                 if (userDTO.roleId == null || !await _validationService.CheckUUIDFormat(userDTO.roleId))
                     throw new InvalidFieldException("Invalid roleId!!!");
 
@@ -97,26 +90,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     && !userDTO.roleId.Equals(ROLE_PROJECT_MANAGER_ID)
                     && !userDTO.roleId.Equals(ROLE_ADMIN_ID)
                     && !userDTO.roleId.Equals(ROLE_INVESTOR_ID))
-                    throw new NotFoundException("This RoleId is not existed!!!");
-
-                if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_MANAGER_ID))
-                {
-                    if (userDTO.businessId == null)
-                        throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
-
-                    if (!await _validationService.CheckUUIDFormat(userDTO.businessId))
-                        throw new InvalidFieldException("Invalid businessId!!!");
-
-                    if (!await _validationService.CheckExistenceId("Business", Guid.Parse(userDTO.businessId)))
-                        throw new NotFoundException("This BusinessId is not existed!!!");
-                }
-                else
-                {
-                    userDTO.businessId = null;
-                }               
-
-                if (userDTO.description != null && (userDTO.description.Equals("string") || userDTO.description.Length == 0))
-                    userDTO.description = null;
+                    throw new NotFoundException("This RoleId is not existed!!!");       
 
                 if (!await _validationService.CheckText(userDTO.lastName))
                     throw new InvalidFieldException("Invalid lastName!!!");
@@ -127,41 +101,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (userDTO.image != null && (userDTO.image.Equals("string") || userDTO.image.Length == 0))
                     userDTO.image = null;
 
-                if (userDTO.phoneNum == null || userDTO.phoneNum.Length == 0 || !await _validationService.CheckPhoneNumber(userDTO.phoneNum))
-                    throw new InvalidFieldException("Invalid phoneNum!!!");
-
-                if (!await _validationService.CheckText(userDTO.idCard))
-                    throw new InvalidFieldException("Invalid idCard!!!");
-
                 if (userDTO.email == null || userDTO.email.Length == 0 || !await _validationService.CheckEmail(userDTO.email))
                     throw new InvalidFieldException("Invalid email!!!");
-
-                if (!await _validationService.CheckText(userDTO.gender))
-                    throw new InvalidFieldException("Invalid gender!!!");
-
-                if (userDTO.dateOfBirth == null || userDTO.dateOfBirth.Length == 0 || !await _validationService.CheckDOB(userDTO.dateOfBirth))
-                    throw new InvalidFieldException("Invalid dateOfBirth!!!");
-
-                if (!await _validationService.CheckText(userDTO.taxIdentificationNumber))
-                    throw new InvalidFieldException("Invalid taxIdentificationNumber!!!");
-
-                if (!await _validationService.CheckText(userDTO.city))
-                    throw new InvalidFieldException("Invalid city!!!");
-
-                if (!await _validationService.CheckText(userDTO.district))
-                    throw new InvalidFieldException("Invalid district!!!");
-
-                if (!await _validationService.CheckText(userDTO.address))
-                    throw new InvalidFieldException("Invalid address!!!");
-
-                if (!await _validationService.CheckText(userDTO.bankName))
-                    throw new InvalidFieldException("Invalid bankName!!!");
-
-                if (!await _validationService.CheckText(userDTO.bankAccount))
-                    throw new InvalidFieldException("Invalid bankAccount!!!");
-
-                //if (userDTO.status < 0 || userDTO.status > 2)
-                //    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
 
                 //if (userDTO.createBy != null && userDTO.createBy.Length >= 0)
                 //{
@@ -183,9 +124,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 User entity = _mapper.Map<User>(userDTO);
 
-                if (userDTO.image != null)
+                if (entity.RoleId.Equals(ROLE_BUSINESS_MANAGER_ID))
                 {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseUser(userDTO.image, ROLE_ADMIN_ID);//sửa role admin sau
+                    entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1);
+                }
+                else
+                {
+                    entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
                 }
 
                 newId.id = await _userRepository.CreateUser(entity);
@@ -217,16 +162,115 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<AllUserDTO> GetAllUsers(int pageIndex, int pageSize)
+        public async Task<AllUserDTO> GetAllUsers(int pageIndex, int pageSize, string businessId, string role, string status, string temp_field_role)
         {
+            bool statusCheck = false;
+            string statusErrorMessage = "";
+            bool roleCheck = false;
+            string roleErrorMessage = "";
+
             try
             {
+                if (!temp_field_role.Equals("ADMIN") && !temp_field_role.Equals("BUSINESS_MANAGER"))
+                    throw new InvalidFieldException("temp_field_role must be ADMIN or BUSINESS_MANAGER!");
+
+                if (temp_field_role.Equals("ADMIN"))
+                {
+                    int[] statusNum = { 0, 1, 2 };
+                    int[] roleNum = { 0, 1, 2, 3 };
+
+                    if (businessId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(businessId))
+                            throw new InvalidFieldException("Invalid businessId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
+                            throw new NotFoundException("This businessId is not existed!!!");
+                    }
+                    if (role != null)
+                    {
+                        foreach (int item in roleNum)
+                        {
+                            if (role.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(item)))
+                                roleCheck = true;
+                            roleErrorMessage = roleErrorMessage + " '" + Enum.GetNames(typeof(RoleEnum)).ElementAt(item) + "' or";
+                        }
+                        roleErrorMessage = roleErrorMessage.Remove(roleErrorMessage.Length - 3);
+                        if (!roleCheck)
+                            throw new InvalidFieldException("ADMIN can view Users with role" + roleErrorMessage + " !!!");
+
+                        if (role.Equals("ADMIN") && businessId != null)
+                            throw new InvalidFieldException("businessId is not required for ADMIN role!!!");
+
+                        role = RoleDictionary.role.GetValueOrDefault(role);
+                    }
+                    if (status != null)
+                    {
+                        foreach (int item in statusNum)
+                        {
+                            if (status.Equals(Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item)))
+                                statusCheck = true;
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item) + "' or";
+                        }
+                        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
+                        if (!statusCheck)
+                            throw new InvalidFieldException("ADMIN can view Users with status" + statusErrorMessage + " !!!");
+                    }
+                }
+
+                if (temp_field_role.Equals("BUSINESS_MANAGER"))
+                {
+                    int[] statusNum = { 0, 1, 2 };
+                    int[] roleNum = { 2, 3 };
+
+                    if (businessId == null)
+                        throw new InvalidFieldException("businessId can not be empty!!!");
+
+                    if (!await _validationService.CheckUUIDFormat(businessId))
+                        throw new InvalidFieldException("Invalid businessId!!!");
+
+                    if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
+                        throw new NotFoundException("This businessId is not existed!!!");
+                    if (role != null)
+                    {
+                        foreach (int item in roleNum)
+                        {
+                            if (role.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(item)))
+                                roleCheck = true;
+                            roleErrorMessage = roleErrorMessage + " '" + Enum.GetNames(typeof(RoleEnum)).ElementAt(item) + "' or";
+                        }
+                        roleErrorMessage = roleErrorMessage.Remove(roleErrorMessage.Length - 3);
+                        if (!roleCheck)
+                            throw new InvalidFieldException("BUSINESS_MANAGER can view Users with role" + roleErrorMessage + " !!!");
+
+                        role = RoleDictionary.role.GetValueOrDefault(role);
+                    }
+                    if (status != null)
+                    {
+                        foreach (int item in statusNum)
+                        {
+                            if (status.Equals(Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item)))
+                                statusCheck = true;
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item) + "' or";
+                        }
+                        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
+                        if (!statusCheck)
+                            throw new InvalidFieldException("BUSINESS_MANAGER can view Users with status" + statusErrorMessage + " !!!");
+                    }
+                }
+
+                //if (temp_field_role.Equals("PROJECT"))
+                //{
+                //    int[] statusNum = { 0, 1, 2 };
+                //    int[] roleNum = { 1 };
+                //}
+
                 AllUserDTO result = new AllUserDTO();
                 result.listOfUser = new List<GetUserDTO>();
 
-                result.numOfUser = await _userRepository.CountUser();
+                result.numOfUser = await _userRepository.CountUser(businessId, role, status, temp_field_role);
 
-                List<User> listEntity = await _userRepository.GetAllUsers(pageIndex, pageSize);
+                List<User> listEntity = await _userRepository.GetAllUsers(pageIndex, pageSize, businessId, role, status, temp_field_role);
                 List<GetUserDTO> listDTO = _mapper.Map<List<GetUserDTO>>(listEntity);
 
                 foreach (GetUserDTO item in listDTO)
@@ -275,10 +319,47 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 throw new Exception(e.Message);
             }
+        }        
+        
+        public async Task<GetUserDTO> GetUserByEmail(String email)
+        {
+            try
+            {
+                User user = await _userRepository.GetUserByEmail(email);
+                GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
+                if (userDTO == null)
+                    throw new NotFoundException("No User Object Found!");
+
+                userDTO.createDate = await _validationService.FormatDateOutput(userDTO.createDate);
+                userDTO.updateDate = await _validationService.FormatDateOutput(userDTO.updateDate);
+
+                userDTO.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(userDTO.id)));
+                userDTO.role = _mapper.Map<RoleDTO>(await _roleRepository.GetRoleByUserId(Guid.Parse(userDTO.id)));
+
+                return userDTO;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<List<User>> GetUserByBusinessId(Guid businessId)
+        {
+            try
+            {
+                List<User> listEntity = await _userRepository.GetUserByBusinessId(businessId);
+
+                return listEntity;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         //UPDATE
-        public async Task<int> UpdateUser(CreateUpdateUserDTO userDTO, Guid userId)
+        public async Task<int> UpdateUser(UpdateUserDTO userDTO, Guid userId)
         {
             int result;
             try
@@ -521,20 +602,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
         //    return response;
         //}
 
-/*        protected string GenerateOtp()
-        {
-            char[] charArr = "0123456789".ToCharArray();
-            string strrandom = string.Empty;
-            Random objran = new();
-            for (int i = 0; i < 4; i++)
-            {
-                //It will not allow Repetation of Characters
-                int pos = objran.Next(1, charArr.Length);
-                if (!strrandom.Contains(charArr.GetValue(pos).ToString())) strrandom += charArr.GetValue(pos);
-                else i--;
-            }
-            return strrandom;
-        }*/
+        /*        protected string GenerateOtp()
+                {
+                    char[] charArr = "0123456789".ToCharArray();
+                    string strrandom = string.Empty;
+                    Random objran = new();
+                    for (int i = 0; i < 4; i++)
+                    {
+                        //It will not allow Repetation of Characters
+                        int pos = objran.Next(1, charArr.Length);
+                        if (!strrandom.Contains(charArr.GetValue(pos).ToString())) strrandom += charArr.GetValue(pos);
+                        else i--;
+                    }
+                    return strrandom;
+                }*/
 
         private string GenerateOTP(Guid UserId)
         {
@@ -543,19 +624,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return OTP[0];
         }
 
-/*        public async Task<bool> VerifyOTP(String OTP, String email)
-        {
-            User userObj = await _userRepository.GetUserByEmail(email);
+        /*        public async Task<bool> VerifyOTP(String OTP, String email)
+                {
+                    User userObj = await _userRepository.GetUserByEmail(email);
 
-            if (userObj.Id.ToString().Contains(OTP))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }*/
+                    if (userObj.Id.ToString().Contains(OTP))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }*/
 
     }
 }

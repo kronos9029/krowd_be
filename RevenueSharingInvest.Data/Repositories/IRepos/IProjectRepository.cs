@@ -1,4 +1,5 @@
-﻿using RevenueSharingInvest.Data.Models.Entities;
+﻿using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,32 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<string> CreateProject(Project projectDTO);
 
         //READ
-        public Task<List<Project>> GetAllProjects(int pageIndex, int pageSize, string businessId, string managerId, string role);
+        public Task<List<Project>> GetAllProjects
+        (
+            int pageIndex, 
+            int pageSize, 
+            string businessId, 
+            string managerId, 
+            string areaId, 
+            string fieldId, 
+            string investorId, 
+            string name, 
+            string status, 
+            string temp_field_role
+        );
         public Task<Project> GetProjectById(Guid projectId);
-        public Task<int> CountProject(string businessId, string managerId, string role);
+        public Task<int> CountProject
+        (
+            string businessId,
+            string managerId,
+            string areaId,
+            string fieldId,
+            string investorId,
+            string name,
+            string status,
+            string temp_field_role
+        );
+        public Task<List<BusinessProjectDTO>> GetBusinessProjectsToAuthor(Guid businessId);
 
         //UPDATE
         public Task<int> UpdateProject(Project projectDTO, Guid projectId);

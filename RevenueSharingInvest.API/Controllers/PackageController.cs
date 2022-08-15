@@ -27,17 +27,17 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreatePackage([FromBody] PackageDTO packageDTO)
+        public async Task<IActionResult> CreatePackage([FromBody] CreateUpdatePackageDTO packageDTO)
         {
             var result = await _packageService.CreatePackage(packageDTO);
             return Ok(result);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPackages(int pageIndex, int pageSize)
+        public async Task<IActionResult> GetAllPackages(int pageIndex, int pageSize, string projectId)
         {
-            var result = new List<PackageDTO>();
-            result = await _packageService.GetAllPackages(pageIndex, pageSize);
+            var result = new AllProjectPackageDTO();
+            result = await _packageService.GetAllPackagesByProjectId(pageIndex, pageSize, projectId);
             return Ok(result);
         }
 
@@ -45,14 +45,14 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> GetPackageById(Guid id)
         {
-            PackageDTO dto = new PackageDTO();
+            GetPackageDTO dto = new GetPackageDTO();
             dto = await _packageService.GetPackageById(id);
             return Ok(dto);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdatePackage([FromBody] PackageDTO packageDTO, Guid id)
+        public async Task<IActionResult> UpdatePackage([FromBody] CreateUpdatePackageDTO packageDTO, Guid id)
         {
             var result = await _packageService.UpdatePackage(packageDTO, id);
             return Ok(result);

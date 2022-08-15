@@ -51,7 +51,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? ApprovedDate { get; set; }
         public Guid? ApprovedBy { get; set; }
-        public ProjectStatusEnum Status { get; set; }
+        public string Status { get; set; }
 
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }

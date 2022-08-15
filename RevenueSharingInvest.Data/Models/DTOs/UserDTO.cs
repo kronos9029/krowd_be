@@ -13,7 +13,14 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string firstName { get; set; }
     }
 
-    public class CreateUpdateUserDTO : UserDTO
+    public class CreateUserDTO : UserDTO
+    {
+        public string roleId { get; set; }
+        public string email { get; set; }
+        public string image { get; set; }
+    }
+
+    public class UpdateUserDTO : UserDTO
     {
         public IFormFile image { get; set; }
         public string businessId { get; set; }
@@ -50,7 +57,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string bankName { get; set; }
         public string bankAccount { get; set; }
         public string image { get; set; }
-        public int status { get; set; }
+        public string status { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
         public string updateDate { get; set; }
@@ -80,7 +87,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string bankName { get; set; }
         public string bankAccount { get; set; }
         public string image { get; set; }
-        public int status { get; set; }
+        public string status { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
         public string updateDate { get; set; }
@@ -104,7 +111,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string bankName { get; set; }
         public string bankAccount { get; set; }
         public string image { get; set; }
-        public int status { get; set; }
+        public string status { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
         public string updateDate { get; set; }

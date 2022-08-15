@@ -12,14 +12,19 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string name { get; set; }
         public string phoneNum { get; set; }
         public string email { get; set; }
-        public string description { get; set; }
+        public string? description { get; set; }
         public string taxIdentificationNumber { get; set; }
         public string address { get; set; }
     }
 
-    public class CreateUpdateBusinessDTO : BusinessDTO
+    public class CreateBusinessDTO : BusinessDTO
     {
-        public IFormFile image { get; set; }
+
+    }
+    
+    public class UpdateBusinessDTO : BusinessDTO
+    {
+        public IFormFile? image { get; set; }
     }
 
     //public class InvestorGetBusinessDTO : BusinessDTO
@@ -42,7 +47,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public int numOfProject { get; set; }
         public int numOfSuccessfulProject { get; set; }
         public float successfulRate { get; set; }
-        public int status { get; set; }
+        public string status { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
         public string updateDate { get; set; }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Data.Models.DTOs;
 using System;
@@ -27,17 +28,18 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUpdateUserDTO userDTO)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO userDTO)
         {
             var result = await _userService.CreateUser(userDTO);
             return Ok(result);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUsers(int pageIndex, int pageSize)
+        public async Task<IActionResult> GetAllUsers(int pageIndex, int pageSize, string businessId, string role, string status, RoleEnum temp_field_role)
         {
+
             var result = new AllUserDTO();
-            result = await _userService.GetAllUsers(pageIndex, pageSize);
+            result = await _userService.GetAllUsers(pageIndex, pageSize, businessId, role, status, temp_field_role.ToString());
             return Ok(result);
         }
 
@@ -52,7 +54,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateUser([FromForm] CreateUpdateUserDTO userDTO, Guid id)
+        public async Task<IActionResult> UpdateUser([FromForm] UpdateUserDTO userDTO, Guid id)
         {
             var result = await _userService.UpdateUser(userDTO, id);
             return Ok(result);

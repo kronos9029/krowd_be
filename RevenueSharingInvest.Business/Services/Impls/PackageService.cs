@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Common;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -42,7 +43,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreatePackage(PackageDTO packageDTO)
+        public async Task<IdDTO> CreatePackage(CreateUpdatePackageDTO packageDTO)
         {
             IdDTO newId = new IdDTO();
             try
@@ -68,44 +69,29 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (packageDTO.description != null && (packageDTO.description.Equals("string") || packageDTO.description.Length == 0))
                     packageDTO.description = null;
 
-                if (packageDTO.minForPurchasing <= 0)
-                    throw new InvalidFieldException("minForPurchasing must be greater than 0!!!");
+                //if (packageDTO.createBy != null && packageDTO.createBy.Length >= 0)
+                //{
+                //    if (packageDTO.createBy.Equals("string"))
+                //        packageDTO.createBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(packageDTO.createBy))
+                //        throw new InvalidFieldException("Invalid createBy!!!");
+                //}
 
-                if (packageDTO.maxForPurchasing <= 0 || packageDTO.maxForPurchasing < packageDTO.minForPurchasing)
-                    throw new InvalidFieldException("maxForPurchasing must be greater than 0 and greater than minForPurchasing!!!");
+                //if (packageDTO.updateBy != null && packageDTO.updateBy.Length >= 0)
+                //{
+                //    if (packageDTO.updateBy.Equals("string"))
+                //        packageDTO.updateBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(packageDTO.updateBy))
+                //        throw new InvalidFieldException("Invalid updateBy!!!");
+                //}
 
-                if (!await _validationService.CheckDate((packageDTO.openDate)))
-                    throw new InvalidFieldException("Invalid openDate!!!");
+                Package entity = _mapper.Map<Package>(packageDTO);
 
-                packageDTO.openDate = await _validationService.FormatDateInput(packageDTO.openDate);
+                entity.RemainingQuantity = entity.Quantity;
 
-                if (!await _validationService.CheckDate((packageDTO.closeDate)))
-                    throw new InvalidFieldException("Invalid endDate!!!");
+                entity.Status = Enum.GetNames(typeof(PackageStatusEnum)).ElementAt(0);
 
-                packageDTO.closeDate = await _validationService.FormatDateInput(packageDTO.closeDate);
-
-                packageDTO.approvedBy = null;
-
-                if (packageDTO.createBy != null && packageDTO.createBy.Length >= 0)
-                {
-                    if (packageDTO.createBy.Equals("string"))
-                        packageDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(packageDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
-                }
-
-                if (packageDTO.updateBy != null && packageDTO.updateBy.Length >= 0)
-                {
-                    if (packageDTO.updateBy.Equals("string"))
-                        packageDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(packageDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
-
-                packageDTO.isDeleted = false;
-
-                Package dto = _mapper.Map<Package>(packageDTO);
-                newId.id = await _packageRepository.CreatePackage(dto);
+                newId.id = await _packageRepository.CreatePackage(entity);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create Package Object!");
                 return newId;
@@ -134,57 +120,28 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<PackageDTO>> GetAllPackages(int pageIndex, int pageSize)
+        public async Task<AllProjectPackageDTO> GetAllPackagesByProjectId(int pageIndex, int pageSize, string projectId)
         {
             try
             {
-                List<Package> packageList = await _packageRepository.GetAllPackages(pageIndex, pageSize);
-                List<PackageDTO> list = _mapper.Map<List<PackageDTO>>(packageList);
+                if (projectId == null || !await _validationService.CheckUUIDFormat(projectId.ToString()))
+                    throw new InvalidFieldException("Invalid projectId!!!");
 
-                foreach (PackageDTO item in list)
+                AllProjectPackageDTO result = new AllProjectPackageDTO();
+                result.listOfPackage = new List<GetPackageDTO>();
+
+                result.numOfPackage = await _packageRepository.CountPackageByProjectId(Guid.Parse(projectId));
+
+                List<Package> packageList = await _packageRepository.GetAllPackagesByProjectId(pageIndex, pageSize, Guid.Parse(projectId));
+                List<GetPackageDTO> list = _mapper.Map<List<GetPackageDTO>>(packageList);
+
+                foreach (GetPackageDTO item in list)
                 {
-                    item.openDate = await _validationService.FormatDateOutput(item.openDate);
-                    item.closeDate = await _validationService.FormatDateOutput(item.closeDate);
-                    if (item.approvedDate != null)
-                    {
-                        item.approvedDate = await _validationService.FormatDateOutput(item.approvedDate);
-                    }
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+
+                    result.listOfPackage.Add(item);
                 }
-                //foreach (PackageDTO item in list)
-                //{
-                //    item.createDate = await _validationService.FormatDateOutput(item.createDate);
-                //    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
-                //}
-                return list;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
-
-        //GET BY ID
-        public async Task<PackageDTO> GetPackageById(Guid packageId)
-        {
-            PackageDTO result;
-            try
-            {
-
-                Package dto = await _packageRepository.GetPackageById(packageId);
-                result = _mapper.Map<PackageDTO>(dto);                              
-                if (result == null)
-                    throw new NotFoundException("No Package Object Found!");
-
-                result.openDate = await _validationService.FormatDateOutput(result.openDate);
-                result.closeDate = await _validationService.FormatDateOutput(result.closeDate);
-                if (result.approvedDate != null)
-                {
-                    result.approvedDate = await _validationService.FormatDateOutput(result.approvedDate);
-                }
-                result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
 
                 return result;
             }
@@ -194,8 +151,32 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
+        //GET BY ID
+        public async Task<GetPackageDTO> GetPackageById(Guid packageId)
+        {
+            try
+            {
+                if (packageId == null || !await _validationService.CheckUUIDFormat(packageId.ToString()))
+                    throw new InvalidFieldException("Invalid packageId!!!");
+
+                Package package = await _packageRepository.GetPackageById(packageId);
+                GetPackageDTO packageDTO = _mapper.Map<GetPackageDTO>(package);                              
+                if (packageDTO == null)
+                    throw new NotFoundException("No Package Object Found!");
+
+                packageDTO.createDate = await _validationService.FormatDateOutput(packageDTO.createDate);
+                packageDTO.updateDate = await _validationService.FormatDateOutput(packageDTO.updateDate);
+
+                return packageDTO;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         //UPDATE
-        public async Task<int> UpdatePackage(PackageDTO packageDTO, Guid packageId)
+        public async Task<int> UpdatePackage(CreateUpdatePackageDTO packageDTO, Guid packageId)
         {
             int result;
             try
@@ -221,42 +202,27 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (packageDTO.description != null && (packageDTO.description.Equals("string") || packageDTO.description.Length == 0))
                     packageDTO.description = null;
 
-                if (packageDTO.minForPurchasing <= 0)
-                    throw new InvalidFieldException("minForPurchasing must be greater than 0!!!");
+                //if (packageDTO.createBy != null && packageDTO.createBy.Length >= 0)
+                //{
+                //    if (packageDTO.createBy.Equals("string"))
+                //        packageDTO.createBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(packageDTO.createBy))
+                //        throw new InvalidFieldException("Invalid createBy!!!");
+                //}
 
-                if (packageDTO.maxForPurchasing <= 0)
-                    throw new InvalidFieldException("maxForPurchasing must be greater than 0!!!");
+                //if (packageDTO.updateBy != null && packageDTO.updateBy.Length >= 0)
+                //{
+                //    if (packageDTO.updateBy.Equals("string"))
+                //        packageDTO.updateBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(packageDTO.updateBy))
+                //        throw new InvalidFieldException("Invalid updateBy!!!");
+                //}
 
-                if (!await _validationService.CheckDate((packageDTO.openDate)))
-                    throw new InvalidFieldException("Invalid openDate!!!");
+                Package entity = _mapper.Map<Package>(packageDTO);
 
-                packageDTO.openDate = await _validationService.FormatDateInput(packageDTO.openDate);
+                entity.RemainingQuantity = entity.Quantity;
 
-                if (!await _validationService.CheckDate((packageDTO.closeDate)))
-                    throw new InvalidFieldException("Invalid endDate!!!");
-
-                packageDTO.closeDate = await _validationService.FormatDateInput(packageDTO.closeDate);
-
-                packageDTO.approvedBy = null;
-
-                if (packageDTO.createBy != null && packageDTO.createBy.Length >= 0)
-                {
-                    if (packageDTO.createBy.Equals("string"))
-                        packageDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(packageDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
-                }
-
-                if (packageDTO.updateBy != null && packageDTO.updateBy.Length >= 0)
-                {
-                    if (packageDTO.updateBy.Equals("string"))
-                        packageDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(packageDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
-
-                Package dto = _mapper.Map<Package>(packageDTO);
-                result = await _packageRepository.UpdatePackage(dto, packageId);
+                result = await _packageRepository.UpdatePackage(entity, packageId);
                 if (result == 0)
                     throw new UpdateObjectException("Can not update Package Object!");
                 return result;
