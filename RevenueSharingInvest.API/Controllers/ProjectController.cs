@@ -272,14 +272,15 @@ namespace RevenueSharingInvest.API.Controllers
         private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
         {
             ThisUserObj currentUser = new();
-        
+
             var checkUser = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber);
-            if(checkUser == null)
+            if (checkUser == null)
             {
                 currentUser.userId = "";
                 currentUser.email = "";
                 currentUser.investorId = "";
-            } else
+            }
+            else
             {
                 currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
                 currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
@@ -288,16 +289,25 @@ namespace RevenueSharingInvest.API.Controllers
 
             List<RoleDTO> roleList = await _roleService.GetAllRoles();
             GetUserDTO? userDTO = await _userService.GetUserByEmail(currentUser.email);
-            if(userDTO == null)
+            if (userDTO == null)
             {
-              currentUser.roleId = "";
-              currentUser.businessId = "";
+                currentUser.roleId = "";
+                currentUser.businessId = "";
 
             }
             else
             {
-                currentUser.roleId = userDTO.role.id;
-                currentUser.businessId = userDTO.business.id;
+                if (userDTO.business != null)
+                {
+                    currentUser.roleId = userDTO.role.id;
+                    currentUser.businessId = userDTO.business.id;
+                }
+                else
+                {
+                    currentUser.roleId = "";
+                    currentUser.businessId = "";
+                }
+
             }
 
 

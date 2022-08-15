@@ -168,8 +168,17 @@ namespace RevenueSharingInvest.API.Controllers
             }
             else
             {
-                currentUser.roleId = userDTO.role.id;
-                currentUser.businessId = userDTO.business.id;
+                if (userDTO.business != null)
+                {
+                    currentUser.roleId = userDTO.role.id;
+                    currentUser.businessId = userDTO.business.id;
+                }
+                else
+                {
+                    currentUser.roleId = "";
+                    currentUser.businessId = "";
+                }
+
             }
 
 
