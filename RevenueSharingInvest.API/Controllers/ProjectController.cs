@@ -288,19 +288,16 @@ namespace RevenueSharingInvest.API.Controllers
 
             List<RoleDTO> roleList = await _roleService.GetAllRoles();
             GetUserDTO? userDTO = await _userService.GetUserByEmail(currentUser.email);
-            if(userDTO != null)
+            if(userDTO == null)
             {
-                if (userDTO.business == null)
-                {
-                    currentUser.roleId = "";
-                    currentUser.businessId = "";
+              currentUser.roleId = "";
+              currentUser.businessId = "";
 
-                }
-                else
-                {
-                    currentUser.roleId = userDTO.role.id;
-                    currentUser.businessId = userDTO.business.id;
-                }
+            }
+            else
+            {
+                currentUser.roleId = userDTO.role.id;
+                currentUser.businessId = userDTO.business.id;
             }
 
 

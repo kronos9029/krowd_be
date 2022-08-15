@@ -153,8 +153,15 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
-            var result = await _userService.DeleteUserById(id);
-            return Ok(result);
+            GetUserDTO userDTO = await _userService.GetUserById(id);
+
+            if(userDTO != null)
+            {
+                var result = await _userService.DeleteUserById(id);
+                return Ok(result);
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
         }
 
         [HttpDelete]
@@ -164,26 +171,38 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
-        private async Task<ThisUserObj> GetThisUserInfo(HttpContext httpContext)
+        private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
         {
             ThisUserObj currentUser = new();
 
-            currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
-            currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
-            currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
-
-            List<RoleDTO> roleList = await _roleService.GetAllRoles();
-            GetUserDTO userDTO = await _userService.GetUserByEmail(currentUser.email);
-
-            currentUser.roleId = userDTO.role.id;
-            if (userDTO.business != null)
+            var checkUser = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber);
+            if (checkUser == null)
             {
-                currentUser.businessId = userDTO.business.id;
+                currentUser.userId = "";
+                currentUser.email = "";
+                currentUser.investorId = "";
             }
             else
             {
-                currentUser.businessId = "";
+                currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
+                currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
+                currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
             }
+
+            List<RoleDTO> roleList = await _roleService.GetAllRoles();
+            GetUserDTO? userDTO = await _userService.GetUserByEmail(currentUser.email);
+            if (userDTO == null)
+            {
+                currentUser.roleId = "";
+                currentUser.businessId = "";
+
+            }
+            else
+            {
+                currentUser.roleId = userDTO.role.id;
+                currentUser.businessId = userDTO.business.id;
+            }
+
 
             foreach (RoleDTO role in roleList)
             {
