@@ -322,6 +322,102 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        public async Task<User> BusinessManagerGetUserById(Guid businessId, Guid userid)
+        {
+            try
+            {
+
+                var query = "SELECT * " +
+                            "FROM(SELECT U.Id, " +
+                            "            U.BusinessId, " +
+                            "            U.RoleId, " +
+                            "            U.Description, " +
+                            "            U.LastName, " +
+                            "            U.FirstName, " +
+                            "            U.PhoneNum, " +
+                            "            U.Image, " +
+                            "            U.IdCard, " +
+                            "            U.Email, " +
+                            "            U.Gender, " +
+                            "            U.DateOfBirth, " +
+                            "            U.TaxIdentificationNumber, " +
+                            "            U.City, U.District, " +
+                            "            U.Address, " +
+                            "            U.BankName, " +
+                            "            U.BankAccount, " +
+                            "            U.Status, " +
+                            "            U.CreateDate, " +
+                            "            U.CreateBy, " +
+                            "            U.UpdateDate, " +
+                            "            U.UpdateBy, " +
+                            "            U.IsDeleted " +
+                            "FROM[User] U " +
+                            "    JOIN Investor INS ON U.Id = INS.UserId " +
+                            "    JOIN Investment INM ON INS.Id = INM.InvestorId " +
+                            "WHERE INM.ProjectId IN(SELECT Id " +
+                            "                        FROM Project " +
+                            "                        WHERE BusinessId = @BusinessId) " +
+                            "GROUP BY U.Id, " +
+                            "         U.BusinessId, " +
+                            "         U.RoleId, " +
+                            "         U.Description, " +
+                            "         U.LastName, " +
+                            "         U.FirstName, " +
+                            "         U.PhoneNum, " +
+                            "         U.Image, " +
+                            "         U.IdCard, " +
+                            "         U.Email, " +
+                            "         U.Gender, " +
+                            "         U.DateOfBirth, " +
+                            "         U.TaxIdentificationNumber, " +
+                            "         U.City, " +
+                            "         U.District, " +
+                            "         U.Address, " +
+                            "         U.BankName, " +
+                            "         U.BankAccount, " +
+                            "         U.Status, " +
+                            "         U.CreateDate, " +
+                            "         U.CreateBy, " +
+                            "         U.UpdateDate, " +
+                            "         U.UpdateBy, " +
+                            "         U.IsDeleted " +
+                            ") AS X " +
+                            "WHERE Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("BusinessId", businessId, DbType.Guid);
+                parameters.Add("Id", userid, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<User>(query, parameters);
+
+            }
+            catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<User> ProjectManagerGetUserbyId(Guid managerId, Guid id)
+        {
+            var query = "SELECT * "+
+                        "FROM(SELECT U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted "+
+                        "FROM[User] U "+
+                        "    JOIN Investor INS ON U.Id = INS.UserId "+
+                        "    JOIN Investment INM ON INS.Id = INM.InvestorId "+
+                        "   WHERE INM.ProjectId IN(SELECT Id "+
+                        "                        FROM Project "+
+                        "                        WHERE ManagerId = @ManagerId) "+
+                        " GROUP BY U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted "+
+                        " ) AS X "+
+                        " WHERE Id = @Id";
+            var parameters = new DynamicParameters();
+            parameters.Add("ManagerId", managerId, DbType.Guid);
+            parameters.Add("Id", id, DbType.Guid);
+            using var connection = CreateConnection();
+            return await connection.QueryFirstOrDefaultAsync<User>(query, parameters);
+
+        }
+
         //UPDATE
         public async Task<int> UpdateUser(User userDTO, Guid userId)
         {

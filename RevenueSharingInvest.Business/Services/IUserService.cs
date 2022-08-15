@@ -22,6 +22,8 @@ namespace RevenueSharingInvest.Business.Services
         public Task<GetUserDTO> GetUserByEmail(String email);
         //public Task<List<User>> GetUserByBusinessId(Guid businessId);
         //public Task<List<User>> GetUserByRoleId(Guid businessId);
+        public Task<GetUserDTO> BusinessManagerGetUserById(string businesId, Guid userId);
+        public Task<GetUserDTO> ProjectManagerGetUserbyId(string managerId, Guid userId);
 
         //UPDATE
         public Task<int> UpdateUser(UpdateUserDTO userDTO, Guid userId);

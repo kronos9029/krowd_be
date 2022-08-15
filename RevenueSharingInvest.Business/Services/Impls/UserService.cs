@@ -162,19 +162,23 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<AllUserDTO> GetAllUsers(int pageIndex, int pageSize, string businessId, string role, string status, string temp_field_role)
+        public async Task<AllUserDTO> GetAllUsers(int pageIndex, int pageSize, string businessId, string role, string status, string roleId)
         {
             bool statusCheck = false;
             string statusErrorMessage = "";
             bool roleCheck = false;
             string roleErrorMessage = "";
 
+            List<Role> roles = await _roleRepository.GetAllRoles();
+
             try
             {
-                if (!temp_field_role.Equals("ADMIN") && !temp_field_role.Equals("BUSINESS_MANAGER"))
-                    throw new InvalidFieldException("temp_field_role must be ADMIN or BUSINESS_MANAGER!");
+                if (!roleId.Equals(roles.Find(role => role.Name == RoleEnum.ADMIN.ToString()).Id)
+                    && !roleId.Equals(roles.Find(role => role.Name == RoleEnum.BUSINESS_MANAGER.ToString()).Id))
 
-                if (temp_field_role.Equals("ADMIN"))
+                    throw new InvalidFieldException("User role must be ADMIN or BUSINESS_MANAGER!");
+
+                if (roleId.Equals(roles.Find(role => role.Name == RoleEnum.ADMIN.ToString()).Id))
                 {
                     int[] statusNum = { 0, 1, 2 };
                     int[] roleNum = { 0, 1, 2, 3 };
@@ -218,7 +222,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     }
                 }
 
-                if (temp_field_role.Equals("BUSINESS_MANAGER"))
+                if (roleId.Equals(roles.Find(role => role.Name == RoleEnum.BUSINESS_MANAGER.ToString()).Id))
                 {
                     int[] statusNum = { 0, 1, 2 };
                     int[] roleNum = { 2, 3 };
@@ -268,9 +272,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 AllUserDTO result = new AllUserDTO();
                 result.listOfUser = new List<GetUserDTO>();
 
-                result.numOfUser = await _userRepository.CountUser(businessId, role, status, temp_field_role);
+                result.numOfUser = await _userRepository.CountUser(businessId, role, status, roleId);
 
-                List<User> listEntity = await _userRepository.GetAllUsers(pageIndex, pageSize, businessId, role, status, temp_field_role);
+                List<User> listEntity = await _userRepository.GetAllUsers(pageIndex, pageSize, businessId, role, status, roleId);
                 List<GetUserDTO> listDTO = _mapper.Map<List<GetUserDTO>>(listEntity);
 
                 foreach (GetUserDTO item in listDTO)
@@ -319,7 +323,57 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 throw new Exception(e.Message);
             }
-        }        
+        } 
+        
+
+        public async Task<GetUserDTO> BusinessManagerGetUserById(String businesId, Guid userId)
+        {
+            try
+            {
+                User user = await _userRepository.BusinessManagerGetUserById(Guid.Parse(businesId), userId);
+
+                GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
+                if (userDTO == null)
+                    throw new NotFoundException("No User Object Found!");
+
+                userDTO.createDate = await _validationService.FormatDateOutput(userDTO.createDate);
+                userDTO.updateDate = await _validationService.FormatDateOutput(userDTO.updateDate);
+
+                userDTO.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(userDTO.id)));
+                userDTO.role = _mapper.Map<RoleDTO>(await _roleRepository.GetRoleByUserId(Guid.Parse(userDTO.id)));
+
+                return userDTO;
+
+            }
+            catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<GetUserDTO> ProjectManagerGetUserbyId(string managerId, Guid userId)
+        {
+            try
+            {
+                User user = await _userRepository.ProjectManagerGetUserbyId(Guid.Parse(managerId), userId);
+
+                GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
+                if (userDTO == null)
+                    throw new NotFoundException("No User Object Found!");
+
+                userDTO.createDate = await _validationService.FormatDateOutput(userDTO.createDate);
+                userDTO.updateDate = await _validationService.FormatDateOutput(userDTO.updateDate);
+
+                userDTO.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(userDTO.id)));
+                userDTO.role = _mapper.Map<RoleDTO>(await _roleRepository.GetRoleByUserId(Guid.Parse(userDTO.id)));
+
+                return userDTO;
+            }
+            catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
         
         public async Task<GetUserDTO> GetUserByEmail(String email)
         {

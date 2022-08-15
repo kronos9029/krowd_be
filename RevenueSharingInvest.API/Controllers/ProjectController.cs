@@ -81,7 +81,7 @@ namespace RevenueSharingInvest.API.Controllers
             if (countOnly)
             {
                 var countResult = new ProjectCountDTO();
-                if(currentUser.roleId != null)
+                if(!currentUser.roleId.Equals(""))
                 {
                     RoleDTO roleDTO = await _roleService.GetRoleById(Guid.Parse(currentUser.roleId));
                     countResult = await _projectService.CountProjects(businessId, managerId, areaId, fieldId, investorId, name, status, roleDTO.name);
@@ -95,7 +95,7 @@ namespace RevenueSharingInvest.API.Controllers
             else
             {
                 var resultProjectList = new AllProjectDTO();
-                if(currentUser.roleId != null)
+                if(!currentUser.roleId.Equals(""))
                 {
                     RoleDTO roleDTO = await _roleService.GetRoleById(Guid.Parse(currentUser.roleId));
 
@@ -126,7 +126,7 @@ namespace RevenueSharingInvest.API.Controllers
 
             } else if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
             {
-                if (currentUser.businessId == null || currentUser.businessId == "")
+                if (currentUser.businessId.Equals(""))
                 {
                     throw new System.UnauthorizedAccessException("You Don't Have Permission Perform This Action!!");
                 }
@@ -142,7 +142,7 @@ namespace RevenueSharingInvest.API.Controllers
                 }
             } else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
-                if (currentUser.businessId == null || currentUser.businessId == "")
+                if (currentUser.businessId.Equals(""))
                 {
                     throw new System.UnauthorizedAccessException("You Don't Have Permission Perform This Action!!");
                 }
@@ -288,19 +288,16 @@ namespace RevenueSharingInvest.API.Controllers
 
             List<RoleDTO> roleList = await _roleService.GetAllRoles();
             GetUserDTO? userDTO = await _userService.GetUserByEmail(currentUser.email);
-            if(userDTO != null)
+            if(userDTO == null)
             {
-                if (userDTO.business == null)
-                {
-                    currentUser.roleId = "";
-                    currentUser.businessId = "";
+              currentUser.roleId = "";
+              currentUser.businessId = "";
 
-                }
-                else
-                {
-                    currentUser.roleId = userDTO.role.id;
-                    currentUser.businessId = userDTO.business.id;
-                }
+            }
+            else
+            {
+                currentUser.roleId = userDTO.role.id;
+                currentUser.businessId = userDTO.business.id;
             }
 
 
