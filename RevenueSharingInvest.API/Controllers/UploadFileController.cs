@@ -37,6 +37,8 @@ namespace RevenueSharingInvest.API.Controllers
         {
             ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
             firebaseRequest.createBy = userInfo.userId;
+            firebaseRequest.businessId = userInfo.businessId;
+
             var result = await _fileUploadService.UploadFilesWithPath(firebaseRequest);
             return Ok(result);
         }

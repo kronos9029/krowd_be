@@ -104,7 +104,7 @@ namespace RevenueSharingInvest.API.Controllers
             {
                 dto = await _userService.GetUserById(id);
                 if ((dto.role.id.Equals(currentUser.businessManagerRoleId) && dto.business.id.Equals(currentUser.businessId)) 
-                    || currentUser.userId.Equals(id))
+                    || currentUser.userId.Equals(id.ToString()))
                 {
                     return Ok(dto);
                 } else
@@ -118,13 +118,14 @@ namespace RevenueSharingInvest.API.Controllers
                 }
             } else if(currentUser.roleId.Equals(currentUser.investorRoleId))
             {
-                if (currentUser.userId.Equals(id))
+                if (currentUser.userId.Equals(id.ToString()))
                 {
                     dto = await _userService.GetUserById(id);
                     return Ok(dto);
                 }
 
             }
+
             return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
         }
 
@@ -204,7 +205,7 @@ namespace RevenueSharingInvest.API.Controllers
                     currentUser.businessId = userDTO.business.id;
                 } else
                 {
-                    currentUser.roleId = "";
+                    currentUser.roleId = userDTO.role.id;
                     currentUser.businessId = "";
                 }
 
