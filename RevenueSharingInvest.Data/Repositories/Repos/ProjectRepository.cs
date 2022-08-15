@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -153,7 +154,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             string investorId,
             string name,
             string status,
-            string temp_field_role
+            string roleId
             )
         {
             try
@@ -171,7 +172,42 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var nameCondition = " AND Name LIKE '%" + name + "%' ";
                 var statusCondition = " AND Status = @Status ";
 
-                if (temp_field_role.Equals("ADMIN"))
+                if (roleId == null)
+                {
+                    if (businessId != null)
+                    {
+                        whereCondition = whereCondition + businessIdCondition;
+                        parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
+                    }
+                    if (areaId != null)
+                    {
+                        whereCondition = whereCondition + areaIdCondition;
+                        parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
+                    }
+                    if (fieldId != null)
+                    {
+                        whereCondition = whereCondition + fieldIdCondition;
+                        parameters.Add("FieldId", Guid.Parse(fieldId), DbType.Guid);
+                    }
+                    if (name != null)
+                    {
+                        whereCondition = whereCondition + nameCondition;
+                    }
+                    if (status != null)
+                    {
+                        whereCondition = whereCondition + statusCondition;
+                        parameters.Add("Status", status, DbType.String);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + " AND (Status = '"
+                            + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "') "
+                            + isDeletedCondition;
+                    }
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
+                }
+
+                else if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
                     if (businessId != null)
                     {
@@ -212,7 +248,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
-                if (temp_field_role.Equals("BUSINESS"))
+                else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
                     whereCondition = whereCondition + businessIdCondition;
                     parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
@@ -252,7 +288,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
-                if (temp_field_role.Equals("PROJECT"))
+                else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
                 {
                     whereCondition = whereCondition + managerIdCondition;
                     parameters.Add("ManagerId", Guid.Parse(managerId), DbType.Guid);
@@ -292,7 +328,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
-                if (temp_field_role.Equals("INVESTOR"))
+                else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                 {
                     if (businessId != null)
                     {
@@ -334,41 +370,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         + isDeletedCondition;
                     }
 
-                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
-                }
-
-                if (temp_field_role.Equals("GUEST"))
-                {
-                    if (businessId != null)
-                    {
-                        whereCondition = whereCondition + businessIdCondition;
-                        parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
-                    }
-                    if (areaId != null)
-                    {
-                        whereCondition = whereCondition + areaIdCondition;
-                        parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
-                    }
-                    if (fieldId != null)
-                    {
-                        whereCondition = whereCondition + fieldIdCondition;
-                        parameters.Add("FieldId", Guid.Parse(fieldId), DbType.Guid);
-                    }
-                    if (name != null)
-                    {
-                        whereCondition = whereCondition + nameCondition;
-                    }
-                    if (status != null)
-                    {
-                        whereCondition = whereCondition + statusCondition;
-                        parameters.Add("Status", status, DbType.String);
-                    }
-                    else
-                    {
-                        whereCondition = whereCondition + " AND (Status = '"
-                            + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "') "
-                            + isDeletedCondition;
-                    }
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
@@ -542,7 +543,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             string investorId,
             string name,
             string status,
-            string temp_field_role
+            string roleId
         )
         {
             try
@@ -560,7 +561,42 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var nameCondition = " AND Name LIKE '%" + name + "%' ";
                 var statusCondition = " AND Status = @Status ";
 
-                if (temp_field_role.Equals(RoleEnum.ADMIN.ToString()))
+                if (roleId == null)
+                {
+                    if (businessId != null)
+                    {
+                        whereCondition = whereCondition + businessIdCondition;
+                        parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
+                    }
+                    if (areaId != null)
+                    {
+                        whereCondition = whereCondition + areaIdCondition;
+                        parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
+                    }
+                    if (fieldId != null)
+                    {
+                        whereCondition = whereCondition + fieldIdCondition;
+                        parameters.Add("FieldId", Guid.Parse(fieldId), DbType.Guid);
+                    }
+                    if (name != null)
+                    {
+                        whereCondition = whereCondition + nameCondition;
+                    }
+                    if (status != null)
+                    {
+                        whereCondition = whereCondition + statusCondition;
+                        parameters.Add("Status", status, DbType.String);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + " AND (Status = '"
+                            + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "') "
+                            + isDeletedCondition;
+                    }
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
+                }
+
+                else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
                     if (businessId != null)
                     {
@@ -601,7 +637,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
-                if (temp_field_role.Equals("BUSINESS"))
+                else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
                     whereCondition = whereCondition + businessIdCondition;
                     parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
@@ -641,7 +677,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
-                if (temp_field_role.Equals("PROJECT"))
+                else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
                 {
                     whereCondition = whereCondition + managerIdCondition;
                     parameters.Add("ManagerId", Guid.Parse(managerId), DbType.Guid);
@@ -681,7 +717,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
-                if (temp_field_role.Equals(RoleEnum.INVESTOR.ToString()))
+                else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                 {
                     if (businessId != null)
                     {
@@ -723,41 +759,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         + isDeletedCondition;
                     }
 
-                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
-                }
-
-                if (temp_field_role.Equals("GUEST"))
-                {
-                    if (businessId != null)
-                    {
-                        whereCondition = whereCondition + businessIdCondition;
-                        parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
-                    }
-                    if (areaId != null)
-                    {
-                        whereCondition = whereCondition + areaIdCondition;
-                        parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
-                    }
-                    if (fieldId != null)
-                    {
-                        whereCondition = whereCondition + fieldIdCondition;
-                        parameters.Add("FieldId", Guid.Parse(fieldId), DbType.Guid);
-                    }
-                    if (name != null)
-                    {
-                        whereCondition = whereCondition + nameCondition;
-                    }
-                    if (status != null)
-                    {
-                        whereCondition = whereCondition + statusCondition;
-                        parameters.Add("Status", status, DbType.String);
-                    }
-                    else
-                    {
-                        whereCondition = whereCondition + " AND (Status = '"
-                            + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "') "
-                            + isDeletedCondition;
-                    }
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 

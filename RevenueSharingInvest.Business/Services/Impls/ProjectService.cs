@@ -81,9 +81,230 @@ namespace RevenueSharingInvest.Business.Services.Impls
         public async Task<ProjectCountDTO> CountProjects(string businessId, string areaId, string fieldId, string name, string status, ThisUserObj thisUserObj)
         {
             ProjectCountDTO result = new ProjectCountDTO();
+
+            bool statusCheck = false;
+            string statusErrorMessage = "";
             try
             {
-                result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, null, name, status, "GUEST");
+                if (thisUserObj.roleId == null)
+                {
+                    int[] statusNum = { 3 };
+                    if (businessId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(businessId))
+                            throw new InvalidFieldException("Invalid businessId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
+                            throw new NotFoundException("This businessId is not existed!!!");
+                    }
+
+                    if (areaId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(areaId))
+                            throw new InvalidFieldException("Invalid areaId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Area", Guid.Parse(areaId)))
+                            throw new NotFoundException("This areaId is not existed!!!");
+                    }
+
+                    if (fieldId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(fieldId))
+                            throw new InvalidFieldException("Invalid fieldId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                            throw new NotFoundException("This fieldId is not existed!!!");
+                    }
+
+                    if (status != null)
+                    {
+                        foreach (int item in statusNum)
+                        {
+                            if (status.Equals(Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item)))
+                                statusCheck = true;
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item) + "' or";
+                        }
+                        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
+                        if (!statusCheck)
+                            throw new InvalidFieldException("GUEST can view Projects with status" + statusErrorMessage + " !!!");
+                    }
+
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, null, name, status, null);
+                }
+
+                else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                {
+                    int[] statusNum = { 1, 2, 3, 4, 5, 6, 7 };
+
+                    if (businessId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(businessId))
+                            throw new InvalidFieldException("Invalid businessId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
+                            throw new NotFoundException("This businessId is not existed!!!");
+                    }
+
+                    if (areaId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(areaId))
+                            throw new InvalidFieldException("Invalid areaId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Area", Guid.Parse(areaId)))
+                            throw new NotFoundException("This areaId is not existed!!!");
+                    }
+
+                    if (fieldId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(fieldId))
+                            throw new InvalidFieldException("Invalid fieldId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                            throw new NotFoundException("This fieldId is not existed!!!");
+                    }
+
+                    if (status != null)
+                    {
+                        foreach (int item in statusNum)
+                        {
+                            if (status.Equals(Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item)))
+                                statusCheck = true;
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item) + "' or";
+                        }
+                        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
+                        if (!statusCheck)
+                            throw new InvalidFieldException("ADMIN can view Projects with status" + statusErrorMessage + " !!!");
+                    }
+
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, null, name, status, thisUserObj.roleId);                 
+                }
+
+                else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
+                {
+                    int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7 };
+                    if (businessId != null && !businessId.Equals(thisUserObj.businessId))
+                        throw new InvalidFieldException("businessId is not match with this BUSINESS_MANAGER's businessId!!!");
+                    businessId = thisUserObj.businessId;
+
+                    if (areaId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(areaId))
+                            throw new InvalidFieldException("Invalid areaId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Area", Guid.Parse(areaId)))
+                            throw new NotFoundException("This areaId is not existed!!!");
+                    }
+
+                    if (fieldId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(fieldId))
+                            throw new InvalidFieldException("Invalid fieldId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                            throw new NotFoundException("This fieldId is not existed!!!");
+                    }
+
+                    if (status != null)
+                    {
+                        foreach (int item in statusNum)
+                        {
+                            if (status.Equals(Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item)))
+                                statusCheck = true;
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item) + "' or";
+                        }
+                        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
+                        if (!statusCheck)
+                            throw new InvalidFieldException("BUSINESS_MANAGER can view Projects with status" + statusErrorMessage + " !!!");
+                    }
+
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, null, name, status, thisUserObj.roleId);
+                }
+
+                else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                {
+                    int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7 };
+
+                    if (areaId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(areaId))
+                            throw new InvalidFieldException("Invalid areaId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Area", Guid.Parse(areaId)))
+                            throw new NotFoundException("This areaId is not existed!!!");
+                    }
+
+                    if (fieldId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(fieldId))
+                            throw new InvalidFieldException("Invalid fieldId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                            throw new NotFoundException("This fieldId is not existed!!!");
+                    }
+
+                    if (status != null)
+                    {
+                        foreach (int item in statusNum)
+                        {
+                            if (status.Equals(Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item)))
+                                statusCheck = true;
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item) + "' or";
+                        }
+                        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
+                        if (!statusCheck)
+                            throw new InvalidFieldException("PROJECT_MANAGER can view Projects with status" + statusErrorMessage + " !!!");
+                    }
+
+                    result.numOfProject = await _projectRepository.CountProject(null, thisUserObj.userId, areaId, fieldId, null, name, status, thisUserObj.roleId);
+                }
+
+                else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
+                {
+                    int[] statusNum = { 3, 5, 6, 7 };
+
+                    if (businessId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(businessId))
+                            throw new InvalidFieldException("Invalid businessId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
+                            throw new NotFoundException("This businessId is not existed!!!");
+                    }
+
+                    if (areaId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(areaId))
+                            throw new InvalidFieldException("Invalid areaId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Area", Guid.Parse(areaId)))
+                            throw new NotFoundException("This areaId is not existed!!!");
+                    }
+
+                    if (fieldId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(fieldId))
+                            throw new InvalidFieldException("Invalid fieldId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                            throw new NotFoundException("This fieldId is not existed!!!");
+                    }
+
+                    if (status != null)
+                    {
+                        foreach (int item in statusNum)
+                        {
+                            if (status.Equals(Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item)))
+                                statusCheck = true;
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item) + "' or";
+                        }
+                        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
+                        if (!statusCheck)
+                            throw new InvalidFieldException("INVESTOR can view Projects with status" + statusErrorMessage + " !!!");
+                    }
+
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, thisUserObj.investorId, name, status, thisUserObj.roleId);
+                }
+
                 return result;
             }
             catch (Exception e)
@@ -229,13 +450,59 @@ namespace RevenueSharingInvest.Business.Services.Impls
             result.listOfProject = new List<GetProjectDTO>();
             List<Project> listEntity = new List<Project>();
 
-
             bool statusCheck = false;
             string statusErrorMessage = "";
 
             try
             {
-                if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                if (thisUserObj.roleId == null)
+                {
+                    int[] statusNum = { 3 };
+                    if (businessId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(businessId))
+                            throw new InvalidFieldException("Invalid businessId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
+                            throw new NotFoundException("This businessId is not existed!!!");
+                    }
+
+                    if (areaId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(areaId))
+                            throw new InvalidFieldException("Invalid areaId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Area", Guid.Parse(areaId)))
+                            throw new NotFoundException("This areaId is not existed!!!");
+                    }
+
+                    if (fieldId != null)
+                    {
+                        if (!await _validationService.CheckUUIDFormat(fieldId))
+                            throw new InvalidFieldException("Invalid fieldId!!!");
+
+                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                            throw new NotFoundException("This fieldId is not existed!!!");
+                    }
+
+                    if (status != null)
+                    {
+                        foreach (int item in statusNum)
+                        {
+                            if (status.Equals(Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item)))
+                                statusCheck = true;
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item) + "' or";
+                        }
+                        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
+                        if (!statusCheck)
+                            throw new InvalidFieldException("GUEST can view Projects with status" + statusErrorMessage + " !!!");
+                    }
+
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, null, name, status, null);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, null, name, status, null);
+                }
+
+                else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
                     int[] statusNum = { 1, 2, 3, 4, 5, 6, 7 };
 
@@ -283,7 +550,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, null, name, status, thisUserObj.roleId);
                 }
 
-                if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
+                else if(thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
                     int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7 };
                     if (businessId != null && !businessId.Equals(thisUserObj.businessId))
@@ -325,7 +592,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, null, name, status, thisUserObj.roleId);
                 }
 
-                if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                else if(thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
                 {
                     int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7 };                   
 
@@ -364,7 +631,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, null, thisUserObj.userId, areaId, fieldId, null, name, status, thisUserObj.roleId);
                 }
 
-                if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
+                else if(thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                 {
                     int[] statusNum = { 3, 5, 6 ,7 };
 
@@ -410,54 +677,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, thisUserObj.investorId, name, status, thisUserObj.roleId);
                     listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, thisUserObj.investorId, name, status, thisUserObj.roleId);
-                }
-
-                if (thisUserObj == null)
-                {
-                    int[] statusNum = { 3 };
-                    if (businessId != null)
-                    {
-                        if (!await _validationService.CheckUUIDFormat(businessId))
-                            throw new InvalidFieldException("Invalid businessId!!!");
-
-                        if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
-                            throw new NotFoundException("This businessId is not existed!!!");
-                    }
-
-                    if (areaId != null)
-                    {
-                        if (!await _validationService.CheckUUIDFormat(areaId))
-                            throw new InvalidFieldException("Invalid areaId!!!");
-
-                        if (!await _validationService.CheckExistenceId("Area", Guid.Parse(areaId)))
-                            throw new NotFoundException("This areaId is not existed!!!");
-                    }
-
-                    if (fieldId != null)
-                    {
-                        if (!await _validationService.CheckUUIDFormat(fieldId))
-                            throw new InvalidFieldException("Invalid fieldId!!!");
-
-                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
-                            throw new NotFoundException("This fieldId is not existed!!!");
-                    }
-
-                    if (status != null)
-                    {
-                        foreach (int item in statusNum)
-                        {
-                            if (status.Equals(Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item)))
-                                statusCheck = true;
-                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item) + "' or";
-                        }
-                        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
-                        if (!statusCheck)
-                            throw new InvalidFieldException("GUEST can view Projects with status" + statusErrorMessage + " !!!");
-                    }
-
-                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, null, name, status, null);
-                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, null, name, status, null);
-                }               
+                }                            
 
                 List<GetProjectDTO> listDTO = _mapper.Map<List<GetProjectDTO>>(listEntity);
 
@@ -554,7 +774,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             try
             {
                 return await _projectRepository.GetBusinessProjectsToAuthor(businessId);
-            }catch(Exception e)
+            }
+            catch(Exception e)
             {
                 throw new Exception(e.Message);
             }

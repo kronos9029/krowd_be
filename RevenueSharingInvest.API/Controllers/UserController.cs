@@ -8,6 +8,7 @@ using RevenueSharingInvest.Data.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.API.Controllers
@@ -19,11 +20,13 @@ namespace RevenueSharingInvest.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IRoleService _roleService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         
-        public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor)
+        public UserController(IUserService userService, IRoleService roleService, IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
+            _roleService = roleService;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -75,23 +78,61 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
-        //[HttpPost]
-        //[AllowAnonymous]
-        //[Route("authenticate-mobile")]
-        //public async Task<IActionResult> AuthenticateMobile([FromQuery]string token)
-        //{
-        //    var result = await _userService.GetTokenInvestor(token);
-        //    return Ok(result);
-        //}
+        private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
+        {
+            ThisUserObj currentUser = new();
 
-        //[HttpPost]
-        //[AllowAnonymous]
-        //[Route("authenticate-web")]
-        //public async Task<IActionResult> AuthenticateWeb([FromQuery]string token)
-        //{
-        //    var result = await _userService.GetTokenWebBusiness(token);
-        //    return Ok(result);
-        //}
+            var checkUser = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber);
+            if (checkUser == null)
+            {
+                currentUser.userId = "";
+                currentUser.email = "";
+                currentUser.investorId = "";
+            }
+            else
+            {
+                currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
+                currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
+                currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
+            }
+
+            List<RoleDTO> roleList = await _roleService.GetAllRoles();
+            GetUserDTO? userDTO = await _userService.GetUserByEmail(currentUser.email);
+            if (userDTO != null)
+            {
+                if (userDTO.business == null)
+                {
+                    currentUser.roleId = "";
+                    currentUser.businessId = "";
+
+                }
+                else
+                {
+                    currentUser.roleId = userDTO.role.id;
+                    currentUser.businessId = userDTO.business.id;
+                }
+            }
+            foreach (RoleDTO role in roleList)
+            {
+                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(0)))
+                {
+                    currentUser.adminRoleId = role.id;
+                }
+                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(3)))
+                {
+                    currentUser.investorRoleId = role.id;
+                }
+                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(1)))
+                {
+                    currentUser.businessManagerRoleId = role.id;
+                }
+                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(2)))
+                {
+                    currentUser.projectManagerRoleId = role.id;
+                }
+            }
+            return currentUser;
+        }
 
     }
 }

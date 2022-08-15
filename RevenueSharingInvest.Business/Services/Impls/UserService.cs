@@ -35,19 +35,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
 
-        private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
-        private readonly String ROLE_INVESTOR_ID = "ad5f37da-ca48-4dc5-9f4b-963d94b535e6";
-        private readonly String ROLE_BUSINESS_MANAGER_ID = "015ae3c5-eee9-4f5c-befb-57d41a43d9df";
-        private readonly String ROLE_PROJECT_MANAGER_ID = "2d80393a-3a3d-495d-8dd7-f9261f85cc8f";
-        private readonly String INVESTOR_TYPE_ID = "";
-
         public UserService(IOptions<AppSettings> appSettings, 
             IUserRepository userRepository, 
             IInvestorRepository investorRepository,
             IBusinessRepository businessRepository,
             IRoleRepository roleRepository,
             IFieldRepository fieldRepository,
-        IValidationService validationService,
+            IValidationService validationService,
             IFileUploadService fileUploadService,
             IMapper mapper)
         {
@@ -86,10 +80,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (userDTO.roleId == null || !await _validationService.CheckUUIDFormat(userDTO.roleId))
                     throw new InvalidFieldException("Invalid roleId!!!");
 
-                if (!userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID)
-                    && !userDTO.roleId.Equals(ROLE_PROJECT_MANAGER_ID)
-                    && !userDTO.roleId.Equals(ROLE_ADMIN_ID)
-                    && !userDTO.roleId.Equals(ROLE_INVESTOR_ID))
+                if (!userDTO.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN"))
+                    && !userDTO.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER"))
+                    && !userDTO.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"))
+                    && !userDTO.roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                     throw new NotFoundException("This RoleId is not existed!!!");       
 
                 if (!await _validationService.CheckText(userDTO.lastName))
@@ -124,7 +118,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 User entity = _mapper.Map<User>(userDTO);
 
-                if (entity.RoleId.Equals(ROLE_BUSINESS_MANAGER_ID))
+                if (entity.RoleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
                     entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1);
                 }
@@ -366,13 +360,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (userDTO.roleId == null || !await _validationService.CheckUUIDFormat(userDTO.roleId))
                     throw new InvalidFieldException("Invalid roleId!!!");
 
-                if (!userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID)
-                    && !userDTO.roleId.Equals(ROLE_PROJECT_MANAGER_ID)
-                    && !userDTO.roleId.Equals(ROLE_ADMIN_ID)
-                    && !userDTO.roleId.Equals(ROLE_INVESTOR_ID))
+                if (!userDTO.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN"))
+                    && !userDTO.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER"))
+                    && !userDTO.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"))
+                    && !userDTO.roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                     throw new NotFoundException("This RoleId is not existed!!!");
 
-                if (userDTO.roleId.Equals(ROLE_BUSINESS_MANAGER_ID) || userDTO.roleId.Equals(ROLE_PROJECT_MANAGER_ID))
+                if (userDTO.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")) || userDTO.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
                 {
                     if (userDTO.businessId == null)
                         throw new InvalidFieldException("BusinessId is required for BUSINESS_MANAGER or PROJECT_OWNER!!!");
@@ -456,7 +450,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if(userDTO.image != null)
                 {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseUser(userDTO.image, ROLE_ADMIN_ID);
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseUser(userDTO.image, RoleDictionary.role.GetValueOrDefault("ADMIN"));
                 }
 
                 result = await _userRepository.UpdateUser(entity, userId);

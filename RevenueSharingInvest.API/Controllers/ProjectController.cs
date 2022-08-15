@@ -74,17 +74,17 @@ namespace RevenueSharingInvest.API.Controllers
             string status
             )
         {
-            //ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
             if (countOnly)
             {
                 var countResult = new ProjectCountDTO();
-                countResult = await _projectService.CountProjects(businessId, areaId, fieldId, name, status, null);
+                countResult = await _projectService.CountProjects(businessId, areaId, fieldId, name, status, currentUser);
                 return Ok(countResult);
             }
             else
             {
                 var resultProjectList = new AllProjectDTO();
-                resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, fieldId, name, status, null);
+                resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, fieldId, name, status, currentUser);
                 return Ok(resultProjectList);
             }           
             return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
