@@ -304,7 +304,7 @@ namespace RevenueSharingInvest.API.Controllers
                 }
                 else
                 {
-                    currentUser.roleId = "";
+                    currentUser.roleId = userDTO.role.id;
                     currentUser.businessId = "";
                 }
 
