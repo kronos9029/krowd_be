@@ -88,8 +88,7 @@ namespace RevenueSharingInvest.API.Controllers
             } else if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
             {
                 dto = await _userService.GetUserById(id);
-                if ((dto.role.id.Equals(currentUser.projectManagerRoleId) && dto.business.id.Equals(currentUser.businessId)) 
-                    || currentUser.userId.Equals(id))
+                if ((dto.role.id.Equals(currentUser.projectManagerRoleId) && dto.business.id.Equals(currentUser.businessId)) || currentUser.userId.Equals(id.ToString()))
                 {
                     return Ok(dto);
                 } else
