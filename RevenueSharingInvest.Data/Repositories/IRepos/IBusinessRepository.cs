@@ -23,6 +23,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //UPDATE
         public Task<int> UpdateBusiness(RevenueSharingInvest.Data.Models.Entities.Business businessDTO, Guid businesssId);
         public Task<int> UpdateBusinessStatus(Guid businessId, String status);
+        public Task<int> UpdateBusinessImage(string url, Guid businessId);
 
         //DELETE
         public Task<int> DeleteBusinessById(Guid businesssId);

@@ -19,11 +19,21 @@ namespace RevenueSharingInvest.Business.Services.Common.Firebase
     {
         private readonly FirebaseSettings _firebaseSettings;
         private readonly IProjectEntityRepository _projectEntityRepository;
+        private readonly IBusinessRepository _businessRepository;
+        private readonly IProjectRepository _projectRepository;
+        private readonly IUserRepository _userRepository;
 
-        public FileUploadService(IOptions<FirebaseSettings> firebaseSettings, IProjectEntityRepository projectEntityRepository)
+        public FileUploadService(IOptions<FirebaseSettings> firebaseSettings,
+            IProjectEntityRepository projectEntityRepository,
+            IBusinessRepository businessRepository,
+            IProjectRepository projectRepository,
+            IUserRepository userRepository)
         {
             _firebaseSettings = firebaseSettings.Value;
             _projectEntityRepository = projectEntityRepository;
+            _businessRepository = businessRepository;
+            _projectRepository = projectRepository;
+            _userRepository = userRepository;
         }
 
         private ProjectEntity ParseToProjectentity(FirebaseRequest request, Guid newId, string url)
@@ -67,7 +77,12 @@ namespace RevenueSharingInvest.Business.Services.Common.Firebase
             string path = null;
             if (request.entityName.ToLower().Equals(StoragePathEnum.Business.ToString().ToLower()))
             {
-                foreach(var file in request.files)
+                if (request.files.Count > 1)
+                {
+                    throw new FileException("One Business Only Have One Avatar!!");
+                }
+
+                foreach (var file in request.files)
                 {
                     string newGuid = Guid.NewGuid().ToString();
 
@@ -86,12 +101,20 @@ namespace RevenueSharingInvest.Business.Services.Common.Firebase
 
                     string url = await uploadTask.Child(path).PutAsync(file.OpenReadStream());
 
+                    if(type[0].ToLower().Equals(CategoryEnum.Image.ToString().ToLower()))
+                        await _businessRepository.UpdateBusinessImage(url, Guid.Parse(request.createBy));
+
                     urls.Add(url);
 
                 }
             } else if (request.entityName.ToLower().Equals(StoragePathEnum.Project.ToString().ToLower()))
             {
-                foreach(var file in request.files)
+                if (request.files.Count > 1)
+                {
+                    throw new FileException("One Project Only Have One Avatar!!");
+                }
+
+                foreach (var file in request.files)
                 {
                     string newGuid = Guid.NewGuid().ToString();
 
@@ -109,6 +132,8 @@ namespace RevenueSharingInvest.Business.Services.Common.Firebase
                     }
 
                     string url = await uploadTask.Child(path).PutAsync(file.OpenReadStream());
+                    if (type[0].ToLower().Equals(CategoryEnum.Image.ToString().ToLower()))
+                        await _projectRepository.UpdateProjectImage(url, Guid.Parse(request.createBy));
 
                     urls.Add(url);
 
@@ -165,6 +190,8 @@ namespace RevenueSharingInvest.Business.Services.Common.Firebase
                     }
 
                     string url = await uploadTask.Child(path).PutAsync(file.OpenReadStream());
+                    if (type[0].ToLower().Equals(CategoryEnum.Image.ToString().ToLower()))
+                        await _userRepository.UpdateUserImage(url, Guid.Parse(request.createBy));
 
                     urls.Add(url);
 

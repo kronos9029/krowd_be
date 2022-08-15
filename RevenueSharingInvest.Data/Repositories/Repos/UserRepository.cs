@@ -481,6 +481,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+        
+        public async Task<int> UpdateUserImage(string url, Guid userId)
+        {
+            try
+            {
+                var query = "UPDATE [User] SET  Image = @Image WHERE Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Image", url, DbType.String);
+                parameters.Add("Id", userId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
 
         //CLEAR DATA
         public async Task<int> ClearAllUserData()
