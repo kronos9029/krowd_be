@@ -20,7 +20,6 @@ namespace RevenueSharingInvest.API.Controllers
     [ApiController]
     [Route("api/v1.0/businesses")]
     [EnableCors]
-    [Authorize]
     public class BusinessController : ControllerBase
     {
         private readonly IBusinessService _businessService;
@@ -36,6 +35,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateBusiness([FromForm] CreateBusinessDTO businessDTO, [FromQuery] List<string> fieldIdList)
         {
             ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
@@ -56,18 +56,18 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllBusinesses(int pageIndex, int pageSize, string? orderBy, string? order)
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllBusinesses(int pageIndex, int pageSize, string status, string name, string orderBy, string order)
         {
             ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
 
-            if((userInfo.roleId.Equals(userInfo.investorRoleId) && !userInfo.investorId.Equals("")) || userInfo.roleId.Equals(userInfo.adminRoleId))
+            if(userInfo.roleId.Equals(userInfo.adminRoleId) || (userInfo.roleId.Equals(userInfo.investorRoleId) && !userInfo.investorId.Equals("")) || userInfo.roleId.Equals(""))
             {
                 var result = new AllBusinessDTO();
-                result = await _businessService.GetAllBusiness(pageIndex, pageSize, orderBy, order, userInfo.roleId);
+                result = await _businessService.GetAllBusiness(pageIndex, pageSize, status, name, orderBy, order, userInfo);
                 return Ok(result);
             }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN and INVESTOR can perform this action!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or INVESTOR or GUEST can perform this action!!!");
         }
 
         [HttpGet]
@@ -160,19 +160,25 @@ namespace RevenueSharingInvest.API.Controllers
 
             List<RoleDTO> roleList = await _roleService.GetAllRoles();
             GetUserDTO? userDTO = await _userService.GetUserByEmail(currentUser.email);
-            if (userDTO != null)
+            if (userDTO == null)
             {
-                if (userDTO.business == null)
-                {
-                    currentUser.roleId = "";
-                    currentUser.businessId = "";
+                currentUser.roleId = "";
+                currentUser.businessId = "";
 
-                }
-                else
+            }
+            else
+            {
+                if (userDTO.business != null)
                 {
                     currentUser.roleId = userDTO.role.id;
                     currentUser.businessId = userDTO.business.id;
                 }
+                else
+                {
+                    currentUser.roleId = "";
+                    currentUser.businessId = "";
+                }
+
             }
 
 

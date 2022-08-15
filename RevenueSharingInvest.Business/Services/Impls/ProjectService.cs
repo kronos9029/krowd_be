@@ -86,7 +86,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             string statusErrorMessage = "";
             try
             {
-                if (thisUserObj.roleId == null)
+                if (thisUserObj.roleId.Equals(""))
                 {
                     int[] statusNum = { 3 };
                     if (businessId != null)
@@ -455,7 +455,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             try
             {
-                if (thisUserObj.roleId == null)
+                if (thisUserObj.roleId.Equals(""))
                 {
                     int[] statusNum = { 3 };
                     if (businessId != null)

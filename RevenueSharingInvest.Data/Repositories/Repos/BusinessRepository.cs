@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -109,22 +110,85 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<RevenueSharingInvest.Data.Models.Entities.Business>> GetAllBusiness(int pageIndex, int pageSize, string? orderBy, string? order, string roleId)
+        public async Task<List<RevenueSharingInvest.Data.Models.Entities.Business>> GetAllBusiness(int pageIndex, int pageSize, string status, string name, string orderBy, string order, string roleId)
         {
             try
             {
+                var parameters = new DynamicParameters();
+
                 var whereCondition = "";
                 var orderByCondition = "ORDER BY CreateDate";
                 var orderCondition = "";
+                var isDeletedCondition = " AND IsDeleted = 0 ";
 
-                if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                var statusCondition = " AND Status = @Status ";
+                var nameCondition = " AND Name LIKE '%" + name + "%' ";
+
+                if (roleId.Equals(""))
                 {
-                    whereCondition = "";
+                    if (status != null)
+                    {
+                        whereCondition = whereCondition + statusCondition;
+                        parameters.Add("Status", status, DbType.String);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + " AND (Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "')";
+                    }
+
+                    if (name != null)
+                    {
+                        whereCondition = whereCondition + nameCondition;
+                    }
+
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4) + " " + isDeletedCondition;
                 }
-                if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
+                
+                else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
-                    whereCondition = "WHERE IsDeleted = 0 AND Status = " + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
+                    if (status != null)
+                    {
+                        whereCondition = whereCondition + statusCondition;
+                        parameters.Add("Status", status, DbType.String);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + " AND (Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "')";
+                    }
+
+                    if (name != null)
+                    {
+                        whereCondition = whereCondition + nameCondition;
+                    }
+
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4) + " " + isDeletedCondition;
                 }
+                
+                else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
+                {
+                    if (status != null)
+                    {
+                        whereCondition = whereCondition + statusCondition;
+                        parameters.Add("Status", status, DbType.String);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + " AND (Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "')";
+                    }
+
+                    if (name != null)
+                    {
+                        whereCondition = whereCondition + nameCondition;
+                    }
+
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4) + " " + isDeletedCondition;
+                }
+
                 if (orderBy != null)
                 {
                     orderByCondition = "ORDER BY " + orderBy;
@@ -168,7 +232,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     WHERE "
                     + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
                     + "         AND @PageIndex * @PageSize";
-                    var parameters = new DynamicParameters();
+                    
                     parameters.Add("PageIndex", pageIndex, DbType.Int16);
                     parameters.Add("PageSize", pageSize, DbType.Int16);
                     using var connection = CreateConnection();
@@ -178,7 +242,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 {
                     var query = "SELECT * FROM Business " + whereCondition + " " + orderByCondition + " " + orderCondition;
                     using var connection = CreateConnection();
-                    return (await connection.QueryAsync<RevenueSharingInvest.Data.Models.Entities.Business>(query)).ToList();
+                    return (await connection.QueryAsync<RevenueSharingInvest.Data.Models.Entities.Business>(query, parameters)).ToList();
                 }              
             }
             catch (Exception e)
@@ -277,6 +341,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        public async Task<int> UpdateBusinessImage(string url, Guid businessId)
+        {
+            try
+            {
+                var query = "UPDATE Business SET Image = @Image WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Image", url, DbType.String);
+                parameters.Add("Id", businessId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
+
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //CLEAR DATA
         public async Task<int> ClearAllBusinessData()
         {
@@ -309,25 +391,87 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public async Task<int> CountBusiness(string roleId)
+        public async Task<int> CountBusiness(string status, string name,string roleId)
         {
             try
             {
+                var parameters = new DynamicParameters();
+
                 var whereCondition = "";
-                
-                if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                var isDeletedCondition = " AND IsDeleted = 0 ";
+
+                var statusCondition = " AND Status = @Status ";
+                var nameCondition = " AND Name LIKE '%" + name + "%' ";
+
+                if (roleId.Equals(""))
                 {
-                    whereCondition = "";
+                    if (status != null)
+                    {
+                        whereCondition = whereCondition + statusCondition;
+                        parameters.Add("Status", status, DbType.String);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + " AND (Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "')";
+                    }
+
+                    if (name != null)
+                    {
+                        whereCondition = whereCondition + nameCondition;
+                    }
+
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4) + " " + isDeletedCondition;
                 }
-                if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
+
+                else if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
-                    whereCondition = "WHERE IsDeleted = 0 AND Status = " + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
-                }            
+                    if (status != null)
+                    {
+                        whereCondition = whereCondition + statusCondition;
+                        parameters.Add("Status", status, DbType.String);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + " AND (Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "')";
+                    }
+
+                    if (name != null)
+                    {
+                        whereCondition = whereCondition + nameCondition;
+                    }
+
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4) + " " + isDeletedCondition;
+                }
+
+                else if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
+                {
+                    if (status != null)
+                    {
+                        whereCondition = whereCondition + statusCondition;
+                        parameters.Add("Status", status, DbType.String);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + " AND (Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "')";
+                    }
+
+                    if (name != null)
+                    {
+                        whereCondition = whereCondition + nameCondition;
+                    }
+
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4) + " " + isDeletedCondition;
+                }
 
                 var query = "SELECT COUNT(*) FROM Business " + whereCondition;
 
                 using var connection = CreateConnection();
-                return ((int)connection.ExecuteScalar(query));
+                return ((int)connection.ExecuteScalar(query, parameters));
             }
             catch (Exception e)
             {

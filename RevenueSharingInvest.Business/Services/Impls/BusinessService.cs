@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Business.Services.Common.Firebase;
@@ -154,15 +155,72 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<AllBusinessDTO> GetAllBusiness(int pageIndex, int pageSize, string? orderBy, string? order, string roleId)
+        public async Task<AllBusinessDTO> GetAllBusiness(int pageIndex, int pageSize, string status, string name, string orderBy, string order, ThisUserObj currentUser)
         {
+            AllBusinessDTO result = new AllBusinessDTO();
+            result.listOfBusiness = new List<GetBusinessDTO>();
+            List<RevenueSharingInvest.Data.Models.Entities.Business> listEntity = new List<Data.Models.Entities.Business>();
+
             string orderByErrorMessage = "";
             bool checkOrderError = false;
             string orderErrorMessage = "";
+            bool statusCheck = false;
+            string statusErrorMessage = "";
             try
             {
-                if (!roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")) && !roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
-                    throw new InvalidFieldException("Only user with role ADMIN and INVESTOR can perform this action!!");
+                if (currentUser.roleId.Equals(""))
+                {
+                    int[] statusNum = { 0 };
+
+                    if (status != null)
+                    {
+                        foreach (int item in statusNum)
+                        {
+                            if (status.Equals(Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item)))
+                                statusCheck = true;
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item) + "' or";
+                        }
+                        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
+                        if (!statusCheck)
+                            throw new InvalidFieldException("GUEST can view Businesses with status" + statusErrorMessage + " !!!");
+                    }
+                }
+
+                else if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                {
+                    int[] statusNum = { 0, 1, 2 };
+
+                    if (status != null)
+                    {
+                        foreach (int item in statusNum)
+                        {
+                            if (status.Equals(Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item)))
+                                statusCheck = true;
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item) + "' or";
+                        }
+                        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
+                        if (!statusCheck)
+                            throw new InvalidFieldException("ADMIN can view Businesses with status" + statusErrorMessage + " !!!");
+                    }
+                }
+
+                else if(currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
+                {
+                    int[] statusNum = { 0 };
+
+                    if (status != null)
+                    {
+                        foreach (int item in statusNum)
+                        {
+                            if (status.Equals(Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item)))
+                                statusCheck = true;
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item) + "' or";
+                        }
+                        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
+                        if (!statusCheck)
+                            throw new InvalidFieldException("INVESTOR can view Businesses with status" + statusErrorMessage + " !!!");
+                    }                   
+                }
 
                 if (orderBy != null)
                 {
@@ -178,7 +236,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     else
                         orderBy = BusinessOrderFieldDictionary.column.GetValueOrDefault(orderBy);
                 }
-
                 if (order != null)
                 {
                     for (int o = 0; o < Enum.GetNames(typeof(OrderEnum)).Length; o++)
@@ -192,12 +249,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("order must be" + orderErrorMessage + " !!!");
                 }
 
-                AllBusinessDTO result = new AllBusinessDTO();
-                result.listOfBusiness = new List<GetBusinessDTO>();
+                result.numOfBusiness = await _businessRepository.CountBusiness(status, name, currentUser.roleId);
+                listEntity = await _businessRepository.GetAllBusiness(pageIndex, pageSize, status, name, orderBy, order, currentUser.roleId);
 
-                result.numOfBusiness = await _businessRepository.CountBusiness(roleId);
-
-                List<RevenueSharingInvest.Data.Models.Entities.Business> listEntity = await _businessRepository.GetAllBusiness(pageIndex, pageSize, orderBy, order, roleId);
                 List<GetBusinessDTO> listDTO = _mapper.Map<List<GetBusinessDTO>>(listEntity);
 
                 foreach (GetBusinessDTO item in listDTO)

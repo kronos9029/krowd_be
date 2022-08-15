@@ -131,10 +131,10 @@ namespace RevenueSharingInvest.Data.Models.Helpers
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
-                entity.HasOne(d => d.InvestorType)
+/*                entity.HasOne(d => d.InvestorType)
                     .WithMany(p => p.Investors)
                     .HasForeignKey(d => d.InvestorTypeId)
-                    .HasConstraintName("FK_Investor_InvestorType");
+                    .HasConstraintName("FK_Investor_InvestorType");*/
             });
 
             modelBuilder.Entity<InvestorType>(entity =>

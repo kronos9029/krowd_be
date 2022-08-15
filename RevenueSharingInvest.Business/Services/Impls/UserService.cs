@@ -156,8 +156,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<AllUserDTO> GetAllUsers(int pageIndex, int pageSize, string businessId, string role, string status, string temp_field_role)
+        public async Task<AllUserDTO> GetAllUsers(int pageIndex, int pageSize, string businessId, string role, string status, ThisUserObj currentUser)
         {
+            AllUserDTO result = new AllUserDTO();
+            result.listOfUser = new List<GetUserDTO>();
+            List<User> listEntity = new List<User>();
+
             bool statusCheck = false;
             string statusErrorMessage = "";
             bool roleCheck = false;
@@ -165,10 +169,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             try
             {
-                if (!temp_field_role.Equals("ADMIN") && !temp_field_role.Equals("BUSINESS_MANAGER"))
-                    throw new InvalidFieldException("temp_field_role must be ADMIN or BUSINESS_MANAGER!");
-
-                if (temp_field_role.Equals("ADMIN"))
+                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
                     int[] statusNum = { 0, 1, 2 };
                     int[] roleNum = { 0, 1, 2, 3 };
@@ -210,21 +211,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         if (!statusCheck)
                             throw new InvalidFieldException("ADMIN can view Users with status" + statusErrorMessage + " !!!");
                     }
+
+                    result.numOfUser = await _userRepository.CountUser(businessId, null, role, status, currentUser.roleId);
+                    listEntity = await _userRepository.GetAllUsers(pageIndex, pageSize, businessId, null, role, status, currentUser.roleId);
                 }
 
-                if (temp_field_role.Equals("BUSINESS_MANAGER"))
+                else if(currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
                     int[] statusNum = { 0, 1, 2 };
                     int[] roleNum = { 2, 3 };
 
-                    if (businessId == null)
-                        throw new InvalidFieldException("businessId can not be empty!!!");
+                    if (businessId != null && !businessId.Equals(currentUser.businessId))
+                        throw new InvalidFieldException("businessId is not match with this BUSINESS_MANAGER's businessId!!!");
+                    businessId = currentUser.businessId;
 
-                    if (!await _validationService.CheckUUIDFormat(businessId))
-                        throw new InvalidFieldException("Invalid businessId!!!");
-
-                    if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
-                        throw new NotFoundException("This businessId is not existed!!!");
                     if (role != null)
                     {
                         foreach (int item in roleNum)
@@ -251,20 +251,47 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         if (!statusCheck)
                             throw new InvalidFieldException("BUSINESS_MANAGER can view Users with status" + statusErrorMessage + " !!!");
                     }
+
+                    result.numOfUser = await _userRepository.CountUser(businessId, null, role, status, currentUser.roleId);
+                    listEntity = await _userRepository.GetAllUsers(pageIndex, pageSize, businessId, null, role, status, currentUser.roleId);
                 }
 
-                //if (temp_field_role.Equals("PROJECT"))
-                //{
-                //    int[] statusNum = { 0, 1, 2 };
-                //    int[] roleNum = { 1 };
-                //}
+                else if(currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                {
+                    int[] statusNum = { 0, 1, 2 };
+                    int[] roleNum = { 3 };
 
-                AllUserDTO result = new AllUserDTO();
-                result.listOfUser = new List<GetUserDTO>();
+                    if (role != null)
+                    {
+                        foreach (int item in roleNum)
+                        {
+                            if (role.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(item)))
+                                roleCheck = true;
+                            roleErrorMessage = roleErrorMessage + " '" + Enum.GetNames(typeof(RoleEnum)).ElementAt(item) + "' or";
+                        }
+                        roleErrorMessage = roleErrorMessage.Remove(roleErrorMessage.Length - 3);
+                        if (!roleCheck)
+                            throw new InvalidFieldException("PROJECT_MANAGER can view Users with role" + roleErrorMessage + " !!!");
 
-                result.numOfUser = await _userRepository.CountUser(businessId, role, status, temp_field_role);
+                        role = RoleDictionary.role.GetValueOrDefault(role);
+                    }
+                    if (status != null)
+                    {
+                        foreach (int item in statusNum)
+                        {
+                            if (status.Equals(Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item)))
+                                statusCheck = true;
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item) + "' or";
+                        }
+                        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
+                        if (!statusCheck)
+                            throw new InvalidFieldException("PROJECT_MANAGER can view Users with status" + statusErrorMessage + " !!!");
+                    }
 
-                List<User> listEntity = await _userRepository.GetAllUsers(pageIndex, pageSize, businessId, role, status, temp_field_role);
+                    result.numOfUser = await _userRepository.CountUser(null, currentUser.userId, role, status, currentUser.roleId);
+                    listEntity = await _userRepository.GetAllUsers(pageIndex, pageSize, null, currentUser.userId, role, status, currentUser.roleId);
+                }               
+                
                 List<GetUserDTO> listDTO = _mapper.Map<List<GetUserDTO>>(listEntity);
 
                 foreach (GetUserDTO item in listDTO)
@@ -313,7 +340,57 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 throw new Exception(e.Message);
             }
-        }        
+        } 
+        
+
+        public async Task<GetUserDTO> BusinessManagerGetUserById(String businesId, Guid userId)
+        {
+            try
+            {
+                User user = await _userRepository.BusinessManagerGetUserById(Guid.Parse(businesId), userId);
+
+                GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
+                if (userDTO == null)
+                    throw new NotFoundException("No User Object Found!");
+
+                userDTO.createDate = await _validationService.FormatDateOutput(userDTO.createDate);
+                userDTO.updateDate = await _validationService.FormatDateOutput(userDTO.updateDate);
+
+                userDTO.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(userDTO.id)));
+                userDTO.role = _mapper.Map<RoleDTO>(await _roleRepository.GetRoleByUserId(Guid.Parse(userDTO.id)));
+
+                return userDTO;
+
+            }
+            catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<GetUserDTO> ProjectManagerGetUserbyId(string managerId, Guid userId)
+        {
+            try
+            {
+                User user = await _userRepository.ProjectManagerGetUserbyId(Guid.Parse(managerId), userId);
+
+                GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
+                if (userDTO == null)
+                    throw new NotFoundException("No User Object Found!");
+
+                userDTO.createDate = await _validationService.FormatDateOutput(userDTO.createDate);
+                userDTO.updateDate = await _validationService.FormatDateOutput(userDTO.updateDate);
+
+                userDTO.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(userDTO.id)));
+                userDTO.role = _mapper.Map<RoleDTO>(await _roleRepository.GetRoleByUserId(Guid.Parse(userDTO.id)));
+
+                return userDTO;
+            }
+            catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
         
         public async Task<GetUserDTO> GetUserByEmail(String email)
         {

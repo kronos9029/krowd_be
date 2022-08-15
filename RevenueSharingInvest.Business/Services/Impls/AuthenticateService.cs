@@ -6,6 +6,7 @@ using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Common;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -43,12 +44,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
         public async Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken)
         {
-            List<Role> roleList = await _roleRepository.GetAllRoles();
             FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
             string uid = decryptedToken.Uid;
 
             UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
             string email = userRecord.Email;
+            string lastName = userRecord.DisplayName;
             DateTime createdDate = (DateTime)userRecord.UserMetaData.CreationTimestamp;
             string ImageUrl = userRecord.PhotoUrl.ToString();
 
@@ -60,24 +61,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
             if (userObject == null)
             {
 
-                Guid roleId = roleList.Find(role => role.Name == RoleEnum.INVESTOR.ToString()).Id;
+                Guid roleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.INVESTOR.ToString()));
 
                 Investor investor = new();
-                User newInvestorObject = new();
+                User newInvestorUser = new();
 
-                newInvestorObject.Email = email;
-                newInvestorObject.CreateDate = createdDate;
-                newInvestorObject.Image = ImageUrl;
-                newInvestorObject.RoleId = roleId;
+                newInvestorUser.Email = email;
+                newInvestorUser.CreateDate = createdDate;
+                newInvestorUser.Image = ImageUrl;
+                newInvestorUser.RoleId = roleId;
+                newInvestorUser.LastName = lastName;
 
-                string newUserID = await _userRepository.CreateUser(newInvestorObject);
+                string newUserID = await _userRepository.CreateUser(newInvestorUser);
                 if (newUserID.Equals(""))
                 {
                     throw new RegisterException("Register Fail!!");
                 }
 
                 investor.UserId = Guid.Parse(newUserID);
-                investor.InvestorTypeId = roleList.Find(role => role.Name == RoleEnum.INVESTOR.ToString()).Id;
+                //investor.InvestorTypeId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.INVESTOR.ToString()));
 
                 string newInvestorID = await _investorRepository.CreateInvestor(investor);
                 if (newInvestorID.Equals("")) 
@@ -88,6 +90,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.id = Guid.Parse(newUserID);
                 response.uid = uid;
                 response.investorId = Guid.Parse(newInvestorID);
+                response.image = ImageUrl;
                 response = await GenerateTokenAsync(response, RoleEnum.INVESTOR.ToString());
             }
             else
@@ -95,7 +98,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.email = email;
                 response.id = userObject.Id;
                 response.uid = uid;
-                response.investorId = Guid.Parse(await _investorRepository.GetInvestorByEmail(email));
+                response.image = ImageUrl;
+                response.investorId = await _investorRepository.GetInvestorByEmail(email);
                 response = await GenerateTokenAsync(response, RoleEnum.INVESTOR.ToString());
             }
             return response;

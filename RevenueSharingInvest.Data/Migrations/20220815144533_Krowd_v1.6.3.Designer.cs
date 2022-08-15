@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RevenueSharingInvest.Data.Models.Helpers;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
     [DbContext(typeof(KrowdContext))]
-    partial class KrowdContextModelSnapshot : ModelSnapshot
+    [Migration("20220815144533_Krowd_v1.6.3")]
+    partial class Krowd_v163
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,6 +312,8 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InvestorTypeId");
 
                     b.HasIndex("UserId");
 
@@ -1404,9 +1408,18 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investor", b =>
                 {
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.InvestorType", "InvestorType")
+                        .WithMany("Investors")
+                        .HasForeignKey("InvestorTypeId")
+                        .HasConstraintName("FK_Investor_InvestorType")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "User")
                         .WithMany("Investors")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("InvestorType");
 
                     b.Navigation("User");
                 });
@@ -1694,6 +1707,11 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("Investments");
 
                     b.Navigation("InvestorWallets");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.InvestorType", b =>
+                {
+                    b.Navigation("Investors");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.InvestorWallet", b =>

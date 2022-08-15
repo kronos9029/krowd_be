@@ -1,4 +1,5 @@
-﻿using RevenueSharingInvest.Data.Models.DTOs;
+﻿using RevenueSharingInvest.API;
+using RevenueSharingInvest.Data.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace RevenueSharingInvest.Business.Services
         //public Task<int> AdminCreateBusiness(Data.Models.Entities.Business newBusiness, string email);
 
         //READ
-        public Task<AllBusinessDTO> GetAllBusiness(int pageIndex, int pageSize, string? orderBy, string? order, string roleId);
+        public Task<AllBusinessDTO> GetAllBusiness(int pageIndex, int pageSize, string status, string name, string orderBy, string order, ThisUserObj currentUser);
         public Task<GetBusinessDTO> GetBusinessById(Guid businessId);
         public Task<Data.Models.Entities.Business> GetBusinessByProjectId(Guid projectId);
 

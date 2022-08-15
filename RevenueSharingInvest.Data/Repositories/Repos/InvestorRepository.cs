@@ -25,7 +25,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "INSERT INTO Investor ("
                     + "         UserId, "
-                    + "         InvestorTypeId, "
+//                    + "         InvestorTypeId, "
                     + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
@@ -36,7 +36,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @UserId, "
-                    + "         @InvestorTypeId, "
+//                    + "         @InvestorTypeId, "
                     + "         0, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
@@ -46,7 +46,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("UserId", investorDTO.UserId, DbType.Guid);
-                parameters.Add("InvestorTypeId", investorDTO.InvestorTypeId, DbType.Guid);
+//                parameters.Add("InvestorTypeId", investorDTO.InvestorTypeId, DbType.Guid);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", investorDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
@@ -155,15 +155,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }        
         
         //GET BY EMAIL
-        public async Task<string> GetInvestorByEmail(string email)
+        public async Task<Guid> GetInvestorByEmail(string email)
         {
             try
             {
-                string query = "SELECT Id FROM Investor WHERE Email = @Email";
+                string query = "SELECT I.Id FROM Investor I LEFT JOIN [User] U ON I.UserId = U.Id WHERE U.Email = @Email";
                 var parameters = new DynamicParameters();
                 parameters.Add("Email", email, DbType.String);
                 using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<string>(query, parameters);
+                return await connection.QueryFirstOrDefaultAsync<Guid>(query, parameters);
             }
             catch (Exception e)
             {

@@ -11,10 +11,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
     [Table("InvestorType")]
     public partial class InvestorType
     {
-        public InvestorType()
+/*        public InvestorType()
         {
             Investors = new HashSet<Investor>();
-        }
+        }*/
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
@@ -29,7 +29,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
 
-        [InverseProperty(nameof(Investor.InvestorType))]
-        public virtual ICollection<Investor> Investors { get; set; }
+/*        [InverseProperty(nameof(Investor.InvestorType))]
+        public virtual ICollection<Investor> Investors { get; set; }*/
     }
 }
