@@ -27,5 +27,8 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> DeleteProjectEntityById(Guid projectId);
         public Task<int> DeleteProjectEntityByProjectIdAndType(Guid projectId, string type);
         public Task<int> ClearAllProjectEntityData();
+
+        //Firebase
+        public Task<int> CreateProjectEntityFromFirebase(ProjectEntity projectEntityDTO);
     }
 }

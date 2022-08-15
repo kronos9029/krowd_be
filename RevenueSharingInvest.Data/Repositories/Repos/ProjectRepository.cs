@@ -601,7 +601,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
-                if (temp_field_role.Equals(RoleEnum.BUSINESS_MANAGER.ToString()))
+                if (temp_field_role.Equals("BUSINESS"))
                 {
                     whereCondition = whereCondition + businessIdCondition;
                     parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
@@ -641,7 +641,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
-                if (temp_field_role.Equals(RoleEnum.PROJECT_OWNER.ToString()))
+                if (temp_field_role.Equals("PROJECT"))
                 {
                     whereCondition = whereCondition + managerIdCondition;
                     parameters.Add("ManagerId", Guid.Parse(managerId), DbType.Guid);
@@ -758,31 +758,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                             + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "') "
                             + isDeletedCondition;
                     }
-                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
-                }
-
-                if (temp_field_role.Equals("GUEST"))
-                {
-                    if (businessId != null)
-                    {
-                        whereCondition = whereCondition + businessIdCondition;
-                        parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
-                    }
-                    if (areaId != null)
-                    {
-                        whereCondition = whereCondition + areaIdCondition;
-                        parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
-                    }
-                    if (fieldId != null)
-                    {
-                        whereCondition = whereCondition + fieldIdCondition;
-                        parameters.Add("FieldId", Guid.Parse(fieldId), DbType.Guid);
-                    }
-
-                    whereCondition = whereCondition + " AND (Status = '"
-                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(1) + "') "
-                        + isDeletedCondition;
-
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
