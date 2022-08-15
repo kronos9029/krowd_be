@@ -381,15 +381,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 User user = await _userRepository.GetUserByEmail(email);
                 GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
-                if (userDTO == null)
-                    throw new NotFoundException("No User Object Found!");
+                if(userDTO != null)
+                {
+                    userDTO.createDate = await _validationService.FormatDateOutput(userDTO.createDate);
+                    userDTO.updateDate = await _validationService.FormatDateOutput(userDTO.updateDate);
 
-                userDTO.createDate = await _validationService.FormatDateOutput(userDTO.createDate);
-                userDTO.updateDate = await _validationService.FormatDateOutput(userDTO.updateDate);
-
-                userDTO.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(userDTO.id)));
-                userDTO.role = _mapper.Map<RoleDTO>(await _roleRepository.GetRoleByUserId(Guid.Parse(userDTO.id)));
-
+                    userDTO.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(userDTO.id)));
+                    userDTO.role = _mapper.Map<RoleDTO>(await _roleRepository.GetRoleByUserId(Guid.Parse(userDTO.id)));
+                }
                 return userDTO;
             }
             catch (Exception e)

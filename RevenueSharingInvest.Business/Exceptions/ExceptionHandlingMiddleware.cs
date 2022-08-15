@@ -55,6 +55,10 @@ namespace RevenueSharingInvest.Business.Exceptions
                     errorMessageObject.Code = "B001";
                     statusCode = (int)HttpStatusCode.BadRequest;
                     break;
+                case FileException:
+                    errorMessageObject.Code = "F001";
+                    statusCode = (int)HttpStatusCode.Conflict;
+                    break;
 
             }
 

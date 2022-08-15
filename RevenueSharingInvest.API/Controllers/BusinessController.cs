@@ -140,41 +140,56 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
         }
 
-        private async Task<ThisUserObj> GetThisUserInfo(HttpContext httpContext)
+        private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
         {
             ThisUserObj currentUser = new();
 
-            currentUser.userId =  httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
-            currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
-            currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
-
-            List<RoleDTO> roleList = await _roleService.GetAllRoles();
-            GetUserDTO userDTO = await _userService.GetUserByEmail(currentUser.email);
-
-            currentUser.roleId = userDTO.role.id;
-            if(userDTO.business != null)
+            var checkUser = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber);
+            if (checkUser == null)
             {
-                currentUser.businessId = userDTO.business.id;
+                currentUser.userId = "";
+                currentUser.email = "";
+                currentUser.investorId = "";
             }
             else
             {
-                currentUser.businessId = "";
+                currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
+                currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
+                currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
             }
 
-            foreach(RoleDTO role in roleList)
+            List<RoleDTO> roleList = await _roleService.GetAllRoles();
+            GetUserDTO? userDTO = await _userService.GetUserByEmail(currentUser.email);
+            if (userDTO != null)
+            {
+                if (userDTO.business == null)
+                {
+                    currentUser.roleId = "";
+                    currentUser.businessId = "";
+
+                }
+                else
+                {
+                    currentUser.roleId = userDTO.role.id;
+                    currentUser.businessId = userDTO.business.id;
+                }
+            }
+
+
+            foreach (RoleDTO role in roleList)
             {
                 if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(0)))
                 {
                     currentUser.adminRoleId = role.id;
-                }                
+                }
                 if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(3)))
                 {
                     currentUser.investorRoleId = role.id;
-                }                
+                }
                 if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(1)))
                 {
                     currentUser.businessManagerRoleId = role.id;
-                }                
+                }
                 if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(2)))
                 {
                     currentUser.projectManagerRoleId = role.id;

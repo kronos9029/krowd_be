@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Models.DTOs
 {
@@ -37,4 +33,16 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string updateBy { get; set; }
         public bool isDeleted { get; set; }
     }
+
+    public class ProjectEntityFile
+    {
+        public string id { get; set; }
+        public string projectId { get; set; }
+        public string createDate { get; set; }
+        public string createBy { get; set; }
+        public string updateDate { get; set; }
+        public string updateBy { get; set; }
+        public List<IFormFile> files { get; set; }
+    }
+
 }

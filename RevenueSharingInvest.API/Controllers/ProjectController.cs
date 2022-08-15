@@ -272,23 +272,37 @@ namespace RevenueSharingInvest.API.Controllers
         private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
         {
             ThisUserObj currentUser = new();
-
-            currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
-            currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
-            currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
+        
+            var checkUser = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber);
+            if(checkUser == null)
+            {
+                currentUser.userId = "";
+                currentUser.email = "";
+                currentUser.investorId = "";
+            } else
+            {
+                currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
+                currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
+                currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
+            }
 
             List<RoleDTO> roleList = await _roleService.GetAllRoles();
-            GetUserDTO userDTO = await _userService.GetUserByEmail(currentUser.email);
+            GetUserDTO? userDTO = await _userService.GetUserByEmail(currentUser.email);
+            if(userDTO != null)
+            {
+                if (userDTO.business == null)
+                {
+                    currentUser.roleId = "";
+                    currentUser.businessId = "";
 
-            currentUser.roleId = userDTO.role.id;
-            if (userDTO.business != null)
-            {
-                currentUser.businessId = userDTO.business.id;
+                }
+                else
+                {
+                    currentUser.roleId = userDTO.role.id;
+                    currentUser.businessId = userDTO.business.id;
+                }
             }
-            else
-            {
-                currentUser.businessId = "";
-            }
+
 
             foreach (RoleDTO role in roleList)
             {
