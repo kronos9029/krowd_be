@@ -413,7 +413,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     else
                     {
                         whereCondition = whereCondition + " AND (Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "')";
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "')";
                     }
 
                     if (name != null)
@@ -457,7 +457,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     else
                     {
                         whereCondition = whereCondition + " AND (Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "')";
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "')";
                     }
 
                     if (name != null)

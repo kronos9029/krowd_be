@@ -498,8 +498,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("GUEST can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, null, name, status, null);
-                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, null, name, status, null);
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, null, name, status, thisUserObj.roleId);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, null, name, status, thisUserObj.roleId);
                 }
 
                 else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
