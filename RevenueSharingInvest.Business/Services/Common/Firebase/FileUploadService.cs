@@ -73,18 +73,18 @@ namespace RevenueSharingInvest.Business.Services.Common.Firebase
 
                     string[] type = file.ContentType.Split("/");
 
-                    if (type[0].ToLower().Equals(CategoryEnum.Images.ToString().ToLower()))
+                    if (type[0].ToLower().Equals(CategoryEnum.Image.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Business.ToString() + "/" + request.entityId + "/" + CategoryEnum.Images;
-                    } else if (type[0].ToLower().Equals(CategoryEnum.Videos.ToString().ToLower()))
+                        path = StoragePathEnum.Business.ToString() + "/" + request.entityId + "/" + CategoryEnum.Image + newGuid;
+                    } else if (type[0].ToLower().Equals(CategoryEnum.Video.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Business.ToString() + "/" + request.entityId + "/" + CategoryEnum.Videos;
-                    } else if (type[0].ToLower().Equals(CategoryEnum.Applications.ToString().ToLower()))
+                        path = StoragePathEnum.Business.ToString() + "/" + request.entityId + "/" + CategoryEnum.Video + newGuid;
+                    } else if (type[0].ToLower().Equals(CategoryEnum.Application.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Business.ToString() + "/" + request.entityId + "/" + CategoryEnum.Applications;
+                        path = StoragePathEnum.Business.ToString() + "/" + request.entityId + "/" + CategoryEnum.Application + newGuid;
                     }
 
-                    string url = await uploadTask.Child(path).Child(newGuid).PutAsync(file.OpenReadStream());
+                    string url = await uploadTask.Child(path).PutAsync(file.OpenReadStream());
 
                     urls.Add(url);
 
@@ -97,15 +97,15 @@ namespace RevenueSharingInvest.Business.Services.Common.Firebase
 
                     string[] type = file.ContentType.Split("/");
 
-                    if (type[0].ToLower().Equals(CategoryEnum.Images.ToString().ToLower()))
+                    if (type[0].ToLower().Equals(CategoryEnum.Image.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + CategoryEnum.Images;
-                    } else if (type[0].ToLower().Equals(CategoryEnum.Videos.ToString().ToLower()))
+                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + CategoryEnum.Image;
+                    } else if (type[0].ToLower().Equals(CategoryEnum.Video.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + CategoryEnum.Videos;
-                    } else if (type[0].ToLower().Equals(CategoryEnum.Applications.ToString().ToLower()))
+                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + CategoryEnum.Video;
+                    } else if (type[0].ToLower().Equals(CategoryEnum.Application.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + CategoryEnum.Applications;
+                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + CategoryEnum.Application;
                     }
 
                     string url = await uploadTask.Child(path).Child(newGuid).PutAsync(file.OpenReadStream());
@@ -121,15 +121,15 @@ namespace RevenueSharingInvest.Business.Services.Common.Firebase
 
                     string[] type = file.ContentType.Split("/");
 
-                    if (type[0].ToLower().Equals(CategoryEnum.Images.ToString().ToLower()))
+                    if (type[0].ToLower().Equals(CategoryEnum.Image.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + CategoryEnum.Images;
-                    } else if (type[0].ToLower().Equals(CategoryEnum.Videos.ToString().ToLower()))
+                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + CategoryEnum.Image;
+                    } else if (type[0].ToLower().Equals(CategoryEnum.Video.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + CategoryEnum.Videos;
-                    } else if (type[0].ToLower().Equals(CategoryEnum.Applications.ToString().ToLower()))
+                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + CategoryEnum.Video;
+                    } else if (type[0].ToLower().Equals(CategoryEnum.Application.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + CategoryEnum.Applications;
+                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + CategoryEnum.Application;
                     }
 
                     string url = await uploadTask.Child(path).Child(newGuid.ToString()).PutAsync(file.OpenReadStream());
@@ -153,15 +153,15 @@ namespace RevenueSharingInvest.Business.Services.Common.Firebase
 
                     string[] type = file.ContentType.Split("/");
 
-                    if (type[0].ToLower().Equals(CategoryEnum.Images.ToString().ToLower()))
+                    if (type[0].ToLower().Equals(CategoryEnum.Image.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.User.ToString() + request.entityId + "/" + CategoryEnum.Images;
-                    } else if (type[0].ToLower().Equals(CategoryEnum.Videos.ToString().ToLower()))
+                        path = StoragePathEnum.User.ToString() + request.entityId + "/" + CategoryEnum.Image;
+                    } else if (type[0].ToLower().Equals(CategoryEnum.Video.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.User.ToString() + request.entityId + "/" + CategoryEnum.Videos;
-                    } else if (type[0].ToLower().Equals(CategoryEnum.Applications.ToString().ToLower()))
+                        path = StoragePathEnum.User.ToString() + request.entityId + "/" + CategoryEnum.Video;
+                    } else if (type[0].ToLower().Equals(CategoryEnum.Application.ToString().ToLower()))
                     {
-                        path = StoragePathEnum.User.ToString() + request.entityId + "/" + CategoryEnum.Applications;
+                        path = StoragePathEnum.User.ToString() + request.entityId + "/" + CategoryEnum.Application;
                     }
 
                     string url = await uploadTask.Child(path).Child(newGuid).PutAsync(file.OpenReadStream());

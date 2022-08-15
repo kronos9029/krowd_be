@@ -2,8 +2,8 @@
 {
     public enum CategoryEnum
     {
-        Images,
-        Videos,
-        Applications
+        Image,
+        Video,
+        Application
     }
 }
