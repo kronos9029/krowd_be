@@ -1,4 +1,5 @@
-﻿using RevenueSharingInvest.Data.Models.DTOs;
+﻿using RevenueSharingInvest.API;
+using RevenueSharingInvest.Data.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace RevenueSharingInvest.Business.Services
     public interface IProjectService
     {
         //CREATE
-        public Task<IdDTO> CreateProject(CreateUpdateProjectDTO projectDTO);
+        public Task<IdDTO> CreateProject(CreateUpdateProjectDTO projectDTO, ThisUserObj thisUserObj);
 
         //READ
         public Task<AllProjectDTO> GetAllProjects
@@ -18,25 +19,21 @@ namespace RevenueSharingInvest.Business.Services
             int pageIndex, 
             int pageSize, 
             string businessId, 
-            string managerId, 
             string areaId, 
             string fieldId, 
-            string investorId,
             string name,
             string status,
-            string temp_field_role
+            ThisUserObj thisUserObj
         );
         public Task<GetProjectDTO> GetProjectById(Guid projectId);
         public Task<ProjectCountDTO> CountProjects
         (
             string businessId, 
-            string managerId, 
             string areaId, 
             string fieldId, 
-            string investorId,
             string name,
             string status,
-            string temp_field_role
+            ThisUserObj thisUserObj
         );
         public Task<List<BusinessProjectDTO>> GetBusinessProjectsToAuthor(Guid businessId);
 

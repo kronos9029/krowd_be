@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -55,7 +55,7 @@ namespace RevenueSharingInvest.API.Controllers
                 && projectDTO.businessId.Equals(currentUser.businessId) 
                 && projectDTO.managerId.Equals(currentUser.userId))
             {
-                var result = await _projectService.CreateProject(projectDTO);
+                var result = await _projectService.CreateProject(projectDTO, currentUser);
                 return Ok(result);
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
@@ -68,44 +68,24 @@ namespace RevenueSharingInvest.API.Controllers
             int pageIndex,
             int pageSize,
             string businessId,
-            string managerId,
             string areaId,
             string fieldId,
-            string investorId,
             string name,
             string status
             )
         {
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
-
+            //ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
             if (countOnly)
             {
                 var countResult = new ProjectCountDTO();
-                if(currentUser.roleId != null)
-                {
-                    RoleDTO roleDTO = await _roleService.GetRoleById(Guid.Parse(currentUser.roleId));
-                    countResult = await _projectService.CountProjects(businessId, managerId, areaId, fieldId, investorId, name, status, roleDTO.name);
-                    return Ok(countResult);
-                } else
-                {
-                    countResult = await _projectService.CountProjects(businessId, managerId, areaId, fieldId, investorId, name, status, "GUEST");
-                    return Ok(countResult);
-                }
+                countResult = await _projectService.CountProjects(businessId, areaId, fieldId, name, status, null);
+                return Ok(countResult);
             }
             else
             {
                 var resultProjectList = new AllProjectDTO();
-                if(currentUser.roleId != null)
-                {
-                    RoleDTO roleDTO = await _roleService.GetRoleById(Guid.Parse(currentUser.roleId));
-
-                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, managerId, areaId, fieldId, investorId, name, status, roleDTO.name);
-                    return Ok(resultProjectList);
-                } else
-                {
-                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, managerId, areaId, fieldId, investorId, name, status, "GUEST");
-                    return Ok(resultProjectList);
-                }
+                resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, fieldId, name, status, null);
+                return Ok(resultProjectList);
             }           
             return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
         }

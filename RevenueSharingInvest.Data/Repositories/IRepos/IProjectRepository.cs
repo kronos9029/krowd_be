@@ -25,7 +25,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
             string investorId, 
             string name, 
             string status, 
-            string temp_field_role
+            string roleId
         );
         public Task<Project> GetProjectById(Guid projectId);
         public Task<int> CountProject
@@ -37,7 +37,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
             string investorId,
             string name,
             string status,
-            string temp_field_role
+            string roleId
         );
         public Task<List<BusinessProjectDTO>> GetBusinessProjectsToAuthor(Guid businessId);
 

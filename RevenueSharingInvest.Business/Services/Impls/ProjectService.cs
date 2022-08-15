@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Common;
@@ -77,12 +78,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //COUNT PROJECTS
-        public async Task<ProjectCountDTO> CountProjects(string businessId, string managerId, string areaId, string fieldId, string investorId, string name, string status, string temp_field_role)
+        public async Task<ProjectCountDTO> CountProjects(string businessId, string areaId, string fieldId, string name, string status, ThisUserObj thisUserObj)
         {
             ProjectCountDTO result = new ProjectCountDTO();
             try
             {
-                result.numOfProject = await _projectRepository.CountProject(businessId, managerId, areaId, fieldId, investorId, name, status, temp_field_role);
+                result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, null, name, status, "GUEST");
                 return result;
             }
             catch (Exception e)
@@ -92,17 +93,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreateProject(CreateUpdateProjectDTO projectDTO)
+        public async Task<IdDTO> CreateProject(CreateUpdateProjectDTO projectDTO, ThisUserObj currentUser)
         {
             IdDTO newId = new IdDTO();
             try
             {
-
                 if (projectDTO.businessId == null || !await _validationService.CheckUUIDFormat(projectDTO.businessId))
                     throw new InvalidFieldException("Invalid businessId!!!");
 
                 if (!await _validationService.CheckExistenceId("Business", Guid.Parse(projectDTO.businessId)))
                     throw new NotFoundException("This BusinessId is not existed!!!");
+
+                if (!projectDTO.businessId.Equals(currentUser.businessId))
+                    throw new InvalidFieldException("This businessId is not match with creator businessId!!!");
 
                 if (projectDTO.managerId == null || !await _validationService.CheckUUIDFormat(projectDTO.managerId))
                     throw new InvalidFieldException("Invalid managerId!!!");
@@ -143,9 +146,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (projectDTO.investmentTargetCapital <= 0)
                     throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
 
-                if (projectDTO.investedCapital <= 0)
-                    throw new InvalidFieldException("investedCapital must be greater than 0!!!");
-
                 if (projectDTO.sharedRevenue <= 0)
                     throw new InvalidFieldException("sharedRevenue must be greater than 0!!!");
 
@@ -157,10 +157,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (projectDTO.numOfStage <= 0)
                     throw new InvalidFieldException("numOfStage must be greater than 0!!!");
-
-                //if (projectDTO.remainAmount <= 0)
-                    //throw new InvalidFieldException("remainAmount must be greater than 0!!!");
-                ///
 
                 if (!await _validationService.CheckDate((projectDTO.startDate)))
                     throw new InvalidFieldException("Invalid startDate!!!");
@@ -175,29 +171,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(projectDTO.businessLicense))
                     throw new InvalidFieldException("Invalid businessLicense!!!");
 
-                //projectDTO.approvedBy = null;
-
-                //if (projectDTO.createBy != null && projectDTO.createBy.Length >= 0)
-                //{
-                //    if (projectDTO.createBy.Equals("string"))
-                //        projectDTO.createBy = null;
-                //    else if (!await _validationService.CheckUUIDFormat(projectDTO.createBy))
-                //        throw new InvalidFieldException("Invalid createBy!!!");
-                //}
-
-                //if (projectDTO.updateBy != null && projectDTO.updateBy.Length >= 0)
-                //{
-                //    if (projectDTO.updateBy.Equals("string"))
-                //        projectDTO.updateBy = null;
-                //    else if (!await _validationService.CheckUUIDFormat(projectDTO.updateBy))
-                //        throw new InvalidFieldException("Invalid updateBy!!!");
-                //}
-
-                //projectDTO.isDeleted = false;
-
                 Project entity = _mapper.Map<Project>(projectDTO);
 
                 entity.Status = Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(0);
+
+                entity.CreateBy = Guid.Parse(currentUser.userId);
+                entity.UpdateBy = Guid.Parse(currentUser.userId);
 
                 if (projectDTO.image != null)
                 {
@@ -239,44 +218,27 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int pageIndex, 
             int pageSize, 
             string businessId, 
-            string managerId, 
             string areaId, 
             string fieldId, 
-            string investorId, 
             string name, 
             string status, 
-            string temp_field_role
+            ThisUserObj thisUserObj
         )
         {
+            AllProjectDTO result = new AllProjectDTO();
+            result.listOfProject = new List<GetProjectDTO>();
+            List<Project> listEntity = new List<Project>();
+
+
             bool statusCheck = false;
             string statusErrorMessage = "";
 
             try
             {
-                if (!temp_field_role.Equals("ADMIN") && !temp_field_role.Equals("INVESTOR") && !temp_field_role.Equals("PROJECT") && !temp_field_role.Equals("BUSINESS") && !temp_field_role.Equals("GUEST"))
-                    throw new InvalidFieldException("ADMIN or INVESTOR or PROJECT or BUSINESS or GUEST!");
-
-                //if (businessId != null)
-                //{
-                //    if (!await _validationService.CheckUUIDFormat(businessId))
-                //        throw new InvalidFieldException("Invalid businessId!!!");
-
-                //    if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
-                //        throw new NotFoundException("This businessId is not existed!!!");
-                //}
-
-                //if (managerId != null)
-                //{
-                //    if (!await _validationService.CheckUUIDFormat(managerId))
-                //        throw new InvalidFieldException("Invalid managerId!!!");
-
-                //    if (!await _validationService.CheckExistenceUserWithRole(ROLE_PROJECT_MANAGER_ID, Guid.Parse(managerId)))
-                //        throw new NotFoundException("This managerId is not existed!!!");
-                //}
-
-                if (temp_field_role.Equals("ADMIN"))
+                if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
                     int[] statusNum = { 1, 2, 3, 4, 5, 6, 7 };
+
                     if (businessId != null)
                     {
                         if (!await _validationService.CheckUUIDFormat(businessId))
@@ -316,19 +278,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         if (!statusCheck)
                             throw new InvalidFieldException("ADMIN can view Projects with status" + statusErrorMessage + " !!!");
                     }
+
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, null, name, status, thisUserObj.roleId);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, null, name, status, thisUserObj.roleId);
                 }
 
-                if (temp_field_role.Equals("BUSINESS"))
+                if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
                     int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7 };
-                    if (businessId == null)
-                        throw new InvalidFieldException("businessId can not be empty!!!");
-
-                    if (!await _validationService.CheckUUIDFormat(businessId))
-                        throw new InvalidFieldException("Invalid businessId!!!");
-
-                    if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
-                        throw new NotFoundException("This businessId is not existed!!!");
+                    if (businessId != null && !businessId.Equals(thisUserObj.businessId))
+                        throw new InvalidFieldException("businessId is not match with this BUSINESS_MANAGER's businessId!!!");
+                    businessId = thisUserObj.businessId;
 
                     if (areaId != null)
                     {
@@ -360,19 +320,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         if (!statusCheck)
                             throw new InvalidFieldException("BUSINESS_MANAGER can view Projects with status" + statusErrorMessage + " !!!");
                     }
+
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, null, name, status, thisUserObj.roleId);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, null, name, status, thisUserObj.roleId);
                 }
 
-                if (temp_field_role.Equals("PROJECT"))
+                if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
                 {
-                    int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7 };
-                    if (managerId == null)
-                        throw new InvalidFieldException("managerId can not be empty!!!");
-
-                    if (!await _validationService.CheckUUIDFormat(managerId))
-                        throw new InvalidFieldException("Invalid managerId!!!");
-
-                    if (!await _validationService.CheckExistenceUserWithRole(ROLE_PROJECT_MANAGER_ID, Guid.Parse(managerId)))
-                        throw new NotFoundException("This managerId is not existed!!!");
+                    int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7 };                   
 
                     if (areaId != null)
                     {
@@ -404,19 +359,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         if (!statusCheck)
                             throw new InvalidFieldException("PROJECT_MANAGER can view Projects with status" + statusErrorMessage + " !!!");
                     }
+
+                    result.numOfProject = await _projectRepository.CountProject(null, thisUserObj.userId, areaId, fieldId, null, name, status, thisUserObj.roleId);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, null, thisUserObj.userId, areaId, fieldId, null, name, status, thisUserObj.roleId);
                 }
 
-                if (temp_field_role.Equals("INVESTOR"))
+                if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                 {
                     int[] statusNum = { 3, 5, 6 ,7 };
-                    if (investorId != null)
-                    {
-                        if (!await _validationService.CheckUUIDFormat(investorId))
-                            throw new InvalidFieldException("Invalid investorId!!!");
-
-                        if (!await _validationService.CheckExistenceId("Investor", Guid.Parse(investorId)))
-                            throw new NotFoundException("This investorId is not existed!!!");
-                    }
 
                     if (businessId != null)
                     {
@@ -457,9 +407,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         if (!statusCheck)
                             throw new InvalidFieldException("INVESTOR can view Projects with status" + statusErrorMessage + " !!!");
                     }
+
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, thisUserObj.investorId, name, status, thisUserObj.roleId);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, thisUserObj.investorId, name, status, thisUserObj.roleId);
                 }
 
-                if (temp_field_role.Equals("GUEST"))
+                if (thisUserObj == null)
                 {
                     int[] statusNum = { 3 };
                     if (businessId != null)
@@ -501,15 +454,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         if (!statusCheck)
                             throw new InvalidFieldException("GUEST can view Projects with status" + statusErrorMessage + " !!!");
                     }
-                }
 
-                AllProjectDTO result = new AllProjectDTO();
-                result.listOfProject = new List<GetProjectDTO>();
-                //ProjectDetailDTO resultItem = new ProjectDetailDTO();
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, null, name, status, null);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, null, name, status, null);
+                }               
 
-                result.numOfProject = await _projectRepository.CountProject(businessId, managerId, areaId, fieldId, investorId, name, status, temp_field_role);
-
-                List<Project> listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, managerId, areaId, fieldId, investorId , name, status, temp_field_role);
                 List<GetProjectDTO> listDTO = _mapper.Map<List<GetProjectDTO>>(listEntity);
 
                 foreach (GetProjectDTO item in listDTO)
@@ -661,9 +610,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 ///
                 if (projectDTO.investmentTargetCapital <= 0)
                     throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
-
-                if (projectDTO.investedCapital <= 0)
-                    throw new InvalidFieldException("investedCapital must be greater than 0!!!");
 
                 if (projectDTO.sharedRevenue <= 0)
                     throw new InvalidFieldException("sharedRevenue must be greater than 0!!!");

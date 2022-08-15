@@ -13,7 +13,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string description { get; set; }
         public string address { get; set; }       
         public float investmentTargetCapital { get; set; }
-        public float investedCapital { get; set; }
         public float sharedRevenue { get; set; }
         public float multiplier { get; set; }
         public int duration { get; set; }
@@ -42,6 +41,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public AreaDTO area { get; set; }
         public List<TypeProjectEntityDTO> projectEntity { get; set; }
         public List<ProjectMemberUserDTO> memberList { get; set; }
+        public float investedCapital { get; set; }
         public float remainAmount { get; set; }
         public string approvedDate { get; set; }
         public string approvedBy { get; set; }
