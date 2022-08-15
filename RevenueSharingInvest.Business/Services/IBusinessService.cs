@@ -10,15 +10,16 @@ namespace RevenueSharingInvest.Business.Services
     public interface IBusinessService
     {
         //CREATE
-        public Task<IdDTO> CreateBusiness(CreateUpdateBusinessDTO businessDTO, List<string> fieldIdList, string adminId);
+        public Task<IdDTO> CreateBusiness(CreateBusinessDTO businessDTO, List<string> fieldIdList, string creatorId);
         //public Task<int> AdminCreateBusiness(Data.Models.Entities.Business newBusiness, string email);
 
         //READ
-        public Task<AllBusinessDTO> GetAllBusiness(int pageIndex, int pageSize, string? orderBy, string? order, string temp_field_role);
+        public Task<AllBusinessDTO> GetAllBusiness(int pageIndex, int pageSize, string? orderBy, string? order, string roleId);
         public Task<GetBusinessDTO> GetBusinessById(Guid businessId);
+        public Task<Data.Models.Entities.Business> GetBusinessByProjectId(Guid projectId);
 
         //UPDATE
-        public Task<int> UpdateBusiness(CreateUpdateBusinessDTO businessDTO, Guid businessId);
+        public Task<int> UpdateBusiness(UpdateBusinessDTO businessDTO, Guid businessId);
         public Task<int> UpdateBusinessStatus(Guid businessId, String status);
 
         //DELETE

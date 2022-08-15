@@ -123,6 +123,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.id = userObject.Id;
                 response.uid = uid;
                 response.businessId = userObject.BusinessId;
+                response.roleId = userObject.RoleId;
+                response.roleName = RoleEnum.BUSINESS_MANAGER.ToString();
+                response.image = userObject.Image;
+                response.fullName = userObject.FirstName + " " + userObject.LastName;
                 response = await GenerateTokenAsync(response, RoleEnum.BUSINESS_MANAGER.ToString());
             }
 
@@ -151,7 +155,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.id = userObject.Id;
                 response.uid = uid;
                 response.businessId = userObject.BusinessId;
-                response = await GenerateTokenAsync(response, RoleEnum.PROJECT_OWNER.ToString());
+                response = await GenerateTokenAsync(response, RoleEnum.PROJECT_MANAGER.ToString());
             }
 
             return response;
@@ -201,9 +205,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 investorId = new Claim(ClaimTypes.GroupSid, "");
 
             }
-            else if (roleCheck.Equals(RoleEnum.PROJECT_OWNER.ToString()))
+            else if (roleCheck.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
             {
-                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.PROJECT_OWNER.ToString());
+                roleClaim = new Claim(ClaimTypes.Role, RoleEnum.PROJECT_MANAGER.ToString());
                 investorId = new Claim(ClaimTypes.GroupSid, "");
 
             }
@@ -218,7 +222,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             if (roleCheck.Equals(RoleEnum.ADMIN.ToString()))
             {
-                hours = 1;
+                hours = 8760;
             }
             else
             {

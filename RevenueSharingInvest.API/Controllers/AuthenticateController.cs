@@ -43,7 +43,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        [Route("business")]
+        [Route("business_manager")]
         public async Task<IActionResult> GetTokenBusiness([FromQuery] string token)
         {
             var result = await _authenticateService.GetTokenWebBusiness(token);
@@ -59,7 +59,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
 
-        [ServiceFilter(typeof(ClientIpCheckActionFilter))]
+        //[ServiceFilter(typeof(ClientIpCheckActionFilter))]
         [HttpPost]
         [Route("admin")]
         public async Task<IActionResult> GetTokenAdmin([FromQuery] string token)

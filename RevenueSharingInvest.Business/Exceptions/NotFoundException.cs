@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Exceptions
 {
-    class NotFoundException : Exception
+    public class NotFoundException : Exception
     {
         public NotFoundException(string message) : base(message)
         {

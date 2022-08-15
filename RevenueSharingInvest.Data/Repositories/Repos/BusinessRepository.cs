@@ -109,7 +109,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<RevenueSharingInvest.Data.Models.Entities.Business>> GetAllBusiness(int pageIndex, int pageSize, string? orderBy, string? order, string role)
+        public async Task<List<RevenueSharingInvest.Data.Models.Entities.Business>> GetAllBusiness(int pageIndex, int pageSize, string? orderBy, string? order, string roleId)
         {
             try
             {
@@ -117,11 +117,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var orderByCondition = "ORDER BY CreateDate";
                 var orderCondition = "";
 
-                if (role.Equals("ADMIN"))
+                if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
                     whereCondition = "";
                 }
-                if (role.Equals("INVESTOR"))
+                if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                 {
                     whereCondition = "WHERE IsDeleted = 0 AND Status = " + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
                 }
@@ -309,17 +309,17 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public async Task<int> CountBusiness(string role)
+        public async Task<int> CountBusiness(string roleId)
         {
             try
             {
                 var whereCondition = "";
                 
-                if (role.Equals("ADMIN"))
+                if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
                     whereCondition = "";
                 }
-                if (role.Equals("INVESTOR"))
+                if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                 {
                     whereCondition = "WHERE IsDeleted = 0 AND Status = " + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
                 }            
