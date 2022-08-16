@@ -72,7 +72,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreateUser(CreateUserDTO userDTO)
+        public async Task<IdDTO> CreateUser(CreateUserDTO userDTO, string? businessId)
         {
             IdDTO newId = new IdDTO();
             try
@@ -121,6 +121,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (entity.RoleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
                     entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1);
+                    entity.BusinessId = Guid.Parse(businessId);
                 }
                 else
                 {
