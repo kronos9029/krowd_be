@@ -25,7 +25,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly AppSettings _appSettings;
         private readonly IUserRepository _userRepository;
         private readonly IInvestorRepository _investorRepository;
-        private readonly IRoleRepository _roleRepository;
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
@@ -55,6 +54,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             User userObject = await _userRepository.GetUserByEmail(email);
 
+            if (!userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.INVESTOR.ToString())))
+                throw new RegisterException("This Is Not An Investor Email!!");
 
             AuthenticateResponse response = new();
 
@@ -91,6 +92,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.uid = uid;
                 response.investorId = Guid.Parse(newInvestorID);
                 response.image = ImageUrl;
+                response.fullName = userRecord.DisplayName;
                 response = await GenerateTokenAsync(response, RoleEnum.INVESTOR.ToString());
             }
             else
@@ -98,7 +100,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.email = email;
                 response.id = userObject.Id;
                 response.uid = uid;
-                response.image = ImageUrl;
+                response.image = userObject.Image;
+                response.fullName = userObject.LastName;
                 response.investorId = await _investorRepository.GetInvestorByEmail(email);
                 response = await GenerateTokenAsync(response, RoleEnum.INVESTOR.ToString());
             }
