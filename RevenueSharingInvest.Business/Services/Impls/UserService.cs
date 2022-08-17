@@ -121,11 +121,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (entity.RoleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
                     entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1);
-                    entity.BusinessId = Guid.Parse(businessId);
                 }
                 else
                 {
                     entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
+                    entity.BusinessId = Guid.Parse(businessId);
                 }
 
                 newId.id = await _userRepository.CreateUser(entity);
