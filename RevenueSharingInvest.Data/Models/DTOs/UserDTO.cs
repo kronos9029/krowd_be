@@ -24,11 +24,9 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     {
         public IFormFile image { get; set; }
         public string businessId { get; set; }
-        public string roleId { get; set; }
         public string description { get; set; }
         public string phoneNum { get; set; }
         public string idCard { get; set; }
-        public string email { get; set; }
         public string gender { get; set; }
         public string dateOfBirth { get; set; }
         public string taxIdentificationNumber { get; set; }

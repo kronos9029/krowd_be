@@ -473,26 +473,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE [User] "
                     + "     SET "
-                    + "         BusinessId = @BusinessId, "
-                    + "         RoleId = @RoleId, "
-                    + "         Description = @Description, "
-                    + "         LastName = @LastName, "
-                    + "         FirstName = @FirstName, "
-                    + "         PhoneNum = @PhoneNum, "
-                    + "         Image = @Image, "
-                    + "         IdCard = @IdCard, "
-                    + "         Email = @Email, "
-                    + "         Gender = @Gender, "
-                    + "         DateOfBirth = @DateOfBirth, "
-                    + "         TaxIdentificationNumber = @TaxIdentificationNumber, "
-                    + "         City = @City, "
-                    + "         District = @District, "
-                    + "         Address = @Address, "
-                    + "         BankName = @BankName, "
-                    + "         BankAccount = @BankAccount, "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted "
+                    + "         BusinessId = ISNULL(@BusinessId, BusinessId), "
+                    + "         RoleId = ISNULL(@RoleId, RoleId), "
+                    + "         Description = ISNULL(@Description, Description), "
+                    + "         LastName = ISNULL(@LastName, LastName), "
+                    + "         FirstName = ISNULL(@FirstName, FirstName), "
+                    + "         PhoneNum = ISNULL(@PhoneNum, PhoneNum), "
+                    + "         Image = ISNULL(@Image, Image), "
+                    + "         IdCard = ISNULL(@IdCard, IdCard), "
+                    + "         Gender = ISNULL(@Gender, Gender), "
+                    + "         DateOfBirth = ISNULL(@DateOfBirth, DateOfBirth), "
+                    + "         TaxIdentificationNumber = ISNULL(@TaxIdentificationNumber, TaxIdentificationNumber), "
+                    + "         City = ISNULL(@City, City), "
+                    + "         District = ISNULL(@District, District), "
+                    + "         Address = ISNULL(@Address, Address), "
+                    + "         BankName = ISNULL(@BankName, BankName), "
+                    + "         BankAccount = ISNULL(@BankAccount, BankAccount), "
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -505,7 +503,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("PhoneNum", userDTO.PhoneNum, DbType.String);
                 parameters.Add("Image", userDTO.Image, DbType.String);
                 parameters.Add("IdCard", userDTO.IdCard, DbType.String);
-                parameters.Add("Email", userDTO.Email, DbType.String);
                 parameters.Add("Gender", userDTO.Gender, DbType.String);
                 parameters.Add("DateOfBirth", userDTO.DateOfBirth, DbType.String);
                 parameters.Add("TaxIdentificationNumber", userDTO.TaxIdentificationNumber, DbType.String);
@@ -516,7 +513,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("BankAccount", userDTO.BankAccount, DbType.String);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", userDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", userDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", userId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -845,6 +841,57 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<int> UpdateUserStatus(Guid userId, string status, Guid updaterId)
+        {
+            try
+            {
+                var query = "UPDATE [User] "
+                    + "     SET "
+                    + "         Status = ISNULL(@Status, Status), "
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
+                    + "     WHERE "
+                    + "         Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Status", status, DbType.String);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateBy", updaterId, DbType.Guid);
+                parameters.Add("Id", userId, DbType.Guid);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<int> UpdateUserEmail(Guid userId, string email, Guid updaterId)
+        {
+            var query = "UPDATE [User] "
+                    + "     SET "
+                    + "         Email = ISNULL(@Email, Email), "
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
+                    + "     WHERE "
+                    + "         Id = @Id";
+
+            var parameters = new DynamicParameters();
+            parameters.Add("Email", email, DbType.String);
+            parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+            parameters.Add("UpdateBy", updaterId, DbType.Guid);
+            parameters.Add("Id", userId, DbType.Guid);
+
+            using (var connection = CreateConnection())
+            {
+                return await connection.ExecuteAsync(query, parameters);
             }
         }
     }

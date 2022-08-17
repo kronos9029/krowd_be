@@ -133,22 +133,54 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateUser([FromForm] UpdateUserDTO userDTO, Guid id)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            if (currentUser.roleId.Equals(currentUser.adminRoleId))
+            if (currentUser.roleId.Equals(currentUser.adminRoleId) 
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId) 
+                || currentUser.roleId.Equals(currentUser.projectManagerRoleId) 
+                || currentUser.roleId.Equals(currentUser.investorRoleId))
             {
-                var result = await _userService.UpdateUser(userDTO, id);
+                var result = await _userService.UpdateUser(userDTO, id, currentUser);
                 return Ok(result);
             }
-            else if (currentUser.userId.Equals(id.ToString()))
-            {
-                var result = await _userService.UpdateUser(userDTO, id);
-                return Ok(result);
-            }
-
             return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
+        }
+
+        //UPDATE STATUS
+        [HttpPut]
+        [Route("status/{id}, {status}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUserStatus(Guid id, string status)
+        {
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+
+            if (currentUser.roleId.Equals(currentUser.adminRoleId)
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+            {
+                var result = await _userService.UpdateUserStatus(id, status, currentUser);
+                return Ok();
+            }
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUSINESS_MANAGER can perform this action!!!!!");
+        }
+
+        //UPDATE EMAIL
+        [HttpPut]
+        [Route("email/{id}, {email}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUserEmail(Guid id, string email)
+        {
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+
+            if (currentUser.roleId.Equals(currentUser.adminRoleId)
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+            {
+                var result = await _userService.UpdateUserEmail(id, email, currentUser);
+                return Ok();
+            }
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUSINESS_MANAGER can perform this action!!!!!");
         }
 
         [HttpDelete]
