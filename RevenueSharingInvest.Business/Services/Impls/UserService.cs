@@ -101,6 +101,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
                     entity.RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"));
+                    entity.BusinessId = Guid.Parse(currentUser.businessId);
                 }
                 entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1);
                 entity.CreateBy = Guid.Parse(currentUser.userId);
