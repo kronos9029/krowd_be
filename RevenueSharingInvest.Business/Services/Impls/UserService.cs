@@ -72,7 +72,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreateUser(CreateUserDTO userDTO)
+        public async Task<IdDTO> CreateUser(CreateUserDTO userDTO, string? businessId)
         {
             IdDTO newId = new IdDTO();
             try
@@ -125,6 +125,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 else
                 {
                     entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
+                    entity.BusinessId = Guid.Parse(businessId);
                 }
 
                 newId.id = await _userRepository.CreateUser(entity);

@@ -6,6 +6,7 @@ using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,13 +43,13 @@ namespace RevenueSharingInvest.API.Controllers
             if (currentUser.roleId.Equals(currentUser.adminRoleId))
             {
 
-                var result = await _userService.CreateUser(userDTO);
+                var result = await _userService.CreateUser(userDTO, currentUser.businessId);
                 return Ok(result);
             }
             else if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
             {
 
-                var result = await _userService.CreateUser(userDTO);
+                var result = await _userService.CreateUser(userDTO, currentUser.businessId);
                 return Ok(result);
             }
 
