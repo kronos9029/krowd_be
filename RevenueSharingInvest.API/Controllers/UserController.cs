@@ -19,7 +19,6 @@ namespace RevenueSharingInvest.API.Controllers
     [ApiController]
     [Route("api/v1.0/users")]
     [EnableCors]
-    //[Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -35,6 +34,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO userDTO)
         {
 
@@ -51,6 +51,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllUsers(int pageIndex, int pageSize, string businessId, string role, string status)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
