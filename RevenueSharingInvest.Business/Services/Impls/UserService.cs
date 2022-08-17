@@ -301,7 +301,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 User user = await _userRepository.GetUserById(userId);
                 GetUserDTO userDTO = _mapper.Map<GetUserDTO>(user);
                 if (userDTO == null)
-                    throw new NotFoundException("No User Object Found!");
+                    throw new NotFoundException("No User Found!");
 
                 userDTO.createDate = await _validationService.FormatDateOutput(userDTO.createDate);
                 userDTO.updateDate = await _validationService.FormatDateOutput(userDTO.updateDate);

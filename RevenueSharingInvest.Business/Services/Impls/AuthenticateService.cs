@@ -101,7 +101,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.id = userObject.Id;
                 response.uid = uid;
                 response.image = userObject.Image;
-                response.fullName = userObject.LastName;
+                response.fullName = (userObject.FirstName + " " + userObject.LastName) ?? userRecord.DisplayName;
                 response.investorId = await _investorRepository.GetInvestorByEmail(email);
                 response = await GenerateTokenAsync(response, RoleEnum.INVESTOR.ToString());
             }
@@ -147,6 +147,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
             string email = userRecord.Email;
+            string ImageUrl = userRecord.PhotoUrl.ToString();
 
             User userObject = await _userRepository.GetUserByEmail(email);
 
@@ -162,6 +163,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.id = userObject.Id;
                 response.uid = uid;
                 response.businessId = userObject.BusinessId;
+                response.image = userObject.Image ?? ImageUrl;
                 response = await GenerateTokenAsync(response, RoleEnum.PROJECT_MANAGER.ToString());
             }
 
@@ -175,12 +177,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
             string email = userRecord.Email;
+            string ImageUrl = userRecord.PhotoUrl.ToString();
 
 
+            User userObject = await _userRepository.GetUserByEmail(email);
             AuthenticateResponse response = new();
-
+            
+            if(userObject == null)
+                throw new NotFoundException("User Not Found!!");
+            
             response.email = email;
             response.uid = uid;
+            response.id = userObject.Id;
+            response.image = userObject.Image ?? ImageUrl;
             response =  await GenerateTokenAsync(response, RoleEnum.ADMIN.ToString());
 
 

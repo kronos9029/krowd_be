@@ -182,7 +182,14 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
             GetUserDTO userDTO = await _userService.GetUserById(id);
+
+/*            if (userDTO.role.id.Equals(currentUser.adminRoleId))
+            {
+            }*/
+
+
 
             if (userDTO != null)
             {
