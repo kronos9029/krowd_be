@@ -89,6 +89,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (userDTO.email == null || userDTO.email.Length == 0 || !await _validationService.CheckEmail(userDTO.email))
                     throw new InvalidFieldException("Invalid email!!!");
 
+                if (await _userRepository.GetUserByEmail(userDTO.email) != null)
+                    throw new InvalidFieldException("This email is existed!!!");
+
                 User entity = _mapper.Map<User>(userDTO);
 
                 if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
@@ -463,14 +466,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 User user = await _userRepository.GetUserById(userId);
 
-                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")) && user.RoleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")) && user.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                     throw new InvalidFieldException("Can not update ADMIN's status!!!");
 
                 if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
-                    if (!user.RoleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                    if (!user.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
                         throw new InvalidFieldException("BUSINESS_MANAGER can update status of PROJECT_MANAGER only!!!");
-                    if (!user.BusinessId.Equals(currentUser.businessId))
+                    if (!user.BusinessId.ToString().Equals(currentUser.businessId))
                         throw new InvalidFieldException("The PROJECT_MANAGER with this businessId is not match with this BUSINESS_MANAGER's businessId!!!");
                 }
 
@@ -505,20 +508,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
-                    if (!user.RoleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
+                    if (!user.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                         throw new InvalidFieldException("ADMIN can update email of BUSINESS_MANAGER only!!!");
                 }
 
                 if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
-                    if (!user.RoleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                    if (!user.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
                         throw new InvalidFieldException("BUSINESS_MANAGER can update email of PROJECT_MANAGER only!!!");
-                    if (!user.BusinessId.Equals(currentUser.businessId))
+                    if (!user.BusinessId.ToString().Equals(currentUser.businessId))
                         throw new InvalidFieldException("The PROJECT_MANAGER with this businessId is not match with this BUSINESS_MANAGER's businessId!!!");
                 }
 
                 if (await _userRepository.GetUserByEmail(email) != null)
-                    throw new InvalidFieldException("This email is already used!!!");
+                    throw new InvalidFieldException("This email is existed!!!");
 
                 result = await _userRepository.UpdateUserEmail(userId, email, Guid.Parse(currentUser.userId));
 

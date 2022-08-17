@@ -156,7 +156,7 @@ namespace RevenueSharingInvest.API.Controllers
                 || currentUser.roleId.Equals(currentUser.businessManagerRoleId))
             {
                 var result = await _userService.UpdateUserStatus(id, status, currentUser);
-                return Ok();
+                return Ok(result);
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUSINESS_MANAGER can perform this action!!!!!");
         }

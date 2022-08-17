@@ -190,7 +190,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             response.uid = uid;
             response.id = userObject.Id;
             response.image = userObject.Image ?? ImageUrl;
-            response =  await GenerateTokenAsync(response, RoleEnum.ADMIN.ToString());
+            response = await GenerateTokenAsync(response, RoleEnum.ADMIN.ToString());
 
 
             return response;
