@@ -463,12 +463,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 User user = await _userRepository.GetUserById(userId);
 
+                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")) && user.RoleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                    throw new InvalidFieldException("Can not update ADMIN's status!!!");
+
                 if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
                     if (!user.RoleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
-                        throw new InvalidFieldException("The user with this userId must have role is PROJECT_MANAGER!!!");
+                        throw new InvalidFieldException("BUSINESS_MANAGER can update status of PROJECT_MANAGER only!!!");
                     if (!user.BusinessId.Equals(currentUser.businessId))
-                        throw new InvalidFieldException("The user with this businessId is not match with this Updater's businessId!!!");
+                        throw new InvalidFieldException("The PROJECT_MANAGER with this businessId is not match with this BUSINESS_MANAGER's businessId!!!");
                 }
 
                 for (int item = 0; item < Enum.GetNames(typeof(ObjectStatusEnum)).Count(); item ++)
@@ -500,12 +503,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 User user = await _userRepository.GetUserById(userId);
 
+                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                {
+                    if (!user.RoleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
+                        throw new InvalidFieldException("ADMIN can update email of BUSINESS_MANAGER only!!!");
+                }
+
                 if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
                     if (!user.RoleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
-                        throw new InvalidFieldException("The user with this userId must have role is PROJECT_MANAGER!!!");
+                        throw new InvalidFieldException("BUSINESS_MANAGER can update email of PROJECT_MANAGER only!!!");
                     if (!user.BusinessId.Equals(currentUser.businessId))
-                        throw new InvalidFieldException("The user with this businessId is not match with this Updater's businessId!!!");
+                        throw new InvalidFieldException("The PROJECT_MANAGER with this businessId is not match with this BUSINESS_MANAGER's businessId!!!");
                 }
 
                 if (await _userRepository.GetUserByEmail(email) != null)
