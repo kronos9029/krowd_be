@@ -31,11 +31,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         FieldId, "
                     + "         AreaId, "
                     + "         Name, "
-                    //+ "         Image, "
                     + "         Description, "
                     + "         Address, "
                     + "         InvestmentTargetCapital, "
-                    //+ "         InvestedCapital, "
                     + "         SharedRevenue, "
                     + "         Multiplier, "
                     + "         Duration, "
@@ -44,8 +42,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         StartDate, "
                     + "         EndDate, "
                     + "         BusinessLicense, "
-                    //+ "         ApprovedDate, "
-                    //+ "         ApprovedBy, " //Id Admin
                     + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, " //Id Business Manager
@@ -60,11 +56,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @FieldId, "
                     + "         @AreaId, "
                     + "         @Name, "
-                    //+ "         @Image, "
                     + "         @Description, "
                     + "         @Address, "
                     + "         @InvestmentTargetCapital, "
-                    //+ "         @InvestedCapital, "
                     + "         @SharedRevenue, "
                     + "         @Multiplier, "
                     + "         @Duration, "
@@ -73,8 +67,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @StartDate, "
                     + "         @EndDate, "
                     + "         @BusinessLicense, "
-                    //+ "         null, "
-                    //+ "         null, "
                     + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
@@ -88,11 +80,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("FieldId", projectDTO.FieldId, DbType.Guid);
                 parameters.Add("AreaId", projectDTO.AreaId, DbType.Guid);
                 parameters.Add("Name", projectDTO.Name, DbType.String);
-                //parameters.Add("Image", projectDTO.Image, DbType.String);
                 parameters.Add("Description", projectDTO.Description, DbType.String);
                 parameters.Add("Address", projectDTO.Description, DbType.String);
                 parameters.Add("InvestmentTargetCapital", projectDTO.InvestmentTargetCapital, DbType.Double);
-                //parameters.Add("InvestedCapital", projectDTO.InvestedCapital, DbType.Double);
                 parameters.Add("SharedRevenue", projectDTO.SharedRevenue, DbType.Double);
                 parameters.Add("Multiplier", projectDTO.Multiplier, DbType.Double);
                 parameters.Add("Duration", projectDTO.Duration, DbType.Int16);
@@ -105,7 +95,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", projectDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", projectDTO.CreateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
@@ -460,33 +450,28 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE Project "
                     + "     SET "
-                    + "         ManagerId = @ManagerId, "
-                    + "         BusinessId = @BusinessId, "
-                    + "         FieldId = @FieldId, "
-                    + "         AreaId = @AreaId, "
-                    + "         Name = @Name, "
-                    + "         Image = @Image, "
-                    + "         Description = @Description, "
-                    + "         Address = @Address, "
-                    + "         InvestmentTargetCapital = @InvestmentTargetCapital, "
-                    + "         InvestedCapital = @InvestedCapital, "
-                    + "         SharedRevenue = @SharedRevenue, "
-                    + "         Multiplier = @Multiplier, "
-                    + "         Duration = @Duration, "
-                    + "         NumOfStage = @NumOfStage, "
-                    + "         RemainAmount = @RemainAmount, "
-                    + "         StartDate = @StartDate, "
-                    + "         EndDate = @EndDate, "
-                    + "         BusinessLicense = @BusinessLicense, "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted "
+                    + "         ManagerId = ISNULL(@ManagerId, ManagerId)"
+                    + "         FieldId = ISNULL(@FieldId, FieldId)"
+                    + "         AreaId = ISNULL(@AreaId, AreaId)"
+                    + "         Name = ISNULL(@Name, Name)"
+                    + "         Image = ISNULL(@Image, Image)"
+                    + "         Description = ISNULL(@Description, Description)"
+                    + "         Address = ISNULL(@Address, Address)"
+                    + "         InvestmentTargetCapital = ISNULL(@InvestmentTargetCapital, InvestmentTargetCapital)"
+                    + "         SharedRevenue = ISNULL(@SharedRevenue, SharedRevenue)"
+                    + "         Multiplier = ISNULL(@Multiplier, Multiplier)"
+                    + "         Duration = ISNULL(@Duration, Duration)"
+                    + "         NumOfStage = ISNULL(@NumOfStage, NumOfStage)"
+                    + "         StartDate = ISNULL(@StartDate, StartDate)"
+                    + "         EndDate = ISNULL(@EndDate, EndDate)"
+                    + "         BusinessLicense = ISNULL(@BusinessLicense, BusinessLicense)"
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate)"
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
                     + "     WHERE "
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("ManagerId", projectDTO.ManagerId, DbType.Guid);
-                parameters.Add("BusinessId", projectDTO.BusinessId, DbType.Guid);
                 parameters.Add("FieldId", projectDTO.FieldId, DbType.Guid);
                 parameters.Add("AreaId", projectDTO.AreaId, DbType.Guid);
                 parameters.Add("Name", projectDTO.Name, DbType.String);
@@ -499,13 +484,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Multiplier", projectDTO.Multiplier, DbType.Double);
                 parameters.Add("Duration", projectDTO.Duration, DbType.Int16);
                 parameters.Add("NumOfStage", projectDTO.NumOfStage, DbType.Int16);
-                parameters.Add("RemainAmount", projectDTO.RemainAmount, DbType.Double);
                 parameters.Add("StartDate", Convert.ToDateTime(projectDTO.StartDate), DbType.DateTime);
                 parameters.Add("EndDate", Convert.ToDateTime(projectDTO.EndDate), DbType.DateTime);
                 parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", projectDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", projectId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -811,6 +794,34 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        public async Task<int> UpdateProjectStatus(Guid projectId, string status, Guid updaterId)
+        {
+            try
+            {
+                var query = "UPDATE Project "
+                    + "     SET "
+                    + "         Status = ISNULL(@Status, Status), "
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
+                    + "     WHERE "
+                    + "         Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Status", status, DbType.String);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateBy", updaterId, DbType.Guid);
+                parameters.Add("Id", projectId, DbType.Guid);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 
     public enum RoleEnum

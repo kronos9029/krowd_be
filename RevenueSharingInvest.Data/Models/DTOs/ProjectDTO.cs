@@ -22,10 +22,16 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string businessLicense { get; set; }
     }
 
-    public class CreateUpdateProjectDTO : ProjectDTO
+    public class CreateProjectDTO : ProjectDTO
+    {
+        public string managerId { get; set; }
+        public string fieldId { get; set; }
+        public string areaId { get; set; }
+    }
+
+    public class UpdateProjectDTO : ProjectDTO
     {
         public IFormFile image { get; set; }
-        public string businessId { get; set; }
         public string managerId { get; set; }
         public string fieldId { get; set; }
         public string areaId { get; set; }

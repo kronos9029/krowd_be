@@ -11,7 +11,7 @@ namespace RevenueSharingInvest.Business.Services
     public interface IProjectService
     {
         //CREATE
-        public Task<IdDTO> CreateProject(CreateUpdateProjectDTO projectDTO, ThisUserObj thisUserObj);
+        public Task<IdDTO> CreateProject(CreateProjectDTO projectDTO, ThisUserObj thisUserObj);
 
         //READ
         public Task<AllProjectDTO> GetAllProjects
@@ -38,7 +38,8 @@ namespace RevenueSharingInvest.Business.Services
         public Task<List<BusinessProjectDTO>> GetBusinessProjectsToAuthor(Guid businessId);
 
         //UPDATE
-        public Task<int> UpdateProject(CreateUpdateProjectDTO projectDTO, Guid projectId);
+        public Task<int> UpdateProject(UpdateProjectDTO projectDTO, Guid projectId, ThisUserObj thisUserObj);
+        public Task<int> UpdateProjectStatus(Guid projectId, string status, ThisUserObj currentUser);
 
         //DELETE
         public Task<int> DeleteProjectById(Guid projectId);

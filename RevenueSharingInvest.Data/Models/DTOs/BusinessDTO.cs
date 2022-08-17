@@ -12,7 +12,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string name { get; set; }
         public string phoneNum { get; set; }
         public string email { get; set; }
-        public string? description { get; set; }
+        public string description { get; set; }
         public string taxIdentificationNumber { get; set; }
         public string address { get; set; }
     }
@@ -24,7 +24,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     
     public class UpdateBusinessDTO : BusinessDTO
     {
-        public IFormFile? image { get; set; }
+        public IFormFile image { get; set; }
     }
 
     //public class InvestorGetBusinessDTO : BusinessDTO

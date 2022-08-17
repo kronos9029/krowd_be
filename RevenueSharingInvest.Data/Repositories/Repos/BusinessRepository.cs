@@ -33,8 +33,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         TaxIdentificationNumber, "
                     + "         Address, "
                     + "         NumOfProject, "
-                    + "         NumOfSuccessfulProject, "
-                    + "         SuccessfulRate, "
                     + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
@@ -52,8 +50,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @TaxIdentificationNumber, "
                     + "         @Address, "
                     + "         0, "
-                    + "         null, "
-                    + "         null, "
                     + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
@@ -72,7 +68,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", businessDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", businessDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", businessDTO.CreateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
@@ -84,21 +80,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteBusinessById(Guid businesssId)
+        public async Task<int> DeleteBusinessById(Guid businesssId, Guid deleteUserId)
         {
             try
             {
                 var query = "UPDATE Business "
                     + "     SET "
                     + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
+                    + "         UpdateBy = @UpdateBy, "
                     + "         IsDeleted = 1 "
                     + "     WHERE "
                     + "         Id=@Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", deleteUserId, DbType.Guid);
                 parameters.Add("Id", businesssId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
@@ -251,6 +247,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET BY ID
         public async Task<RevenueSharingInvest.Data.Models.Entities.Business> GetBusinessById(Guid businesssId)
         {
             try
@@ -267,6 +264,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }        
         
+        //GET BY EMAIL
         public async Task<RevenueSharingInvest.Data.Models.Entities.Business> GetBusinessByEmail(string email)
         {
             try
@@ -283,23 +281,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //UPDATE - chưa update NumOfProject, NumOfSuccessfulProject, SuccessfulRate (update riêng)
+        //UPDATE
         public async Task<int> UpdateBusiness(RevenueSharingInvest.Data.Models.Entities.Business businessDTO, Guid businesssId)
         {
             try
             {
                 var query = "UPDATE Business "
                     + "     SET "
-                    + "         Name = @Name, "
-                    + "         PhoneNum = @PhoneNum, "
-                    + "         Image = @Image, "
-                    + "         Email = @Email, "
-                    + "         Description = @Description, "
-                    + "         TaxIdentificationNumber = @TaxIdentificationNumber, "
-                    + "         Address = @Address, "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         Name = ISNULL(@Name, Name)"
+                    + "         PhoneNum = ISNULL(@PhoneNum, PhoneNum)"
+                    + "         Image = ISNULL(@Image, Image)"
+                    + "         Email = ISNULL(@Email, Email)"
+                    + "         Description = ISNULL(@Description, Description)"
+                    + "         TaxIdentificationNumber = ISNULL(@TaxIdentificationNumber, TaxIdentificationNumber)"
+                    + "         Address = ISNULL(@Address, Address)"
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate)"
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -313,7 +310,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Address", businessDTO.Address, DbType.String);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", businessDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", businessDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", businesssId, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -325,6 +321,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //UPDATE STATUS
         public async Task<int> UpdateBusinessStatus(Guid businessId, String status)
         {
             try
@@ -332,6 +329,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "UPDATE Business SET Status = @Status WHERE Id = @Id";
                 var parameters = new DynamicParameters();
                 parameters.Add("Status", status, DbType.String);
+                parameters.Add("Id", businessId, DbType.Guid);
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
 
@@ -516,6 +514,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("ProjectId", projectId, DbType.Guid);
                 using var connection = CreateConnection();
                 return await connection.QueryFirstOrDefaultAsync<Models.Entities.Business>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //UPDATE NUM OF PROJECT
+        public async Task<int> UpdateBusinessNumOfProject(Guid businessId)
+        {
+            try
+            {
+                var query = "UPDATE Business SET NumOfProject = NumOfProject + 1 WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", businessId, DbType.String);
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
             {

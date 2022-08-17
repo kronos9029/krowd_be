@@ -59,12 +59,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreateBusiness(CreateBusinessDTO businessDTO, List<string> fieldIdList, string creatorId)
+        public async Task<IdDTO> CreateBusiness(CreateBusinessDTO businessDTO, List<string> fieldIdList, ThisUserObj currentUser)
         {
             IdDTO newId = new IdDTO();
             try
             {
-            //Validate
+                if (!currentUser.businessId.Equals(""))
+                {
+                    throw new CreateObjectException("This BUSINESS_MANAGER has a business already!!!");
+                }
+
+                //Validate
                 //List<string> - List FieldId
                 if (fieldIdList.Count() == 0)
                     throw new InvalidFieldException("fieldIdList contain at least 1 fieldId!!!");
@@ -77,6 +82,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
                         throw new NotFoundException("This fieldId " + fieldId + " is not existed!!!");
                 }
+
                 //BusinessDTO object
                 if (!await _validationService.CheckText(businessDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");
@@ -90,32 +96,31 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(businessDTO.taxIdentificationNumber))
                     throw new InvalidFieldException("Invalid taxIdentificationNumber!!!");
 
-                RevenueSharingInvest.Data.Models.Entities.Business entity = _mapper.Map<RevenueSharingInvest.Data.Models.Entities.Business>(businessDTO);
+                Data.Models.Entities.Business entity = _mapper.Map<Data.Models.Entities.Business>(businessDTO);
 
-                entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
-                entity.CreateBy = Guid.Parse(creatorId);
-                entity.UpdateBy = Guid.Parse(creatorId);
+                entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1);
+                entity.CreateBy = Guid.Parse(currentUser.userId);
 
                 newId.id = await _businessRepository.CreateBusiness(entity);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create Business Object!");
                 else
                 {
-                    if (await _userRepository.UpdateBusinessIdForBuM(Guid.Parse(newId.id), Guid.Parse(creatorId)) == 0)
+                    if (await _userRepository.UpdateBusinessIdForBuM(Guid.Parse(newId.id), Guid.Parse(currentUser.userId)) == 0)
                     {
                         _businessRepository.DeleteBusinessByBusinessId(Guid.Parse(newId.id));
                         throw new UpdateObjectException("Can not update businessId for User(BUSINESS_MANAGER) Object!");
                     }
                     foreach (string fieldId in fieldIdList)
                     {
-                        if (await _businessFieldRepository.CreateBusinessField(Guid.Parse(newId.id), Guid.Parse(fieldId), Guid.Parse(creatorId)) == 0)//ráp authen sửa createBy và updateBy
+                        if (await _businessFieldRepository.CreateBusinessField(Guid.Parse(newId.id), Guid.Parse(fieldId), Guid.Parse(currentUser.userId)) == 0)//ráp authen sửa createBy và updateBy
                         {
                             //Xóa các object BusinessField vừa mới tạo
                             _businessFieldRepository.DeleteBusinessFieldByBusinessId(Guid.Parse(newId.id));
                             //Xóa object Business vừa mới tạo
                             _businessRepository.DeleteBusinessByBusinessId(Guid.Parse(newId.id));
                             //Update businessId của BuM lại thành null
-                            _userRepository.UpdateBusinessIdForBuM(null, Guid.Parse(creatorId));
+                            _userRepository.UpdateBusinessIdForBuM(null, Guid.Parse(currentUser.userId));
                             throw new CreateObjectException("Can not create BusinessField Object has businessId: " + newId.id + " and fieldId: " + fieldId + " ! Create Business object failed!");
                         }                           
                     }
@@ -129,23 +134,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //DELETE
-        public async Task<int> DeleteBusinessById(Guid businessId)
+        public async Task<int> DeleteBusinessById(Guid businessId, ThisUserObj currentUser)
         {
-            int result;
+            int result = 0;
             try
             {
                 Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(businessId);
 
-                if (business.Status.Equals(ObjectStatusEnum.INACTIVE.ToString()))
+                if (business != null)
                 {
-                    result = await _businessRepository.DeleteBusinessById(businessId);
-                } else
-                {
-                    result = 0;
+                    if (business.Status.Equals(ObjectStatusEnum.INACTIVE.ToString()))
+                        result = await _businessRepository.DeleteBusinessById(businessId, Guid.Parse(currentUser.userId));
                 }
-                
+             
                 if (result == 0)
-                    throw new DeleteObjectException("Can not delete Business Object!");
+                    throw new DeleteObjectException("Can not delete Business Object. Business can be deleted if status is INACTIVE!!!");
                 return result;
             }
             catch (Exception e)
@@ -278,7 +281,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             try
             {
-
                 RevenueSharingInvest.Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(businessId);
                 GetBusinessDTO businessDTO = _mapper.Map<GetBusinessDTO>(business);
                 if (businessDTO == null)
@@ -298,6 +300,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }        
         
+        //GET BY EMAIL
         public async Task<GetBusinessDTO> GetBusinessByEmail(string email)
         {
             try
@@ -323,28 +326,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdateBusiness(UpdateBusinessDTO businessDTO, Guid businessId)
+        public async Task<int> UpdateBusiness(UpdateBusinessDTO businessDTO, Guid businessId, ThisUserObj currentUser)
         {
             int result;
             try
             {
-                Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(businessId);
+                Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(Guid.Parse(currentUser.businessId));
 
                 if (business.Status.Equals(ObjectStatusEnum.BLOCKED))
                 {
                     throw new UnauthorizedException("You Can Not Update This Business Because It Is Blocked!!");
                 }
 
-                if (!await _validationService.CheckText(businessDTO.name))
-                    throw new InvalidFieldException("Invalid name!!!");
-
-                if (businessDTO.phoneNum == null || businessDTO.phoneNum.Length == 0 || !await _validationService.CheckPhoneNumber(businessDTO.phoneNum))
+                if (businessDTO.phoneNum != null && (businessDTO.phoneNum.Length == 0 || !await _validationService.CheckPhoneNumber(businessDTO.phoneNum)))
                     throw new InvalidFieldException("Invalid phoneNum!!!");
 
                 if (businessDTO.image != null && (businessDTO.image.Equals("string") || businessDTO.image.Length == 0))
                     businessDTO.image = null;
 
-                if (businessDTO.email == null || businessDTO.email.Length == 0 || !await _validationService.CheckEmail(businessDTO.email))
+                if (businessDTO.email != null && (businessDTO.email.Length == 0 || !await _validationService.CheckEmail(businessDTO.email)))
                     throw new InvalidFieldException("Invalid email!!!");
 
                 if (businessDTO.description != null && (businessDTO.description.Equals("string") || businessDTO.description.Length == 0))
@@ -356,31 +356,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckText(businessDTO.address))
                     throw new InvalidFieldException("Invalid address!!!");
 
-                //if (businessDTO.status < 0 || businessDTO.status > 2)
-                //    throw new InvalidFieldException("Status must be 0(ACTIVE) or 1(INACTIVE) or 2(BLOCKED)!!!");
-
-                //if (businessDTO.createBy != null && businessDTO.createBy.Length >= 0)
-                //{
-                //    if (businessDTO.createBy.Equals("string"))
-                //        businessDTO.createBy = null;
-                //    else if (!await _validationService.CheckUUIDFormat(businessDTO.createBy))
-                //        throw new InvalidFieldException("Invalid createBy!!!");
-                //}
-
-                //if (businessDTO.updateBy != null && businessDTO.updateBy.Length >= 0)
-                //{
-                //    if (businessDTO.updateBy.Equals("string"))
-                //        businessDTO.updateBy = null;
-                //    else if (!await _validationService.CheckUUIDFormat(businessDTO.updateBy))
-                //        throw new InvalidFieldException("Invalid updateBy!!!");
-                //}
-
                 RevenueSharingInvest.Data.Models.Entities.Business entity = _mapper.Map<RevenueSharingInvest.Data.Models.Entities.Business>(businessDTO);
 
                 if (businessDTO.image != null)
                 {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, businessId.ToString());
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, currentUser.businessId);
                 }
+                entity.UpdateBy = Guid.Parse(currentUser.userId);
 
                 result = await _businessRepository.UpdateBusiness(entity, businessId);
                 if (result == 0)

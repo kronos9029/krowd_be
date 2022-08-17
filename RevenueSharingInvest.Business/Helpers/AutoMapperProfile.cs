@@ -44,7 +44,8 @@ namespace RevenueSharingInvest.Business.Helpers
             CreateMap<ProjectDTO, ProjectDetailDTO>().ReverseMap();
             
             CreateMap<Project, GetProjectDTO>().ReverseMap();
-            CreateMap<Project, CreateUpdateProjectDTO>().ReverseMap();
+            CreateMap<Project, CreateProjectDTO>().ReverseMap();
+            CreateMap<Project, UpdateProjectDTO>().ReverseMap();
            
             CreateMap<Data.Models.Entities.Business, GetBusinessDTO>().ReverseMap();
             CreateMap<Data.Models.Entities.Business, CreateBusinessDTO>().ReverseMap();

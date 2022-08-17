@@ -34,98 +34,91 @@ namespace RevenueSharingInvest.API.Controllers
             _userService = userService;
         }
 
+        //CREATE
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> CreateBusiness([FromForm] CreateBusinessDTO businessDTO, [FromQuery] List<string> fieldIdList)
         {
-            ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            if (!userInfo.businessId.Equals(""))
+            if(currentUser.roleId.Equals(currentUser.businessManagerRoleId))
             {
-                throw new CreateObjectException("This BUSINESS_MANAGER has a business already!!!");
-            }
-
-            if(userInfo.roleId.Equals(userInfo.businessManagerRoleId))
-            {
-                var result = await _businessService.CreateBusiness(businessDTO, fieldIdList, userInfo.userId);
+                var result = await _businessService.CreateBusiness(businessDTO, fieldIdList, currentUser);
                 return Ok(result);
             }
-
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Perform This Action!!");
-
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role BUSINESS_MANAGER can perform this action!!!");
         }
 
+        //GET ALL
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllBusinesses(int pageIndex, int pageSize, string status, string name, string orderBy, string order)
         {
-            ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            if(userInfo.roleId.Equals(userInfo.adminRoleId) || (userInfo.roleId.Equals(userInfo.investorRoleId) && !userInfo.investorId.Equals("")) || userInfo.roleId.Equals(""))
+            if(currentUser.roleId.Equals(currentUser.adminRoleId) 
+                || (currentUser.roleId.Equals(currentUser.investorRoleId) && !currentUser.investorId.Equals("")) 
+                || currentUser.roleId.Equals(""))
             {
                 var result = new AllBusinessDTO();
-                result = await _businessService.GetAllBusiness(pageIndex, pageSize, status, name, orderBy, order, userInfo);
+                result = await _businessService.GetAllBusiness(pageIndex, pageSize, status, name, orderBy, order, currentUser);
                 return Ok(result);
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or INVESTOR or GUEST can perform this action!!!");
         }
 
+        //GET BY ID
         [HttpGet]
         [Route("{id}")]
         public async Task<IActionResult> GetBusinessById()
         {
-            ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
             GetBusinessDTO dto = new GetBusinessDTO();
 
-            if((userInfo.roleId.Equals(userInfo.businessManagerRoleId) || userInfo.roleId.Equals(userInfo.projectManagerRoleId)) && !userInfo.businessId.Equals(""))
+            if((currentUser.roleId.Equals(currentUser.businessManagerRoleId) || currentUser.roleId.Equals(currentUser.projectManagerRoleId)) && !currentUser.businessId.Equals(""))
             {
-                dto = await _businessService.GetBusinessById(Guid.Parse(userInfo.businessId));
+                dto = await _businessService.GetBusinessById(Guid.Parse(currentUser.businessId));
                 return Ok(dto);
             }
 
             return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
         }
 
+        //UPDATE
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateBusiness([FromForm] UpdateBusinessDTO businessDTO)
+        public async Task<IActionResult> UpdateBusiness([FromForm] UpdateBusinessDTO businessDTO, Guid id)
         {
-            ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            if (userInfo.roleId.Equals(userInfo.businessManagerRoleId))
+            if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
             {
-                if (userInfo.businessId.Equals(""))
+                if (currentUser.businessId.Equals(""))
                 {
                     throw new System.UnauthorizedAccessException("You Have To Create Business First!!");
                 }
-                var result = await _businessService.UpdateBusiness(businessDTO, Guid.Parse(userInfo.businessId));
+                var result = await _businessService.UpdateBusiness(businessDTO, id, currentUser);
                 return Ok(result);
             }
-
             return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
         }
 
+        //DELETE BY ID
         [HttpDelete]
         [Route("{id}")]
         public async Task<IActionResult> DeleteBusiness(Guid id)
         {
-            ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            GetBusinessDTO businessDTO = await _businessService.GetBusinessById(id);
-
-            if(businessDTO == null)
+            if (currentUser.roleId.Equals(currentUser.adminRoleId))
             {
-                throw new Business.Exceptions.NotFoundException("No Business With This ID Found!!");
-            }
-
-            if (userInfo.roleId.Equals(userInfo.adminRoleId))
-            {
-                var result = await _businessService.DeleteBusinessById(id);
+                var result = await _businessService.DeleteBusinessById(id, currentUser);
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN can perform this action!!!");
         }
 
+        //CLEAR DATA
         [HttpDelete]
         public async Task<IActionResult> ClearAllBusinessData()
         {
