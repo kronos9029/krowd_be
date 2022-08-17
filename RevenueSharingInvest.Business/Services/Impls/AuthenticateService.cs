@@ -116,7 +116,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
         public async Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken)
         {
-            FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
+                FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
             string uid = decryptedToken.Uid;
 
             UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
@@ -131,28 +131,28 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 throw new NotFoundException("User Not Found!!");
             }
 
-            if (!userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.BUSINESS_MANAGER.ToString())) || !userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.PROJECT_MANAGER.ToString())))
+            if (userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.BUSINESS_MANAGER.ToString())) 
+                || userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.PROJECT_MANAGER.ToString())))
+            {
+                bool isBusinessManager = userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.BUSINESS_MANAGER.ToString())) ? true : false;
+
+                response.email = email;
+                response.id = userObject.Id;
+                response.uid = uid;
+                response.businessId = userObject.BusinessId;
+                response.roleId = userObject.RoleId;
+                response.roleName = isBusinessManager ? RoleEnum.BUSINESS_MANAGER.ToString() : RoleEnum.PROJECT_MANAGER.ToString();
+                response.image = userObject.Image ?? ImageUrl;
+                response.fullName = userObject.FirstName + " " + userObject.LastName;
+                response = await GenerateTokenAsync(response, RoleEnum.BUSINESS_MANAGER.ToString());
+
+                return response;
+                
+            } else
             {
                 throw new UnauthorizedAccessException("You Are Not Using An Business/Project Manager Account!!");
             }
-
-
-            bool isBusinessManager = userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.BUSINESS_MANAGER.ToString())) ? true : false;
-
-
-            response.email = email;
-            response.id = userObject.Id;
-            response.uid = uid;
-            response.businessId = userObject.BusinessId;
-            response.roleId = userObject.RoleId;
-            response.roleName = isBusinessManager ? RoleEnum.BUSINESS_MANAGER.ToString(): RoleEnum.PROJECT_MANAGER.ToString();
-            response.image = userObject.Image ?? ImageUrl;
-            response.fullName = userObject.FirstName + " " + userObject.LastName;
-            response = await GenerateTokenAsync(response, RoleEnum.BUSINESS_MANAGER.ToString());
-           
-
-
-            return response;
+            
         }
 
 /*        public async Task<AuthenticateResponse> GetTokenProjectManager(string firebaseToken)
