@@ -146,7 +146,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         //UPDATE STATUS
         [HttpPut]
-        [Route("status/{id}, {status}")]
+        [Route("status/{id},{status}")]
         [Authorize]
         public async Task<IActionResult> UpdateUserStatus(Guid id, string status)
         {
@@ -163,7 +163,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         //UPDATE EMAIL
         [HttpPut]
-        [Route("email/{id}, {email}")]
+        [Route("email/{id},{email}")]
         [Authorize]
         public async Task<IActionResult> UpdateUserEmail(Guid id, string email)
         {

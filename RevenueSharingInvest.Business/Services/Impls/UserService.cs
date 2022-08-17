@@ -474,7 +474,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("The PROJECT_MANAGER with this businessId is not match with this BUSINESS_MANAGER's businessId!!!");
                 }
 
-                for (int item = 0; item < Enum.GetNames(typeof(ObjectStatusEnum)).Count(); item ++)
+                for (int item = 0; item < Enum.GetNames(typeof(ObjectStatusEnum)).Count(); item++)
                 {
                     if (status.Equals(Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item)))
                         statusCheck = true;
@@ -482,7 +482,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
                 statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
                 if (!statusCheck)
-                    throw new InvalidFieldException("ADMIN can view Users with status" + statusErrorMessage + " !!!");
+                    throw new InvalidFieldException("ADMIN can update Users with status" + statusErrorMessage + " !!!");
 
                 result = await _userRepository.UpdateUserStatus(userId, status, Guid.Parse(currentUser.userId));
 
