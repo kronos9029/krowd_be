@@ -72,20 +72,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreateUser(CreateUserDTO userDTO, string? businessId)
+        public async Task<IdDTO> CreateUser(CreateUserDTO userDTO, ThisUserObj currentUser)
         {
             IdDTO newId = new IdDTO();
             try
-            {
-                if (userDTO.roleId == null || !await _validationService.CheckUUIDFormat(userDTO.roleId))
-                    throw new InvalidFieldException("Invalid roleId!!!");
-
-                if (!userDTO.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN"))
-                    && !userDTO.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER"))
-                    && !userDTO.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"))
-                    && !userDTO.roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
-                    throw new NotFoundException("This RoleId is not existed!!!");       
-
+            {   
                 if (!await _validationService.CheckText(userDTO.lastName))
                     throw new InvalidFieldException("Invalid lastName!!!");
 
@@ -98,35 +89,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (userDTO.email == null || userDTO.email.Length == 0 || !await _validationService.CheckEmail(userDTO.email))
                     throw new InvalidFieldException("Invalid email!!!");
 
-                //if (userDTO.createBy != null && userDTO.createBy.Length >= 0)
-                //{
-                //    if (userDTO.createBy.Equals("string"))
-                //        userDTO.createBy = null;
-                //    else if (!await _validationService.CheckUUIDFormat(userDTO.createBy))
-                //        throw new InvalidFieldException("Invalid createBy!!!");
-                //}
-
-                //if (userDTO.updateBy != null && userDTO.updateBy.Length >= 0)
-                //{
-                //    if (userDTO.updateBy.Equals("string"))
-                //        userDTO.updateBy = null;
-                //    else if (!await _validationService.CheckUUIDFormat(userDTO.updateBy))
-                //        throw new InvalidFieldException("Invalid updateBy!!!");
-                //}
-
-                //userDTO.isDeleted = false;
-
                 User entity = _mapper.Map<User>(userDTO);
 
-                if (entity.RoleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
+                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
-                    entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1);
+                    entity.RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER"));                   
                 }
-                else
+                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
-                    entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
-                    entity.BusinessId = Guid.Parse(businessId);
+                    entity.RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"));
                 }
+                entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1);
+                entity.CreateBy = Guid.Parse(currentUser.userId);
 
                 newId.id = await _userRepository.CreateUser(entity);
                 if (newId.id.Equals(""))
@@ -473,152 +447,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        //Tấn Phát coi lại chổ này
-        //public async Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken)
-        //{
-        //    FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
-        //    string uid = decryptedToken.Uid;
-
-        //    UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
-        //    string email = userRecord.Email;
-        //    DateTime createdDate = (DateTime)userRecord.UserMetaData.CreationTimestamp;
-        //    string ImageUrl = userRecord.PhotoUrl.ToString();
-
-        //    User userObject = await _userRepository.GetUserByEmail(email);
-
-        //    AuthenticateResponse response = new();
-
-        //    if (userObject == null)
-        //    {
-        //        Role role = await _roleRepository.GetRoleById(Guid.Parse(ROLE_INVESTOR_ID));
-
-        //        Guid userId = Guid.NewGuid();
-        //        Guid investorId = Guid.NewGuid();
-
-        //        Investor investor = new();
-        //        User newInvestorObject = new();
-
-        //        newInvestorObject.Email = email;
-        //        newInvestorObject.CreateDate = createdDate;
-        //        newInvestorObject.Image = ImageUrl;
-        //        newInvestorObject.RoleId = role.Id;
-
-        //        int checkCreateUser = await _userRepository.CreateInvestorUser(newInvestorObject);
-        //        if (checkCreateUser == 0)
-        //        {
-        //            throw new RegisterException("Register Fail!!");
-        //        }
-        //        User user = await _userRepository.GetUserByEmail(email);
-        //        investor.Id = investorId;
-        //        investor.UserId = userId;
-        //        investor.InvestorTypeId = Guid.Parse(INVESTOR_TYPE_ID);
-
-        //        int checkCreateInvestor = await _investorRepository.CreateInvestor(investor);
-        //        if (checkCreateInvestor == 0)
-        //        {
-        //            throw new RegisterException("Create Investor Fail!!");
-        //        }
-        //        response.email = email;
-        //        response.id = userId;
-        //        response.uid = uid;
-        //        response = GenerateToken(response, RoleEnum.Investor.ToString());
-        //    }
-        //    else
-        //    {
-        //        response.email = email;
-        //        response.id = userObject.Id;
-        //        response.uid = uid;
-        //        response = GenerateToken(response, RoleEnum.Investor.ToString());
-        //    }
-        //    return response;
-        //}
-
-        //public async Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken)
-        //{
-        //    FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
-        //    string uid = decryptedToken.Uid;
-
-        //    UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
-        //    string email = userRecord.Email;
-
-        //    User userObject = await _userRepository.GetUserByEmail(email);
-
-        //    AuthenticateResponse response = new();
-
-        //    if (userObject == null)
-        //    {
-        //        throw new NotFoundException("Business Not Found!!");
-        //    }
-        //    else
-        //    {
-        //        response.email = email;
-        //        response.id = userObject.Id;
-        //        response.uid = uid;
-        //        response = GenerateToken(response, RoleEnum.BusinessManager.ToString());
-        //    }
-
-        //    return response;
-        //}
-
-
-
-
-
-        //private AuthenticateResponse GenerateToken(AuthenticateResponse response, string roleCheck)
-        //{
-        //    var tokenHandler = new JwtSecurityTokenHandler();
-        //    var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-
-        //    Claim roleClaim;
-
-        //    if (roleCheck.Equals(RoleEnum.Admin.ToString()))
-        //    {
-        //        roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Admin.ToString());
-        //    }
-        //    else if (roleCheck.Equals(RoleEnum.Investor.ToString()))
-        //    {
-        //        roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Investor.ToString());
-        //    }
-        //    else if (roleCheck.Equals(RoleEnum.BusinessManager.ToString()))
-        //    {
-        //        roleClaim = new Claim(ClaimTypes.Role, RoleEnum.BusinessManager.ToString());
-        //    }
-        //    else
-        //    {
-        //        roleClaim = new Claim(ClaimTypes.Role, RoleEnum.Investor.ToString());
-        //    }
-
-        //    var tokenDescriptor = new SecurityTokenDescriptor
-        //    {
-        //        Subject = new ClaimsIdentity(new Claim[]
-        //        {
-        //           new Claim(ClaimTypes.SerialNumber, response.id.ToString()),
-        //           roleClaim
-        //        }),
-        //        Expires = DateTime.UtcNow.AddDays(7),
-        //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
-        //    };
-
-        //    var token = tokenHandler.CreateToken(tokenDescriptor);
-        //    response.token = tokenHandler.WriteToken(token);
-        //    return response;
-        //}
-
-        /*        protected string GenerateOtp()
-                {
-                    char[] charArr = "0123456789".ToCharArray();
-                    string strrandom = string.Empty;
-                    Random objran = new();
-                    for (int i = 0; i < 4; i++)
-                    {
-                        //It will not allow Repetation of Characters
-                        int pos = objran.Next(1, charArr.Length);
-                        if (!strrandom.Contains(charArr.GetValue(pos).ToString())) strrandom += charArr.GetValue(pos);
-                        else i--;
-                    }
-                    return strrandom;
-                }*/
-
         private string GenerateOTP(Guid UserId)
         {
             string[] OTP = UserId.ToString().Split("-");
@@ -694,20 +522,5 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 throw new Exception(e.Message);
             }
         }
-
-        /*        public async Task<bool> VerifyOTP(String OTP, String email)
-                {
-                    User userObj = await _userRepository.GetUserByEmail(email);
-
-                    if (userObj.Id.ToString().Contains(OTP))
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }*/
-
     }
 }

@@ -62,7 +62,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", userDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", userDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", userDTO.CreateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();

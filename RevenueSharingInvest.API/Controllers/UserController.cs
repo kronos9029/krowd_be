@@ -40,19 +40,12 @@ namespace RevenueSharingInvest.API.Controllers
 
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            if (currentUser.roleId.Equals(currentUser.adminRoleId))
+            if (currentUser.roleId.Equals(currentUser.adminRoleId)
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId))
             {
-
-                var result = await _userService.CreateUser(userDTO, currentUser.businessId);
+                var result = await _userService.CreateUser(userDTO, currentUser);
                 return Ok(result);
             }
-            else if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
-            {
-
-                var result = await _userService.CreateUser(userDTO, currentUser.businessId);
-                return Ok(result);
-            }
-
             return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
 
         }

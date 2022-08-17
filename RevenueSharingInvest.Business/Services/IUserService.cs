@@ -14,7 +14,7 @@ namespace RevenueSharingInvest.Business.Services
         //public Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken);
         //public Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken);
         //CREATE
-        public Task<IdDTO> CreateUser(CreateUserDTO userDTO, string? businessId);
+        public Task<IdDTO> CreateUser(CreateUserDTO userDTO, ThisUserObj currentUser);
 
         //READ
         public Task<AllUserDTO> GetAllUsers(int pageIndex, int pageSize, string businessId, string role, string status, ThisUserObj currentUser);
