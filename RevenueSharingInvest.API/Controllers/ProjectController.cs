@@ -47,18 +47,16 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreateProject([FromForm] CreateUpdateProjectDTO projectDTO)
+        public async Task<IActionResult> CreateProject([FromForm] CreateProjectDTO projectDTO)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            if (currentUser.roleId.Equals(currentUser.projectManagerRoleId) 
-                && projectDTO.businessId.Equals(currentUser.businessId) 
-                && projectDTO.managerId.Equals(currentUser.userId))
+            if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
             {
                 var result = await _projectService.CreateProject(projectDTO, currentUser);
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role BUSINESS_MANAGER can perform this action!!!");
         }
 
         [HttpGet]
@@ -186,7 +184,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPut]
         [Route("{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateProject([FromForm] CreateUpdateProjectDTO projectDTO, Guid id)
+        public async Task<IActionResult> UpdateProject([FromForm] UpdateProjectDTO projectDTO, Guid id)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
@@ -199,23 +197,34 @@ namespace RevenueSharingInvest.API.Controllers
                 if (businessDTO == null || project == null)
                 {
                     throw new NotFoundException("no Project With This ID Found!!");
-                } else if(businessDTO.Id.Equals(currentUser.businessId))
+                } 
+                else if(businessDTO.Id.Equals(currentUser.businessId))
                 {
-                    if(project.status.Equals(ProjectStatusEnum.DRAFT.ToString()) || project.status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVED.ToString()))
+                    if(project.status.Equals(ProjectStatusEnum.DRAFT.ToString()) || project.status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
                     {
-                        var result = await _projectService.UpdateProject(projectDTO, id);
+                        var result = await _projectService.UpdateProject(projectDTO, id, currentUser);
                         return Ok(result);
                     }   
-                }
-
-                
-            } else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
-            {
-
+                }               
             }
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role BUSINESS_MANAGER can perform this action!!!");
+        }
 
+        //UPDATE STATUS
+        [HttpPut]
+        [Route("status/{id},{status}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProjectStatus(Guid id, string status)
+        {
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
+            if (currentUser.roleId.Equals(currentUser.adminRoleId)
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+            {
+                var result = await _projectService.UpdateProjectStatus(id, status, currentUser);
+                return Ok(result);
+            }
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUSINESS_MANAGER can perform this action!!!");
         }
 
         [HttpDelete]

@@ -491,7 +491,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = await _userRepository.UpdateUserStatus(userId, status, Guid.Parse(currentUser.userId));
 
                 if (result == 0)
-                    throw new UpdateObjectException("Can not update User Object!");
+                    throw new UpdateObjectException("Can not update User status!");
                 return result;
             }
             catch (Exception e)

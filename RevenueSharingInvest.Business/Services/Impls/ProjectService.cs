@@ -31,10 +31,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
 
-        private readonly String ROLE_ADMIN_ID = "ff54acc6-c4e9-4b73-a158-fd640b4b6940";
-        private readonly String ROLE_PROJECT_MANAGER_ID = "2d80393a-3a3d-495d-8dd7-f9261f85cc8f";
-        private readonly String ROLE_INVESTOR_ID = "ad5f37da-ca48-4dc5-9f4b-963d94b535e6";
-
         public ProjectService(
             IProjectRepository projectRepository, 
             IFieldRepository fieldRepository, 
@@ -314,28 +310,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreateProject(CreateUpdateProjectDTO projectDTO, ThisUserObj currentUser)
+        public async Task<IdDTO> CreateProject(CreateProjectDTO projectDTO, ThisUserObj currentUser)
         {
             IdDTO newId = new IdDTO();
             try
             {
-                if (projectDTO.businessId == null || !await _validationService.CheckUUIDFormat(projectDTO.businessId))
-                    throw new InvalidFieldException("Invalid businessId!!!");
-
-                if (!await _validationService.CheckExistenceId("Business", Guid.Parse(projectDTO.businessId)))
-                    throw new NotFoundException("This BusinessId is not existed!!!");
-
-                if (!projectDTO.businessId.Equals(currentUser.businessId))
-                    throw new InvalidFieldException("This businessId is not match with creator businessId!!!");
-
                 if (projectDTO.managerId == null || !await _validationService.CheckUUIDFormat(projectDTO.managerId))
                     throw new InvalidFieldException("Invalid managerId!!!");
 
-                if (!await _validationService.CheckExistenceUserWithRole(ROLE_PROJECT_MANAGER_ID, Guid.Parse(projectDTO.managerId)))
+                if (!await _validationService.CheckExistenceUserWithRole(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"), Guid.Parse(projectDTO.managerId)))
                     throw new NotFoundException("This ManagerId is not existed!!!");
                 
-                if (!await _validationService.CheckManagerOfBusiness(Guid.Parse(projectDTO.managerId), Guid.Parse(projectDTO.businessId)))
+                if (!await _validationService.CheckManagerOfBusiness(Guid.Parse(projectDTO.managerId), Guid.Parse(currentUser.businessId)))
                     throw new InvalidFieldException("This manager does not belong to this business!!!");
+
+                if (!(await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId))).Status.Equals(ObjectStatusEnum.ACTIVE.ToString()))
+                    throw new InvalidFieldException("This PROJECT_MANAGER's status must be ACTIVE!!!");
+
+                if (await _projectRepository.GetAllProjects(0, 0, null, projectDTO.managerId, null, null, null, null, null, RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")) != null)
+                    throw new InvalidFieldException("This PROJECT_MANAGER has a project already!!!");
 
                 if (projectDTO.fieldId == null || !await _validationService.CheckUUIDFormat(projectDTO.fieldId))
                     throw new InvalidFieldException("Invalid fieldId!!!");
@@ -343,7 +336,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckExistenceId("Field", Guid.Parse(projectDTO.fieldId)))
                     throw new NotFoundException("This fieldId is not existed!!!");
 
-                if (!await _validationService.CheckProjectFieldInBusinessField(Guid.Parse(projectDTO.businessId), Guid.Parse(projectDTO.fieldId)))
+                if (!await _validationService.CheckProjectFieldInBusinessField(Guid.Parse(currentUser.businessId), Guid.Parse(projectDTO.fieldId)))
                     throw new InvalidFieldException("This fieldId is not suitable with this business!!!");
 
                 if (projectDTO.areaId == null || !await _validationService.CheckUUIDFormat(projectDTO.areaId))
@@ -354,9 +347,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (!await _validationService.CheckText(projectDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");
-
-                if (projectDTO.image != null && (projectDTO.image.Equals("string") || projectDTO.image.Length == 0))
-                    projectDTO.image = null;
 
                 if (projectDTO.description != null && (projectDTO.description.Equals("string") || projectDTO.description.Length == 0))
                     projectDTO.description = null;
@@ -395,18 +385,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Project entity = _mapper.Map<Project>(projectDTO);
 
                 entity.Status = Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(0);
-
+                entity.BusinessId = Guid.Parse(currentUser.businessId);
                 entity.CreateBy = Guid.Parse(currentUser.userId);
-                entity.UpdateBy = Guid.Parse(currentUser.userId);
-
-                if (projectDTO.image != null)
-                {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, ROLE_ADMIN_ID);
-                }
 
                 newId.id = await _projectRepository.CreateProject(entity);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create Project Object!");
+
+                //Update NumOfProject
+                await _businessRepository.UpdateBusinessNumOfProject(Guid.Parse(currentUser.businessId));
+
                 return newId;
             }
             catch (Exception e)
@@ -782,36 +770,36 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdateProject(CreateUpdateProjectDTO projectDTO, Guid projectId)
+        public async Task<int> UpdateProject(UpdateProjectDTO projectDTO, Guid projectId, ThisUserObj currentUser)
         {
             int result;
             try
             {
-                if (projectDTO.businessId == null || !await _validationService.CheckUUIDFormat(projectDTO.businessId))
-                    throw new InvalidFieldException("Invalid businessId!!!");
-
-                if (!await _validationService.CheckExistenceId("Business", Guid.Parse(projectDTO.businessId)))
-                    throw new NotFoundException("This BusinessId is not existed!!!");
-
-                if (projectDTO.managerId == null || !await _validationService.CheckUUIDFormat(projectDTO.managerId))
+                if (projectDTO.managerId != null && !await _validationService.CheckUUIDFormat(projectDTO.managerId))
                     throw new InvalidFieldException("Invalid managerId!!!");
 
-                if (!await _validationService.CheckExistenceUserWithRole(ROLE_PROJECT_MANAGER_ID, Guid.Parse(projectDTO.managerId)))
+                if (!await _validationService.CheckExistenceUserWithRole(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"), Guid.Parse(projectDTO.managerId)))
                     throw new NotFoundException("This ManagerId is not existed!!!");
 
-                if (!await _validationService.CheckManagerOfBusiness(Guid.Parse(projectDTO.managerId), Guid.Parse(projectDTO.businessId)))
+                if (!await _validationService.CheckManagerOfBusiness(Guid.Parse(projectDTO.managerId), Guid.Parse(currentUser.businessId)))
                     throw new InvalidFieldException("This manager does not belong to this business!!!");
 
-                if (projectDTO.fieldId == null || !await _validationService.CheckUUIDFormat(projectDTO.fieldId))
+                if (!(await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId))).Status.Equals(ObjectStatusEnum.ACTIVE.ToString()))
+                    throw new InvalidFieldException("This PROJECT_MANAGER's status must be ACTIVE!!!");
+
+                if (await _projectRepository.GetAllProjects(0, 0, null, projectDTO.managerId, null, null, null, null, null, RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")) != null)
+                    throw new InvalidFieldException("This PROJECT_MANAGER has a project already!!!");
+
+                if (projectDTO.fieldId != null && !await _validationService.CheckUUIDFormat(projectDTO.fieldId))
                     throw new InvalidFieldException("Invalid fieldId!!!");
 
                 if (!await _validationService.CheckExistenceId("Field", Guid.Parse(projectDTO.fieldId)))
                     throw new NotFoundException("This fieldId is not existed!!!");
 
-                if (!await _validationService.CheckProjectFieldInBusinessField(Guid.Parse(projectDTO.businessId), Guid.Parse(projectDTO.fieldId)))
+                if (!await _validationService.CheckProjectFieldInBusinessField(Guid.Parse(currentUser.businessId), Guid.Parse(projectDTO.fieldId)))
                     throw new InvalidFieldException("This fieldId is not suitable with this business!!!");
        
-                if (projectDTO.areaId == null || !await _validationService.CheckUUIDFormat(projectDTO.areaId))
+                if (projectDTO.areaId != null && !await _validationService.CheckUUIDFormat(projectDTO.areaId))
                     throw new InvalidFieldException("Invalid areaId!!!");
 
                 if (!await _validationService.CheckExistenceId("Area", Guid.Parse(projectDTO.areaId)))
@@ -825,9 +813,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (projectDTO.description != null && (projectDTO.description.Equals("string") || projectDTO.description.Length == 0))
                     projectDTO.description = null;
-
-                if (!await _validationService.CheckText(projectDTO.address))
-                    throw new InvalidFieldException("Invalid address!!!");
                 ///
                 if (projectDTO.investmentTargetCapital <= 0)
                     throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
@@ -844,54 +829,68 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (projectDTO.numOfStage <= 0)
                     throw new InvalidFieldException("numOfStage must be greater than 0!!!");
 
-                //if (projectDTO.remainAmount <= 0)
-                //    throw new InvalidFieldException("remainAmount must be greater than 0!!!");
-                ///
-
-                if (!await _validationService.CheckDate((projectDTO.startDate)))
+                if (projectDTO.startDate != null && !await _validationService.CheckDate((projectDTO.startDate)))
                     throw new InvalidFieldException("Invalid startDate!!!");
+                
+                if (projectDTO.startDate != null)
+                    projectDTO.startDate = await _validationService.FormatDateInput(projectDTO.startDate);
 
-                projectDTO.startDate = await _validationService.FormatDateInput(projectDTO.startDate);
-
-                if (!await _validationService.CheckDate((projectDTO.endDate)))
+                if (projectDTO.endDate != null && !await _validationService.CheckDate((projectDTO.endDate)))
                     throw new InvalidFieldException("Invalid endDate!!!");
 
-                projectDTO.endDate = await _validationService.FormatDateInput(projectDTO.endDate);
-
-                if (!await _validationService.CheckText(projectDTO.businessLicense))
-                    throw new InvalidFieldException("Invalid businessLicense!!!");
-
-                //if (projectDTO.status < 0 || projectDTO.status > 5)
-                //    throw new InvalidFieldException("Status must be 0(NOT_APPROVED_YET) or 1(DENIED) or 2(CALLING_FOR_INVESTMENT) or 3(CALLING_TIME_IS_OVER) or 4(ACTIVE) or 5(CLOSED)!!!");
-
-                //projectDTO.approvedBy = null;
-
-                //if (projectDTO.createBy != null && projectDTO.createBy.Length >= 0)
-                //{
-                //    if (projectDTO.createBy.Equals("string"))
-                //        projectDTO.createBy = null;
-                //    else if (!await _validationService.CheckUUIDFormat(projectDTO.createBy))
-                //        throw new InvalidFieldException("Invalid createBy!!!");
-                //}
-
-                //if (projectDTO.updateBy != null && projectDTO.updateBy.Length >= 0)
-                //{
-                //    if (projectDTO.updateBy.Equals("string"))
-                //        projectDTO.updateBy = null;
-                //    else if (!await _validationService.CheckUUIDFormat(projectDTO.updateBy))
-                //        throw new InvalidFieldException("Invalid updateBy!!!");
-                //}
+                if (projectDTO.endDate != null)
+                    projectDTO.endDate = await _validationService.FormatDateInput(projectDTO.endDate);
 
                 Project entity = _mapper.Map<Project>(projectDTO);
 
                 if (projectDTO.image != null)
                 {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, ROLE_ADMIN_ID);
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, RoleDictionary.role.GetValueOrDefault("ADMIN"));
                 }
+                entity.UpdateBy = Guid.Parse(currentUser.userId);
 
                 result = await _projectRepository.UpdateProject(entity, projectId);
                 if (result == 0)
                     throw new UpdateObjectException("Can not update Project Object!");
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<int> UpdateProjectStatus(Guid projectId, string status, ThisUserObj currentUser)
+        {
+            int result;
+            try
+            {
+                Project project = await _projectRepository.GetProjectById(projectId);
+
+                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                {
+                    if (!project.Status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
+                        throw new InvalidFieldException("ADMIN can update Project's status from WAITING_FOR_APPROVAL to DENIED or CALLING_FOR_INVESTMENT!!!");
+
+                    if (!status.Equals(ProjectStatusEnum.DENIED.ToString()) && !status.Equals(ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString()))
+                        throw new InvalidFieldException("Status must be DENIED or CALLING_FOR_INVESTMENT!!!");
+                }
+                else if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
+                {
+                    if (!project.BusinessId.ToString().Equals(currentUser.businessId))
+                        throw new InvalidFieldException("The Project with this businessId is not match with this BUSINESS_MANAGER's businessId!!!");
+
+                    if (!project.Status.Equals(ProjectStatusEnum.DRAFT.ToString()))
+                        throw new InvalidFieldException("BUSINESS_MANAGER can update Project's status from DRAFT to WAITING_FOR_APPROVAL!!!");
+
+                    if (!status.Equals(ProjectStatusEnum.DENIED.ToString()) && !status.Equals(ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString()))
+                        throw new InvalidFieldException("Status must be WAITING_FOR_APPROVAL!!!");
+                }
+
+                result = await _projectRepository.UpdateProjectStatus(projectId, status, Guid.Parse(currentUser.userId));
+
+                if (result == 0)
+                    throw new UpdateObjectException("Can not update Project status!");
                 return result;
             }
             catch (Exception e)
