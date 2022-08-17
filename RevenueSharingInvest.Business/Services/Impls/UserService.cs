@@ -103,7 +103,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     entity.RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"));
                     entity.BusinessId = Guid.Parse(currentUser.businessId);
                 }
-                entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1);
+                entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
                 entity.CreateBy = Guid.Parse(currentUser.userId);
 
                 newId.id = await _userRepository.CreateUser(entity);
