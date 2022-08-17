@@ -17,6 +17,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using UnauthorizedAccessException = RevenueSharingInvest.Business.Exceptions.UnauthorizedAccessException;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
@@ -97,6 +98,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             else
             {
+                if (!userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.INVESTOR.ToString())))
+                {
+                    throw new UnauthorizedAccessException("You Are Not Using An Investor Account!!");
+                }
+
                 response.email = email;
                 response.id = userObject.Id;
                 response.uid = uid;
@@ -115,32 +121,41 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
             string email = userRecord.Email;
+            string ImageUrl = userRecord.PhotoUrl.ToString();
 
             User userObject = await _userRepository.GetUserByEmail(email);
-
             AuthenticateResponse response = new();
-
+            
             if (userObject == null)
             {
                 throw new NotFoundException("User Not Found!!");
             }
-            else
+
+            if (!userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.BUSINESS_MANAGER.ToString())) || !userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.PROJECT_MANAGER.ToString())))
             {
-                response.email = email;
-                response.id = userObject.Id;
-                response.uid = uid;
-                response.businessId = userObject.BusinessId;
-                response.roleId = userObject.RoleId;
-                response.roleName = RoleEnum.BUSINESS_MANAGER.ToString();
-                response.image = userObject.Image;
-                response.fullName = userObject.FirstName + " " + userObject.LastName;
-                response = await GenerateTokenAsync(response, RoleEnum.BUSINESS_MANAGER.ToString());
+                throw new UnauthorizedAccessException("You Are Not Using An Business/Project Manager Account!!");
             }
+
+
+            bool isBusinessManager = userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.BUSINESS_MANAGER.ToString())) ? true : false;
+
+
+            response.email = email;
+            response.id = userObject.Id;
+            response.uid = uid;
+            response.businessId = userObject.BusinessId;
+            response.roleId = userObject.RoleId;
+            response.roleName = isBusinessManager ? RoleEnum.BUSINESS_MANAGER.ToString(): RoleEnum.PROJECT_MANAGER.ToString();
+            response.image = userObject.Image ?? ImageUrl;
+            response.fullName = userObject.FirstName + " " + userObject.LastName;
+            response = await GenerateTokenAsync(response, RoleEnum.BUSINESS_MANAGER.ToString());
+           
+
 
             return response;
         }
 
-        public async Task<AuthenticateResponse> GetTokenProjectManager(string firebaseToken)
+/*        public async Task<AuthenticateResponse> GetTokenProjectManager(string firebaseToken)
         {
             FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
             string uid = decryptedToken.Uid;
@@ -164,11 +179,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.uid = uid;
                 response.businessId = userObject.BusinessId;
                 response.image = userObject.Image ?? ImageUrl;
+                response.roleId = userObject.RoleId;
+                response.roleName = RoleEnum.PROJECT_MANAGER.ToString();
+                response.fullName = userObject.FirstName + " " + userObject.LastName;
                 response = await GenerateTokenAsync(response, RoleEnum.PROJECT_MANAGER.ToString());
             }
 
             return response;
-        }
+        }*/
 
         public async Task<AuthenticateResponse> GetTokenAdmin(string firebaseToken)
         {
@@ -181,10 +199,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
 
             User userObject = await _userRepository.GetUserByEmail(email);
+            
+            if (userObject == null)
+                throw new NotFoundException("User Not Found!!");
+
+            if (!userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.ADMIN.ToString())))
+            {
+                throw new UnauthorizedAccessException("You Are Not Using An Admin Account!!");
+            }
+
             AuthenticateResponse response = new();
             
-            if(userObject == null)
-                throw new NotFoundException("User Not Found!!");
+
             
             response.email = email;
             response.uid = uid;

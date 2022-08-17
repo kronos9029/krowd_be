@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using System;
@@ -184,20 +185,20 @@ namespace RevenueSharingInvest.API.Controllers
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
             GetUserDTO userDTO = await _userService.GetUserById(id);
-
-/*            if (userDTO.role.id.Equals(currentUser.adminRoleId))
-            {
-            }*/
-
-
-
             if (userDTO != null)
             {
-                var result = await _userService.DeleteUserById(id);
-                return Ok(result);
+                throw new NotFoundException("No Such User With This Id!!");
+            }
+            if (userDTO.role.id.Equals(currentUser.adminRoleId))
+            {
+                if (userDTO.status.Equals(ObjectStatusEnum.INACTIVE.ToString()) || userDTO.status.Equals(ObjectStatusEnum.BLOCKED.ToString()))
+                {
+                    var result = await _userService.DeleteUserById(id);
+                    return Ok(result);
+                }
             }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Perfrom This Action!!");
         }
 
         [HttpDelete]

@@ -43,21 +43,13 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        [Route("business_manager")]
+        [Route("business")]
         public async Task<IActionResult> GetTokenBusiness([FromQuery] string token)
         {
             var result = await _authenticateService.GetTokenWebBusiness(token);
             return Ok(result);
         }
-        
-        [HttpPost]
-        [Route("project-manager")]
-        public async Task<IActionResult> GetTokenProJectManager([FromQuery] string token)
-        {
-            var result = await _authenticateService.GetTokenProjectManager(token);
-            return Ok(result);
-        }
-
+       
 
         //[ServiceFilter(typeof(ClientIpCheckActionFilter))]
         [HttpPost]
