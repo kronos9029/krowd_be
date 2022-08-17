@@ -27,6 +27,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "INSERT INTO [User] ("
                     + "         RoleId, "
+                    + "         BusinessId, "
                     + "         LastName, "
                     + "         FirstName, "
                     + "         Image, "
@@ -41,6 +42,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @RoleId, "
+                    + "         @BusinessId, "
                     + "         @LastName, "
                     + "         @FirstName, "
                     + "         @Image, "
@@ -54,6 +56,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("RoleId", userDTO.RoleId, DbType.Guid);
+                parameters.Add("BusinessId", userDTO.BusinessId, DbType.Guid);
                 parameters.Add("LastName", userDTO.LastName, DbType.String);
                 parameters.Add("FirstName", userDTO.FirstName, DbType.String);
                 parameters.Add("Image", userDTO.Image, DbType.String);
