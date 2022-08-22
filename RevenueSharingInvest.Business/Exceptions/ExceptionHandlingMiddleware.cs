@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using RevenueSharingInvest.Business.Models;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Exceptions
 {
-    public class ExceptionHandlingMiddleware
+    public class ExceptionHandlingMiddleware : AuthorizeAttribute
     {
         public RequestDelegate requestDelegate;
         public ExceptionHandlingMiddleware(RequestDelegate requestDelegate)
@@ -57,6 +58,10 @@ namespace RevenueSharingInvest.Business.Exceptions
                     break;
                 case FileException:
                     errorMessageObject.Code = "F001";
+                    statusCode = (int)HttpStatusCode.Conflict;
+                    break;
+                case InUseException:
+                    errorMessageObject.Code = "I001";
                     statusCode = (int)HttpStatusCode.Conflict;
                     break;
 

@@ -15,7 +15,7 @@ namespace RevenueSharingInvest.API.Controllers
     [ApiController]
     [Route("api/v1.0/fields")]
     [EnableCors]
-    //[Authorize]
+    [Authorize]
     public class FieldController : ControllerBase
     {
         private readonly IFieldService _fieldService;
@@ -27,6 +27,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> CreateField([FromBody] FieldDTO fieldDTO)
         {
             var result = await _fieldService.CreateField(fieldDTO);
@@ -34,32 +35,37 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetAllFields(int pageIndex, int pageSize)
         {
-            var result = new List<FieldDTO>();
-            result = await _fieldService.GetAllFields(pageIndex, pageSize);
+            
+            var result = await _fieldService.GetAllFields(pageIndex, pageSize);
             return Ok(result);
         }
 
         [HttpGet]
         [Route("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetFieldById(Guid id)
         {
-            FieldDTO dto = new FieldDTO();
-            dto = await _fieldService.GetFieldById(id);
+            
+            var dto = await _fieldService.GetFieldById(id);
             return Ok(dto);
         }
 
         [HttpPut]
         [Route("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> UpdateField([FromBody] FieldDTO fieldDTO, Guid id)
         {
+
             var result = await _fieldService.UpdateField(fieldDTO, id);
             return Ok(result);
         }
 
         [HttpDelete]
         [Route("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> DeleteField(Guid id)
         {
             var result = await _fieldService.DeleteFieldById(id);

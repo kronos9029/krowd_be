@@ -55,8 +55,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             User userObject = await _userRepository.GetUserByEmail(email);
 
-            if (!userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.INVESTOR.ToString())))
-                throw new RegisterException("This Is Not An Investor Email!!");
+
 
             AuthenticateResponse response = new();
 
@@ -99,9 +98,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             else
             {
                 if (!userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.INVESTOR.ToString())))
-                {
-                    throw new UnauthorizedAccessException("You Are Not Using An Investor Account!!");
-                }
+                    throw new RegisterException("This Is Not An Investor Email!!");
 
                 response.email = email;
                 response.id = userObject.Id;

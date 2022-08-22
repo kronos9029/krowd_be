@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -174,15 +175,31 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("IsDeleted", riskTypeDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", riskTypeId, DbType.Guid);
 
-                using (var connection = CreateConnection())
-                {
-                    return await connection.ExecuteAsync(query, parameters);
-                }
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
             }
+        }
+
+        public async Task<List<RiskTypeObject>> GetRiskTypeInUse(Guid riskTypeId)
+        {
+            try
+            {
+                var query = "SELECT rt.Id as RiskTypeId, r.Id as RiskId, r.ProjectId " +
+                            "FROM RiskType rt JOIN Risk r ON rt.Id = r.RiskTypeId " +
+                            "WHERE r.ProjectId IN (SELECT Id FROM Project) AND rt.Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", riskTypeId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<RiskTypeObject>(query, parameters)).ToList();
+            } catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
         }
 
         //CLEAR DATA
@@ -199,5 +216,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+    }
+
+    public class RiskTypeObject
+    {
+        public string RiskTypeId { get; set; }
+        public string RiskId { get; set; }
+        public string ProjectId { get; set; }
     }
 }

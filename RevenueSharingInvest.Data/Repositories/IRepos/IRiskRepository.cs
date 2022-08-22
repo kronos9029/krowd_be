@@ -15,6 +15,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //READ
         public Task<List<Risk>> GetAllRisks(int pageIndex, int pageSize);
         public Task<Risk> GetRiskById(Guid riskId);
+        public Task<string> GetBusinessByRiskId(Guid riskId);
 
         //UPDATE
         public Task<int> UpdateRisk(Risk riskDTO, Guid riskId);

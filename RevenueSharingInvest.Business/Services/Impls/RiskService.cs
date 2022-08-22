@@ -162,6 +162,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+
+
+
                 if (!await _validationService.CheckText(riskDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");
 

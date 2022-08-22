@@ -469,7 +469,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "SELECT COUNT(*) FROM Business " + whereCondition;
 
                 using var connection = CreateConnection();
-                return ((int)connection.ExecuteScalar(query, parameters));
+                return (int)connection.ExecuteScalar(query, parameters);
             }
             catch (Exception e)
             {
