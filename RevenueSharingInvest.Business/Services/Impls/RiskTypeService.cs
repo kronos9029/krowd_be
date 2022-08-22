@@ -4,6 +4,7 @@ using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
+using RevenueSharingInvest.Data.Repositories.Repos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -89,6 +90,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                List<RiskTypeObject> riskTypeObjects = await _riskTypeRepository.GetRiskTypeInUse(riskTypeId);
+
+                if (riskTypeObjects != null)
+                {
+                    throw new InUseException("This Risk Type Is Being Used!!");
+                }
+
                 result = await _riskTypeRepository.DeleteRiskTypeById(riskTypeId);
                 if (result == 0)
                     throw new DeleteObjectException("Can not delete RiskType Object!");
@@ -151,6 +159,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                List<RiskTypeObject> riskTypeObjects = await _riskTypeRepository.GetRiskTypeInUse(riskTypeId);
+
+                if(riskTypeObjects != null)
+                {
+                    throw new InUseException("This Risk Type Is Being Used!!");
+                }
 
                 if (!await _validationService.CheckText(riskTypeDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");

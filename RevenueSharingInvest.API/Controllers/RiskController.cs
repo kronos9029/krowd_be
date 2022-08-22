@@ -15,7 +15,6 @@ namespace RevenueSharingInvest.API.Controllers
     [ApiController]
     [Route("api/v1.0/risks")]
     [EnableCors]
-    //[Authorize]
     public class RiskController : ControllerBase
     {
         private readonly IRiskService _riskService;
@@ -27,6 +26,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> CreateRisk([FromBody] RiskDTO riskDTO)
         {
             var result = await _riskService.CreateRisk(riskDTO);
@@ -43,6 +43,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetRiskById(Guid id)
         {
             RiskDTO dto = new RiskDTO();
@@ -60,6 +61,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpDelete]
         [Route("{id}")]
+        [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> DeleteRisk(Guid id)
         {
             var result = await _riskService.DeleteRiskById(id);

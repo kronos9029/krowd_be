@@ -15,7 +15,8 @@ namespace RevenueSharingInvest.API.Controllers
     [ApiController]
     [Route("api/v1.0/risk_types")]
     [EnableCors]
-    //[Authorize]
+    [Authorize]
+    [ValidateAntiForgeryToken]
     public class RiskTypeController : ControllerBase
     {
         private readonly IRiskTypeService _riskTypeService;
@@ -27,6 +28,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles="ADMIN")]
         public async Task<IActionResult> CreateRiskType([FromBody] RiskTypeDTO riskTypeDTO)
         {
             var result = await _riskTypeService.CreateRiskType(riskTypeDTO);
@@ -34,6 +36,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetAllRiskTypes(int pageIndex, int pageSize)
         {
             var result = new List<RiskTypeDTO>();
@@ -43,6 +46,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetRiskTypeById(Guid id)
         {
             RiskTypeDTO dto = new RiskTypeDTO();

@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.Business.Services
         public Task<IdDTO> CreateField(FieldDTO fieldDTO);
 
         //READ
-        public Task<List<FieldDTO>> GetAllFields(int pageIndex, int pageSize);
+        public Task<AllFieldDTO> GetAllFields(int pageIndex, int pageSize);
         public Task<FieldDTO> GetFieldById(Guid fieldId);
 
         //UPDATE

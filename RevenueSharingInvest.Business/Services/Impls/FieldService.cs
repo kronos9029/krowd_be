@@ -88,6 +88,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                List<string> projectWithFieldId = await _fieldRepository.GetProjectsByFieldId(fieldId);
+
+                if (projectWithFieldId != null)
+                {
+                    throw new InUseException("There Are Projects Using This Field");
+                }
 
                 result = await _fieldRepository.DeleteFieldById(fieldId);
                 if (result == 0)
@@ -101,20 +107,23 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<FieldDTO>> GetAllFields(int pageIndex, int pageSize)
+        public async Task<AllFieldDTO> GetAllFields(int pageIndex, int pageSize)
         {
             try
             {
+                AllFieldDTO allFieldDTO = new AllFieldDTO();
                 List<Field> areaList = await _fieldRepository.GetAllFields(pageIndex, pageSize);
-                List<FieldDTO> list = _mapper.Map<List<FieldDTO>>(areaList);
+                allFieldDTO.numOfField = _fieldRepository.CountAllField();
+                allFieldDTO.listOfField = _mapper.Map<List<FieldDTO>>(areaList);
 
-                foreach (FieldDTO item in list)
+                foreach (FieldDTO item in allFieldDTO.listOfField)
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
                 }
 
-                return list;
+
+                return allFieldDTO;
             }
             catch (Exception e)
             {
@@ -151,6 +160,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                List<string> projectWithFieldId = await _fieldRepository.GetProjectsByFieldId(fieldId);
+
+                if (projectWithFieldId != null)
+                {
+                    throw new InUseException("There Are Projects Using This Field");
+                }
+
                 if (!await _validationService.CheckText(fieldDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");
 

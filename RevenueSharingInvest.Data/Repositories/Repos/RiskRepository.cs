@@ -160,6 +160,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        public async Task<string> GetBusinessByRiskId(Guid riskId)
+        {
+            try
+            {
+                var query = "SELECT DISTINCT p.BusinessId FROM Risk r JOIN Project p ON r.ProjectId = p.Id WHERE r.Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", riskId, DbType.Guid);
+                using var connection = CreateConnection();
+                return connection.QueryFirstOrDefaultAsync<Guid>(query, parameters).ToString();
+            }
+            catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         //UPDATE
         public async Task<int> UpdateRisk(Risk riskDTO, Guid riskId)
         {

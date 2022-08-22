@@ -29,7 +29,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
+                    + "         UpdateBy, " 
                     + "         IsDeleted ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
@@ -134,6 +134,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        public int CountAllField()
+        {
+            try
+            {
+                var query = "SELECT COUNT(*) FROM Field";
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query);
+
+            }
+            catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         //GET BY ID
         public async Task<Field> GetFieldById(Guid fieldId)
         {
@@ -144,6 +159,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Id", fieldId, DbType.Guid);
                 using var connection = CreateConnection();
                 return await connection.QueryFirstOrDefaultAsync<Field>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<List<string>> GetProjectsByFieldId(Guid fieldId)
+        {
+            try
+            {
+                var query = "SELECT p.Name FROM Project p JOIN Field f ON p.FieldId = f.Id WHERE f.Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", fieldId, DbType.Guid);
+                using var connections = CreateConnection();
+                return (await connections.QueryAsync<string>(query, parameters)).ToList();
             }
             catch (Exception e)
             {

@@ -1,4 +1,5 @@
 ﻿using RevenueSharingInvest.Data.Models.Entities;
+using RevenueSharingInvest.Data.Repositories.Repos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //READ
         public Task<List<RiskType>> GetAllRiskTypes(int pageIndex, int pageSize);
         public Task<RiskType> GetRiskTypeById(Guid riskTypeId);
+        public Task<List<RiskTypeObject>> GetRiskTypeInUse(Guid riskTypeId);
 
         //UPDATE
         public Task<int> UpdateRiskType(RiskType riskTypeDTO, Guid riskTypeId);
