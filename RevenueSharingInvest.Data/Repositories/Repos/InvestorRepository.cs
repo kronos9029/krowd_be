@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -88,11 +89,96 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Investor>> GetAllInvestors(int pageIndex, int pageSize)
+        public async Task<List<Investor>> GetAllInvestors(
+            int pageIndex,
+            int pageSize,
+            string businessId,
+            string projectManagerId,
+            string status,
+            string name,
+            string orderBy,
+            string order,
+            string thisUserRoleId)
         {
+            var parameters = new DynamicParameters();
+
+            var selectCondition = " * ";
+            var fromCondition = " Investor ";
+            var whereCondition = "";
+            var groupByCondition = " GROUP BY INS.Id, INS.UserId, INS.InvestorTypeId, INS.Status, INS.CreateDate, INS.CreateBy, INS.UpdateDate, INS.UpdateBy, INS.IsDeleted ";
+            var orderByCondition = "ORDER BY CreateDate";
+            var orderCondition = "";
+            var isDeletedCondition = " AND IsDeleted = 0 ";
+
+            var statusCondition = " AND Status = @Status ";
+            var nameCondition = " AND Name LIKE '%" + name + "%' ";
+
             try
             {
-                if(pageIndex != 0 && pageSize != 0)
+                if (thisUserRoleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                {
+                    if (status != null)
+                    {
+                        whereCondition = whereCondition + statusCondition;
+                        parameters.Add("Status", status, DbType.String);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + " AND (Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "')";
+                    }
+
+                    if (name != null)
+                    {
+                        whereCondition = whereCondition + nameCondition;
+                    }
+
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4) + " " + isDeletedCondition;
+                }
+                else if (thisUserRoleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
+                {
+                    selectCondition = " INS.Id, INS.UserId, INS.InvestorTypeId, INS.Status, INS.CreateDate, INS.CreateBy, INS.UpdateDate, INS.UpdateBy, INS.IsDeleted ";
+                    fromCondition = " Investor INS JOIN Investment INM ON INS.Id = INM.InvestorId ";
+                    whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE BusinessId = @BusinessId) ";
+                    parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
+
+                    if (name != null)
+                    {
+                        whereCondition = whereCondition + " AND Name LIKE '%" + name + "%' ";
+                    }
+                    if (status != null)
+                    {
+                        whereCondition = whereCondition + " AND INS.Status = @Status" + groupByCondition;
+                        parameters.Add("Status", status, DbType.String);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + " AND (INS.Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR INS.Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR INS.Status = '"
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') AND INS.IsDeleted = 0 "
+                        + groupByCondition;
+                    }
+
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
+                }
+                else if (thisUserRoleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                {
+
+                }
+
+                if (orderBy != null)
+                {
+                    orderByCondition = "ORDER BY " + orderBy;
+                }
+                if (order != null)
+                {
+                    orderCondition = order;
+                }
+
+                if (pageIndex != 0 && pageSize != 0)
                 {
                     var query = "WITH X AS ( "
                     + "         SELECT "
@@ -117,8 +203,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         X "
                     + "     WHERE "
                     + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
-                    + "         AND @PageIndex * @PageSize";
-                    var parameters = new DynamicParameters();
+                    + "         AND @PageIndex * @PageSize";                   
                     parameters.Add("PageIndex", pageIndex, DbType.Int16);
                     parameters.Add("PageSize", pageSize, DbType.Int16);
                     using var connection = CreateConnection();
@@ -219,6 +304,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<Investor> GetInvestorByUserId(Guid userId)
+        {
+            try
+            {
+                string query = "SELECT * FROM Investor WHERE UserId = @UserId";
+                var parameters = new DynamicParameters();
+                parameters.Add("UserId", userId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Investor>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
             }
         }
     }

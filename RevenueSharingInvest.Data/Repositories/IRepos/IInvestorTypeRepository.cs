@@ -15,6 +15,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //READ
         public Task<List<InvestorType>> GetAllInvestorTypes(int pageIndex, int pageSize);
         public Task<InvestorType> GetInvestorTypeById(Guid investorTypeId);
+        public Task<InvestorType> GetInvestorTypeByInvestorId(Guid investorId);
 
         //UPDATE
         public Task<int> UpdateInvestorType(InvestorType investorTypeDTO, Guid investorTypeId);

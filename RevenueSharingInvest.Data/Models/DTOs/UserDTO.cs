@@ -41,6 +41,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string id { get; set; }
         public GetBusinessDTO? business { get; set; }
         public RoleDTO role { get; set; }
+        //public GetInvestorDTO? investor { get; set; }
         public string description { get; set; }
         public string phoneNum { get; set; }
         public string idCard { get; set; }

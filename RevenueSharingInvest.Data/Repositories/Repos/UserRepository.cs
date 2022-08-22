@@ -160,7 +160,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                                     whereCondition = whereCondition + " AND (U.Status = '"
                                     + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR U.Status = '"
                                     + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR U.Status = '"
-                                    + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') AND U.IsDeleted = 0 "
+                                    + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') "
                                     + groupByCondition;
                                 }
                             }
@@ -205,7 +205,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         {
                             selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted ";
                             fromCondition = " [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId ";
-                            whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE BusinessId = @BusinessId) " + roleIdCondition + isDeletedCondition;
+                            whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE BusinessId = @BusinessId) " + roleIdCondition;
                             parameters.Add("RoleId", Guid.Parse(roleId), DbType.Guid);
 
                             if (status != null)
@@ -253,7 +253,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         {
                             selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted ";
                             fromCondition = " [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId ";
-                            whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE ManagerId = @ManagerId) " + roleIdCondition + isDeletedCondition;
+                            whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE ManagerId = @ManagerId) " + roleIdCondition;
                             parameters.Add("ManagerId", Guid.Parse(projectManagerId), DbType.Guid);
                             parameters.Add("RoleId", Guid.Parse(roleId), DbType.Guid);
 
@@ -636,7 +636,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                                     whereCondition = whereCondition + " AND (U.Status = '"
                                     + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR U.Status = '"
                                     + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR U.Status = '"
-                                    + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') AND U.IsDeleted = 0 "
+                                    + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') "
                                     + groupByCondition;
                                 }
                             }
@@ -681,7 +681,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         {
                             selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted ";
                             fromCondition = " [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId ";
-                            whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE BusinessId = @BusinessId) " + roleIdCondition + isDeletedCondition;
+                            whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE BusinessId = @BusinessId) " + roleIdCondition;
                             parameters.Add("RoleId", Guid.Parse(roleId), DbType.Guid);
 
                             if (status != null)
@@ -729,7 +729,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         {
                             selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted ";
                             fromCondition = " [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId ";
-                            whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE ManagerId = @ManagerId) " + roleIdCondition + isDeletedCondition;
+                            whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE ManagerId = @ManagerId) " + roleIdCondition;
                             parameters.Add("ManagerId", Guid.Parse(projectManagerId), DbType.Guid);
                             parameters.Add("RoleId", Guid.Parse(roleId), DbType.Guid);
 

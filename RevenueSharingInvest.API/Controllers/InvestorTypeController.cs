@@ -36,7 +36,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllInvestorTypes(int pageIndex, int pageSize)
         {
-            var result = new List<InvestorTypeDTO>();
+            var result = new List<GetInvestorTypeDTO>();
             result = await _investorTypeService.GetAllInvestorTypes(pageIndex, pageSize);
             return Ok(result);
         }
@@ -45,7 +45,7 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> GetInvestorTypeById(Guid id)
         {
-            InvestorTypeDTO dto = new InvestorTypeDTO();
+            GetInvestorTypeDTO dto = new GetInvestorTypeDTO();
             dto = await _investorTypeService.GetInvestorTypeById(id);
             return Ok(dto);
         }

@@ -52,24 +52,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (investorTypeDTO.description != null && (investorTypeDTO.description.Equals("string") || investorTypeDTO.description.Length == 0))
                     investorTypeDTO.description = null;
 
-                if (investorTypeDTO.createBy != null && investorTypeDTO.createBy.Length >= 0)
-                {
-                    if (investorTypeDTO.createBy.Equals("string"))
-                        investorTypeDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(investorTypeDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
-                }
-
-                if (investorTypeDTO.updateBy != null && investorTypeDTO.updateBy.Length >= 0)
-                {
-                    if (investorTypeDTO.updateBy.Equals("string"))
-                        investorTypeDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(investorTypeDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
-
-                investorTypeDTO.isDeleted = false;
-
                 InvestorType dto = _mapper.Map<InvestorType>(investorTypeDTO);
                 newId.id = await _investorTypeRepository.CreateInvestorType(dto);
                 if (newId.id.Equals(""))
@@ -101,14 +83,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<InvestorTypeDTO>> GetAllInvestorTypes(int pageIndex, int pageSize)
+        public async Task<List<GetInvestorTypeDTO>> GetAllInvestorTypes(int pageIndex, int pageSize)
         {
             try
             {
                 List<InvestorType> investorTypeList = await _investorTypeRepository.GetAllInvestorTypes(pageIndex, pageSize);
-                List<InvestorTypeDTO> list = _mapper.Map<List<InvestorTypeDTO>>(investorTypeList);
+                List<GetInvestorTypeDTO> list = _mapper.Map<List<GetInvestorTypeDTO>>(investorTypeList);
 
-                foreach (InvestorTypeDTO item in list)
+                foreach (GetInvestorTypeDTO item in list)
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
@@ -123,14 +105,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET BY ID
-        public async Task<InvestorTypeDTO> GetInvestorTypeById(Guid investorTypeId)
+        public async Task<GetInvestorTypeDTO> GetInvestorTypeById(Guid investorTypeId)
         {
-            InvestorTypeDTO result;
+            GetInvestorTypeDTO result;
             try
             {
 
                 InvestorType dto = await _investorTypeRepository.GetInvestorTypeById(investorTypeId);
-                result = _mapper.Map<InvestorTypeDTO>(dto);
+                result = _mapper.Map<GetInvestorTypeDTO>(dto);
                 if (result == null)
                     throw new NotFoundException("No InvestorType Object Found!");
 
@@ -156,22 +138,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (investorTypeDTO.description != null && (investorTypeDTO.description.Equals("string") || investorTypeDTO.description.Length == 0))
                     investorTypeDTO.description = null;
-
-                if (investorTypeDTO.createBy != null && investorTypeDTO.createBy.Length >= 0)
-                {
-                    if (investorTypeDTO.createBy.Equals("string"))
-                        investorTypeDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(investorTypeDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
-                }
-
-                if (investorTypeDTO.updateBy != null && investorTypeDTO.updateBy.Length >= 0)
-                {
-                    if (investorTypeDTO.updateBy.Equals("string"))
-                        investorTypeDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(investorTypeDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
 
                 InvestorType dto = _mapper.Map<InvestorType>(investorTypeDTO);
                 result = await _investorTypeRepository.UpdateInvestorType(dto, investorTypeId);

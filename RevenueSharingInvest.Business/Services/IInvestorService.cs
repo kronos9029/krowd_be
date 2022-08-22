@@ -1,4 +1,5 @@
-﻿using RevenueSharingInvest.Data.Models.DTOs;
+﻿using RevenueSharingInvest.API;
+using RevenueSharingInvest.Data.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,17 +13,17 @@ namespace RevenueSharingInvest.Business.Services
         //public Task<InvestorDTO> GetInvestorById(String ID);
         //public Task<List<ProjectMemberDTO>> GetProjectMembers(String projectID);
         //CREATE
-        public Task<IdDTO> CreateInvestor(InvestorDTO investorDTO);
+        //public Task<IdDTO> CreateInvestor(InvestorDTO investorDTO);
 
         //READ
-        public Task<List<InvestorDTO>> GetAllInvestors(int pageIndex, int pageSize);
-        public Task<InvestorDTO> GetInvestorById(Guid investorId);
+        //public Task<AllInvestorDTO> GetAllInvestors(int pageIndex, int pageSize, string status, string name, string orderBy, string order, ThisUserObj currentUser);
+        //public Task<GetInvestorDTO> GetInvestorById(Guid investorId);
 
         //UPDATE
-        public Task<int> UpdateInvestor(InvestorDTO investorDTO, Guid investorId);
+        //public Task<int> UpdateInvestor(InvestorDTO investorDTO, Guid investorId);
 
         //DELETE
-        public Task<int> DeleteInvestorById(Guid investorId);
-        public Task<int> ClearAllInvestorData();
+        //public Task<int> DeleteInvestorById(Guid investorId);
+        //public Task<int> ClearAllInvestorData();
     }
 }

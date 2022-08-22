@@ -64,6 +64,10 @@ namespace RevenueSharingInvest.Business.Helpers
 
             CreateMap<Package, GetPackageDTO>().ReverseMap();
             CreateMap<Package, CreateUpdatePackageDTO>().ReverseMap();
+
+            CreateMap<Investor, GetInvestorDTO>().ReverseMap();
+
+            CreateMap<InvestorType, UserInvestorTypeDTO>().ReverseMap();
         }
     }
 }

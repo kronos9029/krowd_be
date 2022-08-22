@@ -227,9 +227,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (orderBy != null)
                 {
-                    if (!BusinessOrderFieldDictionary.column.ContainsKey(orderBy))
+                    if (!OrderFieldDictionary.business.ContainsKey(orderBy))
                     {
-                        foreach (KeyValuePair<string, string> pair in BusinessOrderFieldDictionary.column)
+                        foreach (KeyValuePair<string, string> pair in OrderFieldDictionary.business)
                         {
                             orderByErrorMessage = orderByErrorMessage + " " + pair.Key + " or";
                         }
@@ -237,7 +237,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("orderBy must be" + orderByErrorMessage + " !!!");
                     }
                     else
-                        orderBy = BusinessOrderFieldDictionary.column.GetValueOrDefault(orderBy);
+                        orderBy = OrderFieldDictionary.business.GetValueOrDefault(orderBy);
                 }
                 if (order != null)
                 {

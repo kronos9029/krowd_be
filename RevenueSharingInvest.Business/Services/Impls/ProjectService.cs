@@ -366,9 +366,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (projectDTO.duration <= 0)
                     throw new InvalidFieldException("duration must be greater than 0!!!");
 
-                if (projectDTO.numOfStage <= 0)
-                    throw new InvalidFieldException("numOfStage must be greater than 0!!!");
-
                 if (!await _validationService.CheckDate((projectDTO.startDate)))
                     throw new InvalidFieldException("Invalid startDate!!!");
 
@@ -378,9 +375,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new InvalidFieldException("Invalid endDate!!!");
 
                 projectDTO.endDate = await _validationService.FormatDateInput(projectDTO.endDate);
-
-                if (!await _validationService.CheckText(projectDTO.businessLicense))
-                    throw new InvalidFieldException("Invalid businessLicense!!!");
 
                 Project entity = _mapper.Map<Project>(projectDTO);
 

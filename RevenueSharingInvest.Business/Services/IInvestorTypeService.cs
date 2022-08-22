@@ -13,8 +13,8 @@ namespace RevenueSharingInvest.Business.Services
         public Task<IdDTO> CreateInvestorType(InvestorTypeDTO investorTypeDTO);
 
         //READ
-        public Task<List<InvestorTypeDTO>> GetAllInvestorTypes(int pageIndex, int pageSize);
-        public Task<InvestorTypeDTO> GetInvestorTypeById(Guid investorTypeId);
+        public Task<List<GetInvestorTypeDTO>> GetAllInvestorTypes(int pageIndex, int pageSize);
+        public Task<GetInvestorTypeDTO> GetInvestorTypeById(Guid investorTypeId);
 
         //UPDATE
         public Task<int> UpdateInvestorType(InvestorTypeDTO investorTypeDTO, Guid investorTypeId);

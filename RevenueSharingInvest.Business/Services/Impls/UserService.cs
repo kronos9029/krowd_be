@@ -27,6 +27,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly AppSettings _appSettings;
         private readonly IUserRepository _userRepository;
         private readonly IInvestorRepository _investorRepository;
+        private readonly IInvestorTypeRepository _investorTypeRepository;
         private readonly IBusinessRepository _businessRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly IFieldRepository _fieldRepository;
@@ -38,6 +39,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         public UserService(IOptions<AppSettings> appSettings, 
             IUserRepository userRepository, 
             IInvestorRepository investorRepository,
+            IInvestorTypeRepository investorTypeRepository,
             IBusinessRepository businessRepository,
             IRoleRepository roleRepository,
             IFieldRepository fieldRepository,
@@ -48,6 +50,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _appSettings = appSettings.Value;
             _userRepository = userRepository;
             _investorRepository = investorRepository;
+            _investorTypeRepository = investorTypeRepository;
             _businessRepository = businessRepository;
             _roleRepository = roleRepository;
             _fieldRepository = fieldRepository;
@@ -278,14 +281,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
 
-                    item.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(item.id)));
-                    if (item.business != null)
-                    {
-                        item.business.manager = _mapper.Map<BusinessManagerUserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(item.business.id)));
-                        item.business.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(item.business.id)));
-                    }                    
-
                     item.role = _mapper.Map<RoleDTO>(await _roleRepository.GetRoleByUserId(Guid.Parse(item.id)));
+                    if (item.role.id.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")) || item.role.id.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                    {
+                        item.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(item.id)));
+                        if (item.business != null)
+                        {
+                            item.business.manager = _mapper.Map<BusinessManagerUserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(item.business.id)));
+                            item.business.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(item.business.id)));
+                        }
+                    }
+                    //else if (item.role.id.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
+                    //{
+                    //    item.investor = _mapper.Map<GetInvestorDTO>(await _investorRepository.GetInvestorByUserId(Guid.Parse(item.id)));
+                    //    if (item.investor != null)
+                    //    {
+                    //        item.investor.investorType = _mapper.Map<UserInvestorTypeDTO>(await _investorTypeRepository.GetInvestorTypeByInvestorId(Guid.Parse(item.investor.id)));
+                    //    }
+                    //}
 
                     result.listOfUser.Add(item);
                 }               
@@ -310,8 +323,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 userDTO.createDate = await _validationService.FormatDateOutput(userDTO.createDate);
                 userDTO.updateDate = await _validationService.FormatDateOutput(userDTO.updateDate);
 
-                userDTO.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(userDTO.id)));
                 userDTO.role = _mapper.Map<RoleDTO>(await _roleRepository.GetRoleByUserId(Guid.Parse(userDTO.id)));
+                if (userDTO.role.id.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")) || userDTO.role.id.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                {
+                    userDTO.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(userDTO.id)));
+                    if (userDTO.business != null)
+                    {
+                        userDTO.business.manager = _mapper.Map<BusinessManagerUserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(userDTO.business.id)));
+                        userDTO.business.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(userDTO.business.id)));
+                    }
+                }
+                //else if (userDTO.role.id.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
+                //{
+                //    userDTO.investor = _mapper.Map<GetInvestorDTO>(await _investorRepository.GetInvestorByUserId(Guid.Parse(userDTO.id)));
+                //    if (userDTO.investor != null)
+                //    {
+                //        userDTO.investor.investorType = _mapper.Map<UserInvestorTypeDTO>(await _investorTypeRepository.GetInvestorTypeByInvestorId(Guid.Parse(userDTO.investor.id)));
+                //    }
+                //}
 
                 return userDTO;
             }

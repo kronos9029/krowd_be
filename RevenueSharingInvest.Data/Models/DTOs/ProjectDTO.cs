@@ -16,10 +16,8 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public float sharedRevenue { get; set; }
         public float multiplier { get; set; }
         public int duration { get; set; }
-        public int numOfStage { get; set; }
         public string startDate { get; set; }
         public string endDate { get; set; }
-        public string businessLicense { get; set; }
     }
 
     public class CreateProjectDTO : ProjectDTO
@@ -35,6 +33,8 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string managerId { get; set; }
         public string fieldId { get; set; }
         public string areaId { get; set; }
+        public int numOfStage { get; set; }
+        public string businessLicense { get; set; }
     }
 
     public class GetProjectDTO : ProjectDTO
@@ -48,7 +48,9 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public List<TypeProjectEntityDTO> projectEntity { get; set; }
         public List<ProjectMemberUserDTO> memberList { get; set; }
         public float investedCapital { get; set; }
+        public int numOfStage { get; set; }
         public float remainAmount { get; set; }
+        public string businessLicense { get; set; }
         public string approvedDate { get; set; }
         public string approvedBy { get; set; }
         public string status { get; set; }
