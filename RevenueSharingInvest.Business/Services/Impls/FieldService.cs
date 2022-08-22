@@ -5,6 +5,7 @@ using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -149,6 +150,29 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 return result;
             }
             catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<List<FieldDTO>> GetFieldsByBusinessId(Guid businessId)
+        {
+            
+            try
+            {
+                List<Field> result = await _fieldRepository.GetFieldsByBusinessId(businessId);
+                List<FieldDTO> fieldDTOs = _mapper.Map<List<FieldDTO>>(result);
+
+
+                foreach (FieldDTO item in fieldDTOs)
+                {
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
+
+                return fieldDTOs;
+            }
+            catch(Exception e)
             {
                 throw new Exception(e.Message);
             }

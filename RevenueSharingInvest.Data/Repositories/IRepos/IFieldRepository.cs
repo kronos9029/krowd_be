@@ -18,6 +18,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<List<Field>> GetCompanyFields(Guid businessId);
         public Task<Field> GetProjectFieldByProjectId(Guid projectId);
         public Task<List<string>> GetProjectsByFieldId(Guid fieldId);
+        public Task<List<Field>> GetFieldsByBusinessId(Guid businessId);
         public int CountAllField();
 
         //UPDATE

@@ -182,6 +182,18 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        public async Task<List<Field>> GetFieldsByBusinessId(Guid businessId)
+        {
+            var query = "SELECT f.Id, f.Name, f.Description, f.CreateDate, f.CreateBy, f.UpdateDate, f.UpdateBy, f.IsDeleted " +
+                "FROM BusinessField bf JOIN Field f ON bf.FieldId = f.Id " +
+                "WHERE bf.BusinessId = @Id";
+            var parameters = new DynamicParameters();
+            parameters.Add("Id", businessId, DbType.Guid);
+            using var connections = CreateConnection();
+            return (await connections.QueryAsync<Field>(query, parameters)).ToList();
+
+        }
+
         //UPDATE
         public async Task<int> UpdateField(Field fieldDTO, Guid fieldId)
         {

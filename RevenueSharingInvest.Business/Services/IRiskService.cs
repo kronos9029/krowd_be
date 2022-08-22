@@ -1,9 +1,9 @@
-﻿using RevenueSharingInvest.Data.Models.DTOs;
+﻿using RevenueSharingInvest.API;
+using RevenueSharingInvest.Data.Models.DTOs;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+
 
 namespace RevenueSharingInvest.Business.Services
 {
@@ -17,10 +17,10 @@ namespace RevenueSharingInvest.Business.Services
         public Task<RiskDTO> GetRiskById(Guid riskId);
 
         //UPDATE
-        public Task<int> UpdateRisk(RiskDTO riskDTO, Guid riskId);
+        public Task<int> UpdateRisk(RiskDTO riskDTO, Guid riskId, ThisUserObj currentUser);
 
         //DELETE
-        public Task<int> DeleteRiskById(Guid riskId);
+        public Task<int> DeleteRiskById(Guid riskId, ThisUserObj currentUser);
         public Task<int> ClearAllRiskData();
     }
 }

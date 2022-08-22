@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Data.Models.DTOs;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnauthorizedAccessException = RevenueSharingInvest.Business.Exceptions.UnauthorizedAccessException;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
@@ -96,11 +98,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //DELETE
-        public async Task<int> DeleteRiskById(Guid riskId)
+        public async Task<int> DeleteRiskById(Guid riskId, ThisUserObj currentUser)
         {
             int result;
             try
             {
+                string businessId = await _riskRepository.GetBusinessByRiskId(riskId);
+
+                if (businessId == null)
+                    throw new NotFoundException("This Risk Do Not Belong To Any Business!!");
+                else if (!businessId.Equals(currentUser.businessId))
+                    throw new UnauthorizedAccessException("You Can Not Edit This Risk Information!!");
+
                 result = await _riskRepository.DeleteRiskById(riskId);
                 if (result == 0)
                     throw new DeleteObjectException("Can not delete Risk Object!");
@@ -157,11 +166,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdateRisk(RiskDTO riskDTO, Guid riskId)
+        public async Task<int> UpdateRisk(RiskDTO riskDTO, Guid riskId, ThisUserObj currentUser)
         {
             int result;
             try
             {
+                string businessId = await _riskRepository.GetBusinessByRiskId(riskId);
+
+                if (businessId == null)
+                    throw new NotFoundException("This Risk Do Not Belong To Any Business!!");
+                else if (!businessId.Equals(currentUser.businessId))
+                    throw new UnauthorizedAccessException("You Can Not Edit This Risk Information!!");
 
 
 
@@ -198,6 +213,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     else if (!await _validationService.CheckUUIDFormat(riskDTO.updateBy))
                         throw new InvalidFieldException("Invalid updateBy!!!");
                 }
+
+                riskDTO.updateDate = currentUser.userId;
 
                 Risk dto = _mapper.Map<Risk>(riskDTO);
                 result = await _riskRepository.UpdateRisk(dto, riskId);

@@ -15,6 +15,7 @@ namespace RevenueSharingInvest.Business.Services
         //READ
         public Task<AllFieldDTO> GetAllFields(int pageIndex, int pageSize);
         public Task<FieldDTO> GetFieldById(Guid fieldId);
+        public Task<List<FieldDTO>> GetFieldsByBusinessId(Guid businessId);
 
         //UPDATE
         public Task<int> UpdateField(FieldDTO fieldDTO, Guid fieldId);
