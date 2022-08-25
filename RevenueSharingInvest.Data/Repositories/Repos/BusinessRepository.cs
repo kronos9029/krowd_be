@@ -115,8 +115,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var whereCondition = "";
                 var orderByCondition = "ORDER BY CreateDate";
                 var orderCondition = "";
-                var isDeletedCondition = " AND IsDeleted = 0 ";
-
+                var isDeletedCondition = "";
+                if (!roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                {
+                     isDeletedCondition= " AND IsDeleted = 0 ";
+                }
+                
                 var statusCondition = " AND Status = @Status ";
                 var nameCondition = " AND Name LIKE '%" + name + "%' ";
 
