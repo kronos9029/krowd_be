@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<string> CreateInvestorWallet(InvestorWallet investorWalletDTO)
+        public async Task<int> CreateInvestorWallet(Guid investorId, Guid walletTypeId, Guid currentUserId)
         {
             try
             {
@@ -32,8 +32,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate, "
                     + "         UpdateBy, "
                     + "         IsDeleted ) "
-                    + "     OUTPUT "
-                    + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @InvestorId, "
                     + "         0, "
@@ -45,15 +43,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("InvestorId", investorWalletDTO.InvestorId, DbType.Guid);
-                parameters.Add("WalletTypeId", investorWalletDTO.WalletTypeId, DbType.Guid);
+                parameters.Add("InvestorId", investorId, DbType.Guid);
+                parameters.Add("WalletTypeId", walletTypeId, DbType.Guid);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", investorWalletDTO.CreateBy, DbType.Guid);
+                parameters.Add("CreateBy", currentUserId, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", currentUserId, DbType.Guid);
 
                 using var connection = CreateConnection();
-                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
             {

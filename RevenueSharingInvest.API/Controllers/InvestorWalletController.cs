@@ -26,12 +26,12 @@ namespace RevenueSharingInvest.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateInvestorWallet([FromBody] InvestorWalletDTO investorWalletDTO)
-        {
-            var result = await _investorWalletService.CreateInvestorWallet(investorWalletDTO);
-            return Ok(result);
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> CreateInvestorWallet([FromBody] InvestorWalletDTO investorWalletDTO)
+        //{
+        //    var result = await _investorWalletService.CreateInvestorWallet(investorWalletDTO);
+        //    return Ok(result);
+        //}
 
         [HttpGet]
         public async Task<IActionResult> GetAllInvestorWallets(int pageIndex, int pageSize)
@@ -50,27 +50,27 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(dto);
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public async Task<IActionResult> UpdateInvestorWallet([FromBody] InvestorWalletDTO investorWalletDTO, Guid id)
-        {
-            var result = await _investorWalletService.UpdateInvestorWallet(investorWalletDTO, id);
-            return Ok(result);
-        }
+        //[HttpPut]
+        //[Route("{id}")]
+        //public async Task<IActionResult> UpdateInvestorWallet([FromBody] InvestorWalletDTO investorWalletDTO, Guid id)
+        //{
+        //    var result = await _investorWalletService.UpdateInvestorWallet(investorWalletDTO, id);
+        //    return Ok(result);
+        //}
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteInvestorWallet(Guid id)
-        {
-            var result = await _investorWalletService.DeleteInvestorWalletById(id);
-            return Ok(result);
-        }
+        //[HttpDelete]
+        //[Route("{id}")]
+        //public async Task<IActionResult> DeleteInvestorWallet(Guid id)
+        //{
+        //    var result = await _investorWalletService.DeleteInvestorWalletById(id);
+        //    return Ok(result);
+        //}
 
-        [HttpDelete]
-        public async Task<IActionResult> ClearAllInvestorWalletData()
-        {
-            var result = await _investorWalletService.ClearAllInvestorWalletData();
-            return Ok(result);
-        }
+        //[HttpDelete]
+        //public async Task<IActionResult> ClearAllInvestorWalletData()
+        //{
+        //    var result = await _investorWalletService.ClearAllInvestorWalletData();
+        //    return Ok(result);
+        //}
     }
 }

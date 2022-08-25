@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IInvestorWalletRepository
     {
         //CREATE
-        public Task<string> CreateInvestorWallet(InvestorWallet investorWalletDTO);
+        public Task<int> CreateInvestorWallet(Guid investorId, Guid walletTypeId, Guid currentUserId);
 
         //READ
         public Task<List<InvestorWallet>> GetAllInvestorWallets(int pageIndex, int pageSize);

@@ -60,11 +60,6 @@ namespace RevenueSharingInvest.API.Controllers
                 var result = await _fieldService.GetFieldsByBusinessId(Guid.Parse(currentUser.businessId));
                 return Ok(result);
             }
-            
-            
-            
-            
-
         }
 
         [HttpGet]

@@ -26,18 +26,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly AppSettings _appSettings;
         private readonly IUserRepository _userRepository;
         private readonly IInvestorRepository _investorRepository;
+        private readonly IInvestorWalletRepository _investorWalletRepository;
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
         public AuthenticateService(IOptions<AppSettings> appSettings, 
             IUserRepository userRepository, 
-            IInvestorRepository investorRepository, 
+            IInvestorRepository investorRepository,
+            IInvestorWalletRepository investorWalletRepository,
             IValidationService validationService,
             IMapper mapper)
         {
             _appSettings = appSettings.Value;
             _userRepository = userRepository;
             _investorRepository = investorRepository;
+            _investorWalletRepository = investorWalletRepository;
             _validationService = validationService;
             _mapper = mapper;
         }
@@ -91,7 +94,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 else
                 {
                     //Tạo ví I1, I2, I5
-
+                    await _investorWalletRepository.CreateInvestorWallet(Guid.Parse(newInvestorID), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I1")), Guid.Parse(newUserID));
+                    await _investorWalletRepository.CreateInvestorWallet(Guid.Parse(newInvestorID), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")), Guid.Parse(newUserID));
+                    await _investorWalletRepository.CreateInvestorWallet(Guid.Parse(newInvestorID), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I5")), Guid.Parse(newUserID));
                 }
                 response.email = email;
                 response.id = Guid.Parse(newUserID);
