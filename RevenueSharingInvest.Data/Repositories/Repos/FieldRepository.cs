@@ -138,7 +138,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "SELECT COUNT(*) FROM Field";
+                var query = "SELECT COUNT(*) FROM Field WHERE IsDeleted = 0";
                 using var connection = CreateConnection();
                 return (int)connection.ExecuteScalar(query);
 
