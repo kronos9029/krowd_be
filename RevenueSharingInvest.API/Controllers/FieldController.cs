@@ -51,7 +51,7 @@ namespace RevenueSharingInvest.API.Controllers
 
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            if(pageIndex > 0 && pageSize > 0)
+            if(!currentUser.roleId.Equals(currentUser.businessManagerRoleId) && !currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
                 var result = await _fieldService.GetAllFields(pageIndex, pageSize);
                 return Ok(result);
@@ -60,6 +60,10 @@ namespace RevenueSharingInvest.API.Controllers
                 var result = await _fieldService.GetFieldsByBusinessId(Guid.Parse(currentUser.businessId));
                 return Ok(result);
             }
+            
+            
+            
+            
 
         }
 

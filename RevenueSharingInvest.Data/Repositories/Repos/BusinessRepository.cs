@@ -115,8 +115,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var whereCondition = "";
                 var orderByCondition = "ORDER BY CreateDate";
                 var orderCondition = "";
-                var isDeletedCondition = " AND IsDeleted = 0 ";
-
+                var isDeletedCondition = "";
+                if (!roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                {
+                     isDeletedCondition= " AND IsDeleted = 0 ";
+                }
+                
                 var statusCondition = " AND Status = @Status ";
                 var nameCondition = " AND Name LIKE '%" + name + "%' ";
 
@@ -288,14 +292,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE Business "
                     + "     SET "
-                    + "         Name = ISNULL(@Name, Name)"
-                    + "         PhoneNum = ISNULL(@PhoneNum, PhoneNum)"
-                    + "         Image = ISNULL(@Image, Image)"
-                    + "         Email = ISNULL(@Email, Email)"
-                    + "         Description = ISNULL(@Description, Description)"
-                    + "         TaxIdentificationNumber = ISNULL(@TaxIdentificationNumber, TaxIdentificationNumber)"
-                    + "         Address = ISNULL(@Address, Address)"
-                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate)"
+                    + "         Name = ISNULL(@Name, Name), "
+                    + "         PhoneNum = ISNULL(@PhoneNum, PhoneNum), "
+                    + "         Image = ISNULL(@Image, Image), "
+                    + "         Email = ISNULL(@Email, Email), "
+                    + "         Description = ISNULL(@Description, Description), "
+                    + "         TaxIdentificationNumber = ISNULL(@TaxIdentificationNumber, TaxIdentificationNumber), "
+                    + "         Address = ISNULL(@Address, Address), "
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
                     + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
                     + "     WHERE "
                     + "         Id = @Id";
