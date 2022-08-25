@@ -847,7 +847,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public async Task<int> UpdateUserStatus(Guid userId, string status, Guid updaterId)
+        public async Task<int> UpdateUserStatus(Guid userId, string status, Guid currentUserId)
         {
             try
             {
@@ -862,7 +862,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("Status", status, DbType.String);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", updaterId, DbType.Guid);
+                parameters.Add("UpdateBy", currentUserId, DbType.Guid);
                 parameters.Add("Id", userId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -876,7 +876,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public async Task<int> UpdateUserEmail(Guid userId, string email, Guid updaterId)
+        public async Task<int> UpdateUserEmail(Guid userId, string email, Guid currentUserId)
         {
             var query = "UPDATE [User] "
                     + "     SET "
@@ -889,7 +889,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             var parameters = new DynamicParameters();
             parameters.Add("Email", email, DbType.String);
             parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-            parameters.Add("UpdateBy", updaterId, DbType.Guid);
+            parameters.Add("UpdateBy", currentUserId, DbType.Guid);
             parameters.Add("Id", userId, DbType.Guid);
 
             using (var connection = CreateConnection())

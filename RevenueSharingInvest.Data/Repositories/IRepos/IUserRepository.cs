@@ -28,8 +28,8 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> UpdateUser(User userDTO, Guid userId);
         public Task<int> UpdateBusinessIdForBuM(Guid? businessId, Guid businesManagerId);
         public Task<int> UpdateUserImage(string url, Guid userId);
-        public Task<int> UpdateUserStatus(Guid userId, string status, Guid updaterId);
-        public Task<int> UpdateUserEmail(Guid userId, string email, Guid updaterId);
+        public Task<int> UpdateUserStatus(Guid userId, string status, Guid currentUserId);
+        public Task<int> UpdateUserEmail(Guid userId, string email, Guid currentUserId);
 
         //DELETE
         public Task<int> DeleteUserById(Guid userId);

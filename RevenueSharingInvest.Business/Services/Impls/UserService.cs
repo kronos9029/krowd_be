@@ -110,8 +110,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 entity.CreateBy = Guid.Parse(currentUser.userId);
 
                 newId.id = await _userRepository.CreateUser(entity);
+
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create User Object!");
+                else
+                {
+
+                }
                 return newId;
             }
             catch (Exception e)
@@ -442,7 +447,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-                if (!userId.Equals(currentUser.userId))
+                if (!userId.ToString().Equals(currentUser.userId))
                     throw new InvalidFieldException("id is not match with this Updater's Id!!!");
 
                 if (userDTO.businessId != null && !userDTO.businessId.Equals(currentUser.businessId))

@@ -38,7 +38,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     VALUES ( "
                     + "         @UserId, "
 //                    + "         @InvestorTypeId, "
-                    + "         0, "
+                    + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -47,7 +47,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("UserId", investorDTO.UserId, DbType.Guid);
-//                parameters.Add("InvestorTypeId", investorDTO.InvestorTypeId, DbType.Guid);
+                //                parameters.Add("InvestorTypeId", investorDTO.InvestorTypeId, DbType.Guid);
+                parameters.Add("Status", ObjectStatusEnum.ACTIVE.ToString(), DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", investorDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
@@ -316,6 +317,36 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UserId", userId, DbType.Guid);
                 using var connection = CreateConnection();
                 return await connection.QueryFirstOrDefaultAsync<Investor>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //UPDATE STATUS
+        public async Task<int> UpdateInvestorStatus(Guid userId, string status, Guid currentUserId)
+        {
+            try
+            {
+                var query = "UPDATE Investor "
+                    + "     SET "
+                    + "         Status = ISNULL(@Status, Status), "
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
+                    + "     WHERE "
+                    + "         Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Status", status, DbType.String);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateBy", currentUserId, DbType.Guid);
+                parameters.Add("Id", userId, DbType.Guid);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
             }
             catch (Exception e)
             {

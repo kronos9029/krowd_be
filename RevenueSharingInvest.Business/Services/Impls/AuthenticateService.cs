@@ -73,19 +73,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 newInvestorUser.RoleId = roleId;
                 newInvestorUser.LastName = lastName;
 
+                //Tạo User object Role INVESTOR
                 string newUserID = await _userRepository.CreateUser(newInvestorUser);
                 if (newUserID.Equals(""))
                 {
                     throw new RegisterException("Register Fail!!");
                 }
 
+                //Tạo Investor object
                 investor.UserId = Guid.Parse(newUserID);
                 //investor.InvestorTypeId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.INVESTOR.ToString()));
-
                 string newInvestorID = await _investorRepository.CreateInvestor(investor);
                 if (newInvestorID.Equals("")) 
                 {
                     throw new RegisterException("Create Investor Fail!!"); 
+                }
+                else
+                {
+                    //Tạo ví I1, I2, I5
+
                 }
                 response.email = email;
                 response.id = Guid.Parse(newUserID);
