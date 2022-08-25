@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Business.Services
     public interface IInvestorWalletService
     {
         //CREATE
-        public Task<IdDTO> CreateInvestorWallet(InvestorWalletDTO investorWalletDTO);
+        //public Task<IdDTO> CreateInvestorWallet(InvestorWalletDTO investorWalletDTO);
 
         //READ
         public Task<List<InvestorWalletDTO>> GetAllInvestorWallets(int pageIndex, int pageSize);
