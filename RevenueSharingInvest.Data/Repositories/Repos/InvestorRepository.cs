@@ -47,7 +47,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("UserId", investorDTO.UserId, DbType.Guid);
-                //                parameters.Add("InvestorTypeId", investorDTO.InvestorTypeId, DbType.Guid);
+                parameters.Add("InvestorTypeId", Guid.Parse(InvestorTypeDictionary.investorType.GetValueOrDefault("Nhà đầu tư ngắn hạn")), DbType.Guid);
                 parameters.Add("Status", ObjectStatusEnum.ACTIVE.ToString(), DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", investorDTO.CreateBy, DbType.Guid);

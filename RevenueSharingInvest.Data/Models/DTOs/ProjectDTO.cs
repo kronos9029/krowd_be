@@ -22,6 +22,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
 
     public class CreateProjectDTO : ProjectDTO
     {
+        public int numOfStage { get; set; }
         public string managerId { get; set; }
         public string fieldId { get; set; }
         public string areaId { get; set; }

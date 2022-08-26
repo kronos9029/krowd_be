@@ -75,6 +75,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 newInvestorUser.Image = ImageUrl;
                 newInvestorUser.RoleId = roleId;
                 newInvestorUser.LastName = lastName;
+                newInvestorUser.Status = ObjectStatusEnum.ACTIVE.ToString();
 
                 //Tạo User object Role INVESTOR
                 string newUserID = await _userRepository.CreateUser(newInvestorUser);

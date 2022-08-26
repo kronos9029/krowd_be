@@ -8,12 +8,12 @@ namespace RevenueSharingInvest.Data.Models.Constants
 {
     public class InvestorTypeDictionary
     {
-        public static readonly Dictionary<string, string> role = new Dictionary<string, string>
+        public static readonly Dictionary<string, string> investorType = new Dictionary<string, string>
         {
-            {"ADMIN", "ff54acc6-c4e9-4b73-a158-fd640b4b6940"},
-            {"BUSINESS_MANAGER", "015ae3c5-eee9-4f5c-befb-57d41a43d9df"},
-            {"PROJECT_MANAGER", "2d80393a-3a3d-495d-8dd7-f9261f85cc8f"},
-            {"INVESTOR", "ad5f37da-ca48-4dc5-9f4b-963d94b535e6"}
+            {"Nhà đầu tư dài hạn", "EC92EF2A-F794-11EC-B939-0242AC120002"},
+            {"Nhà đầu tư theo sở thích", "07C55F72-F794-11EC-B939-0242AC120002"},
+            {"Nhà đầu tư ngắn hạn", "CA4E68CC-F794-11EC-B939-0242AC120002"},
+            {"Nhà đầu tư khôn khéo", "175389B8-F795-11EC-B939-0242AC120002"}
         };
     }
 }
