@@ -26,17 +26,17 @@ namespace RevenueSharingInvest.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateStage([FromBody] StageDTO stageDTO)
-        {
-            var result = await _stageService.CreateStage(stageDTO);
-            return Ok(result);
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> CreateStage([FromBody] StageDTO stageDTO)
+        //{
+        //    var result = await _stageService.CreateStage(stageDTO);
+        //    return Ok(result);
+        //}
 
         [HttpGet]
         public async Task<IActionResult> GetAllStages(int pageIndex, int pageSize)
         {
-            var result = new List<StageDTO>();
+            var result = new List<GetStageDTO>();
             result = await _stageService.GetAllStages(pageIndex, pageSize);
             return Ok(result);
         }
@@ -45,25 +45,25 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> GetStageById(Guid id)
         {
-            StageDTO dto = new StageDTO();
+            GetStageDTO dto = new GetStageDTO();
             dto = await _stageService.GetStageById(id);
             return Ok(dto);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateStage([FromBody] StageDTO stageDTO, Guid id)
+        public async Task<IActionResult> UpdateStage([FromBody] UpdateStageDTO stageDTO, Guid id)
         {
             var result = await _stageService.UpdateStage(stageDTO, id);
             return Ok(result);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteStage(Guid id)
-        {
-            var result = await _stageService.DeleteStageById(id);
-            return Ok(result);
-        }
+        //[HttpDelete]
+        //[Route("{id}")]
+        //public async Task<IActionResult> DeleteStage(Guid id)
+        //{
+        //    var result = await _stageService.DeleteStageById(id);
+        //    return Ok(result);
+        //}
     }
 }

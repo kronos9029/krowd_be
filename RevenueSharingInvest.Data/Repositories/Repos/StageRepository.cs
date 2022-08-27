@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -26,10 +27,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "INSERT INTO Stage ("
                     + "         Name, "
                     + "         ProjectId, "
-                    + "         Description, "
-                    + "         Percents, "
-                    + "         OpenMonth, "
-                    + "         CloseMonth, "
+                    //+ "         Percents, "
+                    + "         StartDate, "
+                    + "         EndDate, "
                     + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
@@ -41,10 +41,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     VALUES ( "
                     + "         @Name, "
                     + "         @ProjectId, "
-                    + "         @Description, "
-                    + "         @Percents, "
-                    + "         @OpenMonth, "
-                    + "         @CloseMonth, "
+                    //+ "         @Percents, "
+                    + "         @StartDate, "
+                    + "         @EndDate, "
                     + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
@@ -55,10 +54,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", stageDTO.Name, DbType.String);
                 parameters.Add("ProjectId", stageDTO.ProjectId, DbType.Guid);
-                parameters.Add("Description", stageDTO.Description, DbType.String);
-                parameters.Add("Percents", stageDTO.Percents, DbType.Double);
-                parameters.Add("OpenMonth", stageDTO.OpenMonth, DbType.Int16);
-                parameters.Add("CloseMonth", stageDTO.CloseMonth, DbType.Int16);
+                //parameters.Add("Percents", stageDTO.Percents, DbType.Double);
+                parameters.Add("StartDate", stageDTO.StartDate, DbType.DateTime);
+                parameters.Add("EndDate", stageDTO.EndDate, DbType.DateTime);
                 parameters.Add("Status", stageDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", stageDTO.CreateBy, DbType.Guid);
@@ -123,8 +121,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         ProjectId, "
                     + "         Description, "
                     + "         Percents, "
-                    + "         OpenMonth, "
-                    + "         CloseMonth, "
+                    + "         StartDate, "
+                    + "         EndDate, "
                     + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
@@ -182,9 +180,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Name = @Name, "
                     + "         ProjectId = @ProjectId, "
                     + "         Description = @Description, "
-                    + "         Percents = @Percents, "
-                    + "         OpenMonth = @OpenMonth, "
-                    + "         CloseMonth = @CloseMonth, "
+                    //+ "         Percents = @Percents, "
+                    + "         StartDate = @StartDate, "
+                    + "         EndDate = @EndDate, "
                     + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
@@ -196,9 +194,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Name", stageDTO.Name, DbType.String);
                 parameters.Add("ProjectId", stageDTO.ProjectId, DbType.Guid);
                 parameters.Add("Description", stageDTO.Description, DbType.String);
-                parameters.Add("Percents", stageDTO.Percents, DbType.Double);
-                parameters.Add("OpenMonth", stageDTO.OpenMonth, DbType.Int16);
-                parameters.Add("CloseMonth", stageDTO.CloseMonth, DbType.Int16);
+                //parameters.Add("Percents", stageDTO.Percents, DbType.Double);
+                parameters.Add("StartDate", stageDTO.StartDate, DbType.DateTime);
+                parameters.Add("EndDate", stageDTO.EndDate, DbType.DateTime);
                 parameters.Add("Status", stageDTO.Status, DbType.String);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", stageDTO.UpdateBy, DbType.Guid);

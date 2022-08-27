@@ -40,12 +40,12 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public double? SharedRevenue { get; set; }
         public double? Multiplier { get; set; }
         public int? Duration { get; set; }
-        public int? NumOfStage { get; set; }
+        public int NumOfStage { get; set; }
         public double? RemainAmount { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? StartDate { get; set; }
+        public DateTime StartDate { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? EndDate { get; set; }
+        public DateTime EndDate { get; set; }
         [StringLength(13)]
         public string BusinessLicense { get; set; }
         [Column(TypeName = "datetime")]

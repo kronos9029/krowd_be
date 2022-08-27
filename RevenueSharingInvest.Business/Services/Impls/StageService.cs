@@ -27,107 +27,108 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CLEAR DATA
-        public async Task<int> ClearAllStageData()
-        {
-            int result;
-            try
-            {
-                result = await _stageRepository.ClearAllStageData();
-                return result;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
+        //public async Task<int> ClearAllStageData()
+        //{
+        //    int result;
+        //    try
+        //    {
+        //        result = await _stageRepository.ClearAllStageData();
+        //        return result;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new Exception(e.Message);
+        //    }
+        //}
 
         //CREATE
-        public async Task<IdDTO> CreateStage(StageDTO stageDTO)
-        {
-            IdDTO newId = new IdDTO();
-            try
-            {
-                if (!await _validationService.CheckText(stageDTO.name))
-                    throw new InvalidFieldException("Invalid name!!!");
+        //public async Task<IdDTO> CreateStage(StageDTO stageDTO)
+        //{
+        //    IdDTO newId = new IdDTO();
+        //    try
+        //    {
+        //        if (!await _validationService.CheckText(stageDTO.name))
+        //            throw new InvalidFieldException("Invalid name!!!");
 
-                if (stageDTO.projectId == null || !await _validationService.CheckUUIDFormat(stageDTO.projectId))
-                    throw new InvalidFieldException("Invalid projectId!!!");
+        //        if (stageDTO.projectId == null || !await _validationService.CheckUUIDFormat(stageDTO.projectId))
+        //            throw new InvalidFieldException("Invalid projectId!!!");
 
-                if (!await _validationService.CheckExistenceId("Project", Guid.Parse(stageDTO.projectId)))
-                    throw new NotFoundException("This projectId is not existed!!!");
+        //        if (!await _validationService.CheckExistenceId("Project", Guid.Parse(stageDTO.projectId)))
+        //            throw new NotFoundException("This projectId is not existed!!!");
 
-                if (stageDTO.description != null && (stageDTO.description.Equals("string") || stageDTO.description.Length == 0))
-                    stageDTO.description = null;
+        //        if (stageDTO.description != null && (stageDTO.description.Equals("string") || stageDTO.description.Length == 0))
+        //            stageDTO.description = null;
 
-                if (stageDTO.percents <= 0)
-                    throw new InvalidFieldException("percents must be greater than 0!!!");
+        //        if (!await _validationService.CheckDate((stageDTO.startDate)))
+        //            throw new InvalidFieldException("Invalid startDate!!!");
 
-                if (stageDTO.openMonth <= 0)
-                    throw new InvalidFieldException("openMonth must be greater than 0!!!");
+        //        stageDTO.startDate = await _validationService.FormatDateInput(stageDTO.startDate);
 
-                if (stageDTO.closeMonth <= 0)
-                    throw new InvalidFieldException("closeMonth must be greater than 0!!!");
+        //        if (!await _validationService.CheckDate((stageDTO.endDate)))
+        //            throw new InvalidFieldException("Invalid endDate!!!");
 
-                if (!await _validationService.CheckText(stageDTO.status))
-                    throw new InvalidFieldException("Invalid status!!!");
+        //        stageDTO.endDate = await _validationService.FormatDateInput(stageDTO.endDate);
 
-                if (stageDTO.createBy != null && stageDTO.createBy.Length >= 0)
-                {
-                    if (stageDTO.createBy.Equals("string"))
-                        stageDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(stageDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
-                }
+        //        if (!await _validationService.CheckText(stageDTO.status))
+        //            throw new InvalidFieldException("Invalid status!!!");
 
-                if (stageDTO.updateBy != null && stageDTO.updateBy.Length >= 0)
-                {
-                    if (stageDTO.updateBy.Equals("string"))
-                        stageDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(stageDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
+        //        if (stageDTO.createBy != null && stageDTO.createBy.Length >= 0)
+        //        {
+        //            if (stageDTO.createBy.Equals("string"))
+        //                stageDTO.createBy = null;
+        //            else if (!await _validationService.CheckUUIDFormat(stageDTO.createBy))
+        //                throw new InvalidFieldException("Invalid createBy!!!");
+        //        }
 
-                stageDTO.isDeleted = false;
+        //        if (stageDTO.updateBy != null && stageDTO.updateBy.Length >= 0)
+        //        {
+        //            if (stageDTO.updateBy.Equals("string"))
+        //                stageDTO.updateBy = null;
+        //            else if (!await _validationService.CheckUUIDFormat(stageDTO.updateBy))
+        //                throw new InvalidFieldException("Invalid updateBy!!!");
+        //        }
 
-                Stage dto = _mapper.Map<Stage>(stageDTO);
-                newId.id = await _stageRepository.CreateStage(dto);
-                if (newId.id.Equals(""))
-                    throw new CreateObjectException("Can not create Stage Object!");
-                return newId;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
+        //        stageDTO.isDeleted = false;
+
+        //        Stage dto = _mapper.Map<Stage>(stageDTO);
+        //        newId.id = await _stageRepository.CreateStage(dto);
+        //        if (newId.id.Equals(""))
+        //            throw new CreateObjectException("Can not create Stage Object!");
+        //        return newId;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new Exception(e.Message);
+        //    }
+        //}
 
         //DELETE
-        public async Task<int> DeleteStageById(Guid stageId)
-        {
-            int result;
-            try
-            {
+        //public async Task<int> DeleteStageById(Guid stageId)
+        //{
+        //    int result;
+        //    try
+        //    {
 
-                result = await _stageRepository.DeleteStageById(stageId);
-                if (result == 0)
-                    throw new DeleteObjectException("Can not delete Stage Object!");
-                return result;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
+        //        result = await _stageRepository.DeleteStageById(stageId);
+        //        if (result == 0)
+        //            throw new DeleteObjectException("Can not delete Stage Object!");
+        //        return result;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new Exception(e.Message);
+        //    }
+        //}
 
         //GET ALL
-        public async Task<List<StageDTO>> GetAllStages(int pageIndex, int pageSize)
+        public async Task<List<GetStageDTO>> GetAllStages(int pageIndex, int pageSize)
         {
             try
             {
                 List<Stage> stageList = await _stageRepository.GetAllStages(pageIndex, pageSize);
-                List<StageDTO> list = _mapper.Map<List<StageDTO>>(stageList);
+                List<GetStageDTO> list = _mapper.Map<List<GetStageDTO>>(stageList);
 
-                foreach (StageDTO item in list)
+                foreach (GetStageDTO item in list)
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
@@ -142,14 +143,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET BY ID
-        public async Task<StageDTO> GetStageById(Guid stageId)
+        public async Task<GetStageDTO> GetStageById(Guid stageId)
         {
-            StageDTO result;
+            GetStageDTO result;
             try
             {
 
                 Stage dto = await _stageRepository.GetStageById(stageId);
-                result = _mapper.Map<StageDTO>(dto);
+                result = _mapper.Map<GetStageDTO>(dto);
                 if (result == null)
                     throw new NotFoundException("No Stage Object Found!");
 
@@ -165,7 +166,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdateStage(StageDTO stageDTO, Guid stageId)
+        public async Task<int> UpdateStage(UpdateStageDTO stageDTO, Guid stageId)
         {
             int result;
             try
@@ -182,33 +183,34 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (stageDTO.description != null && (stageDTO.description.Equals("string") || stageDTO.description.Length == 0))
                     stageDTO.description = null;
 
-                if (stageDTO.percents <= 0)
-                    throw new InvalidFieldException("percents must be greater than 0!!!");
+                if (!await _validationService.CheckDate((stageDTO.startDate)))
+                    throw new InvalidFieldException("Invalid startDate!!!");
 
-                if (stageDTO.openMonth <= 0)
-                    throw new InvalidFieldException("openMonth must be greater than 0!!!");
+                stageDTO.startDate = await _validationService.FormatDateInput(stageDTO.startDate);
 
-                if (stageDTO.closeMonth <= 0)
-                    throw new InvalidFieldException("closeMonth must be greater than 0!!!");
+                if (!await _validationService.CheckDate((stageDTO.endDate)))
+                    throw new InvalidFieldException("Invalid endDate!!!");
+
+                stageDTO.endDate = await _validationService.FormatDateInput(stageDTO.endDate);
 
                 if (!await _validationService.CheckText(stageDTO.status))
                     throw new InvalidFieldException("Invalid status!!!");
 
-                if (stageDTO.createBy != null && stageDTO.createBy.Length >= 0)
-                {
-                    if (stageDTO.createBy.Equals("string"))
-                        stageDTO.createBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(stageDTO.createBy))
-                        throw new InvalidFieldException("Invalid createBy!!!");
-                }
+                //if (stageDTO.createBy != null && stageDTO.createBy.Length >= 0)
+                //{
+                //    if (stageDTO.createBy.Equals("string"))
+                //        stageDTO.createBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(stageDTO.createBy))
+                //        throw new InvalidFieldException("Invalid createBy!!!");
+                //}
 
-                if (stageDTO.updateBy != null && stageDTO.updateBy.Length >= 0)
-                {
-                    if (stageDTO.updateBy.Equals("string"))
-                        stageDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(stageDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
-                }
+                //if (stageDTO.updateBy != null && stageDTO.updateBy.Length >= 0)
+                //{
+                //    if (stageDTO.updateBy.Equals("string"))
+                //        stageDTO.updateBy = null;
+                //    else if (!await _validationService.CheckUUIDFormat(stageDTO.updateBy))
+                //        throw new InvalidFieldException("Invalid updateBy!!!");
+                //}
 
                 Stage dto = _mapper.Map<Stage>(stageDTO);
                 result = await _stageRepository.UpdateStage(dto, stageId);

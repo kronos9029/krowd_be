@@ -532,7 +532,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE Business SET NumOfProject = NumOfProject + 1 WHERE Id = @Id";
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", businessId, DbType.String);
+                parameters.Add("Id", businessId, DbType.Guid);
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
             }
