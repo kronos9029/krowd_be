@@ -23,7 +23,9 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid? ProjectId { get; set; }
         public string Description { get; set; }
         //public double? Percents { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime StartDate { get; set; }
+        [Column(TypeName = "datetime")]
         public DateTime EndDate { get; set; }
         [StringLength(20)]
         public string Status { get; set; }
