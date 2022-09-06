@@ -72,6 +72,10 @@ namespace RevenueSharingInvest.Business.Helpers
             CreateMap<Stage, CreateStageDTO>().ReverseMap();
             CreateMap<Stage, UpdateStageDTO>().ReverseMap();
             CreateMap<Stage, GetStageDTO>().ReverseMap();
+
+            CreateMap<PeriodRevenue, CreatePeriodRevenueDTO>().ReverseMap();
+            CreateMap<PeriodRevenue, UpdatePeriodRevenueDTO>().ReverseMap();
+            CreateMap<PeriodRevenue, GetPeriodRevenueDTO>().ReverseMap();
         }
     }
 }

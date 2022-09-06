@@ -28,6 +28,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IAreaRepository _areaRepository;
         private readonly IProjectEntityRepository _projectEntityRepository;
         private readonly IStageRepository _stageRepository;
+        private readonly IPeriodRevenueRepository _periodRevenueRepository;
 
         private readonly IValidationService _validationService;
         private readonly IProjectTagService _projectTagService;
@@ -43,6 +44,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IAreaRepository areaRepository,
             IProjectEntityRepository projectEntityRepository,
             IStageRepository stageRepository,
+            IPeriodRevenueRepository periodRevenueRepository,
             IValidationService validationService,
             IProjectTagService projectTagService,
             IFileUploadService fileUploadService,
@@ -56,6 +58,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _areaRepository = areaRepository;
             _projectEntityRepository = projectEntityRepository;
             _stageRepository = stageRepository;
+            _periodRevenueRepository = periodRevenueRepository;
 
             _validationService = validationService;
             _projectTagService = projectTagService;
@@ -403,17 +406,26 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 else
                 {
                     Stage stage = new Stage();
+                    PeriodRevenue periodRevenue = new PeriodRevenue();
                     string newStageId;
+                    string newPeriodRevenueId;
 
                     stage.ProjectId = Guid.Parse(newId.id);
                     stage.Status = StageStatusEnum.UNDUE.ToString();
+                    stage.CreateBy = Guid.Parse(currentUser.userId);
                     stage.StartDate = entity.StartDate;
                     stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "23:59:59", "dd/MM/yyyy HH:mm:ss", null);
+
+                    periodRevenue.ProjectId = Guid.Parse(newId.id);
+                    periodRevenue.Status = StageStatusEnum.UNDUE.ToString();
+                    periodRevenue.CreateBy = Guid.Parse(currentUser.userId);
 
                     for (int i = 1; i <= projectDTO.numOfStage - 1; i++)
                     {
                         stage.Name = projectDTO.name + " giai đoạn " + i;
                         newStageId = await _stageRepository.CreateStage(stage);
+                        periodRevenue.StageId = Guid.Parse(newStageId);
+                        newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
                         stage.StartDate = stage.StartDate.AddDays(daysPerStage);
                         stage.EndDate = stage.EndDate.AddDays(daysPerStage);
                         
@@ -421,6 +433,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     stage.Name = projectDTO.name + " giai đoạn " + projectDTO.numOfStage;
                     stage.EndDate = stage.EndDate.AddDays(modDays);
                     newStageId = await _stageRepository.CreateStage(stage);
+                    periodRevenue.StageId = Guid.Parse(newStageId);
+                    newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
                 }    
                 //Update NumOfProject
                 await _businessRepository.UpdateBusinessNumOfProject(Guid.Parse(currentUser.businessId));

@@ -8,9 +8,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
 {
     public class PeriodRevenueDTO
     {
-        public string id { get; set; }
-        public string projectId { get; set; }
-        public string stageId { get; set; }
         public float actualAmount { get; set; }
         public float pessimisticExpectedAmount { get; set; }
         public float normalExpectedAmount { get; set; }
@@ -18,12 +15,29 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public float pessimisticExpectedRatio { get; set; }
         public float normalExpectedRatio { get; set; }
         public float optimisticExpectedRatio { get; set; }
+    }
+
+    public class CreatePeriodRevenueDTO : PeriodRevenueDTO
+    {
+        public string projectId { get; set; }
+        public string stageId { get; set; }
+    }
+
+    public class UpdatePeriodRevenueDTO : PeriodRevenueDTO
+    {
+
+    }
+
+    public class GetPeriodRevenueDTO : PeriodRevenueDTO
+    {
+        public string id { get; set; }
+        public string projectId { get; set; }
+        public string stageId { get; set; }
         public string status { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
         public string updateDate { get; set; }
         public string updateBy { get; set; }
         public bool isDeleted { get; set; }
-
     }
 }
