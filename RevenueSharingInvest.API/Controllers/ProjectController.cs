@@ -51,7 +51,7 @@ namespace RevenueSharingInvest.API.Controllers
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+            if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
                 var result = await _projectService.CreateProject(projectDTO, currentUser);
                 return Ok(result);
