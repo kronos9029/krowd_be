@@ -25,6 +25,7 @@ namespace RevenueSharingInvest.Business.Services
             string status,
             ThisUserObj thisUserObj
         );
+        public Task<AllProjectDTO> GetInvestedProjects(int pageIndex, int pageSize, ThisUserObj thisUserObj);
         public Task<GetProjectDTO> GetProjectById(Guid projectId);
         public Task<ProjectCountDTO> CountProjects
         (

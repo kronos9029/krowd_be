@@ -22,7 +22,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
             string managerId, 
             string areaId, 
             string fieldId, 
-            string investorId, 
+            //string investorId, 
             string name, 
             string status, 
             string roleId
@@ -34,11 +34,13 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
             string managerId,
             string areaId,
             string fieldId,
-            string investorId,
+            //string investorId,
             string name,
             string status,
             string roleId
         );
+        public Task<List<Project>> GetInvestedProjects(int pageIndex, int pageSize, Guid investorId);
+        public Task<int> CountInvestedProjects(Guid investorId);
         public Task<List<BusinessProjectDTO>> GetBusinessProjectsToAuthor(Guid businessId);
 
         //UPDATE
