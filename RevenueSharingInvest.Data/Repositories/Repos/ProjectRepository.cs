@@ -141,7 +141,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             string managerId,
             string areaId,
             string fieldId,
-            string investorId,
+            //string investorId,
             string name,
             string status,
             string roleId
@@ -158,11 +158,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var managerIdCondition = " AND ManagerId = @ManagerId ";
                 var areaIdCondition = " AND AreaId = @AreaId ";
                 var fieldIdCondition = " AND FieldId = @FieldId ";
-                var investorIdCondition = " Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId) ";
+                //var investorIdCondition = " AND Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId) ";
                 var nameCondition = " AND Name LIKE '%" + name + "%' ";
                 var statusCondition = " AND Status = @Status ";
 
-                if (roleId.Equals(""))
+                if (roleId.Equals("") || roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                 {
                     if (businessId != null)
                     {
@@ -318,50 +318,50 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
-                else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
-                {
-                    if (businessId != null)
-                    {
-                        whereCondition = whereCondition + businessIdCondition;
-                        parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
-                    }
-                    if (areaId != null)
-                    {
-                        whereCondition = whereCondition + areaIdCondition;
-                        parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
-                    }
-                    if (fieldId != null)
-                    {
-                        whereCondition = whereCondition + fieldIdCondition;
-                        parameters.Add("FieldId", Guid.Parse(fieldId), DbType.Guid);
-                    }
+                //else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
+                //{
+                //    if (businessId != null)
+                //    {
+                //        whereCondition = whereCondition + businessIdCondition;
+                //        parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
+                //    }
+                //    if (areaId != null)
+                //    {
+                //        whereCondition = whereCondition + areaIdCondition;
+                //        parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
+                //    }
+                //    if (fieldId != null)
+                //    {
+                //        whereCondition = whereCondition + fieldIdCondition;
+                //        parameters.Add("FieldId", Guid.Parse(fieldId), DbType.Guid);
+                //    }
 
-                    if (investorId != null)
-                    {
-                        whereCondition = whereCondition + investorIdCondition;
-                        parameters.Add("InvestorId", Guid.Parse(investorId), DbType.Guid);
-                    }
-                    if (name != null)
-                    {
-                        whereCondition = whereCondition + nameCondition;
-                    }
-                    if (status != null)
-                    {
-                        whereCondition = whereCondition + statusCondition;
-                        parameters.Add("Status", status, DbType.String);
-                    }
-                    else
-                    {
-                        whereCondition = whereCondition + " AND (Status = '"
-                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "') "
-                        + isDeletedCondition;
-                    }
+                //    if (investorId != null)
+                //    {
+                //        whereCondition = whereCondition + investorIdCondition;
+                //        parameters.Add("InvestorId", Guid.Parse(investorId), DbType.Guid);
+                //    }
+                //    if (name != null)
+                //    {
+                //        whereCondition = whereCondition + nameCondition;
+                //    }
+                //    if (status != null)
+                //    {
+                //        whereCondition = whereCondition + statusCondition;
+                //        parameters.Add("Status", status, DbType.String);
+                //    }
+                //    else
+                //    {
+                //        whereCondition = whereCondition + " AND (Status = '"
+                //        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "' OR Status = '"
+                //        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
+                //        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
+                //        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "') "
+                //        + isDeletedCondition;
+                //    }
 
-                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
-                }
+                //    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
+                //}
 
                 if (pageIndex != 0 && pageSize != 0)
                 {
@@ -542,7 +542,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             string managerId,
             string areaId,
             string fieldId,
-            string investorId,
+            //string investorId,
             string name,
             string status,
             string roleId
@@ -559,11 +559,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var managerIdCondition = " AND ManagerId = @ManagerId ";
                 var areaIdCondition = " AND AreaId = @AreaId ";
                 var fieldIdCondition = " AND FieldId = @FieldId ";
-                var investorIdCondition = " Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId) ";
+                //var investorIdCondition = " AND Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId) ";
                 var nameCondition = " AND Name LIKE '%" + name + "%' ";
                 var statusCondition = " AND Status = @Status ";
 
-                if (roleId.Equals(""))
+                if (roleId.Equals("") || roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                 {
                     if (businessId != null)
                     {
@@ -719,50 +719,50 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
-                else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
-                {
-                    if (businessId != null)
-                    {
-                        whereCondition = whereCondition + businessIdCondition;
-                        parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
-                    }
-                    if (areaId != null)
-                    {
-                        whereCondition = whereCondition + areaIdCondition;
-                        parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
-                    }
-                    if (fieldId != null)
-                    {
-                        whereCondition = whereCondition + fieldIdCondition;
-                        parameters.Add("FieldId", Guid.Parse(fieldId), DbType.Guid);
-                    }
+                //else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
+                //{
+                //    if (businessId != null)
+                //    {
+                //        whereCondition = whereCondition + businessIdCondition;
+                //        parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
+                //    }
+                //    if (areaId != null)
+                //    {
+                //        whereCondition = whereCondition + areaIdCondition;
+                //        parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
+                //    }
+                //    if (fieldId != null)
+                //    {
+                //        whereCondition = whereCondition + fieldIdCondition;
+                //        parameters.Add("FieldId", Guid.Parse(fieldId), DbType.Guid);
+                //    }
 
-                    if (investorId != null)
-                    {
-                        whereCondition = whereCondition + investorIdCondition;
-                        parameters.Add("InvestorId", Guid.Parse(investorId), DbType.Guid);
-                    }
-                    if (name != null)
-                    {
-                        whereCondition = whereCondition + nameCondition;
-                    }
-                    if (status != null)
-                    {
-                        whereCondition = whereCondition + statusCondition;
-                        parameters.Add("Status", status, DbType.String);
-                    }
-                    else
-                    {
-                        whereCondition = whereCondition + " AND (Status = '"
-                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "') "
-                        + isDeletedCondition;
-                    }
+                //    if (investorId != null)
+                //    {
+                //        whereCondition = whereCondition + investorIdCondition;
+                //        parameters.Add("InvestorId", Guid.Parse(investorId), DbType.Guid);
+                //    }
+                //    if (name != null)
+                //    {
+                //        whereCondition = whereCondition + nameCondition;
+                //    }
+                //    if (status != null)
+                //    {
+                //        whereCondition = whereCondition + statusCondition;
+                //        parameters.Add("Status", status, DbType.String);
+                //    }
+                //    else
+                //    {
+                //        whereCondition = whereCondition + " AND (Status = '"
+                //        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "' OR Status = '"
+                //        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
+                //        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
+                //        + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "') "
+                //        + isDeletedCondition;
+                //    }
 
-                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
-                }
+                //    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
+                //}
 
                 var query = "SELECT COUNT(*) FROM Project " + whereCondition;
 
@@ -816,6 +816,111 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 {
                     return await connection.ExecuteAsync(query, parameters);
                 }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //GET INVESTED PROJECTS
+        public async Task<List<Project>> GetInvestedProjects(int pageIndex, int pageSize, Guid investorId)
+        {
+            try 
+            {
+                var parameters = new DynamicParameters();
+
+                var whereCondition = " (Status = '"
+                + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "' OR Status = '"
+                + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
+                + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
+                + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "') "
+                + " AND IsDeleted = 0 AND Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId) ";
+                parameters.Add("InvestorId", investorId, DbType.Guid);
+
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     BusinessId ASC, "
+                    + "                     Name ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM Project "
+                    + whereCondition
+                    + "         ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         ManagerId, " //Id của chủ dự án
+                    + "         BusinessId, " //Id của Business
+                    + "         FieldId, "
+                    + "         AreaId, "
+                    + "         Name, "
+                    + "         Image, "
+                    + "         Description, "
+                    + "         Address, "
+                    + "         InvestmentTargetCapital, "
+                    + "         InvestedCapital, "
+                    + "         SharedRevenue, "
+                    + "         Multiplier, "
+                    + "         Duration, "
+                    + "         NumOfStage, "
+                    + "         RemainAmount, "
+                    + "         StartDate, "
+                    + "         EndDate, "
+                    + "         BusinessLicense, "
+                    + "         ApprovedDate, "
+                    + "         ApprovedBy, " //Id Admin
+                    + "         Status, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy, "
+                    + "         IsDeleted "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Project>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM Project " + whereCondition + " ORDER BY BusinessId ASC, Name ASC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Project>(query, parameters)).ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+
+        //COUNT INVESTED PROJECTS
+        public async Task<int> CountInvestedProjects(Guid investorId)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+
+                var whereCondition = " (Status = '"
+                + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "' OR Status = '"
+                + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
+                + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
+                + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "') "
+                + " AND IsDeleted = 0 AND Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId) ";
+                parameters.Add("InvestorId", investorId, DbType.Guid);
+
+                var query = "SELECT COUNT(*) FROM Project " + whereCondition;
+
+                using var connection = CreateConnection();
+                return ((int)connection.ExecuteScalar(query, parameters));
             }
             catch (Exception e)
             {
