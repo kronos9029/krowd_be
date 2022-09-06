@@ -14,8 +14,8 @@ namespace RevenueSharingInvest.Business.Services
 
         //READ
         public Task<List<RiskDTO>> GetAllRisks(int pageIndex, int pageSize);
-        public Task<RiskDTO> GetRiskById(Guid riskId);
-
+        public Task<RiskDTO> GetRiskById(Guid riskId, ThisUserObj currentUser);
+        public Task<List<RiskDTO>> GetAllRisksByBusinessId(int pageIndex, int pageSize, string businessId);
         //UPDATE
         public Task<int> UpdateRisk(RiskDTO riskDTO, Guid riskId, ThisUserObj currentUser);
 

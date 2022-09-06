@@ -141,23 +141,58 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 throw new Exception(e.Message);
             }
+        }        
+        
+        public async Task<List<RiskDTO>> GetAllRisksByBusinessId(int pageIndex, int pageSize, string businessId)
+        {
+            try
+            {
+                List<Risk> riskList = await _riskRepository.GetAllRisksByBusinessId(pageIndex, pageSize, Guid.Parse(businessId));
+                List<RiskDTO> list = _mapper.Map<List<RiskDTO>>(riskList);
+
+                foreach (RiskDTO item in list)
+                {
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
+
+                return list;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         //GET BY ID
-        public async Task<RiskDTO> GetRiskById(Guid riskId)
+        public async Task<RiskDTO> GetRiskById(Guid riskId, ThisUserObj currentUser)
         {
             RiskDTO result;
             try
             {
-                Risk dto = await _riskRepository.GetRiskById(riskId);
-                result = _mapper.Map<RiskDTO>(dto);
-                if (result == null)
-                    throw new NotFoundException("No Risk Object Found!");
+                string businessId = await _riskRepository.GetBusinessByRiskId(riskId);
 
-                result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+                if(businessId == null)
+                {
+                    throw new NotFoundException("This Risk Have Not Assign To Any Project!!");
+                }
+                else if (businessId.Equals(currentUser.businessId) || currentUser.investorRoleId.Equals(currentUser.roleId))
+                {
+                    Risk dto = await _riskRepository.GetRiskById(riskId);
+                    result = _mapper.Map<RiskDTO>(dto);
+                    if (result == null)
+                        throw new NotFoundException("No Risk Object Found!");
 
-                return result;
+                    result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                    result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+
+                    return result;
+                    
+                } else
+                {
+                    throw new UnauthorizedException("You Do not Have Permisssion To Access This Information!!");
+                }
+
             }
             catch (Exception e)
             {

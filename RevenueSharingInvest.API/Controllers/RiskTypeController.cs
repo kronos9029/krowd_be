@@ -56,6 +56,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> UpdateRiskType([FromBody] RiskTypeDTO riskTypeDTO, Guid id)
         {
             var result = await _riskTypeService.UpdateRiskType(riskTypeDTO, id);
@@ -64,6 +65,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpDelete]
         [Route("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> DeleteRiskType(Guid id)
         {
             var result = await _riskTypeService.DeleteRiskTypeById(id);

@@ -67,7 +67,6 @@ namespace RevenueSharingInvest.API.Controllers
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetFieldById(Guid id)
         {
-            
             var dto = await _fieldService.GetFieldById(id);
             return Ok(dto);
         }
