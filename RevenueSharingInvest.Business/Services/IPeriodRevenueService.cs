@@ -10,17 +10,17 @@ namespace RevenueSharingInvest.Business.Services
     public interface IPeriodRevenueService
     {
         //CREATE
-        public Task<IdDTO> CreatePeriodRevenue(PeriodRevenueDTO periodRevenueDTO);
+        //public Task<IdDTO> CreatePeriodRevenue(PeriodRevenueDTO periodRevenueDTO);
 
         //READ
-        public Task<List<PeriodRevenueDTO>> GetAllPeriodRevenues(int pageIndex, int pageSize);
-        public Task<PeriodRevenueDTO> GetPeriodRevenueById(Guid periodRevenueId);
+        public Task<List<GetPeriodRevenueDTO>> GetAllPeriodRevenues(int pageIndex, int pageSize);
+        public Task<GetPeriodRevenueDTO> GetPeriodRevenueById(Guid periodRevenueId);
 
         //UPDATE
-        public Task<int> UpdatePeriodRevenue(PeriodRevenueDTO periodRevenueDTO, Guid periodRevenueId);
+        //public Task<int> UpdatePeriodRevenue(PeriodRevenueDTO periodRevenueDTO, Guid periodRevenueId);
 
         //DELETE
-        public Task<int> DeletePeriodRevenueById(Guid periodRevenueId);
-        public Task<int> ClearAllPeriodRevenueData();
+        //public Task<int> DeletePeriodRevenueById(Guid periodRevenueId);
+        //public Task<int> ClearAllPeriodRevenueData();
     }
 }
