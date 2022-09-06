@@ -8,11 +8,9 @@ namespace RevenueSharingInvest.Business.Models.Constant
 {
     public enum InvestorTypeEnum
     {
-        Investor,
-        AngelInvestor,
-        PeerToPeerInvestor,
-        PersonalInvestor,
-        Banks,
-        VentureCapitalist
+        LONG_INVESTOR,
+        HOBBYIST_INVESTOR,
+        SHORT_INVESTOR,
+        STRATEGIC_INVESTOR
     }
 }
