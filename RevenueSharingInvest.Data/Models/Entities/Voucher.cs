@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("Voucher")]
+    [Index(nameof(ProjectId), Name = "IX_Voucher_ProjectId")]
     public partial class Voucher
     {
         public Voucher()
@@ -16,14 +17,14 @@ namespace RevenueSharingInvest.Data.Models.Entities
             PackageVouchers = new HashSet<PackageVoucher>();
             VoucherItems = new HashSet<VoucherItem>();
         }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
         [Key]
         public Guid Id { get; set; }
+        public Guid? ProjectId { get; set; }
         [StringLength(50)]
         public string Name { get; set; }
         [StringLength(10)]
         public string Code { get; set; }
-        public Guid? ProjectId { get; set; }
         public string Description { get; set; }
         public string Image { get; set; }
         public int? Quantity { get; set; }

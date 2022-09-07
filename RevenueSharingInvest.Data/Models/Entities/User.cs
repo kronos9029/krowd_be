@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
-using RevenueSharingInvest.Data.Models.Constants;
 
 #nullable disable
 
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("User")]
+    [Index(nameof(BusinessId), Name = "IX_User_BusinessId")]
+    [Index(nameof(RoleId), Name = "IX_User_RoleId")]
     public partial class User
     {
         public User()
@@ -17,9 +18,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
             AccountTransactionFromUsers = new HashSet<AccountTransaction>();
             AccountTransactionToUsers = new HashSet<AccountTransaction>();
             Investors = new HashSet<Investor>();
+            ProjectWallets = new HashSet<ProjectWallet>();
             Projects = new HashSet<Project>();
         }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
         [Key]
         public Guid Id { get; set; }
         public Guid? BusinessId { get; set; }
@@ -29,7 +31,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string LastName { get; set; }
         [StringLength(20)]
         public string FirstName { get; set; }
-        [StringLength(11)]
+        [StringLength(10)]
         public string PhoneNum { get; set; }
         public string Image { get; set; }
         [StringLength(20)]
@@ -72,6 +74,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public virtual ICollection<AccountTransaction> AccountTransactionToUsers { get; set; }
         [InverseProperty(nameof(Investor.User))]
         public virtual ICollection<Investor> Investors { get; set; }
+        [InverseProperty(nameof(ProjectWallet.ProjectManager))]
+        public virtual ICollection<ProjectWallet> ProjectWallets { get; set; }
         [InverseProperty(nameof(Project.Manager))]
         public virtual ICollection<Project> Projects { get; set; }
     }

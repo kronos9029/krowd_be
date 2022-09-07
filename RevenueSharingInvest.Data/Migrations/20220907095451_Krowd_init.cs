@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
-    public partial class init : Migration
+    public partial class Krowd_init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,11 +14,10 @@ namespace RevenueSharingInvest.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     City = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     District = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Ward = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -38,15 +37,14 @@ namespace RevenueSharingInvest.Data.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TaxIdentificationNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Bank = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    BankAccount = table.Column<string>(type: "nvarchar(14)", maxLength: 14, nullable: true),
                     NumOfProject = table.Column<int>(type: "int", nullable: true),
                     NumOfSuccessfulProject = table.Column<int>(type: "int", nullable: true),
                     SuccessfulRate = table.Column<double>(type: "float", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -62,9 +60,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -80,9 +78,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -98,9 +96,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -116,9 +114,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -133,9 +131,13 @@ namespace RevenueSharingInvest.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     Mode = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    Type = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
+                    Type = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -147,7 +149,12 @@ namespace RevenueSharingInvest.Data.Migrations
                 columns: table => new
                 {
                     BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FieldId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    FieldId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -167,25 +174,47 @@ namespace RevenueSharingInvest.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Investor",
+                name: "User",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
-                    UserId = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    FirstName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    PhoneNum = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdCard = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    DateOfBirth = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    TaxIdentificationNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    City = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    District = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BankName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    BankAccount = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    InvestorTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Investor", x => x.Id);
+                    table.PrimaryKey("PK_User", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Investor_InvestorType",
-                        column: x => x.InvestorTypeId,
-                        principalTable: "InvestorType",
+                        name: "FK_User_Business",
+                        column: x => x.BusinessId,
+                        principalTable: "Business",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_User_Role_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Role",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -198,9 +227,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     Balance = table.Column<double>(type: "float", nullable: true),
                     WalletTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -215,90 +244,6 @@ namespace RevenueSharingInvest.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "InvestorWallet",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
-                    InvestorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Balance = table.Column<double>(type: "float", nullable: true),
-                    WalletTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpDateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_InvestorWallet", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_InvestorWallet_Investor",
-                        column: x => x.InvestorId,
-                        principalTable: "Investor",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_InvestorWallet_WalletType",
-                        column: x => x.WalletTypeId,
-                        principalTable: "WalletType",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "User",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
-                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    InvestorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    FirstName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    PhoneNum = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: true),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IdCard = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    DateOfBirth = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    TaxIdentificationNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    City = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    District = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    Ward = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Bank = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    BankAccount = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_User", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_User_Business",
-                        column: x => x.BusinessId,
-                        principalTable: "Business",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_User_Investor",
-                        column: x => x.InvestorId,
-                        principalTable: "Investor",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_User_Role",
-                        column: x => x.InvestorId,
-                        principalTable: "Role",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AccountTransaction",
                 columns: table => new
                 {
@@ -306,11 +251,12 @@ namespace RevenueSharingInvest.Data.Migrations
                     FromUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ToUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -330,36 +276,61 @@ namespace RevenueSharingInvest.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Investor",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    InvestorTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Investor", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Investor_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Project",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     ManagerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    FieldId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    AreaId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Category = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AreaId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     InvestmentTargetCapital = table.Column<double>(type: "float", nullable: true),
                     InvestedCapital = table.Column<double>(type: "float", nullable: true),
                     SharedRevenue = table.Column<double>(type: "float", nullable: true),
                     Multiplier = table.Column<double>(type: "float", nullable: true),
                     Duration = table.Column<int>(type: "int", nullable: true),
-                    NumOfPeriod = table.Column<int>(type: "int", nullable: true),
+                    NumOfStage = table.Column<int>(type: "int", nullable: false),
                     RemainAmount = table.Column<double>(type: "float", nullable: true),
-                    StartDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    EndDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "('0001-01-01T00:00:00.000')"),
+                    EndDate = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "('0001-01-01T00:00:00.000')"),
                     BusinessLicense = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     ApprovedDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    ApprovedBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    ApprovedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    BusinessId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -385,6 +356,68 @@ namespace RevenueSharingInvest.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProjectWallet",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
+                    ProjectManagerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Balance = table.Column<double>(type: "float", nullable: true),
+                    WalletTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectWallet", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BusinessWallet_WalletType",
+                        column: x => x.WalletTypeId,
+                        principalTable: "WalletType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProjectWallet_User",
+                        column: x => x.ProjectManagerId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InvestorWallet",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
+                    InvestorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Balance = table.Column<double>(type: "float", nullable: true),
+                    WalletTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InvestorWallet", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_InvestorWallet_Investor",
+                        column: x => x.InvestorId,
+                        principalTable: "Investor",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_InvestorWallet_WalletType",
+                        column: x => x.WalletTypeId,
+                        principalTable: "WalletType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Package",
                 columns: table => new
                 {
@@ -393,19 +426,15 @@ namespace RevenueSharingInvest.Data.Migrations
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Price = table.Column<double>(type: "float", nullable: true),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Quantity = table.Column<int>(type: "int", nullable: true),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MinForPurchasing = table.Column<int>(type: "int", nullable: true),
-                    MaxForPurchasing = table.Column<int>(type: "int", nullable: true),
-                    OpenDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CloseDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    ApprovedDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    ApprovedBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RemainingQuantity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -419,52 +448,22 @@ namespace RevenueSharingInvest.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PeriodRevenue",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
-                    ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    PeriodNum = table.Column<int>(type: "int", nullable: true),
-                    ActualAmount = table.Column<double>(type: "float", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    PessimisticExpectedAmount = table.Column<double>(type: "float", nullable: true),
-                    NormalExpectedAmount = table.Column<double>(type: "float", nullable: true),
-                    OptimisticExpectedAmount = table.Column<double>(type: "float", nullable: true),
-                    PessimisticExpectedRatio = table.Column<double>(type: "float", nullable: true),
-                    NormalExpectedRatio = table.Column<double>(type: "float", nullable: true),
-                    OptimisticExpectedRatio = table.Column<double>(type: "float", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PeriodRevenue", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PeriodRevenue_Project",
-                        column: x => x.ProjectId,
-                        principalTable: "Project",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ProjectEntity",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
-                    ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    Type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true)
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Link = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Priority = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -474,38 +473,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         column: x => x.ProjectId,
                         principalTable: "Project",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ProjectWallet",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
-                    ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Balance = table.Column<double>(type: "float", nullable: true),
-                    WalletTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProjectWallet", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_BusinessWallet_WalletType",
-                        column: x => x.WalletTypeId,
-                        principalTable: "WalletType",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ProjectWallet_Project",
-                        column: x => x.ProjectId,
-                        principalTable: "Project",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -518,9 +486,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     RiskTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -548,15 +516,15 @@ namespace RevenueSharingInvest.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Percents = table.Column<double>(type: "float", nullable: true),
-                    OpenMonth = table.Column<int>(type: "int", nullable: true),
-                    CloseMonth = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    EndDate = table.Column<DateTime>(type: "datetime", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime", nullable: false),
+                    IsPrivate = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -574,19 +542,19 @@ namespace RevenueSharingInvest.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
+                    ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Code = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Quantity = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     StartDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateDate = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    CreateBy = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateDate = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    UpdateBy = table.Column<DateTime>(type: "datetime", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -612,9 +580,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     TotalPrice = table.Column<double>(type: "float", nullable: true),
                     LastPayment = table.Column<DateTime>(type: "datetime", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -641,27 +609,39 @@ namespace RevenueSharingInvest.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PeriodRevenueHistory",
+                name: "PeriodRevenue",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    PeriodRevenueId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ActualAmount = table.Column<double>(type: "float", nullable: true),
+                    PessimisticExpectedAmount = table.Column<double>(type: "float", nullable: true),
+                    OptimisticExpectedAmount = table.Column<double>(type: "float", nullable: true),
+                    NormalExpectedAmount = table.Column<double>(type: "float", nullable: true),
+                    PessimisticExpectedRatio = table.Column<double>(type: "float", nullable: true),
+                    OptimisticExpectedRatio = table.Column<double>(type: "float", nullable: true),
+                    NormalExpectedRatio = table.Column<double>(type: "float", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PeriodRevenueHistory", x => x.Id);
+                    table.PrimaryKey("PK_PeriodRevenue", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PeriodRevenueHistory_PeriodRevenue",
-                        column: x => x.PeriodRevenueId,
-                        principalTable: "PeriodRevenue",
+                        name: "FK_PeriodRevenue_Project",
+                        column: x => x.ProjectId,
+                        principalTable: "Project",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PeriodRevenue_Stage_StageId",
+                        column: x => x.StageId,
+                        principalTable: "Stage",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -673,7 +653,12 @@ namespace RevenueSharingInvest.Data.Migrations
                     PackageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     VoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: true),
-                    MaxQuantity = table.Column<int>(type: "int", nullable: false)
+                    MaxQuantity = table.Column<int>(type: "int", nullable: false),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -696,21 +681,26 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "VoucherItem",
                 columns: table => new
                 {
-                    InvestorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    VoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InvestmentId = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
+                    VoucherId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    InvestmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IssuedDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     ExpireDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     RedeemDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    AvailableDate = table.Column<DateTime>(type: "datetime", nullable: true)
+                    AvailableDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_VoucherItem", x => new { x.InvestorId, x.VoucherId });
+                    table.PrimaryKey("PK_VoucherItem", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_VoucherItem_Investor",
-                        column: x => x.InvestorId,
-                        principalTable: "Investor",
+                        name: "FK_VoucherItem_Investment_InvestmentId",
+                        column: x => x.InvestmentId,
+                        principalTable: "Investment",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -727,17 +717,17 @@ namespace RevenueSharingInvest.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     PeriodRevenueId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    InvestmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Amount = table.Column<double>(type: "float", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    FromId = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    ToId = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    FromId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ToId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    InvestmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -757,25 +747,51 @@ namespace RevenueSharingInvest.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PeriodRevenueHistory",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    PeriodRevenueId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PeriodRevenueHistory", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PeriodRevenueHistory_PeriodRevenue",
+                        column: x => x.PeriodRevenueId,
+                        principalTable: "PeriodRevenue",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WalletTransaction",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     PaymentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Amount = table.Column<double>(type: "float", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    FromWalletId = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    ToWalletId = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    Fee = table.Column<double>(type: "float", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CreateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    UpdateBy = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     SystemWalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ProjectWalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    InvestorWalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    InvestorWalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Amount = table.Column<double>(type: "float", nullable: true),
+                    Fee = table.Column<double>(type: "float", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FromWalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ToWalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -837,9 +853,9 @@ namespace RevenueSharingInvest.Data.Migrations
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Investor_InvestorTypeId",
+                name: "IX_Investor_UserId",
                 table: "Investor",
-                column: "InvestorTypeId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InvestorWallet_InvestorId",
@@ -877,6 +893,11 @@ namespace RevenueSharingInvest.Data.Migrations
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PeriodRevenue_StageId",
+                table: "PeriodRevenue",
+                column: "StageId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PeriodRevenueHistory_PeriodRevenueId",
                 table: "PeriodRevenueHistory",
                 column: "PeriodRevenueId");
@@ -904,7 +925,7 @@ namespace RevenueSharingInvest.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ProjectWallet_ProjectId",
                 table: "ProjectWallet",
-                column: "ProjectId");
+                column: "ProjectManagerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProjectWallet_WalletTypeId",
@@ -937,14 +958,19 @@ namespace RevenueSharingInvest.Data.Migrations
                 column: "BusinessId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_User_InvestorId",
+                name: "IX_User_RoleId",
                 table: "User",
-                column: "InvestorId");
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Voucher_ProjectId",
                 table: "Voucher",
                 column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VoucherItem_InvestmentId",
+                table: "VoucherItem",
+                column: "InvestmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VoucherItem_VoucherId",
@@ -981,6 +1007,9 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "BusinessField");
 
             migrationBuilder.DropTable(
+                name: "InvestorType");
+
+            migrationBuilder.DropTable(
                 name: "PackageVoucher");
 
             migrationBuilder.DropTable(
@@ -991,9 +1020,6 @@ namespace RevenueSharingInvest.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Risk");
-
-            migrationBuilder.DropTable(
-                name: "Stage");
 
             migrationBuilder.DropTable(
                 name: "VoucherItem");
@@ -1032,7 +1058,13 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "WalletType");
 
             migrationBuilder.DropTable(
+                name: "Investor");
+
+            migrationBuilder.DropTable(
                 name: "Package");
+
+            migrationBuilder.DropTable(
+                name: "Stage");
 
             migrationBuilder.DropTable(
                 name: "Project");
@@ -1047,13 +1079,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 name: "Business");
 
             migrationBuilder.DropTable(
-                name: "Investor");
-
-            migrationBuilder.DropTable(
                 name: "Role");
-
-            migrationBuilder.DropTable(
-                name: "InvestorType");
         }
     }
 }

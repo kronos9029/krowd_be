@@ -9,13 +9,14 @@ using Microsoft.EntityFrameworkCore;
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("SystemWallet")]
+    [Index(nameof(WalletTypeId), Name = "IX_SystemWallet_WalletTypeId")]
     public partial class SystemWallet
     {
         public SystemWallet()
         {
             WalletTransactions = new HashSet<WalletTransaction>();
         }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
         [Key]
         public Guid Id { get; set; }
         public double? Balance { get; set; }

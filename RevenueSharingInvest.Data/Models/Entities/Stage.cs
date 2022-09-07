@@ -9,24 +9,20 @@ using Microsoft.EntityFrameworkCore;
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("Stage")]
+    [Index(nameof(ProjectId), Name = "IX_Stage_ProjectId")]
     public partial class Stage
     {
         public Stage()
         {
             PeriodRevenues = new HashSet<PeriodRevenue>();
         }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
         [Key]
         public Guid Id { get; set; }
         [StringLength(50)]
         public string Name { get; set; }
         public Guid? ProjectId { get; set; }
         public string Description { get; set; }
-        //public double? Percents { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime StartDate { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime EndDate { get; set; }
         [StringLength(20)]
         public string Status { get; set; }
         [Column(TypeName = "datetime")]
@@ -36,6 +32,11 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime EndDate { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime StartDate { get; set; }
+        public bool? IsPrivate { get; set; }
 
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("Stages")]

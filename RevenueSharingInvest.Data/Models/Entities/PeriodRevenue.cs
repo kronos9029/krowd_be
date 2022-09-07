@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("PeriodRevenue")]
+    [Index(nameof(ProjectId), Name = "IX_PeriodRevenue_ProjectId")]
+    [Index(nameof(StageId), Name = "IX_PeriodRevenue_StageId")]
     public partial class PeriodRevenue
     {
         public PeriodRevenue()
@@ -16,18 +18,18 @@ namespace RevenueSharingInvest.Data.Models.Entities
             Payments = new HashSet<Payment>();
             PeriodRevenueHistories = new HashSet<PeriodRevenueHistory>();
         }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
         [Key]
         public Guid Id { get; set; }
         public Guid? ProjectId { get; set; }
         public Guid? StageId { get; set; }
         public double? ActualAmount { get; set; }
         public double? PessimisticExpectedAmount { get; set; }
-        public double? NormalExpectedAmount { get; set; }
         public double? OptimisticExpectedAmount { get; set; }
+        public double? NormalExpectedAmount { get; set; }
         public double? PessimisticExpectedRatio { get; set; }
-        public double? NormalExpectedRatio { get; set; }
         public double? OptimisticExpectedRatio { get; set; }
+        public double? NormalExpectedRatio { get; set; }
         [StringLength(20)]
         public string Status { get; set; }
         [Column(TypeName = "datetime")]

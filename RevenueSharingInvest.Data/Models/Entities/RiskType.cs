@@ -15,7 +15,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         {
             Risks = new HashSet<Risk>();
         }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
         [Key]
         public Guid Id { get; set; }
         [StringLength(50)]

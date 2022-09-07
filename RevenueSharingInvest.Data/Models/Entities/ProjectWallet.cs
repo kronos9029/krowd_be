@@ -9,16 +9,18 @@ using Microsoft.EntityFrameworkCore;
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("ProjectWallet")]
+    [Index(nameof(ProjectManagerId), Name = "IX_ProjectWallet_ProjectId")]
+    [Index(nameof(WalletTypeId), Name = "IX_ProjectWallet_WalletTypeId")]
     public partial class ProjectWallet
     {
         public ProjectWallet()
         {
             WalletTransactions = new HashSet<WalletTransaction>();
         }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
         [Key]
         public Guid Id { get; set; }
-        public Guid? ProjectId { get; set; }
+        public Guid? ProjectManagerId { get; set; }
         public double? Balance { get; set; }
         public Guid? WalletTypeId { get; set; }
         [Column(TypeName = "datetime")]
@@ -29,9 +31,9 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
 
-        [ForeignKey(nameof(ProjectId))]
-        [InverseProperty("ProjectWallets")]
-        public virtual Project Project { get; set; }
+        [ForeignKey(nameof(ProjectManagerId))]
+        [InverseProperty(nameof(User.ProjectWallets))]
+        public virtual User ProjectManager { get; set; }
         [ForeignKey(nameof(WalletTypeId))]
         [InverseProperty("ProjectWallets")]
         public virtual WalletType WalletType { get; set; }

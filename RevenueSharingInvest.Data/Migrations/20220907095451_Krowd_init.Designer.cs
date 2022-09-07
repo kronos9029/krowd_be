@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RevenueSharingInvest.Data.Models.Helpers;
+using RevenueSharingInvest.Data.Models.Entities;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
     [DbContext(typeof(KrowdContext))]
-    [Migration("20220608111820_Krowd_v1.4")]
-    partial class Krowd_v14
+    [Migration("20220907095451_Krowd_init")]
+    partial class Krowd_init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -59,11 +59,21 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FromUserId");
+                    b.HasIndex(new[] { "FromUserId" }, "IX_AccountTransaction_FromUserId");
 
-                    b.HasIndex("ToUserId");
+                    b.HasIndex(new[] { "ToUserId" }, "IX_AccountTransaction_ToUserId");
 
                     b.ToTable("AccountTransaction");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Alo", b =>
+                {
+                    b.Property<string>("Status")
+                        .HasMaxLength(6)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(6)");
+
+                    b.ToView("alo");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Area", b =>
@@ -95,10 +105,6 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
-
-                    b.Property<string>("Ward")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -148,8 +154,8 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double?>("SuccessfulRate")
                         .HasColumnType("float");
@@ -193,7 +199,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("BusinessId", "FieldId");
 
-                    b.HasIndex("FieldId");
+                    b.HasIndex(new[] { "FieldId" }, "IX_BusinessField_FieldId");
 
                     b.ToTable("BusinessField");
                 });
@@ -274,11 +280,11 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvestorId");
+                    b.HasIndex(new[] { "InvestorId" }, "IX_Investment_InvestorId");
 
-                    b.HasIndex("PackageId");
+                    b.HasIndex(new[] { "PackageId" }, "IX_Investment_PackageId");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectId" }, "IX_Investment_ProjectId");
 
                     b.ToTable("Investment");
                 });
@@ -296,14 +302,14 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("InvestorTypeId")
+                    b.Property<Guid>("InvestorTypeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -316,9 +322,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvestorTypeId");
-
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_Investor_UserId");
 
                     b.ToTable("Investor");
                 });
@@ -390,9 +394,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvestorId");
+                    b.HasIndex(new[] { "InvestorId" }, "IX_InvestorWallet_InvestorId");
 
-                    b.HasIndex("WalletTypeId");
+                    b.HasIndex(new[] { "WalletTypeId" }, "IX_InvestorWallet_WalletTypeId");
 
                     b.ToTable("InvestorWallet");
                 });
@@ -403,15 +407,6 @@ namespace RevenueSharingInvest.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("(newid())");
-
-                    b.Property<Guid?>("ApprovedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ApprovedDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<DateTime?>("CloseDate")
-                        .HasColumnType("datetime");
 
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
@@ -428,18 +423,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("MaxForPurchasing")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MinForPurchasing")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("OpenDate")
-                        .HasColumnType("datetime");
 
                     b.Property<double?>("Price")
                         .HasColumnType("float");
@@ -447,8 +433,14 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<Guid?>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("Quantity")
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
+
+                    b.Property<int>("RemainingQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -458,7 +450,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectId" }, "IX_Package_ProjectId");
 
                     b.ToTable("Package");
                 });
@@ -494,7 +486,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("PackageId", "VoucherId");
 
-                    b.HasIndex("VoucherId");
+                    b.HasIndex(new[] { "VoucherId" }, "IX_PackageVoucher_VoucherId");
 
                     b.ToTable("PackageVoucher");
                 });
@@ -545,9 +537,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvestmentId");
+                    b.HasIndex(new[] { "InvestmentId" }, "IX_Payment_InvestmentId");
 
-                    b.HasIndex("PeriodRevenueId");
+                    b.HasIndex(new[] { "PeriodRevenueId" }, "IX_Payment_PeriodRevenueId");
 
                     b.ToTable("Payment");
                 });
@@ -607,9 +599,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectId" }, "IX_PeriodRevenue_ProjectId");
 
-                    b.HasIndex("StageId");
+                    b.HasIndex(new[] { "StageId" }, "IX_PeriodRevenue_StageId");
 
                     b.ToTable("PeriodRevenue");
                 });
@@ -652,7 +644,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PeriodRevenueId");
+                    b.HasIndex(new[] { "PeriodRevenueId" }, "IX_PeriodRevenueHistory_PeriodRevenueId");
 
                     b.ToTable("PeriodRevenueHistory");
                 });
@@ -695,8 +687,10 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<int?>("Duration")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime>("EndDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("('0001-01-01T00:00:00.000')");
 
                     b.Property<Guid?>("FieldId")
                         .HasColumnType("uniqueidentifier");
@@ -723,7 +717,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("NumOfStage")
+                    b.Property<int>("NumOfStage")
                         .HasColumnType("int");
 
                     b.Property<double?>("RemainAmount")
@@ -732,11 +726,14 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<double?>("SharedRevenue")
                         .HasColumnType("float");
 
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime>("StartDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("('0001-01-01T00:00:00.000')");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -746,11 +743,11 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AreaId");
+                    b.HasIndex(new[] { "AreaId" }, "IX_Project_AreaId");
 
-                    b.HasIndex("BusinessId");
+                    b.HasIndex(new[] { "BusinessId" }, "IX_Project_BusinessId");
 
-                    b.HasIndex("ManagerId");
+                    b.HasIndex(new[] { "ManagerId" }, "IX_Project_ManagerId");
 
                     b.ToTable("Project");
                 });
@@ -762,6 +759,9 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("(newid())");
 
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -771,13 +771,16 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("ProjectId")
+                    b.Property<string>("Link")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Title")
@@ -785,8 +788,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Type")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -796,7 +798,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectId" }, "IX_ProjectEntity_ProjectId");
 
                     b.ToTable("ProjectEntity");
                 });
@@ -820,7 +822,7 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("ProjectId")
+                    b.Property<Guid?>("ProjectManagerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("UpdateBy")
@@ -834,9 +836,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectManagerId" }, "IX_ProjectWallet_ProjectId");
 
-                    b.HasIndex("WalletTypeId");
+                    b.HasIndex(new[] { "WalletTypeId" }, "IX_ProjectWallet_WalletTypeId");
 
                     b.ToTable("ProjectWallet");
                 });
@@ -878,9 +880,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectId" }, "IX_Risk_ProjectId");
 
-                    b.HasIndex("RiskTypeId");
+                    b.HasIndex(new[] { "RiskTypeId" }, "IX_Risk_RiskTypeId");
 
                     b.ToTable("Risk");
                 });
@@ -960,9 +962,6 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("(newid())");
 
-                    b.Property<int?>("CloseMonth")
-                        .HasColumnType("int");
-
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -972,21 +971,24 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime");
+
                     b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsPrivate")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("OpenMonth")
-                        .HasColumnType("int");
-
-                    b.Property<double?>("Percents")
-                        .HasColumnType("float");
-
                     b.Property<Guid?>("ProjectId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Status")
                         .HasMaxLength(20)
@@ -1000,7 +1002,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectId" }, "IX_Stage_ProjectId");
 
                     b.ToTable("Stage");
                 });
@@ -1035,7 +1037,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WalletTypeId");
+                    b.HasIndex(new[] { "WalletTypeId" }, "IX_SystemWallet_WalletTypeId");
 
                     b.ToTable("SystemWallet");
                 });
@@ -1109,14 +1111,14 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("PhoneNum")
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<Guid?>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TaxIdentificationNumber")
                         .HasMaxLength(20)
@@ -1128,15 +1130,11 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<string>("Ward")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("BusinessId");
+                    b.HasIndex(new[] { "BusinessId" }, "IX_User_BusinessId");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex(new[] { "RoleId" }, "IX_User_RoleId");
 
                     b.ToTable("User");
                 });
@@ -1195,7 +1193,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectId" }, "IX_Voucher_ProjectId");
 
                     b.ToTable("Voucher");
                 });
@@ -1203,7 +1201,9 @@ namespace RevenueSharingInvest.Data.Migrations
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.VoucherItem", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("(newid())");
 
                     b.Property<DateTime?>("AvailableDate")
                         .HasColumnType("datetime");
@@ -1217,7 +1217,7 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("ExpireDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid>("InvestmentId")
+                    b.Property<Guid?>("InvestmentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool?>("IsDeleted")
@@ -1235,14 +1235,14 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid>("VoucherId")
+                    b.Property<Guid?>("VoucherId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvestmentId");
+                    b.HasIndex(new[] { "InvestmentId" }, "IX_VoucherItem_InvestmentId");
 
-                    b.HasIndex("VoucherId");
+                    b.HasIndex(new[] { "VoucherId" }, "IX_VoucherItem_VoucherId");
 
                     b.ToTable("VoucherItem");
                 });
@@ -1302,13 +1302,13 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvestorWalletId");
+                    b.HasIndex(new[] { "InvestorWalletId" }, "IX_WalletTransaction_InvestorWalletId");
 
-                    b.HasIndex("PaymentId");
+                    b.HasIndex(new[] { "PaymentId" }, "IX_WalletTransaction_PaymentId");
 
-                    b.HasIndex("ProjectWalletId");
+                    b.HasIndex(new[] { "ProjectWalletId" }, "IX_WalletTransaction_ProjectWalletId");
 
-                    b.HasIndex("SystemWalletId");
+                    b.HasIndex(new[] { "SystemWalletId" }, "IX_WalletTransaction_SystemWalletId");
 
                     b.ToTable("WalletTransaction");
                 });
@@ -1417,16 +1417,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investor", b =>
                 {
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.InvestorType", "InvestorType")
-                        .WithMany("Investors")
-                        .HasForeignKey("InvestorTypeId")
-                        .HasConstraintName("FK_Investor_InvestorType");
-
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "User")
                         .WithMany("Investors")
                         .HasForeignKey("UserId");
-
-                    b.Navigation("InvestorType");
 
                     b.Navigation("User");
                 });
@@ -1549,24 +1542,26 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Project", "Project")
                         .WithMany("ProjectEntities")
                         .HasForeignKey("ProjectId")
-                        .HasConstraintName("FK_ProjectUpdate_Project");
+                        .HasConstraintName("FK_ProjectUpdate_Project")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Project");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.ProjectWallet", b =>
                 {
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Project", "Project")
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "ProjectManager")
                         .WithMany("ProjectWallets")
-                        .HasForeignKey("ProjectId")
-                        .HasConstraintName("FK_ProjectWallet_Project");
+                        .HasForeignKey("ProjectManagerId")
+                        .HasConstraintName("FK_ProjectWallet_User");
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.WalletType", "WalletType")
                         .WithMany("ProjectWallets")
                         .HasForeignKey("WalletTypeId")
                         .HasConstraintName("FK_BusinessWallet_WalletType");
 
-                    b.Navigation("Project");
+                    b.Navigation("ProjectManager");
 
                     b.Navigation("WalletType");
                 });
@@ -1638,15 +1633,12 @@ namespace RevenueSharingInvest.Data.Migrations
                 {
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Investment", "Investment")
                         .WithMany("VoucherItems")
-                        .HasForeignKey("InvestmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InvestmentId");
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Voucher", "Voucher")
                         .WithMany("VoucherItems")
                         .HasForeignKey("VoucherId")
-                        .HasConstraintName("FK_VoucherItem_Voucher")
-                        .IsRequired();
+                        .HasConstraintName("FK_VoucherItem_Voucher");
 
                     b.Navigation("Investment");
 
@@ -1717,11 +1709,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("InvestorWallets");
                 });
 
-            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.InvestorType", b =>
-                {
-                    b.Navigation("Investors");
-                });
-
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.InvestorWallet", b =>
                 {
                     b.Navigation("WalletTransactions");
@@ -1755,8 +1742,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("PeriodRevenues");
 
                     b.Navigation("ProjectEntities");
-
-                    b.Navigation("ProjectWallets");
 
                     b.Navigation("Risks");
 
@@ -1799,6 +1784,8 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("Investors");
 
                     b.Navigation("Projects");
+
+                    b.Navigation("ProjectWallets");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Voucher", b =>
