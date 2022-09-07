@@ -31,6 +31,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IBusinessRepository _businessRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly IFieldRepository _fieldRepository;
+        private readonly IProjectWalletRepository _projectWalletRepository;
 
         private readonly IValidationService _validationService;
         private readonly IFileUploadService _fileUploadService;
@@ -43,6 +44,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IBusinessRepository businessRepository,
             IRoleRepository roleRepository,
             IFieldRepository fieldRepository,
+            IProjectWalletRepository projectWalletRepository,
             IValidationService validationService,
             IFileUploadService fileUploadService,
             IMapper mapper)
@@ -54,6 +56,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _businessRepository = businessRepository;
             _roleRepository = roleRepository;
             _fieldRepository = fieldRepository;
+            _projectWalletRepository = projectWalletRepository;
             _validationService = validationService;
             _fileUploadService = fileUploadService;
             _mapper = mapper;
@@ -115,7 +118,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new CreateObjectException("Can not create User Object!");
                 else
                 {
-
+                    if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                    {
+                        //Tạo ví B1, B4
+                        await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B1")), Guid.Parse(currentUser.userId));
+                        await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B4")), Guid.Parse(currentUser.userId));
+                    }
                 }
                 return newId;
             }
