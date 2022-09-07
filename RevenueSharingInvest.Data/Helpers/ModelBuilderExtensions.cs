@@ -42,6 +42,22 @@ namespace RevenueSharingInvest.Data.Helpers
                 new WalletType { Id = Guid.Parse("D7ED0979-285F-4EC0-9F6B-AE95FCFA9207"), Name = WalletTypeEnum.BUSINESS_COLLECTING_WALLET.ToString(), Description = "Ví thu tiền của Business", Mode = ModeEnum.BUSINESS.ToString(), Type = TypeEnum.B4.ToString(), CreateDate = localDate, IsDeleted = false }
                 );
 
+            modelBuilder.Entity<User>().HasData(
+                new User { Id = Guid.Parse("21D77B9A-F792-11EC-B939-0242AC120002"), RoleId = Guid.Parse("FF54ACC6-C4E9-4B73-A158-FD640B4B6940"), Description = "Admin 1", LastName = "Admin", FirstName = "Krowd's", Image = "https://firebasestorage.googleapis.com/v0/b/revenuesharinginvest-44354.appspot.com/o/User%2Favt%20Kh%C3%A1nh.jpg?alt=media&token=0940aab1-edaf-443b-ad83-1d14cb8dff1f", Email = "krowd.dev.2022@gmail.com", Gender="LGBT", IsDeleted = false, Status = "ACTIVE", CreateDate = localDate }
+                );
+
+            modelBuilder.Entity<Field>().HasData(
+                new Field { Id = Guid.Parse("180c2784-e700-11ec-8fea-0242ac120002"), Name= "Education",Description= "School, Tutor, Learning tools", CreateDate = localDate, IsDeleted = false},
+                new Field { Id = Guid.Parse("15f8f9bc-e701-11ec-8fea-0242ac120002"), Name= "Beauty", Description= "Spa, Cosmetic, Hair salon", CreateDate = localDate, IsDeleted = false},
+                new Field { Id = Guid.Parse("fc24cff0-e6fd-11ec-8fea-0242ac120002"), Name= "Food", Description= "Restaurant, Food Court, Culinary", CreateDate = localDate, IsDeleted = false},
+                new Field { Id = Guid.Parse("6e39f240-e6ff-11ec-8fea-0242ac120002"), Name= "Health", Description= "Functional foods, Clean food", CreateDate = localDate, IsDeleted = false},
+                new Field { Id = Guid.Parse("d1a18b54-e6ff-11ec-8fea-0242ac120002"), Name= "Fitness", Description= "Gym, Sportwear, Exercise machines", CreateDate = localDate, IsDeleted = false},
+                new Field { Id = Guid.Parse("29e3709e-e6ff-11ec-8fea-0242ac120002"), Name= "Drink", Description= "Restaurant, Drink Court, Culinary, Cafe", CreateDate = localDate, IsDeleted = false},
+                new Field { Id = Guid.Parse("4f492fa4-e6ff-11ec-8fea-0242ac120002"), Name= "Fashion", Description= "Clothes, Shoes, Bags", CreateDate = localDate, IsDeleted = false},
+                new Field { Id = Guid.Parse("b289b3a4-e6ff-11ec-8fea-0242ac120002"), Name= "Medical", Description= "Drug, Medical devices", CreateDate = localDate, IsDeleted = false},
+                new Field { Id = Guid.Parse("98d579ca-0685-11ed-b939-0242ac120002"), Name= "Grocery", Description= "Food, Drink, Personal belongings", CreateDate = localDate, IsDeleted = false}
+                );
+
 
         }
         public enum InvestorTypeEnum
