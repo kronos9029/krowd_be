@@ -32,19 +32,21 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> CreateArea([FromBody] AreaDTO areaDTO)
         {
             string userId = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
 
             //if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.ADMIN.ToString()))
             //{
-                var result = await _areaService.CreateArea(areaDTO);
-                return Ok(result);
+            var result = await _areaService.CreateArea(areaDTO);
+            return Ok(result);
             //}
             //return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllAreas(int pageIndex, int pageSize)
         {
             var result = new List<AreaDTO>();
@@ -54,6 +56,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetAreaById(Guid id)
         {
             AreaDTO dto = new AreaDTO();
@@ -63,6 +66,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> UpdateArea([FromBody] AreaDTO areaDTO, Guid id)
         {
             var result = await _areaService.UpdateArea(areaDTO, id);
@@ -71,6 +75,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpDelete]
         [Route("{id}")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> DeleteArea(Guid id)
         {
             var result = await _areaService.DeleteAreaById(id);

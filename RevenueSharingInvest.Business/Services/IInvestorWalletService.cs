@@ -1,4 +1,5 @@
-﻿using RevenueSharingInvest.Data.Models.DTOs;
+﻿using RevenueSharingInvest.API;
+using RevenueSharingInvest.Data.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,14 +14,14 @@ namespace RevenueSharingInvest.Business.Services
         //public Task<IdDTO> CreateInvestorWallet(InvestorWalletDTO investorWalletDTO);
 
         //READ
-        public Task<List<InvestorWalletDTO>> GetAllInvestorWallets(int pageIndex, int pageSize);
-        public Task<InvestorWalletDTO> GetInvestorWalletById(Guid investorWalletId);
+        public Task<List<GetInvestorWalletDTO>> GetAllInvestorWallets(ThisUserObj currentUser);
+        //public Task<InvestorWalletDTO> GetInvestorWalletById(Guid investorWalletId);
 
         //UPDATE
-        public Task<int> UpdateInvestorWallet(InvestorWalletDTO investorWalletDTO, Guid investorWalletId);
+        //public Task<int> UpdateInvestorWallet(InvestorWalletDTO investorWalletDTO, Guid investorWalletId);
 
         //DELETE
-        public Task<int> DeleteInvestorWalletById(Guid investorWalletId);
-        public Task<int> ClearAllInvestorWalletData();
+        //public Task<int> DeleteInvestorWalletById(Guid investorWalletId);
+        //public Task<int> ClearAllInvestorWalletData();
     }
 }

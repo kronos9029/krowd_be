@@ -76,6 +76,15 @@ namespace RevenueSharingInvest.Business.Helpers
             CreateMap<PeriodRevenue, CreatePeriodRevenueDTO>().ReverseMap();
             CreateMap<PeriodRevenue, UpdatePeriodRevenueDTO>().ReverseMap();
             CreateMap<PeriodRevenue, GetPeriodRevenueDTO>().ReverseMap();
+
+            CreateMap<WalletType, GetWalletTypeDTO>().ReverseMap();
+            CreateMap<WalletType, GetWalletTypeForWalletDTO>().ReverseMap();
+
+            CreateMap<InvestorWallet, MappedInvestorWalletDTO>().ReverseMap();
+            CreateMap<MappedInvestorWalletDTO, GetInvestorWalletDTO>().ReverseMap();
+
+            CreateMap<ProjectWallet, MappedProjectWalletDTO>().ReverseMap();
+            CreateMap<MappedProjectWalletDTO, GetProjectWalletDTO>().ReverseMap();
         }
     }
 }

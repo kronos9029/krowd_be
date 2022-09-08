@@ -21,7 +21,7 @@ using RevenueSharingInvest.Business.Services.Common;
 using RevenueSharingInvest.Business.Services.Common.Firebase;
 using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Helpers;
-using RevenueSharingInvest.Data.Models.Helpers;
+using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.CommonRepos;
 using RevenueSharingInvest.Data.Repositories.CommonRepos.Validation;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -51,7 +51,7 @@ namespace RevenueSharingInvest.API
         public void ConfigureServices(IServiceCollection services)
         {
             // Read the connection string from appsettings.
-            string dbConnectionString = this.Configuration.GetConnectionString("PROD");
+            string dbConnectionString = this.Configuration.GetConnectionString("DEV");
 
             // Inject IDbConnection, with implementation from SqlConnection class.
             services.AddTransient<IDbConnection>((sp) => new SqlConnection(dbConnectionString));

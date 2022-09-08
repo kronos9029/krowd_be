@@ -4,97 +4,62 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
-using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/fields")]
+    [Route("api/v1.0/wallets")]
     [EnableCors]
-    public class FieldController : ControllerBase
+    //[Authorize]
+    public class WalletController : ControllerBase
     {
-        private readonly IFieldService _fieldService;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly IRoleService _roleService;
         private readonly IUserService _userService;
-
-        public FieldController(IFieldService fieldService, 
-            IHttpContextAccessor httpContextAccessor,
-            IRoleService roleService,
-            IUserService userService)
+        private readonly IRoleService _roleService;
+        private readonly IProjectWalletService _projectWalletService;
+        private readonly IInvestorWalletService _investorWalletService;
+        private readonly IHttpContextAccessor httpContextAccessor;
+        public WalletController(IInvestorWalletService investorWalletService, IProjectWalletService projectWalletService, IUserService userService, IRoleService roleService, IHttpContextAccessor httpContextAccessor)
         {
-            _fieldService = fieldService;
-            this.httpContextAccessor = httpContextAccessor;
-            _roleService = roleService;
             _userService = userService;
+            _roleService = roleService;
+            _investorWalletService = investorWalletService;
+            _projectWalletService = projectWalletService;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpPost]
-        [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> CreateField([FromBody] FieldDTO fieldDTO)
-        {
-            var result = await _fieldService.CreateField(fieldDTO);
-            return Ok(result);
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> CreateInvestorWallet([FromBody] InvestorWalletDTO investorWalletDTO)
+        //{
+        //    var result = await _investorWalletService.CreateInvestorWallet(investorWalletDTO);
+        //    return Ok(result);
+        //}
 
         [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetAllFields(int pageIndex, int pageSize)
+        public async Task<IActionResult> GetAllWallets()
         {
-
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            if(!currentUser.roleId.Equals(currentUser.businessManagerRoleId) && !currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            if (currentUser.roleId.Equals(currentUser.investorRoleId))
             {
-                var result = await _fieldService.GetAllFields(pageIndex, pageSize);
-                return Ok(result);
-            } else
-            {
-                var result = await _fieldService.GetFieldsByBusinessId(Guid.Parse(currentUser.businessId));
+                var result = await _investorWalletService.GetAllInvestorWallets(currentUser);
                 return Ok(result);
             }
-        }
 
-        [HttpGet]
-        [Route("{id}")]
-        [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> GetFieldById(Guid id)
-        {
-            var dto = await _fieldService.GetFieldById(id);
-            return Ok(dto);
-        }
+            else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            {
+                var result = await _projectWalletService.GetAllProjectWallets(currentUser);
+                return Ok(result);
+            }
 
-        [HttpPut]
-        [Route("{id}")]
-        [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> UpdateField([FromBody] FieldDTO fieldDTO, Guid id)
-        {
-
-            var result = await _fieldService.UpdateField(fieldDTO, id);
-            return Ok(result);
-        }
-
-        [HttpDelete]
-        [Route("{id}")]
-        [Authorize(Roles = "ADMIN")]
-        public async Task<IActionResult> DeleteField(Guid id)
-        {
-            var result = await _fieldService.DeleteFieldById(id);
-            return Ok(result);
-        }
-
-        [HttpDelete]
-        public async Task<IActionResult> ClearAllFieldData()
-        {
-            var result = await _fieldService.ClearAllFieldData();
-            return Ok(result);
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR or PROJECT_MANAGER can perform this action!!!");
         }
 
         private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
@@ -138,6 +103,7 @@ namespace RevenueSharingInvest.API.Controllers
 
             }
 
+
             foreach (RoleDTO role in roleList)
             {
                 if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(0)))
@@ -159,7 +125,38 @@ namespace RevenueSharingInvest.API.Controllers
             }
 
             return currentUser;
-
         }
+
+        //[HttpGet]
+        //[Route("{id}")]
+        //public async Task<IActionResult> GetInvestorWalletById(Guid id)
+        //{
+        //    InvestorWalletDTO dto = new InvestorWalletDTO();
+        //    dto = await _investorWalletService.GetInvestorWalletById(id);
+        //    return Ok(dto);
+        //}
+
+        //[HttpPut]
+        //[Route("{id}")]
+        //public async Task<IActionResult> UpdateInvestorWallet([FromBody] InvestorWalletDTO investorWalletDTO, Guid id)
+        //{
+        //    var result = await _investorWalletService.UpdateInvestorWallet(investorWalletDTO, id);
+        //    return Ok(result);
+        //}
+
+        //[HttpDelete]
+        //[Route("{id}")]
+        //public async Task<IActionResult> DeleteInvestorWallet(Guid id)
+        //{
+        //    var result = await _investorWalletService.DeleteInvestorWalletById(id);
+        //    return Ok(result);
+        //}
+
+        //[HttpDelete]
+        //public async Task<IActionResult> ClearAllInvestorWalletData()
+        //{
+        //    var result = await _investorWalletService.ClearAllInvestorWalletData();
+        //    return Ok(result);
+        //}
     }
 }

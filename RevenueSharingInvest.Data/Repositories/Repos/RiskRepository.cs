@@ -141,6 +141,73 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 throw new Exception(e.Message, e);
             }
+        }        
+        
+        public async Task<List<Risk>> GetAllRisksByBusinessId(int pageIndex, int pageSize, Guid businessId)
+        {
+            try
+            {
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     RiskTypeId, "
+                    + "                     Name ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM Risk "
+                    + "         WHERE "
+                    + "             IsDeleted = 0 ) "
+                    + "     SELECT "
+                    + "         x.Id, "
+                    + "         x.Name, "
+                    + "         x.ProjectId, "
+                    + "         x.RiskTypeId, "
+                    + "         x.Description, "
+                    + "         x.CreateDate, "
+                    + "         x.CreateBy, "
+                    + "         x.UpdateDate, "
+                    + "         x.UpdateBy, "
+                    + "         x.IsDeleted "
+                    + "     FROM "
+                    + "         X x JOIN Project p ON x.ProjectId = p.Id"
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize AND p.BusinessId = @BusinessId";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    parameters.Add("BusinessId", businessId, DbType.Guid);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Risk>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT " +
+                        "r.Id, " +
+                        "r.Name, " +
+                        "r.ProjectId, " +
+                        "r.RiskTypeId, " +
+                        "r.Description, " +
+                        "r.CreateDate, " +
+                        "r.CreateBy, " +
+                        "r.UpdateDate, " +
+                        "r.UpdateBy, " +
+                        "r.IsDeleted " +
+                        "FROM Risk r JOIN Project p ON r.ProjectId = p.Id " +
+                        "WHERE r.IsDeleted = 0 AND p.BusinessId = @BusinessId " +
+                        "ORDER BY RiskTypeId, r.Name ASC";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("BusinessId", businessId, DbType.Guid);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Risk>(query, parameters)).ToList();
+                }                
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
         }
 
         //GET BY ID
@@ -158,7 +225,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 throw new Exception(e.Message, e);
             }
-        }
+        }        
 
         public async Task<string> GetBusinessByRiskId(Guid riskId)
         {

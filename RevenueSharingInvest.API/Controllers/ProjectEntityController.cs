@@ -15,7 +15,7 @@ namespace RevenueSharingInvest.API.Controllers
     [ApiController]
     [Route("api/v1.0/project_entities")]
     [EnableCors]
-    //[Authorize]
+    [Authorize]
     public class ProjectEntityController : ControllerBase
     {
         private readonly IProjectEntityService _projectEntityService;
@@ -27,6 +27,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles ="PROJECT_MANAGER")]
         public async Task<IActionResult> CreateProjectEntity([FromForm] CreateUpdateProjectEntityDTO projectEntityDTO)
         {
             var result = await _projectEntityService.CreateProjectEntity(projectEntityDTO);
@@ -34,6 +35,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> GetAllProjectEntities(int pageIndex, int pageSize)
         {
             var result = new List<GetProjectEntityDTO>();
@@ -43,6 +45,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> GetProjectEntityById(Guid id)
         {
             GetProjectEntityDTO dto = new GetProjectEntityDTO();
@@ -52,6 +55,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> UpdateProjectEntity([FromForm] CreateUpdateProjectEntityDTO projectEntityDTO, Guid id)
         {
             var result = await _projectEntityService.UpdateProjectEntity(projectEntityDTO, id);
@@ -74,6 +78,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpDelete]
         [Route("{id}")]
+        [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> DeleteProjectEntity(Guid id)
         {
             var result = await _projectEntityService.DeleteProjectEntityById(id);

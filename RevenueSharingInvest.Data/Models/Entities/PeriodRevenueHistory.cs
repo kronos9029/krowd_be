@@ -9,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("PeriodRevenueHistory")]
+    [Index(nameof(PeriodRevenueId), Name = "IX_PeriodRevenueHistory_PeriodRevenueId")]
     public partial class PeriodRevenueHistory
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         [StringLength(50)]

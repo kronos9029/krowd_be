@@ -1,11 +1,12 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Models.Entities;
 
 #nullable disable
 
-namespace RevenueSharingInvest.Data.Models.Helpers
+namespace RevenueSharingInvest.Data.Models.Entities
 {
     public partial class KrowdContext : DbContext
     {
@@ -20,7 +21,7 @@ namespace RevenueSharingInvest.Data.Models.Helpers
 
         public virtual DbSet<AccountTransaction> AccountTransactions { get; set; }
         public virtual DbSet<Area> Areas { get; set; }
-        public virtual DbSet<RevenueSharingInvest.Data.Models.Entities.Business> Businesses { get; set; }
+        public virtual DbSet<Business> Businesses { get; set; }
         public virtual DbSet<BusinessField> BusinessFields { get; set; }
         public virtual DbSet<Field> Fields { get; set; }
         public virtual DbSet<Investment> Investments { get; set; }
@@ -51,8 +52,8 @@ namespace RevenueSharingInvest.Data.Models.Helpers
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                //optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;User ID=sa;Password=123");
-                optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
+                optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=KrowdDB;Trusted_Connection=True;");
+                //optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
             }
         }
 
@@ -80,7 +81,7 @@ namespace RevenueSharingInvest.Data.Models.Helpers
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
 
-            modelBuilder.Entity<RevenueSharingInvest.Data.Models.Entities.Business>(entity =>
+            modelBuilder.Entity<Business>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
@@ -130,11 +131,6 @@ namespace RevenueSharingInvest.Data.Models.Helpers
             modelBuilder.Entity<Investor>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
-
-/*                entity.HasOne(d => d.InvestorType)
-                    .WithMany(p => p.Investors)
-                    .HasForeignKey(d => d.InvestorTypeId)
-                    .HasConstraintName("FK_Investor_InvestorType");*/
             });
 
             modelBuilder.Entity<InvestorType>(entity =>
@@ -253,10 +249,10 @@ namespace RevenueSharingInvest.Data.Models.Helpers
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
-                entity.HasOne(d => d.Project)
+                entity.HasOne(d => d.ProjectManager)
                     .WithMany(p => p.ProjectWallets)
-                    .HasForeignKey(d => d.ProjectId)
-                    .HasConstraintName("FK_ProjectWallet_Project");
+                    .HasForeignKey(d => d.ProjectManagerId)
+                    .HasConstraintName("FK_ProjectWallet_User");
 
                 entity.HasOne(d => d.WalletType)
                     .WithMany(p => p.ProjectWallets)
@@ -336,7 +332,6 @@ namespace RevenueSharingInvest.Data.Models.Helpers
                 entity.HasOne(d => d.Voucher)
                     .WithMany(p => p.VoucherItems)
                     .HasForeignKey(d => d.VoucherId)
-                    //.OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_VoucherItem_Voucher");
             });
 
@@ -369,6 +364,8 @@ namespace RevenueSharingInvest.Data.Models.Helpers
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
+
+            modelBuilder.Seed();
 
             OnModelCreatingPartial(modelBuilder);
         }

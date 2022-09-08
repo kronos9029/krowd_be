@@ -45,10 +45,13 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> GetAllRisks(int pageIndex, int pageSize)
         {
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+
             var result = new List<RiskDTO>();
-            result = await _riskService.GetAllRisks(pageIndex, pageSize);
+            result = await _riskService.GetAllRisksByBusinessId(pageIndex, pageSize, currentUser.businessId);
             return Ok(result);
         }
 
@@ -57,13 +60,16 @@ namespace RevenueSharingInvest.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetRiskById(Guid id)
         {
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+
             RiskDTO dto = new RiskDTO();
-            dto = await _riskService.GetRiskById(id);
+            dto = await _riskService.GetRiskById(id, currentUser);
             return Ok(dto);
         }
 
         [HttpPut]
         [Route("{id}")]
+        [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> UpdateRisk([FromBody] RiskDTO riskDTO, Guid id)
         {
 

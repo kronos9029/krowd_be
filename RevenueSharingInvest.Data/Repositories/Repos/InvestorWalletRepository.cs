@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -86,49 +87,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<InvestorWallet>> GetAllInvestorWallets(int pageIndex, int pageSize)
+        public async Task<List<InvestorWallet>> GetInvestorWalletsByInvestorId(Guid investorId)
         {
             try
             {
-                if (pageIndex != 0 && pageSize != 0)
-                {
-                    var query = "WITH X AS ( "
-                    + "         SELECT "
-                    + "             ROW_NUMBER() OVER ( "
-                    + "                 ORDER BY "
-                    + "                     InvestorId, "
-                    + "                     WalletTypeId ASC ) AS Num, "
-                    + "             * "
-                    + "         FROM InvestorWallet "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
-                    + "     SELECT "
-                    + "         Id, "
-                    + "         InvestorId, "
-                    + "         Balance, "
-                    + "         WalletTypeId, "
-                    + "         CreateDate, "
-                    + "         CreateBy, "
-                    + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
-                    + "     FROM "
-                    + "         X "
-                    + "     WHERE "
-                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
-                    + "         AND @PageIndex * @PageSize";
-                    var parameters = new DynamicParameters();
-                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
-                    parameters.Add("PageSize", pageSize, DbType.Int16);
-                    using var connection = CreateConnection();
-                    return (await connection.QueryAsync<InvestorWallet>(query, parameters)).ToList();
-                }
-                else
-                {
-                    var query = "SELECT * FROM InvestorWallet WHERE IsDeleted = 0 ORDER BY InvestorId, WalletTypeId ASC";
-                    using var connection = CreateConnection();
-                    return (await connection.QueryAsync<InvestorWallet>(query)).ToList();
-                }               
+                var query = " SELECT * FROM InvestorWallet WHERE IsDeleted = 0 " 
+                    + " AND InvestorId = @InvestorId " 
+                    + " AND (WalletTypeId = @I1 OR WalletTypeId = @I2 OR WalletTypeId = @I5 ) "
+                    + " ORDER BY WalletTypeId ASC ";
+                var parameters = new DynamicParameters();
+                parameters.Add("InvestorId", investorId, DbType.Guid);
+                parameters.Add("I1", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I1")), DbType.Guid);
+                parameters.Add("I2", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")), DbType.Guid);
+                parameters.Add("I5", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I5")), DbType.Guid);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<InvestorWallet>(query, parameters)).ToList();               
             }
             catch (Exception e)
             {

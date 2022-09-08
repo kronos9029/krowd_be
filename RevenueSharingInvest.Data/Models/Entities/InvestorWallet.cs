@@ -9,13 +9,15 @@ using Microsoft.EntityFrameworkCore;
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("InvestorWallet")]
+    [Index(nameof(InvestorId), Name = "IX_InvestorWallet_InvestorId")]
+    [Index(nameof(WalletTypeId), Name = "IX_InvestorWallet_WalletTypeId")]
     public partial class InvestorWallet
     {
         public InvestorWallet()
         {
             WalletTransactions = new HashSet<WalletTransaction>();
         }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
         [Key]
         public Guid Id { get; set; }
         public Guid? InvestorId { get; set; }

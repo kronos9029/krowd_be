@@ -15,7 +15,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         {
             Users = new HashSet<User>();
         }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
         [Key]
         public Guid Id { get; set; }
         [StringLength(50)]

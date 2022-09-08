@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("Payment")]
+    [Index(nameof(InvestmentId), Name = "IX_Payment_InvestmentId")]
+    [Index(nameof(PeriodRevenueId), Name = "IX_Payment_PeriodRevenueId")]
     public partial class Payment
     {
         public Payment()
@@ -16,11 +18,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
             WalletTransactions = new HashSet<WalletTransaction>();
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
-        public Guid? InvestmentId { get; set; }
         public Guid? PeriodRevenueId { get; set; }
+        public Guid? InvestmentId { get; set; }
         public double? Amount { get; set; }
         public string Description { get; set; }
         [StringLength(20)]

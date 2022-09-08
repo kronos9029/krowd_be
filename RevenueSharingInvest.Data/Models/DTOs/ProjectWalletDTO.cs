@@ -9,13 +9,22 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class ProjectWalletDTO
     {
         public string id { get; set; }
-        public string projectId { get; set; }
+        public string projectManagerId { get; set; }
         public float balance { get; set; }
-        public string walletTypeId { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
         public string updateDate { get; set; }
         public string updateBy { get; set; }
         public bool isDeleted { get; set; }
+    }
+
+    public class MappedProjectWalletDTO : ProjectWalletDTO
+    {
+        public string walletTypeId { get; set; }
+    }
+
+    public class GetProjectWalletDTO : ProjectWalletDTO
+    {
+        public GetWalletTypeForWalletDTO walletType { get; set; }
     }
 }

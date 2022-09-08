@@ -9,9 +9,10 @@ using Microsoft.EntityFrameworkCore;
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("AccountTransaction")]
+    [Index(nameof(FromUserId), Name = "IX_AccountTransaction_FromUserId")]
+    [Index(nameof(ToUserId), Name = "IX_AccountTransaction_ToUserId")]
     public partial class AccountTransaction
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         public Guid? FromUserId { get; set; }

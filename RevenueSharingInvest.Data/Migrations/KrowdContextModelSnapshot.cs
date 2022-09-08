@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RevenueSharingInvest.Data.Models.Helpers;
+using RevenueSharingInvest.Data.Models.Entities;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
@@ -57,9 +57,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FromUserId");
+                    b.HasIndex(new[] { "FromUserId" }, "IX_AccountTransaction_FromUserId");
 
-                    b.HasIndex("ToUserId");
+                    b.HasIndex(new[] { "ToUserId" }, "IX_AccountTransaction_ToUserId");
 
                     b.ToTable("AccountTransaction");
                 });
@@ -79,7 +79,6 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasMaxLength(50)
                         .HasColumnType("datetime");
 
                     b.Property<string>("District")
@@ -188,7 +187,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("BusinessId", "FieldId");
 
-                    b.HasIndex("FieldId");
+                    b.HasIndex(new[] { "FieldId" }, "IX_BusinessField_FieldId");
 
                     b.ToTable("BusinessField");
                 });
@@ -225,6 +224,80 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Field");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("180c2784-e700-11ec-8fea-0242ac120002"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "School, Tutor, Learning tools",
+                            IsDeleted = false,
+                            Name = "Education"
+                        },
+                        new
+                        {
+                            Id = new Guid("15f8f9bc-e701-11ec-8fea-0242ac120002"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Spa, Cosmetic, Hair salon",
+                            IsDeleted = false,
+                            Name = "Beauty"
+                        },
+                        new
+                        {
+                            Id = new Guid("fc24cff0-e6fd-11ec-8fea-0242ac120002"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Restaurant, Food Court, Culinary",
+                            IsDeleted = false,
+                            Name = "Food"
+                        },
+                        new
+                        {
+                            Id = new Guid("6e39f240-e6ff-11ec-8fea-0242ac120002"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Functional foods, Clean food",
+                            IsDeleted = false,
+                            Name = "Health"
+                        },
+                        new
+                        {
+                            Id = new Guid("d1a18b54-e6ff-11ec-8fea-0242ac120002"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Gym, Sportwear, Exercise machines",
+                            IsDeleted = false,
+                            Name = "Fitness"
+                        },
+                        new
+                        {
+                            Id = new Guid("29e3709e-e6ff-11ec-8fea-0242ac120002"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Restaurant, Drink Court, Culinary, Cafe",
+                            IsDeleted = false,
+                            Name = "Drink"
+                        },
+                        new
+                        {
+                            Id = new Guid("4f492fa4-e6ff-11ec-8fea-0242ac120002"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Clothes, Shoes, Bags",
+                            IsDeleted = false,
+                            Name = "Fashion"
+                        },
+                        new
+                        {
+                            Id = new Guid("b289b3a4-e6ff-11ec-8fea-0242ac120002"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Drug, Medical devices",
+                            IsDeleted = false,
+                            Name = "Medical"
+                        },
+                        new
+                        {
+                            Id = new Guid("98d579ca-0685-11ed-b939-0242ac120002"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Food, Drink, Personal belongings",
+                            IsDeleted = false,
+                            Name = "Grocery"
+                        });
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investment", b =>
@@ -269,11 +342,11 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvestorId");
+                    b.HasIndex(new[] { "InvestorId" }, "IX_Investment_InvestorId");
 
-                    b.HasIndex("PackageId");
+                    b.HasIndex(new[] { "PackageId" }, "IX_Investment_PackageId");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectId" }, "IX_Investment_ProjectId");
 
                     b.ToTable("Investment");
                 });
@@ -311,7 +384,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_Investor_UserId");
 
                     b.ToTable("Investor");
                 });
@@ -348,6 +421,40 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("InvestorType");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("ec92ef2a-f794-11ec-b939-0242ac120002"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Mua và nắm giữ dài hạn, thường là các HOLDER, họ có niềm tin vào tiền điện tử cũng như công nghệ Blockchain.",
+                            IsDeleted = false,
+                            Name = "LONG_INVESTOR"
+                        },
+                        new
+                        {
+                            Id = new Guid("07c55f72-f794-11ec-b939-0242ac120002"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Những người trẻ tuổi, quan tâm đến những thứ mới lạ có thể mang lại sự thay đổi cho tương lai và đặc biệt thích về các công nghệ.",
+                            IsDeleted = false,
+                            Name = "HOBBYIST_INVESTOR"
+                        },
+                        new
+                        {
+                            Id = new Guid("ca4e68cc-f794-11ec-b939-0242ac120002"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Những người đầu tư ngắn hạn, thường là Day Trader, họ tìm kiếm lợi nhuận từ những biến động của thị trường trong thời gian ngắn, thường sử dụng margin để gia tăng lợi nhuận.",
+                            IsDeleted = false,
+                            Name = "SHORT_INVESTOR"
+                        },
+                        new
+                        {
+                            Id = new Guid("175389b8-f795-11ec-b939-0242ac120002"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Họ thường là những người trẻ tuổi, có kiến thức tốt và thấu hiểu bản thân, nhìn thì trường bằng con mắt đa chiều và cũng rất thông minh.",
+                            IsDeleted = false,
+                            Name = "STRATEGIC_INVESTOR"
+                        });
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.InvestorWallet", b =>
@@ -383,9 +490,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvestorId");
+                    b.HasIndex(new[] { "InvestorId" }, "IX_InvestorWallet_InvestorId");
 
-                    b.HasIndex("WalletTypeId");
+                    b.HasIndex(new[] { "WalletTypeId" }, "IX_InvestorWallet_WalletTypeId");
 
                     b.ToTable("InvestorWallet");
                 });
@@ -439,7 +546,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectId" }, "IX_Package_ProjectId");
 
                     b.ToTable("Package");
                 });
@@ -475,7 +582,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("PackageId", "VoucherId");
 
-                    b.HasIndex("VoucherId");
+                    b.HasIndex(new[] { "VoucherId" }, "IX_PackageVoucher_VoucherId");
 
                     b.ToTable("PackageVoucher");
                 });
@@ -526,9 +633,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvestmentId");
+                    b.HasIndex(new[] { "InvestmentId" }, "IX_Payment_InvestmentId");
 
-                    b.HasIndex("PeriodRevenueId");
+                    b.HasIndex(new[] { "PeriodRevenueId" }, "IX_Payment_PeriodRevenueId");
 
                     b.ToTable("Payment");
                 });
@@ -588,9 +695,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectId" }, "IX_PeriodRevenue_ProjectId");
 
-                    b.HasIndex("StageId");
+                    b.HasIndex(new[] { "StageId" }, "IX_PeriodRevenue_StageId");
 
                     b.ToTable("PeriodRevenue");
                 });
@@ -633,7 +740,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PeriodRevenueId");
+                    b.HasIndex(new[] { "PeriodRevenueId" }, "IX_PeriodRevenueHistory_PeriodRevenueId");
 
                     b.ToTable("PeriodRevenueHistory");
                 });
@@ -717,7 +824,8 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -727,11 +835,11 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AreaId");
+                    b.HasIndex(new[] { "AreaId" }, "IX_Project_AreaId");
 
-                    b.HasIndex("BusinessId");
+                    b.HasIndex(new[] { "BusinessId" }, "IX_Project_BusinessId");
 
-                    b.HasIndex("ManagerId");
+                    b.HasIndex(new[] { "ManagerId" }, "IX_Project_ManagerId");
 
                     b.ToTable("Project");
                 });
@@ -744,7 +852,6 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasDefaultValueSql("(newid())");
 
                     b.Property<string>("Content")
-                        .HasMaxLength(2147483647)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CreateBy")
@@ -754,14 +861,12 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(2147483647)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Link")
-                        .HasMaxLength(2147483647)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Priority")
@@ -785,7 +890,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectId" }, "IX_ProjectEntity_ProjectId");
 
                     b.ToTable("ProjectEntity");
                 });
@@ -809,7 +914,7 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("ProjectId")
+                    b.Property<Guid?>("ProjectManagerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("UpdateBy")
@@ -823,9 +928,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectManagerId" }, "IX_ProjectWallet_ProjectId");
 
-                    b.HasIndex("WalletTypeId");
+                    b.HasIndex(new[] { "WalletTypeId" }, "IX_ProjectWallet_WalletTypeId");
 
                     b.ToTable("ProjectWallet");
                 });
@@ -867,9 +972,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectId" }, "IX_Risk_ProjectId");
 
-                    b.HasIndex("RiskTypeId");
+                    b.HasIndex(new[] { "RiskTypeId" }, "IX_Risk_RiskTypeId");
 
                     b.ToTable("Risk");
                 });
@@ -940,6 +1045,40 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Role");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("015ae3c5-eee9-4f5c-befb-57d41a43d9df"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Business manager",
+                            IsDeleted = false,
+                            Name = "BUSINESS_MANAGER"
+                        },
+                        new
+                        {
+                            Id = new Guid("ad5f37da-ca48-4dc5-9f4b-963d94b535e6"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Investor",
+                            IsDeleted = false,
+                            Name = "INVESTOR"
+                        },
+                        new
+                        {
+                            Id = new Guid("2d80393a-3a3d-495d-8dd7-f9261f85cc8f"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Project owner",
+                            IsDeleted = false,
+                            Name = "PROJECT_OWNER"
+                        },
+                        new
+                        {
+                            Id = new Guid("ff54acc6-c4e9-4b73-a158-fd640b4b6940"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Krowd's admin",
+                            IsDeleted = false,
+                            Name = "ADMIN"
+                        });
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Stage", b =>
@@ -964,6 +1103,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool?>("IsPrivate")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -986,7 +1128,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectId" }, "IX_Stage_ProjectId");
 
                     b.ToTable("Stage");
                 });
@@ -1021,7 +1163,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WalletTypeId");
+                    b.HasIndex(new[] { "WalletTypeId" }, "IX_SystemWallet_WalletTypeId");
 
                     b.ToTable("SystemWallet");
                 });
@@ -1095,8 +1237,8 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("PhoneNum")
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<Guid?>("RoleId")
                         .HasColumnType("uniqueidentifier");
@@ -1116,11 +1258,27 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BusinessId");
+                    b.HasIndex(new[] { "BusinessId" }, "IX_User_BusinessId");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex(new[] { "RoleId" }, "IX_User_RoleId");
 
                     b.ToTable("User");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("21d77b9a-f792-11ec-b939-0242ac120002"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Admin 1",
+                            Email = "krowd.dev.2022@gmail.com",
+                            FirstName = "Krowd's",
+                            Gender = "LGBT",
+                            Image = "https://firebasestorage.googleapis.com/v0/b/revenuesharinginvest-44354.appspot.com/o/User%2Favt%20Kh%C3%A1nh.jpg?alt=media&token=0940aab1-edaf-443b-ad83-1d14cb8dff1f",
+                            IsDeleted = false,
+                            LastName = "Admin",
+                            RoleId = new Guid("ff54acc6-c4e9-4b73-a158-fd640b4b6940"),
+                            Status = "ACTIVE"
+                        });
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Voucher", b =>
@@ -1177,7 +1335,7 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex(new[] { "ProjectId" }, "IX_Voucher_ProjectId");
 
                     b.ToTable("Voucher");
                 });
@@ -1224,9 +1382,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvestmentId");
+                    b.HasIndex(new[] { "InvestmentId" }, "IX_VoucherItem_InvestmentId");
 
-                    b.HasIndex("VoucherId");
+                    b.HasIndex(new[] { "VoucherId" }, "IX_VoucherItem_VoucherId");
 
                     b.ToTable("VoucherItem");
                 });
@@ -1286,13 +1444,13 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvestorWalletId");
+                    b.HasIndex(new[] { "InvestorWalletId" }, "IX_WalletTransaction_InvestorWalletId");
 
-                    b.HasIndex("PaymentId");
+                    b.HasIndex(new[] { "PaymentId" }, "IX_WalletTransaction_PaymentId");
 
-                    b.HasIndex("ProjectWalletId");
+                    b.HasIndex(new[] { "ProjectWalletId" }, "IX_WalletTransaction_ProjectWalletId");
 
-                    b.HasIndex("SystemWalletId");
+                    b.HasIndex(new[] { "SystemWalletId" }, "IX_WalletTransaction_SystemWalletId");
 
                     b.ToTable("WalletTransaction");
                 });
@@ -1337,6 +1495,98 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("WalletType");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a036a7d2-980b-41b2-8ec2-06bff8782b66"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Ví đầu tư dự án của Business",
+                            IsDeleted = false,
+                            Mode = "BUSINESS",
+                            Name = "PROJECT_INVESTMENT_WALLET",
+                            Type = "B3"
+                        },
+                        new
+                        {
+                            Id = new Guid("0568667c-1e13-440b-8d4a-077288aa9919"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Ví thanh toán chung của Business",
+                            IsDeleted = false,
+                            Mode = "BUSINESS",
+                            Name = "UNIVERSAL_PAYMENT_WALLET",
+                            Type = "B1"
+                        },
+                        new
+                        {
+                            Id = new Guid("67453687-e268-4f32-8fb8-0e7c77de2c71"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Ví tạm thời của Investor",
+                            IsDeleted = false,
+                            Mode = "INVESTOR",
+                            Name = "TEMPORARY_WALLET",
+                            Type = "I1"
+                        },
+                        new
+                        {
+                            Id = new Guid("e3b41a08-135b-4fb3-bf1f-4d3675d39f96"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Ví đầu tư chung của Investors",
+                            IsDeleted = false,
+                            Mode = "INVESTOR",
+                            Name = "GENERAL_INVESTMENT_WALLET",
+                            Type = "I2"
+                        },
+                        new
+                        {
+                            Id = new Guid("c485dc8b-b61d-4de9-8939-4e765a3f9e7d"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Ví thu tiền của Investor",
+                            IsDeleted = false,
+                            Mode = "INVESTOR",
+                            Name = "INVESTOR_COLLECTING_WALLET",
+                            Type = "I5"
+                        },
+                        new
+                        {
+                            Id = new Guid("ba9baf2f-b063-41a2-808b-a452afa3e57f"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Ví tạm ứng của Investor",
+                            IsDeleted = false,
+                            Mode = "INVESTOR",
+                            Name = "ADVANCE_WALLET",
+                            Type = "I3"
+                        },
+                        new
+                        {
+                            Id = new Guid("4e24a3d5-9aed-4db2-87f5-bd69c55899b7"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Ví thanh toán dự án của Investor",
+                            IsDeleted = false,
+                            Mode = "INVESTOR",
+                            Name = "PROJECT_PAYMENT_WALLET",
+                            Type = "I4"
+                        },
+                        new
+                        {
+                            Id = new Guid("05d47eb3-06a5-4718-a46a-d62494dee371"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Ví thanh toán doanh nghiệp của Business",
+                            IsDeleted = false,
+                            Mode = "BUSINESS",
+                            Name = "BUSINESS_PAYMENT_WALLET",
+                            Type = "B2"
+                        },
+                        new
+                        {
+                            Id = new Guid("d7ed0979-285f-4ec0-9f6b-ae95fcfa9207"),
+                            CreateDate = new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185),
+                            Description = "Ví thu tiền của Business",
+                            IsDeleted = false,
+                            Mode = "BUSINESS",
+                            Name = "BUSINESS_COLLECTING_WALLET",
+                            Type = "B4"
+                        });
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.AccountTransaction", b =>
@@ -1535,17 +1785,17 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.ProjectWallet", b =>
                 {
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Project", "Project")
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "ProjectManager")
                         .WithMany("ProjectWallets")
-                        .HasForeignKey("ProjectId")
-                        .HasConstraintName("FK_ProjectWallet_Project");
+                        .HasForeignKey("ProjectManagerId")
+                        .HasConstraintName("FK_ProjectWallet_User");
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.WalletType", "WalletType")
                         .WithMany("ProjectWallets")
                         .HasForeignKey("WalletTypeId")
                         .HasConstraintName("FK_BusinessWallet_WalletType");
 
-                    b.Navigation("Project");
+                    b.Navigation("ProjectManager");
 
                     b.Navigation("WalletType");
                 });
@@ -1727,8 +1977,6 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.Navigation("ProjectEntities");
 
-                    b.Navigation("ProjectWallets");
-
                     b.Navigation("Risks");
 
                     b.Navigation("Stages");
@@ -1770,6 +2018,8 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("Investors");
 
                     b.Navigation("Projects");
+
+                    b.Navigation("ProjectWallets");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Voucher", b =>
