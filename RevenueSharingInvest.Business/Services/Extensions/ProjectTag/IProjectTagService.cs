@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RevenueSharingInvest.Business.Services.Common
+namespace RevenueSharingInvest.Business.Services.Extensions
 {
     public interface IProjectTagService
     {

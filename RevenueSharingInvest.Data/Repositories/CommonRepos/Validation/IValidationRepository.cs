@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RevenueSharingInvest.Data.Repositories.CommonRepos
+namespace RevenueSharingInvest.Data.Repositories.ExtensionsRepos
 {
     public interface IValidationRepository
     {

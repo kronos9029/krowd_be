@@ -17,13 +17,13 @@ using RevenueSharingInvest.API.Helpers;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
-using RevenueSharingInvest.Business.Services.Common;
-using RevenueSharingInvest.Business.Services.Common.Firebase;
+using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Models.Entities;
-using RevenueSharingInvest.Data.Repositories.CommonRepos;
-using RevenueSharingInvest.Data.Repositories.CommonRepos.Validation;
+using RevenueSharingInvest.Data.Repositories.ExtensionsRepos;
+using RevenueSharingInvest.Data.Repositories.ExtensionsRepos.Validation;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using RevenueSharingInvest.Data.Repositories.Repos;
 using System;
@@ -217,7 +217,12 @@ namespace RevenueSharingInvest.API
             ///Firebase storage
             var firebaseSettingSection = Configuration.GetSection("FirebaseSettings");
             services.Configure<FirebaseSettings>(firebaseSettingSection);
-            var firebaseSettings = firebaseSettingSection.Get<FirebaseSettings>(); 
+            var firebaseSettings = firebaseSettingSection.Get<FirebaseSettings>();
+
+            ///Momo Transaction
+            var momoSettingsSection = Configuration.GetSection("MomoSettings");
+            services.Configure<MomoSettings>(momoSettingsSection);
+            var momoSettings = momoSettingsSection.Get<MomoSettings>();
 
             //Firebase authentication
             FirebaseApp.Create(new AppOptions()

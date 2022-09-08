@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
-using RevenueSharingInvest.Business.Services.Common;
+using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
