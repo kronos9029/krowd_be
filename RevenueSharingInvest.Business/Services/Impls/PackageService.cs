@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Data.Models.Constants;
@@ -16,13 +17,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
     public class PackageService : IPackageService
     {
         private readonly IPackageRepository _packageRepository;
+        private readonly IProjectRepository _projectRepository;
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
 
-        public PackageService(IPackageRepository packageRepository, IValidationService validationService, IMapper mapper)
+        public PackageService(IPackageRepository packageRepository, IProjectRepository projectRepository, IValidationService validationService, IMapper mapper)
         {
             _packageRepository = packageRepository;
+            _projectRepository = projectRepository;
             _validationService = validationService;
             _mapper = mapper;
         }
@@ -43,7 +46,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreatePackage(CreateUpdatePackageDTO packageDTO)
+        public async Task<IdDTO> CreatePackage(CreateUpdatePackageDTO packageDTO, ThisUserObj currentUser)
         {
             IdDTO newId = new IdDTO();
             try
@@ -57,6 +60,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckExistenceId("Project", Guid.Parse(packageDTO.projectId)))
                     throw new NotFoundException("This projectId is not existed!!!");
 
+                //Kiểm tra projectId có thuộc về business của PM không
+                Project project = await _projectRepository.GetProjectById(Guid.Parse(packageDTO.projectId));
+                if (!project.BusinessId.ToString().Equals(currentUser.businessId))
+                {
+                    throw new NotFoundException("This projectId is not belong to your's Business!!!");
+                }    
+                //
+
                 if (packageDTO.price <= 0)
                     throw new InvalidFieldException("price must be greater than 0!!!");
 
@@ -66,32 +77,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (packageDTO.quantity <= 0)
                     throw new InvalidFieldException("quantity must be greater than 0!!!");
 
-                if (packageDTO.description != null && (packageDTO.description.Equals("string") || packageDTO.description.Length == 0))
-                    packageDTO.description = null;
-
-                //if (packageDTO.createBy != null && packageDTO.createBy.Length >= 0)
-                //{
-                //    if (packageDTO.createBy.Equals("string"))
-                //        packageDTO.createBy = null;
-                //    else if (!await _validationService.CheckUUIDFormat(packageDTO.createBy))
-                //        throw new InvalidFieldException("Invalid createBy!!!");
-                //}
-
-                //if (packageDTO.updateBy != null && packageDTO.updateBy.Length >= 0)
-                //{
-                //    if (packageDTO.updateBy.Equals("string"))
-                //        packageDTO.updateBy = null;
-                //    else if (!await _validationService.CheckUUIDFormat(packageDTO.updateBy))
-                //        throw new InvalidFieldException("Invalid updateBy!!!");
-                //}
-
                 Package entity = _mapper.Map<Package>(packageDTO);
 
-                entity.RemainingQuantity = entity.Quantity;
+                foreach (string descriptionItem in packageDTO.descriptionList)
+                {
+                    entity.Description = entity.Description + "\n" + descriptionItem;
+                }
 
-                entity.Status = Enum.GetNames(typeof(PackageStatusEnum)).ElementAt(0);
+                entity.RemainingQuantity = entity.Quantity;
+                entity.Status = Enum.GetNames(typeof(PackageStatusEnum)).ElementAt(0); //IN_STOCK
+                entity.CreateBy = Guid.Parse(currentUser.userId);
+                entity.UpdateBy = Guid.Parse(currentUser.userId);
 
                 newId.id = await _packageRepository.CreatePackage(entity);
+
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create Package Object!");
                 return newId;
@@ -108,9 +107,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                if (!await _validationService.CheckUUIDFormat(packageId.ToString()))
+                    throw new InvalidFieldException("Invalid packageId!!!");
+
+                Package package = await _packageRepository.GetPackageById(packageId);
+                if (package == null)
+                    throw new NotFoundException("No Package Object Found!");
+
                 result = await _packageRepository.DeletePackageById(packageId);
                 if (result == 0)
-                    throw new DeleteObjectException("Can not delete Package Object!");
+                    throw new DeleteObjectException("Can Not Delete Package Object!");
                 return result;
             }
             catch (Exception e)
@@ -120,27 +126,48 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<AllProjectPackageDTO> GetAllPackagesByProjectId(int pageIndex, int pageSize, string projectId)
+        public async Task<AllProjectPackageDTO> GetAllPackagesByProjectId(string projectId, ThisUserObj currentUser)
         {
             try
             {
                 if (projectId == null || !await _validationService.CheckUUIDFormat(projectId.ToString()))
                     throw new InvalidFieldException("Invalid projectId!!!");
 
+                if (!await _validationService.CheckExistenceId("Project", Guid.Parse(projectId)))
+                    throw new NotFoundException("This projectId is not existed!!!");
+
+                //Kiểm tra projectId có thuộc về business của người xem có role BuM hay PM không
+                Project project = await _projectRepository.GetProjectById(Guid.Parse(projectId));
+                if ((currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")) || currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"))) 
+                    && !project.BusinessId.ToString().Equals(currentUser.businessId))
+                {
+                    throw new NotFoundException("This projectId is not belong to your's Business!!!");
+                }
+                //
+
                 AllProjectPackageDTO result = new AllProjectPackageDTO();
                 result.listOfPackage = new List<GetPackageDTO>();
 
                 result.numOfPackage = await _packageRepository.CountPackageByProjectId(Guid.Parse(projectId));
 
-                List<Package> packageList = await _packageRepository.GetAllPackagesByProjectId(pageIndex, pageSize, Guid.Parse(projectId));
-                List<GetPackageDTO> list = _mapper.Map<List<GetPackageDTO>>(packageList);
+                List<Package> packageList = await _packageRepository.GetAllPackagesByProjectId(Guid.Parse(projectId));
+                //List<GetPackageDTO> list = _mapper.Map<List<GetPackageDTO>>(packageList);
+                GetPackageDTO dto = new GetPackageDTO();
 
-                foreach (GetPackageDTO item in list)
+                foreach (Package item in packageList)
                 {
-                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
-                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                    dto = _mapper.Map<GetPackageDTO>(item);
+                    dto.descriptionList = new List<string>();
 
-                    result.listOfPackage.Add(item);
+                    dto.createDate = await _validationService.FormatDateOutput(dto.createDate);
+                    dto.updateDate = await _validationService.FormatDateOutput(dto.updateDate);
+                    string[] split = item.Description.Split("\n", StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string descriptionItem in split)
+                    {
+                        dto.descriptionList.Add(descriptionItem);
+                    }
+
+                    result.listOfPackage.Add(dto);
                 }
 
                 return result;
@@ -152,22 +179,40 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET BY ID
-        public async Task<GetPackageDTO> GetPackageById(Guid packageId)
+        public async Task<GetPackageDTO> GetPackageById(Guid packageId, ThisUserObj currentUser)
         {
             try
             {
-                if (packageId == null || !await _validationService.CheckUUIDFormat(packageId.ToString()))
+                if (!await _validationService.CheckUUIDFormat(packageId.ToString()))
                     throw new InvalidFieldException("Invalid packageId!!!");
 
                 Package package = await _packageRepository.GetPackageById(packageId);
-                GetPackageDTO packageDTO = _mapper.Map<GetPackageDTO>(package);                              
-                if (packageDTO == null)
+                if (package == null)
                     throw new NotFoundException("No Package Object Found!");
 
-                packageDTO.createDate = await _validationService.FormatDateOutput(packageDTO.createDate);
-                packageDTO.updateDate = await _validationService.FormatDateOutput(packageDTO.updateDate);
+                //Kiểm tra projectId của Package đó có thuộc về business của người xem có role BuM hay PM không
+                Project project = await _projectRepository.GetProjectById(package.ProjectId);
+                if ((currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")) || currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                    && !project.BusinessId.ToString().Equals(currentUser.businessId))
+                {
+                    throw new NotFoundException("This Package's projectId is not belong to your's Business!!!");
+                }
+                //
 
-                return packageDTO;
+                GetPackageDTO dto = new GetPackageDTO();
+
+                dto = _mapper.Map<GetPackageDTO>(package);
+                dto.descriptionList = new List<string>();
+
+                dto.createDate = await _validationService.FormatDateOutput(dto.createDate);
+                dto.updateDate = await _validationService.FormatDateOutput(dto.updateDate);
+                string[] split = package.Description.Split("\n", StringSplitOptions.RemoveEmptyEntries);
+                foreach (string descriptionItem in split)
+                {
+                    dto.descriptionList.Add(descriptionItem);
+                }
+
+                return dto;
             }
             catch (Exception e)
             {
@@ -176,51 +221,49 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdatePackage(CreateUpdatePackageDTO packageDTO, Guid packageId)
+        public async Task<int> UpdatePackage(CreateUpdatePackageDTO packageDTO, Guid packageId, ThisUserObj currentUser)
         {
             int result;
             try
             {
-                if (!await _validationService.CheckText(packageDTO.name))
+                if (packageDTO.name != null && !await _validationService.CheckText(packageDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");
 
-                if (packageDTO.projectId == null || !await _validationService.CheckUUIDFormat(packageDTO.projectId))
+                if (packageDTO.projectId != null && !await _validationService.CheckUUIDFormat(packageDTO.projectId))
                     throw new InvalidFieldException("Invalid projectId!!!");
 
-                if (!await _validationService.CheckExistenceId("Project", Guid.Parse(packageDTO.projectId)))
+                if (packageDTO.projectId != null && !await _validationService.CheckExistenceId("Project", Guid.Parse(packageDTO.projectId)))
                     throw new NotFoundException("This projectId is not existed!!!");
 
-                if (packageDTO.price <= 0)
+                //Kiểm tra projectId có thuộc về business của PM không
+                Project project = await _projectRepository.GetProjectById(Guid.Parse(packageDTO.projectId));
+                if (!project.BusinessId.ToString().Equals(currentUser.businessId))
+                {
+                    throw new NotFoundException("This projectId is not belong to your's Business!!!");
+                }
+                //
+
+                if (packageDTO.price != null && packageDTO.price <= 0)
                     throw new InvalidFieldException("price must be greater than 0!!!");
 
-                if (packageDTO.image != null && (packageDTO.image.Equals("string") || packageDTO.image.Length == 0))
-                    packageDTO.image = null;
-
-                if (packageDTO.quantity <= 0)
+                if (packageDTO.quantity != null && packageDTO.quantity <= 0)
                     throw new InvalidFieldException("quantity must be greater than 0!!!");
-
-                if (packageDTO.description != null && (packageDTO.description.Equals("string") || packageDTO.description.Length == 0))
-                    packageDTO.description = null;
-
-                //if (packageDTO.createBy != null && packageDTO.createBy.Length >= 0)
-                //{
-                //    if (packageDTO.createBy.Equals("string"))
-                //        packageDTO.createBy = null;
-                //    else if (!await _validationService.CheckUUIDFormat(packageDTO.createBy))
-                //        throw new InvalidFieldException("Invalid createBy!!!");
-                //}
-
-                //if (packageDTO.updateBy != null && packageDTO.updateBy.Length >= 0)
-                //{
-                //    if (packageDTO.updateBy.Equals("string"))
-                //        packageDTO.updateBy = null;
-                //    else if (!await _validationService.CheckUUIDFormat(packageDTO.updateBy))
-                //        throw new InvalidFieldException("Invalid updateBy!!!");
-                //}
 
                 Package entity = _mapper.Map<Package>(packageDTO);
 
-                entity.RemainingQuantity = entity.Quantity;
+                if (packageDTO.descriptionList != null)
+                {
+                    foreach (string descriptionItem in packageDTO.descriptionList)
+                    {
+                        entity.Description = entity.Description + "\n" + descriptionItem;
+                    }
+                }
+                if (packageDTO.quantity != null)
+                {
+                    entity.RemainingQuantity = entity.Quantity;
+                }                   
+                entity.CreateBy = Guid.Parse(currentUser.userId);
+                entity.UpdateBy = Guid.Parse(currentUser.userId);
 
                 result = await _packageRepository.UpdatePackage(entity, packageId);
                 if (result == 0)

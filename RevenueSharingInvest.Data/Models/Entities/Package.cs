@@ -22,7 +22,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid Id { get; set; }
         [StringLength(50)]
         public string Name { get; set; }
-        public Guid? ProjectId { get; set; }
+        public Guid ProjectId { get; set; }
         public double? Price { get; set; }
         public string Image { get; set; }
         public int Quantity { get; set; }
@@ -33,7 +33,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
-        public bool? IsDeleted { get; set; }
         public string Status { get; set; }
         public int RemainingQuantity { get; set; }
 

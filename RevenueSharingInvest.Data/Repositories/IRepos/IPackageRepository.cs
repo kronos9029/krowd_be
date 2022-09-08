@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<string> CreatePackage(Package packageDTO);
 
         //READ
-        public Task<List<Package>> GetAllPackagesByProjectId(int pageIndex, int pageSize, Guid projectId);
+        public Task<List<Package>> GetAllPackagesByProjectId(Guid projectId);
         public Task<Package> GetPackageById(Guid packageId);
         public Task<int> CountPackageByProjectId(Guid projectId);
 
