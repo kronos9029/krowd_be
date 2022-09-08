@@ -365,7 +365,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
 
-            //modelBuilder.Seed();
+            modelBuilder.Seed();
 
             OnModelCreatingPartial(modelBuilder);
         }
