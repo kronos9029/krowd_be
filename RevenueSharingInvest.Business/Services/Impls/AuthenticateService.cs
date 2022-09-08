@@ -86,7 +86,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 //Tạo Investor object
                 investor.UserId = Guid.Parse(newUserID);
-                investor.InvestorTypeId = Guid.Parse(InvestorTypeDictionary.investorType.GetValueOrDefault("Nhà đầu tư ngắn hạn"));
                 string newInvestorID = await _investorRepository.CreateInvestor(investor);
                 if (newInvestorID.Equals("")) 
                 {
