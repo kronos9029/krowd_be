@@ -4,7 +4,7 @@ using RevenueSharingInvest.Data.Models.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace RevenueSharingInvest.Business.Services.Common.Firebase
+namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
 {
     public interface IFileUploadService
     {

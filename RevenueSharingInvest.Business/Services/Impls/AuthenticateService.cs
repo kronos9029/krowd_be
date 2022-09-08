@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models.Constant;
-using RevenueSharingInvest.Business.Services.Common;
+using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;

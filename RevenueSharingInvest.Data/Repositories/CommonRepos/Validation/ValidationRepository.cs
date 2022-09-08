@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RevenueSharingInvest.Data.Repositories.CommonRepos.Validation
+namespace RevenueSharingInvest.Data.Repositories.ExtensionsRepos.Validation
 {
     public class ValidationRepository : BaseRepository, IValidationRepository
     {

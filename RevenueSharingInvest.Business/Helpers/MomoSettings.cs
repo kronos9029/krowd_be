@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace RevenueSharingInvest.Business.Helpers
+{
+    public class MomoSettings
+    {
+        public string PartnerCode { get; set; }
+        public string AccessKey { get; set; }
+        public string SecretKey { get; set; }
+        public string ApiEndpoint { get; set; }
+    }
+}

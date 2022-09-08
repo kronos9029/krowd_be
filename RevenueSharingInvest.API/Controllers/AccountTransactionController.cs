@@ -40,8 +40,8 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> CreateAccountTransaction([FromBody] AccountTransactionDTO accountTransactionDTO)
         {
 
-                var result = await _accountTransactionService.CreateAccountTransaction(accountTransactionDTO);
-                return Ok(result);
+          var result = await _accountTransactionService.CreateAccountTransaction(accountTransactionDTO);
+          return Ok(result);
             
 
         }

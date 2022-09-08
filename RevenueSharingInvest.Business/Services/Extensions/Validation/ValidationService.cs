@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
-using RevenueSharingInvest.Data.Repositories.CommonRepos;
+using RevenueSharingInvest.Data.Repositories.ExtensionsRepos;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace RevenueSharingInvest.Business.Services.Common
+namespace RevenueSharingInvest.Business.Services.Extensions
 {
     public class ValidationService : IValidationService
     {

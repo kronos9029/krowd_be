@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.Business.Models;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
-using RevenueSharingInvest.Business.Services.Common.Firebase;
+using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Data.Models.DTOs;
 using System;
 using System.Collections.Generic;

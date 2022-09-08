@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace RevenueSharingInvest.Business.Services.Common.Firebase
+namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
 {
     public class FileUploadService : IFileUploadService
     {

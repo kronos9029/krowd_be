@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Business.Exceptions;
-using RevenueSharingInvest.Business.Services.Common;
+using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
