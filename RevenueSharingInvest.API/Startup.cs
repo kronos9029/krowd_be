@@ -51,7 +51,7 @@ namespace RevenueSharingInvest.API
         public void ConfigureServices(IServiceCollection services)
         {
             // Read the connection string from appsettings.
-            string dbConnectionString = this.Configuration.GetConnectionString("DEV");
+            string dbConnectionString = this.Configuration.GetConnectionString("PROD");
 
             // Inject IDbConnection, with implementation from SqlConnection class.
             services.AddTransient<IDbConnection>((sp) => new SqlConnection(dbConnectionString));
