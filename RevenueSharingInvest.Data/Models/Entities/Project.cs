@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
-using RevenueSharingInvest.Business.Models.Constant;
 
 #nullable disable
 
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("Project")]
+    [Index(nameof(AreaId), Name = "IX_Project_AreaId")]
+    [Index(nameof(BusinessId), Name = "IX_Project_BusinessId")]
+    [Index(nameof(ManagerId), Name = "IX_Project_ManagerId")]
     public partial class Project
     {
         public Project()
@@ -18,12 +20,11 @@ namespace RevenueSharingInvest.Data.Models.Entities
             Packages = new HashSet<Package>();
             PeriodRevenues = new HashSet<PeriodRevenue>();
             ProjectEntities = new HashSet<ProjectEntity>();
-            ProjectWallets = new HashSet<ProjectWallet>();
             Risks = new HashSet<Risk>();
             Stages = new HashSet<Stage>();
             Vouchers = new HashSet<Voucher>();
         }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
         [Key]
         public Guid Id { get; set; }
         public Guid? ManagerId { get; set; }
@@ -33,8 +34,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [StringLength(50)]
         public string Name { get; set; }
         public string Image { get; set; }
-        public string Description { get; set; }      
-        public string Address { get; set; }   
+        public string Description { get; set; }
+        public string Address { get; set; }
         public double? InvestmentTargetCapital { get; set; }
         public double? InvestedCapital { get; set; }
         public double? SharedRevenue { get; set; }
@@ -51,8 +52,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? ApprovedDate { get; set; }
         public Guid? ApprovedBy { get; set; }
-        public string Status { get; set; }
-
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
@@ -60,6 +59,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
+        [StringLength(50)]
+        public string Status { get; set; }
 
         [ForeignKey(nameof(AreaId))]
         [InverseProperty("Projects")]
@@ -78,8 +79,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public virtual ICollection<PeriodRevenue> PeriodRevenues { get; set; }
         [InverseProperty(nameof(ProjectEntity.Project))]
         public virtual ICollection<ProjectEntity> ProjectEntities { get; set; }
-        [InverseProperty(nameof(ProjectWallet.Project))]
-        public virtual ICollection<ProjectWallet> ProjectWallets { get; set; }
         [InverseProperty(nameof(Risk.Project))]
         public virtual ICollection<Risk> Risks { get; set; }
         [InverseProperty(nameof(Stage.Project))]

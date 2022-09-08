@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("Investment")]
+    [Index(nameof(InvestorId), Name = "IX_Investment_InvestorId")]
+    [Index(nameof(PackageId), Name = "IX_Investment_PackageId")]
+    [Index(nameof(ProjectId), Name = "IX_Investment_ProjectId")]
     public partial class Investment
     {
         public Investment()
@@ -17,7 +20,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
             VoucherItems = new HashSet<VoucherItem>();
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         public Guid? InvestorId { get; set; }

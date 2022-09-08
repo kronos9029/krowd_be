@@ -18,7 +18,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
             SystemWallets = new HashSet<SystemWallet>();
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         [StringLength(50)]
@@ -28,12 +27,12 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string Mode { get; set; }
         [StringLength(10)]
         public string Type { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? UpdateDate { get; set; }
+        public DateTime? CreateDate { get; set; }
         public Guid? UpdateBy { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? UpdateDate { get; set; }
         public bool? IsDeleted { get; set; }
 
         [InverseProperty(nameof(InvestorWallet.WalletType))]

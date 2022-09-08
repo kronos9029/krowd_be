@@ -9,9 +9,12 @@ using Microsoft.EntityFrameworkCore;
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("WalletTransaction")]
+    [Index(nameof(InvestorWalletId), Name = "IX_WalletTransaction_InvestorWalletId")]
+    [Index(nameof(PaymentId), Name = "IX_WalletTransaction_PaymentId")]
+    [Index(nameof(ProjectWalletId), Name = "IX_WalletTransaction_ProjectWalletId")]
+    [Index(nameof(SystemWalletId), Name = "IX_WalletTransaction_SystemWalletId")]
     public partial class WalletTransaction
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         public Guid? PaymentId { get; set; }
@@ -19,12 +22,12 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid? ProjectWalletId { get; set; }
         public Guid? InvestorWalletId { get; set; }
         public double? Amount { get; set; }
+        public double? Fee { get; set; }
         public string Description { get; set; }
-        [StringLength(20)]
-        public string Type { get; set; }
         public Guid? FromWalletId { get; set; }
         public Guid? ToWalletId { get; set; }
-        public double? Fee { get; set; }
+        [StringLength(20)]
+        public string Type { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }

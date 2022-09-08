@@ -6,7 +6,7 @@ using RevenueSharingInvest.Data.Models.Entities;
 
 #nullable disable
 
-namespace RevenueSharingInvest.Data.Models.Helpers
+namespace RevenueSharingInvest.Data.Models.Entities
 {
     public partial class KrowdContext : DbContext
     {
@@ -21,7 +21,7 @@ namespace RevenueSharingInvest.Data.Models.Helpers
 
         public virtual DbSet<AccountTransaction> AccountTransactions { get; set; }
         public virtual DbSet<Area> Areas { get; set; }
-        public virtual DbSet<RevenueSharingInvest.Data.Models.Entities.Business> Businesses { get; set; }
+        public virtual DbSet<Business> Businesses { get; set; }
         public virtual DbSet<BusinessField> BusinessFields { get; set; }
         public virtual DbSet<Field> Fields { get; set; }
         public virtual DbSet<Investment> Investments { get; set; }
@@ -81,7 +81,7 @@ namespace RevenueSharingInvest.Data.Models.Helpers
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
 
-            modelBuilder.Entity<RevenueSharingInvest.Data.Models.Entities.Business>(entity =>
+            modelBuilder.Entity<Business>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
@@ -131,11 +131,6 @@ namespace RevenueSharingInvest.Data.Models.Helpers
             modelBuilder.Entity<Investor>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
-
-/*                entity.HasOne(d => d.InvestorType)
-                    .WithMany(p => p.Investors)
-                    .HasForeignKey(d => d.InvestorTypeId)
-                    .HasConstraintName("FK_Investor_InvestorType");*/
             });
 
             modelBuilder.Entity<InvestorType>(entity =>
@@ -254,10 +249,10 @@ namespace RevenueSharingInvest.Data.Models.Helpers
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
-                entity.HasOne(d => d.Project)
+                entity.HasOne(d => d.ProjectManager)
                     .WithMany(p => p.ProjectWallets)
-                    .HasForeignKey(d => d.ProjectId)
-                    .HasConstraintName("FK_ProjectWallet_Project");
+                    .HasForeignKey(d => d.ProjectManagerId)
+                    .HasConstraintName("FK_ProjectWallet_User");
 
                 entity.HasOne(d => d.WalletType)
                     .WithMany(p => p.ProjectWallets)
@@ -337,7 +332,6 @@ namespace RevenueSharingInvest.Data.Models.Helpers
                 entity.HasOne(d => d.Voucher)
                     .WithMany(p => p.VoucherItems)
                     .HasForeignKey(d => d.VoucherId)
-                    //.OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_VoucherItem_Voucher");
             });
 

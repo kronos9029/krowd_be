@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("Package")]
+    [Index(nameof(ProjectId), Name = "IX_Package_ProjectId")]
     public partial class Package
     {
         public Package()
@@ -16,7 +17,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
             Investments = new HashSet<Investment>();
             PackageVouchers = new HashSet<PackageVoucher>();
         }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
         [Key]
         public Guid Id { get; set; }
         [StringLength(50)]
@@ -25,9 +26,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public double? Price { get; set; }
         public string Image { get; set; }
         public int Quantity { get; set; }
-        public int RemainingQuantity { get; set; }
         public string Description { get; set; }
-        public string Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
@@ -35,6 +34,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public bool? IsDeleted { get; set; }
+        public string Status { get; set; }
+        public int RemainingQuantity { get; set; }
 
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("Packages")]

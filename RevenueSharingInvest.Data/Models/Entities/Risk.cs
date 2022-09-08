@@ -9,9 +9,10 @@ using Microsoft.EntityFrameworkCore;
 namespace RevenueSharingInvest.Data.Models.Entities
 {
     [Table("Risk")]
+    [Index(nameof(ProjectId), Name = "IX_Risk_ProjectId")]
+    [Index(nameof(RiskTypeId), Name = "IX_Risk_RiskTypeId")]
     public partial class Risk
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
         [StringLength(50)]
