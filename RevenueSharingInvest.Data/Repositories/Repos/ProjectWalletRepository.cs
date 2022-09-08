@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -19,12 +20,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<string> CreateProjectWallet(ProjectWallet projectWalletDTO)
+        public async Task<string> CreateProjectWallet(Guid projectManagerId, Guid walletTypeId, Guid currentUserId)
         {
             try
             {
                 var query = "INSERT INTO ProjectWallet ("
-                    + "         ProjectId, "
+                    + "         ProjectManagerId, "
                     + "         Balance, "
                     + "         WalletTypeId, "
                     + "         CreateDate, "
@@ -35,7 +36,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
-                    + "         @ProjectId, "
+                    + "         @ProjectManagerId, "
                     + "         0, "
                     + "         @WalletTypeId, "
                     + "         @CreateDate, "
@@ -45,12 +46,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         0 )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("ProjectId", projectWalletDTO.ProjectId, DbType.Guid);
-                parameters.Add("WalletTypeId", projectWalletDTO.WalletTypeId, DbType.Guid);
+                parameters.Add("ProjectManagerId", projectManagerId, DbType.Guid);
+                parameters.Add("WalletTypeId", walletTypeId, DbType.Guid);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", projectWalletDTO.CreateBy, DbType.Guid);
+                parameters.Add("CreateBy", currentUserId, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", projectWalletDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", currentUserId, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
@@ -88,49 +89,20 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<ProjectWallet>> GetAllProjectWallets(int pageIndex, int pageSize)
+        public async Task<List<ProjectWallet>> GetProjectWalletsByProjectManagerId(Guid projectManagerId)
         {
             try
             {
-                if (pageIndex != 0 && pageSize != 0)
-                {
-                    var query = "WITH X AS ( "
-                    + "         SELECT "
-                    + "             ROW_NUMBER() OVER ( "
-                    + "                 ORDER BY "
-                    + "                     ProjectId, "
-                    + "                     WalletTypeId ASC ) AS Num, "
-                    + "             * "
-                    + "         FROM ProjectWallet "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
-                    + "     SELECT "
-                    + "         Id, "
-                    + "         ProjectId, "
-                    + "         Balance, "
-                    + "         WalletTypeId, "
-                    + "         CreateDate, "
-                    + "         CreateBy, "
-                    + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
-                    + "     FROM "
-                    + "         X "
-                    + "     WHERE "
-                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
-                    + "         AND @PageIndex * @PageSize";
-                    var parameters = new DynamicParameters();
-                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
-                    parameters.Add("PageSize", pageSize, DbType.Int16);
-                    using var connection = CreateConnection();
-                    return (await connection.QueryAsync<ProjectWallet>(query, parameters)).ToList();
-                }
-                else
-                {
-                    var query = "SELECT * FROM ProjectWallet WHERE IsDeleted = 0 ORDER BY ProjectId, WalletTypeId ASC";
-                    using var connection = CreateConnection();
-                    return (await connection.QueryAsync<ProjectWallet>(query)).ToList();
-                }               
+                var query = " SELECT * FROM ProjectWallet WHERE IsDeleted = 0 "
+                    + " AND ProjectManagerId = @ProjectManagerId "
+                    + " AND (WalletTypeId = @B1 OR WalletTypeId = @B4 ) "
+                    + " ORDER BY WalletTypeId ASC ";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectManagerId", projectManagerId, DbType.Guid);
+                parameters.Add("B1", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B1")), DbType.Guid);
+                parameters.Add("B4", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B4")), DbType.Guid);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<ProjectWallet>(query, parameters)).ToList();
             }
             catch (Exception e)
             {
@@ -162,7 +134,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE ProjectWallet "
                     + "     SET "
-                    + "         ProjectId = @ProjectId, "
+                    + "         ProjectManagerId = @ProjectManagerId, "
                     + "         WalletTypeId = @WalletTypeId, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy, "
@@ -171,7 +143,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("ProjectId", projectWalletDTO.ProjectId, DbType.Guid);
+                parameters.Add("ProjectManagerId", projectWalletDTO.ProjectManagerId, DbType.Guid);
                 parameters.Add("WalletTypeId", projectWalletDTO.WalletTypeId, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", projectWalletDTO.UpdateBy, DbType.Guid);

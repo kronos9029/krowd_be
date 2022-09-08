@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> CreateInvestorWallet(Guid investorId, Guid walletTypeId, Guid currentUserId);
 
         //READ
-        public Task<List<InvestorWallet>> GetAllInvestorWallets(int pageIndex, int pageSize);
+        public Task<List<InvestorWallet>> GetInvestorWalletsByInvestorId(Guid investorId);
         public Task<InvestorWallet> GetInvestorWalletById(Guid investorWalletId);
 
         //UPDATE
