@@ -347,40 +347,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("InvestorType");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("ec92ef2a-f794-11ec-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Mua và nắm giữ dài hạn, thường là các HOLDER, họ có niềm tin vào tiền điện tử cũng như công nghệ Blockchain.",
-                            IsDeleted = false,
-                            Name = "LONG_INVESTOR"
-                        },
-                        new
-                        {
-                            Id = new Guid("07c55f72-f794-11ec-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Những người trẻ tuổi, quan tâm đến những thứ mới lạ có thể mang lại sự thay đổi cho tương lai và đặc biệt thích về các công nghệ.",
-                            IsDeleted = false,
-                            Name = "HOBBYIST_INVESTOR"
-                        },
-                        new
-                        {
-                            Id = new Guid("ca4e68cc-f794-11ec-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Những người đầu tư ngắn hạn, thường là Day Trader, họ tìm kiếm lợi nhuận từ những biến động của thị trường trong thời gian ngắn, thường sử dụng margin để gia tăng lợi nhuận.",
-                            IsDeleted = false,
-                            Name = "SHORT_INVESTOR"
-                        },
-                        new
-                        {
-                            Id = new Guid("175389b8-f795-11ec-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Họ thường là những người trẻ tuổi, có kiến thức tốt và thấu hiểu bản thân, nhìn thì trường bằng con mắt đa chiều và cũng rất thông minh.",
-                            IsDeleted = false,
-                            Name = "STRATEGIC_INVESTOR"
-                        });
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.InvestorWallet", b =>
@@ -971,40 +937,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Role");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("015ae3c5-eee9-4f5c-befb-57d41a43d9df"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Business manager",
-                            IsDeleted = false,
-                            Name = "BUSINESS_MANAGER"
-                        },
-                        new
-                        {
-                            Id = new Guid("ad5f37da-ca48-4dc5-9f4b-963d94b535e6"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Investor",
-                            IsDeleted = false,
-                            Name = "INVESTOR"
-                        },
-                        new
-                        {
-                            Id = new Guid("2d80393a-3a3d-495d-8dd7-f9261f85cc8f"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Project owner",
-                            IsDeleted = false,
-                            Name = "PROJECT_OWNER"
-                        },
-                        new
-                        {
-                            Id = new Guid("ff54acc6-c4e9-4b73-a158-fd640b4b6940"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Krowd's admin",
-                            IsDeleted = false,
-                            Name = "ADMIN"
-                        });
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Stage", b =>
@@ -1405,98 +1337,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("WalletType");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("a036a7d2-980b-41b2-8ec2-06bff8782b66"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Ví đầu tư dự án của Business",
-                            IsDeleted = false,
-                            Mode = "BUSINESS",
-                            Name = "PROJECT_INVESTMENT_WALLET",
-                            Type = "B3"
-                        },
-                        new
-                        {
-                            Id = new Guid("0568667c-1e13-440b-8d4a-077288aa9919"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Ví thanh toán chung của Business",
-                            IsDeleted = false,
-                            Mode = "BUSINESS",
-                            Name = "UNIVERSAL_PAYMENT_WALLET",
-                            Type = "B1"
-                        },
-                        new
-                        {
-                            Id = new Guid("67453687-e268-4f32-8fb8-0e7c77de2c71"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Ví tạm thời của Investor",
-                            IsDeleted = false,
-                            Mode = "INVESTOR",
-                            Name = "TEMPORARY_WALLET",
-                            Type = "I1"
-                        },
-                        new
-                        {
-                            Id = new Guid("e3b41a08-135b-4fb3-bf1f-4d3675d39f96"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Ví đầu tư chung của Investors",
-                            IsDeleted = false,
-                            Mode = "INVESTOR",
-                            Name = "GENERAL_INVESTMENT_WALLET",
-                            Type = "I2"
-                        },
-                        new
-                        {
-                            Id = new Guid("c485dc8b-b61d-4de9-8939-4e765a3f9e7d"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Ví thu tiền của Investor",
-                            IsDeleted = false,
-                            Mode = "INVESTOR",
-                            Name = "INVESTOR_COLLECTING_WALLET",
-                            Type = "I5"
-                        },
-                        new
-                        {
-                            Id = new Guid("ba9baf2f-b063-41a2-808b-a452afa3e57f"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Ví tạm ứng của Investor",
-                            IsDeleted = false,
-                            Mode = "INVESTOR",
-                            Name = "ADVANCE_WALLET",
-                            Type = "I3"
-                        },
-                        new
-                        {
-                            Id = new Guid("4e24a3d5-9aed-4db2-87f5-bd69c55899b7"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Ví thanh toán dự án của Investor",
-                            IsDeleted = false,
-                            Mode = "INVESTOR",
-                            Name = "PROJECT_PAYMENT_WALLET",
-                            Type = "I4"
-                        },
-                        new
-                        {
-                            Id = new Guid("05d47eb3-06a5-4718-a46a-d62494dee371"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Ví thanh toán doanh nghiệp của Business",
-                            IsDeleted = false,
-                            Mode = "BUSINESS",
-                            Name = "BUSINESS_PAYMENT_WALLET",
-                            Type = "B2"
-                        },
-                        new
-                        {
-                            Id = new Guid("d7ed0979-285f-4ec0-9f6b-ae95fcfa9207"),
-                            CreateDate = new DateTime(2022, 9, 6, 17, 59, 20, 900, DateTimeKind.Local).AddTicks(1817),
-                            Description = "Ví thu tiền của Business",
-                            IsDeleted = false,
-                            Mode = "BUSINESS",
-                            Name = "BUSINESS_COLLECTING_WALLET",
-                            Type = "B4"
-                        });
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.AccountTransaction", b =>
