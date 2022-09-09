@@ -323,59 +323,59 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IdDTO newId = new IdDTO();
             try
             {
-                //if (projectDTO.managerId == null || !await _validationService.CheckUUIDFormat(projectDTO.managerId))
-                //    throw new InvalidFieldException("Invalid managerId!!!");
+                if (projectDTO.managerId == null || !await _validationService.CheckUUIDFormat(projectDTO.managerId))
+                    throw new InvalidFieldException("Invalid managerId!!!");
 
-                //if (!await _validationService.CheckExistenceUserWithRole(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"), Guid.Parse(projectDTO.managerId)))
-                //    throw new NotFoundException("This ManagerId is not existed!!!");
-                
-                //if (!await _validationService.CheckManagerOfBusiness(Guid.Parse(projectDTO.managerId), Guid.Parse(currentUser.businessId)))
-                //    throw new InvalidFieldException("This manager does not belong to this business!!!");
+                if (!await _validationService.CheckExistenceUserWithRole(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"), Guid.Parse(projectDTO.managerId)))
+                    throw new NotFoundException("This ManagerId is not existed!!!");
 
-                //if (!(await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId))).Status.Equals(ObjectStatusEnum.ACTIVE.ToString()))
-                //    throw new InvalidFieldException("This PROJECT_MANAGER's status must be ACTIVE!!!");
+                if (!await _validationService.CheckManagerOfBusiness(Guid.Parse(projectDTO.managerId), Guid.Parse(currentUser.businessId)))
+                    throw new InvalidFieldException("This manager does not belong to this business!!!");
 
-                //if (await _projectRepository.GetAllProjects(0, 0, null, projectDTO.managerId, null, null, null, null, null, RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")) != null)
-                //    throw new InvalidFieldException("This PROJECT_MANAGER has a project already!!!");
+                if (!(await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId))).Status.Equals(ObjectStatusEnum.ACTIVE.ToString()))
+                    throw new InvalidFieldException("This PROJECT_MANAGER's status must be ACTIVE!!!");
 
-                //if (projectDTO.fieldId == null || !await _validationService.CheckUUIDFormat(projectDTO.fieldId))
-                //    throw new InvalidFieldException("Invalid fieldId!!!");
+                if (await _projectRepository.GetAllProjects(0, 0, null, projectDTO.managerId, null, null, null, null, RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")) != null)
+                    throw new InvalidFieldException("This PROJECT_MANAGER has a project already!!!");
 
-                //if (!await _validationService.CheckExistenceId("Field", Guid.Parse(projectDTO.fieldId)))
-                //    throw new NotFoundException("This fieldId is not existed!!!");
+                if (projectDTO.fieldId == null || !await _validationService.CheckUUIDFormat(projectDTO.fieldId))
+                    throw new InvalidFieldException("Invalid fieldId!!!");
 
-                //if (!await _validationService.CheckProjectFieldInBusinessField(Guid.Parse(currentUser.businessId), Guid.Parse(projectDTO.fieldId)))
-                //    throw new InvalidFieldException("This fieldId is not suitable with this business!!!");
+                if (!await _validationService.CheckExistenceId("Field", Guid.Parse(projectDTO.fieldId)))
+                    throw new NotFoundException("This fieldId is not existed!!!");
 
-                //if (projectDTO.areaId == null || !await _validationService.CheckUUIDFormat(projectDTO.areaId))
-                //    throw new InvalidFieldException("Invalid areaId!!!");
+                if (!await _validationService.CheckProjectFieldInBusinessField(Guid.Parse(currentUser.businessId), Guid.Parse(projectDTO.fieldId)))
+                    throw new InvalidFieldException("This fieldId is not suitable with this business!!!");
 
-                //if (!await _validationService.CheckExistenceId("Area", Guid.Parse(projectDTO.areaId)))
-                //    throw new NotFoundException("This areaId is not existed!!!");
+                if (projectDTO.areaId == null || !await _validationService.CheckUUIDFormat(projectDTO.areaId))
+                    throw new InvalidFieldException("Invalid areaId!!!");
 
-                //if (!await _validationService.CheckText(projectDTO.name))
-                //    throw new InvalidFieldException("Invalid name!!!");
+                if (!await _validationService.CheckExistenceId("Area", Guid.Parse(projectDTO.areaId)))
+                    throw new NotFoundException("This areaId is not existed!!!");
 
-                //if (projectDTO.description != null && (projectDTO.description.Equals("string") || projectDTO.description.Length == 0))
-                //    projectDTO.description = null;
+                if (!await _validationService.CheckText(projectDTO.name))
+                    throw new InvalidFieldException("Invalid name!!!");
 
-                //if (!await _validationService.CheckText(projectDTO.address))
-                //    throw new InvalidFieldException("Invalid address!!!");
+                if (projectDTO.description != null && (projectDTO.description.Equals("string") || projectDTO.description.Length == 0))
+                    projectDTO.description = null;
+
+                if (!await _validationService.CheckText(projectDTO.address))
+                    throw new InvalidFieldException("Invalid address!!!");
                 /////
-                //if (projectDTO.investmentTargetCapital <= 0)
-                //    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+                if (projectDTO.investmentTargetCapital <= 0)
+                    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
 
-                //if (projectDTO.sharedRevenue <= 0)
-                //    throw new InvalidFieldException("sharedRevenue must be greater than 0!!!");
+                if (projectDTO.sharedRevenue <= 0)
+                    throw new InvalidFieldException("sharedRevenue must be greater than 0!!!");
 
-                //if (projectDTO.multiplier <= 0)
-                //    throw new InvalidFieldException("multiplier must be greater than 0!!!");
+                if (projectDTO.multiplier <= 0)
+                    throw new InvalidFieldException("multiplier must be greater than 0!!!");
 
-                //if (projectDTO.duration <= 0)
-                //    throw new InvalidFieldException("duration must be greater than 0!!!");
+                if (projectDTO.duration <= 0)
+                    throw new InvalidFieldException("duration must be greater than 0!!!");
 
-                //if (projectDTO.numOfStage <= 0)
-                //    throw new InvalidFieldException("numOfStage must be greater than 0!!!");
+                if (projectDTO.numOfStage <= 0)
+                    throw new InvalidFieldException("numOfStage must be greater than 0!!!");
 
                 if (!await _validationService.CheckDate((projectDTO.startDate)))
                     throw new InvalidFieldException("Invalid startDate!!!");
@@ -819,37 +819,43 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-                if (projectDTO.managerId != null && !await _validationService.CheckUUIDFormat(projectDTO.managerId))
-                    throw new InvalidFieldException("Invalid managerId!!!");
+                if (projectDTO.managerId != null)
+                {
+                    if (!await _validationService.CheckUUIDFormat(projectDTO.managerId))
+                        throw new InvalidFieldException("Invalid managerId!!!");
 
-                if (!await _validationService.CheckExistenceUserWithRole(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"), Guid.Parse(projectDTO.managerId)))
-                    throw new NotFoundException("This ManagerId is not existed!!!");
+                    if (!await _validationService.CheckExistenceUserWithRole(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"), Guid.Parse(projectDTO.managerId)))
+                        throw new NotFoundException("This ManagerId is not existed!!!");
 
-                if (!await _validationService.CheckManagerOfBusiness(Guid.Parse(projectDTO.managerId), Guid.Parse(currentUser.businessId)))
-                    throw new InvalidFieldException("This manager does not belong to this business!!!");
+                    if (!await _validationService.CheckManagerOfBusiness(Guid.Parse(projectDTO.managerId), Guid.Parse(currentUser.businessId)))
+                        throw new InvalidFieldException("This manager does not belong to this business!!!");
 
-                if (!(await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId))).Status.Equals(ObjectStatusEnum.ACTIVE.ToString()))
-                    throw new InvalidFieldException("This PROJECT_MANAGER's status must be ACTIVE!!!");
+                    if (!(await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId))).Status.Equals(ObjectStatusEnum.ACTIVE.ToString()))
+                        throw new InvalidFieldException("This PROJECT_MANAGER's status must be ACTIVE!!!");
+                }
 
-                if (await _projectRepository.GetAllProjects(0, 0, null, projectDTO.managerId, null, null, null, null, RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")) != null)
-                    throw new InvalidFieldException("This PROJECT_MANAGER has a project already!!!");
+                if (projectDTO.fieldId != null)
+                {
+                    if (!await _validationService.CheckUUIDFormat(projectDTO.fieldId))
+                        throw new InvalidFieldException("Invalid fieldId!!!");
 
-                if (projectDTO.fieldId != null && !await _validationService.CheckUUIDFormat(projectDTO.fieldId))
-                    throw new InvalidFieldException("Invalid fieldId!!!");
+                    if (!await _validationService.CheckExistenceId("Field", Guid.Parse(projectDTO.fieldId)))
+                        throw new NotFoundException("This fieldId is not existed!!!");
 
-                if (!await _validationService.CheckExistenceId("Field", Guid.Parse(projectDTO.fieldId)))
-                    throw new NotFoundException("This fieldId is not existed!!!");
+                    if (!await _validationService.CheckProjectFieldInBusinessField(Guid.Parse(currentUser.businessId), Guid.Parse(projectDTO.fieldId)))
+                        throw new InvalidFieldException("This fieldId is not suitable with this business!!!");
+                }
+                
+                if (projectDTO.areaId != null)
+                {
+                    if (!await _validationService.CheckUUIDFormat(projectDTO.areaId))
+                        throw new InvalidFieldException("Invalid areaId!!!");
 
-                if (!await _validationService.CheckProjectFieldInBusinessField(Guid.Parse(currentUser.businessId), Guid.Parse(projectDTO.fieldId)))
-                    throw new InvalidFieldException("This fieldId is not suitable with this business!!!");
-       
-                if (projectDTO.areaId != null && !await _validationService.CheckUUIDFormat(projectDTO.areaId))
-                    throw new InvalidFieldException("Invalid areaId!!!");
+                    if (!await _validationService.CheckExistenceId("Area", Guid.Parse(projectDTO.areaId)))
+                        throw new NotFoundException("This areaId is not existed!!!");
+                }
 
-                if (!await _validationService.CheckExistenceId("Area", Guid.Parse(projectDTO.areaId)))
-                    throw new NotFoundException("This areaId is not existed!!!");
-
-                if (!await _validationService.CheckText(projectDTO.name))
+                if (projectDTO.name != null && !await _validationService.CheckText(projectDTO.name))
                     throw new InvalidFieldException("Invalid name!!!");
 
                 if (projectDTO.image != null && (projectDTO.image.Equals("string") || projectDTO.image.Length == 0))
@@ -858,19 +864,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (projectDTO.description != null && (projectDTO.description.Equals("string") || projectDTO.description.Length == 0))
                     projectDTO.description = null;
                 ///
-                if (projectDTO.investmentTargetCapital <= 0)
+                if (projectDTO.investmentTargetCapital != 0 && projectDTO.investmentTargetCapital <= 0)
                     throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
 
-                if (projectDTO.sharedRevenue <= 0)
+                if (projectDTO.sharedRevenue != 0 && projectDTO.sharedRevenue <= 0)
                     throw new InvalidFieldException("sharedRevenue must be greater than 0!!!");
 
-                if (projectDTO.multiplier <= 0)
+                if (projectDTO.multiplier != 0 && projectDTO.multiplier <= 0)
                     throw new InvalidFieldException("multiplier must be greater than 0!!!");
 
-                if (projectDTO.duration <= 0)
+                if (projectDTO.duration != 0 && projectDTO.duration <= 0)
                     throw new InvalidFieldException("duration must be greater than 0!!!");
 
-                if (projectDTO.numOfStage <= 0)
+                if (projectDTO.numOfStage != 0 && projectDTO.numOfStage <= 0)
                     throw new InvalidFieldException("numOfStage must be greater than 0!!!");
 
                 if (projectDTO.startDate != null && !await _validationService.CheckDate((projectDTO.startDate)))
@@ -886,6 +892,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     projectDTO.endDate = await _validationService.FormatDateInput(projectDTO.endDate);
 
                 Project entity = _mapper.Map<Project>(projectDTO);
+
+                if (projectDTO.investmentTargetCapital == 0)
+                    entity.InvestmentTargetCapital = null;
+
+                if (projectDTO.sharedRevenue == 0)
+                    entity.SharedRevenue = null;
+
+                if (projectDTO.multiplier == 0)
+                    entity.Multiplier = null;
+
+                if (projectDTO.duration == 0)
+                    entity.Duration = null;
+
+                if (projectDTO.numOfStage == 0)
+                    entity.NumOfStage = null;
 
                 if (projectDTO.image != null)
                 {
