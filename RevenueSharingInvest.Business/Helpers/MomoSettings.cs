@@ -12,5 +12,7 @@ namespace RevenueSharingInvest.Business.Helpers
         public string AccessKey { get; set; }
         public string SecretKey { get; set; }
         public string ApiEndpoint { get; set; }
+        public string ReturnUrl { get; set; }
+        public string NotifyUrl { get; set; }
     }
 }
