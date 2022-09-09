@@ -26,7 +26,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "INSERT INTO Investor ("
                     + "         UserId, "
-//                    + "         InvestorTypeId, "
+                    + "         InvestorTypeId, "
                     + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
@@ -37,7 +37,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @UserId, "
-//                    + "         @InvestorTypeId, "
+                    + "         @InvestorTypeId, "
                     + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "

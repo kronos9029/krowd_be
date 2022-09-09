@@ -35,8 +35,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -51,8 +50,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", packageDTO.Name, DbType.String);
@@ -97,58 +95,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Package>> GetAllPackagesByProjectId(int pageIndex, int pageSize, Guid projectId)
+        public async Task<List<Package>> GetAllPackagesByProjectId(Guid projectId)
         {
             try
             {
-                if (pageIndex != 0 && pageSize != 0)
-                {
-                    var query = "WITH X AS ( "
-                    + "         SELECT "
-                    + "             ROW_NUMBER() OVER ( "
-                    + "                 ORDER BY "
-                    + "                     ProjectId, "
-                    + "                     Name ASC ) AS Num, "
-                    + "             * "
-                    + "         FROM Package "
-                    + "         WHERE "
-                    + "             ProjectId = @ProjectId "
-                    + "             AND IsDeleted = 0 ) "
-                    + "     SELECT "
-                    + "         Id, "
-                    + "         Name, "
-                    + "         ProjectId, "
-                    + "         Price, "
-                    + "         Image, "
-                    + "         Quantity, "
-                    + "         RemainingQuantity, "
-                    + "         Description, "
-                    + "         Status, "
-                    + "         CreateDate, "
-                    + "         CreateBy, "
-                    + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
-                    + "     FROM "
-                    + "         X "
-                    + "     WHERE "
-                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
-                    + "         AND @PageIndex * @PageSize";
-                    var parameters = new DynamicParameters();
-                    parameters.Add("ProjectId", projectId, DbType.Guid);
-                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
-                    parameters.Add("PageSize", pageSize, DbType.Int16);
-                    using var connection = CreateConnection();
-                    return (await connection.QueryAsync<Package>(query, parameters)).ToList();
-                }
-                else
-                {
-                    var query = "SELECT * FROM Package WHERE ProjectId = @ProjectId AND IsDeleted = 0 ORDER BY ProjectId, Name ASC";
-                    var parameters = new DynamicParameters();
-                    parameters.Add("ProjectId", projectId, DbType.Guid);
-                    using var connection = CreateConnection();
-                    return (await connection.QueryAsync<Package>(query, parameters)).ToList();
-                }               
+                var query = "SELECT * FROM Package WHERE ProjectId = @ProjectId ORDER BY Quantity DESC";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<Package>(query, parameters)).ToList();           
             }
             catch (Exception e)
             {
@@ -180,15 +135,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE Package "
                     + "     SET "
-                    + "         Name = @Name, "
-                    + "         ProjectId = @ProjectId, "
-                    + "         Price = @Price, "
-                    + "         Image = @Image, "
-                    + "         Quantity = @Quantity, "
-                    + "         RemainingQuantity = @RemainingQuantity, "
-                    + "         Description = @Description, "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
+                    + "         Name = ISNULL(@Name, Name),"
+                    + "         ProjectId = ISNULL(@ProjectId, ProjectId), "
+                    + "         Price = ISNULL(@Price, Price), "
+                    + "         Image = ISNULL(@Image, Image), "
+                    + "         Quantity = ISNULL(@Quantity, Quantity), "
+                    + "         RemainingQuantity = ISNULL(@RemainingQuantity, RemainingQuantity), "
+                    + "         Description = ISNULL(@Description, Description), "
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -234,7 +189,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "SELECT COUNT(*) FROM Package WHERE ProjectId = @ProjectId AND IsDeleted = 0 ";
+                var query = " SELECT COUNT(*) FROM Package WHERE ProjectId = @ProjectId ";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", projectId, DbType.Guid);

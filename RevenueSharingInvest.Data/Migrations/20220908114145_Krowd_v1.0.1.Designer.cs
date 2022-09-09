@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RevenueSharingInvest.Data.Models.Entities;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
     [DbContext(typeof(KrowdContext))]
-    partial class KrowdContextModelSnapshot : ModelSnapshot
+    [Migration("20220908114145_Krowd_v1.0.1")]
+    partial class Krowd_v101
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -229,7 +231,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("180c2784-e700-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "School, Tutor, Learning tools",
                             IsDeleted = false,
                             Name = "Education"
@@ -237,7 +239,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("15f8f9bc-e701-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Spa, Cosmetic, Hair salon",
                             IsDeleted = false,
                             Name = "Beauty"
@@ -245,7 +247,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("fc24cff0-e6fd-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Restaurant, Food Court, Culinary",
                             IsDeleted = false,
                             Name = "Food"
@@ -253,7 +255,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("6e39f240-e6ff-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Functional foods, Clean food",
                             IsDeleted = false,
                             Name = "Health"
@@ -261,7 +263,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("d1a18b54-e6ff-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Gym, Sportwear, Exercise machines",
                             IsDeleted = false,
                             Name = "Fitness"
@@ -269,7 +271,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("29e3709e-e6ff-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Restaurant, Drink Court, Culinary, Cafe",
                             IsDeleted = false,
                             Name = "Drink"
@@ -277,7 +279,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("4f492fa4-e6ff-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Clothes, Shoes, Bags",
                             IsDeleted = false,
                             Name = "Fashion"
@@ -285,7 +287,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("b289b3a4-e6ff-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Drug, Medical devices",
                             IsDeleted = false,
                             Name = "Medical"
@@ -293,7 +295,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("98d579ca-0685-11ed-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Food, Drink, Personal belongings",
                             IsDeleted = false,
                             Name = "Grocery"
@@ -426,7 +428,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("ec92ef2a-f794-11ec-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Mua và nắm giữ dài hạn, thường là các HOLDER, họ có niềm tin vào tiền điện tử cũng như công nghệ Blockchain.",
                             IsDeleted = false,
                             Name = "LONG_INVESTOR"
@@ -434,7 +436,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("07c55f72-f794-11ec-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Những người trẻ tuổi, quan tâm đến những thứ mới lạ có thể mang lại sự thay đổi cho tương lai và đặc biệt thích về các công nghệ.",
                             IsDeleted = false,
                             Name = "HOBBYIST_INVESTOR"
@@ -442,7 +444,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("ca4e68cc-f794-11ec-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Những người đầu tư ngắn hạn, thường là Day Trader, họ tìm kiếm lợi nhuận từ những biến động của thị trường trong thời gian ngắn, thường sử dụng margin để gia tăng lợi nhuận.",
                             IsDeleted = false,
                             Name = "SHORT_INVESTOR"
@@ -450,7 +452,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("175389b8-f795-11ec-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Họ thường là những người trẻ tuổi, có kiến thức tốt và thấu hiểu bản thân, nhìn thì trường bằng con mắt đa chiều và cũng rất thông minh.",
                             IsDeleted = false,
                             Name = "STRATEGIC_INVESTOR"
@@ -1047,7 +1049,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("015ae3c5-eee9-4f5c-befb-57d41a43d9df"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Business manager",
                             IsDeleted = false,
                             Name = "BUSINESS_MANAGER"
@@ -1055,7 +1057,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("ad5f37da-ca48-4dc5-9f4b-963d94b535e6"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Investor",
                             IsDeleted = false,
                             Name = "INVESTOR"
@@ -1063,7 +1065,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("2d80393a-3a3d-495d-8dd7-f9261f85cc8f"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Project owner",
                             IsDeleted = false,
                             Name = "PROJECT_OWNER"
@@ -1071,7 +1073,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("ff54acc6-c4e9-4b73-a158-fd640b4b6940"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Krowd's admin",
                             IsDeleted = false,
                             Name = "ADMIN"
@@ -1212,8 +1214,8 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("FirstName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Gender")
                         .HasMaxLength(10)
@@ -1230,8 +1232,8 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("PhoneNum")
                         .HasMaxLength(10)
@@ -1265,7 +1267,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("21d77b9a-f792-11ec-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Admin 1",
                             Email = "krowd.dev.2022@gmail.com",
                             FirstName = "Krowd's",
@@ -1497,7 +1499,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("a036a7d2-980b-41b2-8ec2-06bff8782b66"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Ví đầu tư dự án của Business",
                             IsDeleted = false,
                             Mode = "BUSINESS",
@@ -1507,7 +1509,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("0568667c-1e13-440b-8d4a-077288aa9919"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Ví thanh toán chung của Business",
                             IsDeleted = false,
                             Mode = "BUSINESS",
@@ -1517,7 +1519,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("67453687-e268-4f32-8fb8-0e7c77de2c71"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Ví tạm thời của Investor",
                             IsDeleted = false,
                             Mode = "INVESTOR",
@@ -1527,7 +1529,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("e3b41a08-135b-4fb3-bf1f-4d3675d39f96"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Ví đầu tư chung của Investors",
                             IsDeleted = false,
                             Mode = "INVESTOR",
@@ -1537,7 +1539,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("c485dc8b-b61d-4de9-8939-4e765a3f9e7d"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Ví thu tiền của Investor",
                             IsDeleted = false,
                             Mode = "INVESTOR",
@@ -1547,7 +1549,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("ba9baf2f-b063-41a2-808b-a452afa3e57f"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Ví tạm ứng của Investor",
                             IsDeleted = false,
                             Mode = "INVESTOR",
@@ -1557,7 +1559,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("4e24a3d5-9aed-4db2-87f5-bd69c55899b7"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Ví thanh toán dự án của Investor",
                             IsDeleted = false,
                             Mode = "INVESTOR",
@@ -1567,7 +1569,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("05d47eb3-06a5-4718-a46a-d62494dee371"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Ví thanh toán doanh nghiệp của Business",
                             IsDeleted = false,
                             Mode = "BUSINESS",
@@ -1577,7 +1579,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         new
                         {
                             Id = new Guid("d7ed0979-285f-4ec0-9f6b-ae95fcfa9207"),
-                            CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
+                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
                             Description = "Ví thu tiền của Business",
                             IsDeleted = false,
                             Mode = "BUSINESS",
