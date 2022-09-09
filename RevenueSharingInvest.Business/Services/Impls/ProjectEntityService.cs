@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
@@ -17,17 +18,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
     public class ProjectEntityService : IProjectEntityService
     {
         private readonly IProjectEntityRepository _projectEntityRepository;
+        private readonly IProjectRepository _projectRepository;
         private readonly IValidationService _validationService;
         private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
 
 
         public ProjectEntityService(IProjectEntityRepository projectEntityRepository,
+            IProjectRepository projectRepository,
             IValidationService validationService,
             IFileUploadService fileUploadService,
             IMapper mapper)
         {
             _projectEntityRepository = projectEntityRepository;
+            _projectRepository = projectRepository;
             _validationService = validationService;
             _fileUploadService = fileUploadService;
             _mapper = mapper;
@@ -49,7 +53,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreateProjectEntity(CreateUpdateProjectEntityDTO projectEntityDTO)
+        public async Task<IdDTO> CreateProjectEntity(CreateUpdateProjectEntityDTO projectEntityDTO, ThisUserObj currentUser)
         {
             IdDTO newId = new IdDTO();
             bool typeCheck = false;
@@ -61,6 +65,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (!await _validationService.CheckExistenceId("Project", Guid.Parse(projectEntityDTO.projectId)))
                     throw new NotFoundException("This projectId is not existed!!!");
+
+                //Kiểm tra projectId có thuộc về business của PM không
+                Project project = await _projectRepository.GetProjectById(Guid.Parse(projectEntityDTO.projectId));
+                if (!project.BusinessId.ToString().Equals(currentUser.businessId))
+                {
+                    throw new NotFoundException("This projectId is not belong to your's Business!!!");
+                }
+                //
 
                 if (!await _validationService.CheckText(projectEntityDTO.title))
                     throw new InvalidFieldException("Invalid title!!!");
@@ -84,6 +96,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 ProjectEntity entity = _mapper.Map<ProjectEntity>(projectEntityDTO);
 
                 entity.Priority = (await _projectEntityRepository.CountProjectEntityByProjectIdAndType(entity.Id, entity.Type)) + 1;
+                //entity.CreateBy = Guid.Parse(currentUser.userId);
+                //entity.UpdateBy = Guid.Parse(currentUser.userId);
 
                 newId.id = await _projectEntityRepository.CreateProjectEntity(entity);
                 if (newId.id.Equals(""))

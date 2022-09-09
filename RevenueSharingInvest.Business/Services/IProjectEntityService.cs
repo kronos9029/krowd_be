@@ -1,4 +1,5 @@
-﻿using RevenueSharingInvest.Data.Models.DTOs;
+﻿using RevenueSharingInvest.API;
+using RevenueSharingInvest.Data.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace RevenueSharingInvest.Business.Services
     public interface IProjectEntityService
     {
         //CREATE
-        public Task<IdDTO> CreateProjectEntity(CreateUpdateProjectEntityDTO projectEntityDTO);
+        public Task<IdDTO> CreateProjectEntity(CreateUpdateProjectEntityDTO projectEntityDTO, ThisUserObj currentUser);
 
         //READ
         public Task<List<GetProjectEntityDTO>> GetAllProjectEntities(int pageIndex, int pageSize);
