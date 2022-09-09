@@ -199,12 +199,12 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        [Authorize]
+        [Authorize(Roles = "ADMIN, PROJECT_MANAGER, BUSINESS_MANAGER")]
         public async Task<IActionResult> UpdateProject([FromForm] UpdateProjectDTO projectDTO, Guid id)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+            if (currentUser.roleId.Equals(currentUser.businessManagerRoleId) || currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
                 Data.Models.Entities.Business businessDTO = await _businessService.GetBusinessByProjectId(id);
 
@@ -214,7 +214,7 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     throw new NotFoundException("no Project With This ID Found!!");
                 } 
-                else if(businessDTO.Id.Equals(currentUser.businessId))
+                else if(businessDTO.Id.ToString().Equals(currentUser.businessId))
                 {
                     if(project.status.Equals(ProjectStatusEnum.DRAFT.ToString()) || project.status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
                     {
@@ -229,13 +229,13 @@ namespace RevenueSharingInvest.API.Controllers
         //UPDATE STATUS
         [HttpPut]
         [Route("status/{id},{status}")]
-        [Authorize]
+        [Authorize(Roles ="ADMIN, PROJECT_MANAGER")]
         public async Task<IActionResult> UpdateProjectStatus(Guid id, string status)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
             if (currentUser.roleId.Equals(currentUser.adminRoleId)
-                || currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+                || currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
                 var result = await _projectService.UpdateProjectStatus(id, status, currentUser);
                 return Ok(result);
@@ -245,7 +245,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        [Authorize]
+        [Authorize(Roles = "ADMIN, BUSINESS_MANAGER")]
         public async Task<IActionResult> DeleteProject(Guid id)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
