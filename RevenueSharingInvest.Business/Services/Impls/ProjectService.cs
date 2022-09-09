@@ -895,6 +895,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (projectDTO.investmentTargetCapital == 0)
                     entity.InvestmentTargetCapital = null;
+                else
+                    entity.RemainAmount = entity.InvestmentTargetCapital;
 
                 if (projectDTO.sharedRevenue == 0)
                     entity.SharedRevenue = null;

@@ -458,6 +458,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Description = ISNULL(@Description, Description), "
                     + "         Address = ISNULL(@Address, Address), "
                     + "         InvestmentTargetCapital = ISNULL(@InvestmentTargetCapital, InvestmentTargetCapital), "
+                    + "         RemainAmount = ISNULL(@RemainAmount, RemainAmount), "
                     + "         SharedRevenue = ISNULL(@SharedRevenue, SharedRevenue), "
                     + "         Multiplier = ISNULL(@Multiplier, Multiplier), "
                     + "         Duration = ISNULL(@Duration, Duration), "
@@ -479,6 +480,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", projectDTO.Description, DbType.String);
                 parameters.Add("Address", projectDTO.Description, DbType.String);
                 parameters.Add("InvestmentTargetCapital", projectDTO.InvestmentTargetCapital, DbType.Double);
+                parameters.Add("RemainAmount", projectDTO.RemainAmount, DbType.Double);
                 parameters.Add("InvestedCapital", projectDTO.InvestedCapital, DbType.Double);
                 parameters.Add("SharedRevenue", projectDTO.SharedRevenue, DbType.Double);
                 parameters.Add("Multiplier", projectDTO.Multiplier, DbType.Double);
