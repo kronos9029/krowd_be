@@ -214,7 +214,7 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     throw new NotFoundException("no Project With This ID Found!!");
                 } 
-                else if(businessDTO.Id.Equals(currentUser.businessId))
+                else if(businessDTO.Id.ToString().Equals(currentUser.businessId))
                 {
                     if(project.status.Equals(ProjectStatusEnum.DRAFT.ToString()) || project.status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
                     {
