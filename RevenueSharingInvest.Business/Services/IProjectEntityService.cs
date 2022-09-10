@@ -14,12 +14,12 @@ namespace RevenueSharingInvest.Business.Services
         public Task<IdDTO> CreateProjectEntity(CreateUpdateProjectEntityDTO projectEntityDTO, ThisUserObj currentUser);
 
         //READ
-        public Task<List<GetProjectEntityDTO>> GetAllProjectEntities(int pageIndex, int pageSize);
-        public Task<GetProjectEntityDTO> GetProjectEntityById(Guid projectEntityId);
+        public Task<List<GetProjectEntityDTO>> GetProjectEntityByProjectIdAndType(Guid projectId, string type, ThisUserObj currentUser);
+        public Task<GetProjectEntityDTO> GetProjectEntityById(Guid projectEntityId, ThisUserObj currentUser);
 
         //UPDATE
-        public Task<int> UpdateProjectEntity(CreateUpdateProjectEntityDTO projectEntityDTO, Guid projectEntityId);
-        public Task<int> UpdateProjectEntityPriority(List<ProjectEntityUpdateDTO> idList);
+        public Task<int> UpdateProjectEntity(CreateUpdateProjectEntityDTO projectEntityDTO, Guid projectEntityId, ThisUserObj currentUser);
+        public Task<int> UpdateProjectEntityPriority(List<ProjectEntityUpdateDTO> idList, ThisUserObj currentUser);
 
         //DELETE
         public Task<int> DeleteProjectEntityById(Guid projectEntityId);
