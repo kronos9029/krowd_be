@@ -93,9 +93,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
                 else
                 {
-                    //Tạo ví I1, I2, I5
+                    //Tạo ví I1, I2, I3, I4, I5
                     await _investorWalletRepository.CreateInvestorWallet(Guid.Parse(newInvestorID), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I1")), Guid.Parse(newUserID));
                     await _investorWalletRepository.CreateInvestorWallet(Guid.Parse(newInvestorID), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")), Guid.Parse(newUserID));
+                    await _investorWalletRepository.CreateInvestorWallet(Guid.Parse(newInvestorID), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3")), Guid.Parse(newUserID));
+                    await _investorWalletRepository.CreateInvestorWallet(Guid.Parse(newInvestorID), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I4")), Guid.Parse(newUserID));
                     await _investorWalletRepository.CreateInvestorWallet(Guid.Parse(newInvestorID), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I5")), Guid.Parse(newUserID));
                 }
                 response.email = email;

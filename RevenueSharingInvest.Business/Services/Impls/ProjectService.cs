@@ -29,6 +29,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IProjectEntityRepository _projectEntityRepository;
         private readonly IStageRepository _stageRepository;
         private readonly IPeriodRevenueRepository _periodRevenueRepository;
+        private readonly IProjectWalletRepository _projectWalletRepository;
 
         private readonly IValidationService _validationService;
         private readonly IProjectTagService _projectTagService;
@@ -45,6 +46,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IProjectEntityRepository projectEntityRepository,
             IStageRepository stageRepository,
             IPeriodRevenueRepository periodRevenueRepository,
+            IProjectWalletRepository projectWalletRepository,
             IValidationService validationService,
             IProjectTagService projectTagService,
             IFileUploadService fileUploadService,
@@ -59,6 +61,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _projectEntityRepository = projectEntityRepository;
             _stageRepository = stageRepository;
             _periodRevenueRepository = periodRevenueRepository;
+            _projectWalletRepository = projectWalletRepository;
 
             _validationService = validationService;
             _projectTagService = projectTagService;
@@ -405,6 +408,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new CreateObjectException("Can not create Project Object!");
                 else
                 {
+                    //Tạo Stage và PeriodRevenue
                     Stage stage = new Stage();
                     PeriodRevenue periodRevenue = new PeriodRevenue();
                     string newStageId;
@@ -435,9 +439,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     newStageId = await _stageRepository.CreateStage(stage);
                     periodRevenue.StageId = Guid.Parse(newStageId);
                     newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
+
+                    //Tạo ví B2, B3
+                    await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B2")), Guid.Parse(currentUser.userId));
+                    await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")), Guid.Parse(currentUser.userId));
+
+                    //Update NumOfProject
+                    await _businessRepository.UpdateBusinessNumOfProject(Guid.Parse(currentUser.businessId));
                 }    
-                //Update NumOfProject
-                await _businessRepository.UpdateBusinessNumOfProject(Guid.Parse(currentUser.businessId));
+                
 
                 return newId;
             }
