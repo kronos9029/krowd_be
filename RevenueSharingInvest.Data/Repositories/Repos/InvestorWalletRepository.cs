@@ -98,7 +98,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     OR IW.WalletTypeId = @I3 "
                     + "     OR IW.WalletTypeId = @I4 "
                     + "     OR IW.WalletTypeId = @I5 ) "
-                    + " ORDER BY WT.Name ASC ";
+                    + " ORDER BY WT.Type ASC ";
                 var parameters = new DynamicParameters();
                 parameters.Add("InvestorId", investorId, DbType.Guid);
                 parameters.Add("I1", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I1")), DbType.Guid);

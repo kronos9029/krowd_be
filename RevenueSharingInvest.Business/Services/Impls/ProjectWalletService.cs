@@ -3,6 +3,7 @@ using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -110,13 +111,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
         //}
 
         //GET ALL
-        public async Task<List<GetProjectWalletDTO>> GetAllProjectWallets(ThisUserObj currentUser)
+        public async Task<UserWalletsDTO> GetAllProjectWallets(ThisUserObj currentUser)
         {
             try
             {
+                UserWalletsDTO result = new UserWalletsDTO();
+                result.listOfProjectWallet = new List<GetProjectWalletDTO>();
                 List<ProjectWallet> projectWalletList = await _projectWalletRepository.GetProjectWalletsByProjectManagerId(Guid.Parse(currentUser.userId));
                 List<MappedProjectWalletDTO> list = _mapper.Map<List<MappedProjectWalletDTO>>(projectWalletList);
-                List<GetProjectWalletDTO> result = new List<GetProjectWalletDTO>();
                 GetProjectWalletDTO dto = new GetProjectWalletDTO();
 
                 foreach (MappedProjectWalletDTO item in list)
@@ -127,7 +129,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     dto = _mapper.Map<GetProjectWalletDTO>(item);
                     dto.walletType = _mapper.Map<GetWalletTypeForWalletDTO>(await _walletTypeRepository.GetWalletTypeById(Guid.Parse(item.walletTypeId)));
 
-                    result.Add(dto);
+                    result.totalAsset += item.balance;
+                    result.listOfProjectWallet.Add(dto);
                 }
 
                 return result;

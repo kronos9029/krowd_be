@@ -3,6 +3,7 @@ using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -110,13 +111,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
         //}
 
         //GET ALL
-        public async Task<List<GetInvestorWalletDTO>> GetAllInvestorWallets(ThisUserObj currentUser)
+        public async Task<UserWalletsDTO> GetAllInvestorWallets(ThisUserObj currentUser)
         {
             try
             {
+                UserWalletsDTO result = new UserWalletsDTO();
+                result.listOfInvestorWallet = new List<GetInvestorWalletDTO>();
                 List<InvestorWallet> investorWalletList = await _investorWalletRepository.GetInvestorWalletsByInvestorId(Guid.Parse(currentUser.investorId));
                 List<MappedInvestorWalletDTO> list = _mapper.Map<List<MappedInvestorWalletDTO>>(investorWalletList);
-                List<GetInvestorWalletDTO> result = new List<GetInvestorWalletDTO>();
                 GetInvestorWalletDTO dto = new GetInvestorWalletDTO();
 
                 foreach (MappedInvestorWalletDTO item in list)
@@ -127,9 +129,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     dto = _mapper.Map<GetInvestorWalletDTO>(item);
                     dto.walletType = _mapper.Map<GetWalletTypeForWalletDTO>(await _walletTypeRepository.GetWalletTypeById(Guid.Parse(item.walletTypeId)));
 
-                    result.Add(dto);
+                    result.totalAsset += item.balance;
+                    result.listOfInvestorWallet.Add(dto);
                 }
-
                 return result;
             }
             catch (Exception e)

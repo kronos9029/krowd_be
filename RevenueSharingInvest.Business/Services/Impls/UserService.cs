@@ -291,6 +291,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 foreach (GetUserDTO item in listDTO)
                 {
+                    item.lastName = (item.lastName == null) ? "" : item.lastName; 
+                    item.firstName = (item.firstName == null) ? "" : item.firstName; 
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
 
@@ -333,6 +335,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (userDTO == null)
                     throw new NotFoundException("No User Found!");
 
+                userDTO.lastName = (userDTO.lastName == null) ? "" : userDTO.lastName;
+                userDTO.firstName = (userDTO.firstName == null) ? "" : userDTO.firstName;
                 userDTO.createDate = await _validationService.FormatDateOutput(userDTO.createDate);
                 userDTO.updateDate = await _validationService.FormatDateOutput(userDTO.updateDate);
 

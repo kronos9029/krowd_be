@@ -1,5 +1,6 @@
 ﻿using RevenueSharingInvest.API;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace RevenueSharingInvest.Business.Services
         //public Task<IdDTO> CreateProjectWallet(ProjectWalletDTO projectWalletDTO);
 
         //READ
-        public Task<List<GetProjectWalletDTO>> GetAllProjectWallets(ThisUserObj currentUser);
+        public Task<UserWalletsDTO> GetAllProjectWallets(ThisUserObj currentUser);
         //public Task<ProjectWalletDTO> GetProjectWalletById(Guid projectWalletId);
 
         //UPDATE

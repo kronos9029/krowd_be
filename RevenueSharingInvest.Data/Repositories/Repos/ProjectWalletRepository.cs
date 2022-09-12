@@ -93,13 +93,18 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = " SELECT * FROM ProjectWallet WHERE IsDeleted = 0 "
-                    + " AND ProjectManagerId = @ProjectManagerId "
-                    + " AND (WalletTypeId = @B1 OR WalletTypeId = @B4 ) "
-                    + " ORDER BY WalletTypeId ASC ";
+                var query = " SELECT PW.* FROM ProjectWallet PW JOIN WalletType WT ON PW.WalletTypeId = WT.Id WHERE PW.IsDeleted = 0 "
+                    + " AND PW.ProjectManagerId = @ProjectManagerId "
+                    + " AND (PW.WalletTypeId = @B1 " 
+                    + "     OR PW.WalletTypeId = @B2 ) "
+                    + "     OR PW.WalletTypeId = @B3 ) "
+                    + "     OR PW.WalletTypeId = @B4 ) "
+                    + " ORDER BY WT.Type ASC ";
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectManagerId", projectManagerId, DbType.Guid);
                 parameters.Add("B1", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B1")), DbType.Guid);
+                parameters.Add("B2", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B2")), DbType.Guid);
+                parameters.Add("B3", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")), DbType.Guid);
                 parameters.Add("B4", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B4")), DbType.Guid);
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<ProjectWallet>(query, parameters)).ToList();
