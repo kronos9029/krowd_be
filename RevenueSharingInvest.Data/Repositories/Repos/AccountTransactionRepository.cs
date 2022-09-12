@@ -32,7 +32,17 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateBy, "
                     + "         UpdateDate, "
                     + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         IsDeleted, "
+                    + "         PartnerCode, "
+                    + "         OrderId, "
+                    + "         RequestId, "
+                    + "         Amount, "
+                    + "         ResponseTime, "
+                    + "         Message, "
+                    + "         ResultCode, "
+                    + "         PayUrl, "
+                    + "         Deeplink, "
+                    + "         QrCodeUrl ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -44,7 +54,17 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
                     + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         0, "
+                    + "         @PartnerCode, "
+                    + "         @OrderId, "
+                    + "         @RequestId, "
+                    + "         @Amount, "
+                    + "         @ResponseTime, "
+                    + "         @Message, "
+                    + "         @ResultCode, "
+                    + "         @PayUrl, "
+                    + "         @Deeplink, "
+                    + "         @QrCodeUrl ) ";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("FromUserId", accountTransactionDTO.FromUserId, DbType.Guid);
@@ -55,6 +75,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("CreateBy", accountTransactionDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", accountTransactionDTO.UpdateBy, DbType.Guid);
+                parameters.Add("PartnerCode", accountTransactionDTO.PartnerCode, DbType.String);
+                parameters.Add("OrderId", accountTransactionDTO.OrderId, DbType.String);
+                parameters.Add("RequestId", accountTransactionDTO.RequestId, DbType.String);
+                parameters.Add("Amount", accountTransactionDTO.Amount, DbType.Int32);
+                parameters.Add("ResponseTime", accountTransactionDTO.ResponseTime, DbType.Int32);
+                parameters.Add("Message", accountTransactionDTO.Message, DbType.String);
+                parameters.Add("ResultCode", accountTransactionDTO.ResultCode, DbType.String);
+                parameters.Add("PayUrl", accountTransactionDTO.PayUrl, DbType.String);
+                parameters.Add("Deeplink", accountTransactionDTO.Deeplink, DbType.String);
+                parameters.Add("QrCodeUrl", accountTransactionDTO.QrCodeUrl, DbType.String);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();

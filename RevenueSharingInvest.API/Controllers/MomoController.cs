@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models;
+using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Business.Services.Extensions.Momo;
 using System;
 using System.Threading.Tasks;
@@ -18,11 +19,13 @@ namespace RevenueSharingInvest.API.Controllers
     [AllowAnonymous]
     public class MomoController : ControllerBase
     {
+        private readonly IAccountTransactionService _accountTransactionService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly MomoSettings _momoSettings;
 
-        public MomoController(IOptions<MomoSettings> momoSettings, IHttpContextAccessor httpContextAccessor)
+        public MomoController(IOptions<MomoSettings> momoSettings, IAccountTransactionService accountTransactionService, IHttpContextAccessor httpContextAccessor)
         {
+            _accountTransactionService = accountTransactionService;
             _httpContextAccessor = httpContextAccessor;
             _momoSettings = momoSettings.Value;
         }
@@ -93,10 +96,10 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPost]
         [Route("confirm")]
-        public async Task<IActionResult> ConfirmPaymentClient(MomoPaymentResult result)
+        public async Task<IActionResult> ConfirmPaymentClient(MomoPaymentResult momoPaymentResult)
         {
-            
 
+            var result = await _accountTransactionService.CreateAccountTransaction(momoPaymentResult);
             return Ok(result);
         }
 

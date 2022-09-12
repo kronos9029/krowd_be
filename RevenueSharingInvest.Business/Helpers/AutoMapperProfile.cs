@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RevenueSharingInvest.Business.Models;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using System;
@@ -85,6 +86,8 @@ namespace RevenueSharingInvest.Business.Helpers
 
             CreateMap<ProjectWallet, MappedProjectWalletDTO>().ReverseMap();
             CreateMap<MappedProjectWalletDTO, GetProjectWalletDTO>().ReverseMap();
+
+            CreateMap<AccountTransaction, MomoPaymentResult>().ReverseMap();
         }
     }
 }
