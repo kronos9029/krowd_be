@@ -29,7 +29,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPost]
         [Route("request")]
-        public async Task<IActionResult> RequestPayment()
+        public async Task<IActionResult> RequestPayment(MomoPaymentRequest request)
         {
             //request params need to request to MoMo system
             string endpoint = _momoSettings.ApiEndpoint;
@@ -43,7 +43,7 @@ namespace RevenueSharingInvest.API.Controllers
             string amount = "2000000";
             string orderid = Guid.NewGuid().ToString(); //mã đơn hàng
             string requestId = Guid.NewGuid().ToString();
-            string extraData = "";
+            string extraData = "topup";
             string requestType = "captureWallet";
 
             //Before sign HMAC SHA256 signature
@@ -93,11 +93,9 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPost]
         [Route("confirm")]
-        public async Task<IActionResult> ConfirmPaymentClient(MomoPaymentResult result)
+        public async Task<IActionResult> ConfirmPaymentClient(MomoPaymentRequest result)
         {
-            string rMessage = result.message;
-            string rOrderId = result.orderId;
-            string rErrorCode = result.errorCode; // = 0: thanh toán thành công
+            
 
             return Ok(result);
         }
