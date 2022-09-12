@@ -91,14 +91,20 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = " SELECT * FROM InvestorWallet WHERE IsDeleted = 0 " 
-                    + " AND InvestorId = @InvestorId " 
-                    + " AND (WalletTypeId = @I1 OR WalletTypeId = @I2 OR WalletTypeId = @I5 ) "
-                    + " ORDER BY WalletTypeId ASC ";
+                var query = " SELECT IW.* FROM InvestorWallet IW JOIN WalletType WT ON IW.WalletTypeId = WT.Id WHERE IW.IsDeleted = 0 "
+                    + " AND IW.InvestorId = @InvestorId "
+                    + " AND (IW.WalletTypeId = @I1 "
+                    + "     OR IW.WalletTypeId = @I2 "
+                    + "     OR IW.WalletTypeId = @I3 "
+                    + "     OR IW.WalletTypeId = @I4 "
+                    + "     OR IW.WalletTypeId = @I5 ) "
+                    + " ORDER BY WT.Type ASC ";
                 var parameters = new DynamicParameters();
                 parameters.Add("InvestorId", investorId, DbType.Guid);
                 parameters.Add("I1", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I1")), DbType.Guid);
                 parameters.Add("I2", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")), DbType.Guid);
+                parameters.Add("I3", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3")), DbType.Guid);
+                parameters.Add("I4", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I4")), DbType.Guid);
                 parameters.Add("I5", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I5")), DbType.Guid);
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<InvestorWallet>(query, parameters)).ToList();               

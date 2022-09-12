@@ -42,7 +42,7 @@ namespace RevenueSharingInvest.API.Controllers
             //PROJECT_MANAGER
             if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
-                var result = await _projectEntityService.CreateProjectEntity(projectEntityDTO, null);
+                var result = await _projectEntityService.CreateProjectEntity(projectEntityDTO, currentUser);
                 return Ok(result);
         }
             return StatusCode((int) HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER can perform this action!!!");
