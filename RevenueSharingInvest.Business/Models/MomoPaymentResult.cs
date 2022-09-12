@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.Business.Models
 {
 
-    public class MomoPaymentRequest
+    public class MomoPaymentResult
     {
         public string partnerCode { get; set; }
         public string orderId { get; set; }
@@ -21,7 +21,7 @@ namespace RevenueSharingInvest.Business.Models
         public string qrCodeUrl { get; set; }
 }
 
-    public class MomoPaymentResult
+    public class MomoPaymentRequest
     {
         public string partnerCode { get; set; }
         public string accessKey { get; set; }

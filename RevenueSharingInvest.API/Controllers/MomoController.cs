@@ -93,7 +93,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPost]
         [Route("confirm")]
-        public async Task<IActionResult> ConfirmPaymentClient(MomoPaymentRequest result)
+        public async Task<IActionResult> ConfirmPaymentClient(MomoPaymentResult result)
         {
             
 
