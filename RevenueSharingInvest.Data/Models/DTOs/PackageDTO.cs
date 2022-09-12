@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public float price { get; set; }
         public string image { get; set; }
         public int quantity { get; set; }
-        public string description { get; set; }
+        public List<string> descriptionList { get; set; }
     }
 
     public class CreateUpdatePackageDTO : PackageDTO
@@ -30,6 +30,5 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string createBy { get; set; }
         public string updateDate { get; set; }
         public string updateBy { get; set; }
-        public bool isDeleted { get; set; }
     }
 }

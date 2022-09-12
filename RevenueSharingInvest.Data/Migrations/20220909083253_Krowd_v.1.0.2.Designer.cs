@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RevenueSharingInvest.Data.Models.Entities;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
     [DbContext(typeof(KrowdContext))]
-    partial class KrowdContextModelSnapshot : ModelSnapshot
+    [Migration("20220909083253_Krowd_v.1.0.2")]
+    partial class Krowd_v102
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -751,6 +753,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Link")
                         .HasColumnType("nvarchar(max)");

@@ -26,12 +26,11 @@ namespace RevenueSharingInvest.API.Controllers
         private readonly IRoleService _roleService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor, IRoleService roleService)
+        public UserController(IUserService userService, IRoleService roleService, IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
             _roleService = roleService;
             _httpContextAccessor = httpContextAccessor;
-            _roleService = roleService;
         }
 
         [HttpPost]

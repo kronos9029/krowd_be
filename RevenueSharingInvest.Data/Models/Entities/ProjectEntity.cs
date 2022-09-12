@@ -25,7 +25,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
-        public bool? IsDeleted { get; set; }
         public string Content { get; set; }
         public string Link { get; set; }
         public int Priority { get; set; }

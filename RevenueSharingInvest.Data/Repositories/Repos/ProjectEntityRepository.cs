@@ -34,8 +34,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -49,8 +48,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy) ";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", projectEntityDTO.ProjectId, DbType.Guid);
@@ -91,8 +89,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy) "
                     + "     VALUES ( "
                     + "         @Id, "
                     + "         @ProjectId, "
@@ -105,8 +102,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy) ";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", projectEntityDTO.Id, DbType.Guid);
@@ -132,14 +128,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteProjectEntityById(Guid projectEntityId)//thiếu para UpdateBy
+        public async Task<int> DeleteProjectEntityById(Guid projectEntityId)
         {
             try
             {
                 var query = "DELETE FROM "
                     + "         ProjectEntity "
                     + "     WHERE "
-                    + "         Id=@Id";
+                    + "         Id = @Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", projectEntityId, DbType.Guid);
@@ -153,59 +149,59 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<ProjectEntity>> GetAllProjectEntities(int pageIndex, int pageSize)
-        {
-            try
-            {
-                if (pageIndex != 0 && pageSize != 0)
-                {
-                    var query = "WITH X AS ( "
-                    + "         SELECT "
-                    + "             ROW_NUMBER() OVER ( "
-                    + "                 ORDER BY "
-                    + "                     ProjectId ASC, "
-                    + "                     Priority ASC ) AS Num, "
-                    + "             * "
-                    + "         FROM ProjectEntity "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
-                    + "     SELECT "
-                    + "         Id, "
-                    + "         ProjectId, "
-                    + "         Title, "
-                    + "         Link, "
-                    + "         Content, "
-                    + "         Description, "
-                    + "         Priority, "
-                    + "         Type, "
-                    + "         CreateDate, "
-                    + "         CreateBy, "
-                    + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
-                    + "     FROM "
-                    + "         X "
-                    + "     WHERE "
-                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
-                    + "         AND @PageIndex * @PageSize";
-                    var parameters = new DynamicParameters();
-                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
-                    parameters.Add("PageSize", pageSize, DbType.Int16);
-                    using var connection = CreateConnection();
-                    return (await connection.QueryAsync<ProjectEntity>(query, parameters)).ToList();
-                }
-                else
-                {
-                    var query = "SELECT * FROM ProjectEntity WHERE IsDeleted = 0 ORDER BY ProjectId ASC, Priority ASC";
-                    using var connection = CreateConnection();
-                    return (await connection.QueryAsync<ProjectEntity>(query)).ToList();
-                }               
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message, e);
-            }
-        }
+        //public async Task<List<ProjectEntity>> GetAllProjectEntities(int pageIndex, int pageSize)
+        //{
+        //    try
+        //    {
+        //        if (pageIndex != 0 && pageSize != 0)
+        //        {
+        //            var query = "WITH X AS ( "
+        //            + "         SELECT "
+        //            + "             ROW_NUMBER() OVER ( "
+        //            + "                 ORDER BY "
+        //            + "                     ProjectId ASC, "
+        //            + "                     Priority ASC ) AS Num, "
+        //            + "             * "
+        //            + "         FROM ProjectEntity "
+        //            + "         WHERE "
+        //            + "             IsDeleted = 0 ) "
+        //            + "     SELECT "
+        //            + "         Id, "
+        //            + "         ProjectId, "
+        //            + "         Title, "
+        //            + "         Link, "
+        //            + "         Content, "
+        //            + "         Description, "
+        //            + "         Priority, "
+        //            + "         Type, "
+        //            + "         CreateDate, "
+        //            + "         CreateBy, "
+        //            + "         UpdateDate, "
+        //            + "         UpdateBy, "
+        //            + "         IsDeleted "
+        //            + "     FROM "
+        //            + "         X "
+        //            + "     WHERE "
+        //            + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+        //            + "         AND @PageIndex * @PageSize";
+        //            var parameters = new DynamicParameters();
+        //            parameters.Add("PageIndex", pageIndex, DbType.Int16);
+        //            parameters.Add("PageSize", pageSize, DbType.Int16);
+        //            using var connection = CreateConnection();
+        //            return (await connection.QueryAsync<ProjectEntity>(query, parameters)).ToList();
+        //        }
+        //        else
+        //        {
+        //            var query = "SELECT * FROM ProjectEntity WHERE IsDeleted = 0 ORDER BY ProjectId ASC, Priority ASC";
+        //            using var connection = CreateConnection();
+        //            return (await connection.QueryAsync<ProjectEntity>(query)).ToList();
+        //        }               
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new Exception(e.Message, e);
+        //    }
+        //}
 
         //GET BY ID
         public async Task<ProjectEntity> GetProjectEntityById(Guid projectEntityId)
@@ -231,14 +227,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE ProjectEntity "
                     + "     SET "
-                    + "         ProjectId = @ProjectId, "
-                    + "         Title = @Title, "
-                    + "         Link = @Link, "
-                    + "         Content = @Content, "
-                    + "         Description = @Description, "
-                    + "         Type = @Type, "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
+                    + "         ProjectId = ISNULL(@ProjectId, ProjectId), "
+                    + "         Title = ISNULL(@Title, Title), "
+                    + "         Link = ISNULL(@Link, Link), "
+                    + "         Content = ISNULL(@Content, Content), "
+                    + "         Description = ISNULL(@Description, Description), "
+                    + "         Type = ISNULL(@Type, Type), "
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -283,19 +279,25 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
+                var parameters = new DynamicParameters();
+
+                string whereCondition = " WHERE ProjectId = @ProjectId ";
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+
+                if (type != null)
+                {
+                    whereCondition = whereCondition + " AND Type = @Type ";
+                    parameters.Add("Type", type, DbType.String);
+                }
+                    
                 string query = "SELECT " 
                     + "             * " 
                     + "         FROM " 
                     + "             ProjectEntity "
-                    + "         WHERE " 
-                    + "             ProjectId = @ProjectId " 
-                    + "             AND Type = @Type " 
-                    + "             AND IsDeleted = 0 "
+                    +           whereCondition 
                     + "         ORDER BY "
-                    + "             Priority ASC ";
-                var parameters = new DynamicParameters();
-                parameters.Add("ProjectId", projectId, DbType.Guid);
-                parameters.Add("Type", type, DbType.String);
+                    + "             Type ASC, Priority ASC ";                             
+
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<ProjectEntity>(query, parameters)).ToList();
             }
@@ -315,8 +317,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "             ProjectEntity "
                     + "         WHERE "
                     + "             ProjectId = @ProjectId " 
-                    + "             AND Type = @Type " 
-                    + "             AND IsDeleted = 0";
+                    + "             AND Type = @Type ";
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", projectId, DbType.Guid);
                 parameters.Add("Type", type, DbType.String);
@@ -352,20 +353,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public async Task<int> UpdateProjectEntityPriority(Guid projectEntityId, int priority)
+        public async Task<int> UpdateProjectEntityPriority(Guid projectEntityId, int priority, Guid? updaterId)
         {
             try
             {
                 var query = "UPDATE ProjectEntity "
                     + "     SET "
                     + "         Priority = @Priority, "
-                    + "         UpdateDate = @UpdateDate "
+                    + "         UpdateDate = @UpdateDate, "
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
                     + "     WHERE "
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Priority", priority, DbType.Int16);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateBy", updaterId, DbType.Guid);
                 parameters.Add("Id", projectEntityId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -394,8 +397,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     VALUES ( "
                     + "         @Id, "
                     + "         @ProjectId, "
@@ -407,8 +409,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", projectEntityDTO.Id, DbType.Guid);

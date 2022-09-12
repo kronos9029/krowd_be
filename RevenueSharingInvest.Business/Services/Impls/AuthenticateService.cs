@@ -86,7 +86,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 //Tạo Investor object
                 investor.UserId = Guid.Parse(newUserID);
-                //investor.InvestorTypeId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.INVESTOR.ToString()));
                 string newInvestorID = await _investorRepository.CreateInvestor(investor);
                 if (newInvestorID.Equals("")) 
                 {
@@ -153,7 +152,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 response.roleName = isBusinessManager ? RoleEnum.BUSINESS_MANAGER.ToString() : RoleEnum.PROJECT_MANAGER.ToString();
                 response.image = userObject.Image ?? ImageUrl;
                 response.fullName = userObject.FirstName + " " + userObject.LastName;
-                response = await GenerateTokenAsync(response, RoleEnum.BUSINESS_MANAGER.ToString());
+                response = await GenerateTokenAsync(response, response.roleName);
 
                 return response;
                 
@@ -164,7 +163,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             
         }
 
-/*        public async Task<AuthenticateResponse> GetTokenProjectManager(string firebaseToken)
+        public async Task<AuthenticateResponse> GetTokenProjectManager(string firebaseToken)
         {
             FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
             string uid = decryptedToken.Uid;
@@ -195,7 +194,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
 
             return response;
-        }*/
+        }
 
         public async Task<AuthenticateResponse> GetTokenAdmin(string firebaseToken)
         {

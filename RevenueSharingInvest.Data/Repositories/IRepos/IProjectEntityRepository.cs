@@ -14,14 +14,14 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> CreateProjectEntityById(ProjectEntity projectEntityDTO);
 
         //READ
-        public Task<List<ProjectEntity>> GetAllProjectEntities(int pageIndex, int pageSize);
+        //public Task<List<ProjectEntity>> GetAllProjectEntities(int pageIndex, int pageSize);
         public Task<ProjectEntity> GetProjectEntityById(Guid projectEntityId);
         public Task<List<ProjectEntity>> GetProjectEntityByProjectIdAndType(Guid projectId, string type);
         public Task<int> CountProjectEntityByProjectIdAndType(Guid projectId, string type);
 
         //UPDATE
         public Task<int> UpdateProjectEntity(ProjectEntity projectEntityDTO, Guid projectEntityId);
-        public Task<int> UpdateProjectEntityPriority(Guid projectEntityId, int priority);
+        public Task<int> UpdateProjectEntityPriority(Guid projectEntityId, int priority, Guid? updaterId);
 
         //DELETE
         public Task<int> DeleteProjectEntityById(Guid projectId);
