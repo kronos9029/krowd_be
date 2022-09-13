@@ -53,7 +53,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreateProjectEntity(CreateUpdateProjectEntityDTO projectEntityDTO, ThisUserObj currentUser)
+        public async Task<IdDTO> CreateProjectEntity(CreateProjectEntityDTO projectEntityDTO, ThisUserObj currentUser)
         {
             IdDTO newId = new IdDTO();
             bool typeCheck = false;
@@ -235,29 +235,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdateProjectEntity(CreateUpdateProjectEntityDTO projectEntityDTO, Guid projectEntityId, ThisUserObj currentUser)
+        public async Task<int> UpdateProjectEntity(UpdateProjectEntityDTO projectEntityDTO, Guid projectEntityId, ThisUserObj currentUser)
         {
             int result;
             bool typeCheck = false;
             string typeErrorMessage = "";
             try
             {
-                if (projectEntityDTO.projectId != null)
-                {
-                    if (!await _validationService.CheckUUIDFormat(projectEntityDTO.projectId))
-                        throw new InvalidFieldException("Invalid projectId!!!");
+                ProjectEntity projectEntity = await _projectEntityRepository.GetProjectEntityById(projectEntityId);
+                Project project = await _projectRepository.GetProjectById(projectEntity.ProjectId);
 
-                    if (!await _validationService.CheckExistenceId("Project", Guid.Parse(projectEntityDTO.projectId)))
-                        throw new NotFoundException("This projectId is not existed!!!");
-
-                    //Kiểm tra projectId có thuộc về business của PM không
-                    Project project = await _projectRepository.GetProjectById(Guid.Parse(projectEntityDTO.projectId));
-                    if (!project.BusinessId.ToString().Equals(currentUser.businessId))
-                    {
-                        throw new NotFoundException("This projectId is not belong to your's Business!!!");
-                    }
-                    //
-                }
+                if (!project.ManagerId.ToString().Equals(currentUser.userId))
+                    throw new InvalidFieldException("This projectEntityId is not belong to your Project!!!");
 
                 if (projectEntityDTO.title != null)
                 {

@@ -63,22 +63,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeletePeriodRevenueById(Guid periodRevenueId)//thiếu para UpdateBy
+        public async Task<int> DeletePeriodRevenueByStageId(Guid stageId)
         {
             try
             {
-                var query = "UPDATE PeriodRevenue "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
+                var query = "DELETE FROM PeriodRevenue WHERE StageId = @StageId";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", periodRevenueDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", periodRevenueId, DbType.Guid);
+                parameters.Add("StageId", stageId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -225,6 +217,63 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<PeriodRevenue> GetPeriodRevenueByStageId(Guid stageId)
+        {
+            try
+            {
+                string query = "SELECT * FROM PeriodRevenue WHERE StageId = @StageId";
+                var parameters = new DynamicParameters();
+                parameters.Add("StageId", stageId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<PeriodRevenue>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //UPDATE BY STAGE ID
+        public async Task<int> UpdatePeriodRevenueByStageId(PeriodRevenue periodRevenueDTO, Guid stageId)
+        {
+            try
+            {
+                var query = "UPDATE PeriodRevenue "
+                    + "     SET "
+                    + "         PessimisticExpectedAmount = @PessimisticExpectedAmount, "
+                    + "         NormalExpectedAmount = @NormalExpectedAmount, "
+                    + "         OptimisticExpectedAmount = @OptimisticExpectedAmount, "
+                    + "         PessimisticExpectedRatio = @PessimisticExpectedRatio, "
+                    + "         NormalExpectedRatio = @NormalExpectedRatio, "
+                    + "         OptimisticExpectedRatio = @OptimisticExpectedRatio, "
+                    + "         UpdateDate = @UpdateDate, "
+                    + "         UpdateBy = @UpdateBy "
+                    + "     WHERE "
+                    + "         StageId = @StageId";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("ActualAmount", periodRevenueDTO.ActualAmount, DbType.Double);
+                parameters.Add("PessimisticExpectedAmount", periodRevenueDTO.PessimisticExpectedAmount, DbType.Double);
+                parameters.Add("NormalExpectedAmount", periodRevenueDTO.NormalExpectedAmount, DbType.Double);
+                parameters.Add("OptimisticExpectedAmount", periodRevenueDTO.OptimisticExpectedAmount, DbType.Double);
+                parameters.Add("PessimisticExpectedRatio", periodRevenueDTO.PessimisticExpectedRatio, DbType.Double);
+                parameters.Add("NormalExpectedRatio", periodRevenueDTO.NormalExpectedRatio, DbType.Double);
+                parameters.Add("OptimisticExpectedRatio", periodRevenueDTO.OptimisticExpectedRatio, DbType.Double);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateBy", periodRevenueDTO.UpdateBy, DbType.Guid);
+                parameters.Add("StageId", stageId, DbType.Guid);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
             }
         }
     }

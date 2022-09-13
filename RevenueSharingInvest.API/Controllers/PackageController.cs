@@ -36,7 +36,7 @@ namespace RevenueSharingInvest.API.Controllers
         //CREATE
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreatePackage([FromForm] CreateUpdatePackageDTO packageDTO)
+        public async Task<IActionResult> CreatePackage([FromForm] CreatePackageDTO packageDTO)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
@@ -96,7 +96,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPut]
         [Route("{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdatePackage([FromForm] CreateUpdatePackageDTO packageDTO, Guid id)
+        public async Task<IActionResult> UpdatePackage([FromForm] UpdatePackageDTO packageDTO, Guid id)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 

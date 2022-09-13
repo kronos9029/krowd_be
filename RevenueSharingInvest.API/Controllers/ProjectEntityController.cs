@@ -35,7 +35,7 @@ namespace RevenueSharingInvest.API.Controllers
         //CREATE
         [HttpPost]
         [Authorize(Roles = "PROJECT_MANAGER")]
-        public async Task<IActionResult> CreateProjectEntity([FromBody] CreateUpdateProjectEntityDTO projectEntityDTO)
+        public async Task<IActionResult> CreateProjectEntity([FromBody] CreateProjectEntityDTO projectEntityDTO)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
@@ -99,7 +99,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPut]
         [Route("{id}")]
         [Authorize(Roles = "PROJECT_MANAGER")]
-        public async Task<IActionResult> UpdateProjectEntity([FromForm] CreateUpdateProjectEntityDTO projectEntityDTO, Guid id)
+        public async Task<IActionResult> UpdateProjectEntity([FromForm] UpdateProjectEntityDTO projectEntityDTO, Guid id)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 

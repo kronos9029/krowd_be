@@ -11,14 +11,14 @@ namespace RevenueSharingInvest.Business.Services
     public interface IProjectEntityService
     {
         //CREATE
-        public Task<IdDTO> CreateProjectEntity(CreateUpdateProjectEntityDTO projectEntityDTO, ThisUserObj currentUser);
+        public Task<IdDTO> CreateProjectEntity(CreateProjectEntityDTO projectEntityDTO, ThisUserObj currentUser);
 
         //READ
         public Task<List<GetProjectEntityDTO>> GetProjectEntityByProjectIdAndType(Guid projectId, string type, ThisUserObj currentUser);
         public Task<GetProjectEntityDTO> GetProjectEntityById(Guid projectEntityId, ThisUserObj currentUser);
 
         //UPDATE
-        public Task<int> UpdateProjectEntity(CreateUpdateProjectEntityDTO projectEntityDTO, Guid projectEntityId, ThisUserObj currentUser);
+        public Task<int> UpdateProjectEntity(UpdateProjectEntityDTO projectEntityDTO, Guid projectEntityId, ThisUserObj currentUser);
         public Task<int> UpdateProjectEntityPriority(List<ProjectEntityUpdateDTO> idList, ThisUserObj currentUser);
 
         //DELETE

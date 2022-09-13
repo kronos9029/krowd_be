@@ -60,10 +60,12 @@ namespace RevenueSharingInvest.Business.Helpers
             
             CreateMap<ProjectEntity, GetProjectEntityDTO>().ReverseMap();
             CreateMap<ProjectEntity, ProjectComponentProjectEntityDTO>().ReverseMap();
-            CreateMap<ProjectEntity, CreateUpdateProjectEntityDTO>().ReverseMap();
+            CreateMap<ProjectEntity, CreateProjectEntityDTO>().ReverseMap();
+            CreateMap<ProjectEntity, UpdateProjectEntityDTO>().ReverseMap();
 
             CreateMap<Package, GetPackageDTO>().ReverseMap();
-            CreateMap<Package, CreateUpdatePackageDTO>().ReverseMap();
+            CreateMap<Package, CreatePackageDTO>().ReverseMap();
+            CreateMap<Package, UpdatePackageDTO>().ReverseMap();
 
             CreateMap<Investor, GetInvestorDTO>().ReverseMap();
 

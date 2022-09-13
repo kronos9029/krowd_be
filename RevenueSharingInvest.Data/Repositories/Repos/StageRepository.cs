@@ -34,8 +34,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -48,8 +47,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", stageDTO.Name, DbType.String);
@@ -73,21 +71,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteStageById(Guid stageId)//thiếu para UpdateBy
+        public async Task<int> DeleteStageById(Guid stageId)
         {
             try
             {
-                var query = "UPDATE Stage "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
+                var query = "DELETE FROM Stage WHERE Id = @Id ";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", stageDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", stageId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
@@ -99,53 +89,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Stage>> GetAllStages(int pageIndex, int pageSize)
+        public async Task<List<Stage>> GetAllStagesByProjectId(Guid projectId)
         {
             try
             {
-                if (pageIndex != 0 && pageSize != 0)
-                {
-                    var query = "WITH X AS ( "
-                    + "         SELECT "
-                    + "             ROW_NUMBER() OVER ( "
-                    + "                 ORDER BY "
-                    + "                     ProjectId ASC, "
-                    + "                     Name ASC ) AS Num, "
-                    + "             * "
-                    + "         FROM Stage "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
-                    + "     SELECT "
-                    + "         Id, "
-                    + "         Name, "
-                    + "         ProjectId, "
-                    + "         Description, "
-                    + "         Percents, "
-                    + "         StartDate, "
-                    + "         EndDate, "
-                    + "         Status, "
-                    + "         CreateDate, "
-                    + "         CreateBy, "
-                    + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
-                    + "     FROM "
-                    + "         X "
-                    + "     WHERE "
-                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
-                    + "         AND @PageIndex * @PageSize";
-                    var parameters = new DynamicParameters();
-                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
-                    parameters.Add("PageSize", pageSize, DbType.Int16);
-                    using var connection = CreateConnection();
-                    return (await connection.QueryAsync<Stage>(query, parameters)).ToList();
-                }
-                else
-                {
-                    var query = "SELECT * FROM Stage WHERE IsDeleted = 0 ORDER BY ProjectId ASC, Name ASC";
-                    using var connection = CreateConnection();
-                    return (await connection.QueryAsync<Stage>(query)).ToList();
-                }            
+                var query = "SELECT * FROM Stage WHERE ProjectId = @ProjectId ORDER BY CreateDate ASC";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<Stage>(query, parameters)).ToList();                        
             }
             catch (Exception e)
             {
@@ -177,30 +129,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE Stage "
                     + "     SET "
-                    + "         Name = @Name, "
-                    + "         ProjectId = @ProjectId, "
-                    + "         Description = @Description, "
-                    //+ "         Percents = @Percents, "
-                    + "         StartDate = @StartDate, "
-                    + "         EndDate = @EndDate, "
-                    + "         Status = @Status, "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         Name = ISNULL(@Name, Name), "
+                    + "         Description = ISNULL(@Description, Description), "
+                    + "         StartDate = ISNULL(@StartDate, StartDate), "
+                    + "         EndDate = ISNULL(@EndDate, EndDate), "
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
                     + "     WHERE "
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", stageDTO.Name, DbType.String);
-                parameters.Add("ProjectId", stageDTO.ProjectId, DbType.Guid);
                 parameters.Add("Description", stageDTO.Description, DbType.String);
-                //parameters.Add("Percents", stageDTO.Percents, DbType.Double);
                 parameters.Add("StartDate", stageDTO.StartDate, DbType.DateTime);
                 parameters.Add("EndDate", stageDTO.EndDate, DbType.DateTime);
-                parameters.Add("Status", stageDTO.Status, DbType.String);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", stageDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", stageDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", stageId, DbType.Guid);
 
                 using (var connection = CreateConnection())

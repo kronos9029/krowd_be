@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Models
 {
-    public class FirebaseRequest : CreateUpdateProjectEntityDTO
+    public class FirebaseRequest : CreateProjectEntityDTO
     {
         public string businessId { get; set; }
         public string createBy { get; set; }

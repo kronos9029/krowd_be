@@ -1,4 +1,6 @@
-﻿using RevenueSharingInvest.Data.Models.DTOs;
+﻿using RevenueSharingInvest.API;
+using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,17 +12,15 @@ namespace RevenueSharingInvest.Business.Services
     public interface IStageService
     {
         //CREATE
-        //public Task<IdDTO> CreateStage(StageDTO stageDTO);
 
         //READ
-        public Task<List<GetStageDTO>> GetAllStages(int pageIndex, int pageSize);
-        public Task<GetStageDTO> GetStageById(Guid stageId);
+        public Task<AllStageDTO> GetAllStagesByProjectId(Guid projectId, ThisUserObj currentUser);
+        public Task<GetStageDTO> GetStageById(Guid stageId, ThisUserObj currentUser);
 
         //UPDATE
-        public Task<int> UpdateStage(UpdateStageDTO stageDTO, Guid stageId);
+        public Task<int> UpdateStage(UpdateStageDTO stageDTO, Guid stageId, ThisUserObj currentUser);
 
         //DELETE
-        //public Task<int> DeleteStageById(Guid stageId);
-        //public Task<int> ClearAllStageData();
+        public Task<int> DeleteStageById(Guid stageId);
     }
 }

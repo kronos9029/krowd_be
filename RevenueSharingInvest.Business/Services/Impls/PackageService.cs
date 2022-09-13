@@ -46,7 +46,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreatePackage(CreateUpdatePackageDTO packageDTO, ThisUserObj currentUser)
+        public async Task<IdDTO> CreatePackage(CreatePackageDTO packageDTO, ThisUserObj currentUser)
         {
             IdDTO newId = new IdDTO();
             try
@@ -178,9 +178,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             try
             {
-                if (!await _validationService.CheckUUIDFormat(packageId.ToString()))
-                    throw new InvalidFieldException("Invalid packageId!!!");
-
                 Package package = await _packageRepository.GetPackageById(packageId);
                 if (package == null)
                     throw new NotFoundException("No Package Object Found!");
@@ -216,27 +213,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //UPDATE
-        public async Task<int> UpdatePackage(CreateUpdatePackageDTO packageDTO, Guid packageId, ThisUserObj currentUser)
+        public async Task<int> UpdatePackage(UpdatePackageDTO packageDTO, Guid packageId, ThisUserObj currentUser)
         {
             int result;
             try
             {
-                if (packageDTO.name != null && !await _validationService.CheckText(packageDTO.name))
-                    throw new InvalidFieldException("Invalid name!!!");
-
-                if (packageDTO.projectId != null && !await _validationService.CheckUUIDFormat(packageDTO.projectId))
-                    throw new InvalidFieldException("Invalid projectId!!!");
-
-                if (packageDTO.projectId != null && !await _validationService.CheckExistenceId("Project", Guid.Parse(packageDTO.projectId)))
-                    throw new NotFoundException("This projectId is not existed!!!");
-
-                //Kiểm tra projectId có thuộc về business của PM không
-                Project project = await _projectRepository.GetProjectById(Guid.Parse(packageDTO.projectId));
-                if (!project.BusinessId.ToString().Equals(currentUser.businessId))
+                Package package = await _packageRepository.GetPackageById(packageId);
+                Project project = await _projectRepository.GetProjectById(package.ProjectId);
+                if (!project.ManagerId.ToString().Equals(currentUser.userId))
                 {
-                    throw new NotFoundException("This projectId is not belong to your's Business!!!");
+                    throw new NotFoundException("This packageId is not belong to your Project!!!");
                 }
-                //
+
+                if (packageDTO.name != null && !await _validationService.CheckText(packageDTO.name))
+                    throw new InvalidFieldException("Invalid name!!!");                
 
                 if (packageDTO.price != 0 && packageDTO.price <= 0)
                     throw new InvalidFieldException("price must be greater than 0!!!");

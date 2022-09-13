@@ -21,8 +21,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
 
         [Key]
         public Guid Id { get; set; }
-        public Guid? ProjectId { get; set; }
-        public Guid? StageId { get; set; }
+        public Guid ProjectId { get; set; }
+        public Guid StageId { get; set; }
         public double? ActualAmount { get; set; }
         public double? PessimisticExpectedAmount { get; set; }
         public double? OptimisticExpectedAmount { get; set; }
