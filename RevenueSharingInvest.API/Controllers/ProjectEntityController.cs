@@ -50,7 +50,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         //GET ALL
         [HttpGet]
-        [Route("{project_id}")]
+        [Route("project/{project_id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetProjectEntityByProjectIdAndType(Guid project_Id, string type)
         {
