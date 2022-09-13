@@ -29,8 +29,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public bool? IsDeleted { get; set; }
         ///MOMO
         public string PartnerCode { get; set; }
-        public string OrderId { get; set; }
         public string RequestId { get; set; }
+        public string OrderId { get; set; }
         public long Amount { get; set; }
         public long ResponseTime { get; set; }
         public string Message { get; set; }
@@ -38,6 +38,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string PayUrl { get; set; }
         public string Deeplink { get; set; }
         public string QrCodeUrl { get; set; }
+        public string PartnerClientId { get; set; }
 
         [ForeignKey(nameof(FromUserId))]
         [InverseProperty(nameof(User.AccountTransactionFromUsers))]

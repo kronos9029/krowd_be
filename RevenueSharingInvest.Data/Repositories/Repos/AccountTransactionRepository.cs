@@ -78,8 +78,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("PartnerCode", accountTransactionDTO.PartnerCode, DbType.String);
                 parameters.Add("OrderId", accountTransactionDTO.OrderId, DbType.String);
                 parameters.Add("RequestId", accountTransactionDTO.RequestId, DbType.String);
-                parameters.Add("Amount", accountTransactionDTO.Amount, DbType.Int32);
-                parameters.Add("ResponseTime", accountTransactionDTO.ResponseTime, DbType.Int32);
+                parameters.Add("Amount", accountTransactionDTO.Amount, DbType.Int64);
+                parameters.Add("ResponseTime", accountTransactionDTO.ResponseTime, DbType.Int64);
                 parameters.Add("Message", accountTransactionDTO.Message, DbType.String);
                 parameters.Add("ResultCode", accountTransactionDTO.ResultCode, DbType.String);
                 parameters.Add("PayUrl", accountTransactionDTO.PayUrl, DbType.String);

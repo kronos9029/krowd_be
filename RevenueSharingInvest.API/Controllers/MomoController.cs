@@ -10,6 +10,7 @@ using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Business.Services.Extensions.Momo;
 using System;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace RevenueSharingInvest.API.Controllers
 {
@@ -53,11 +54,11 @@ namespace RevenueSharingInvest.API.Controllers
             string rawHash = "accessKey=" + accessKey +
                 "&amount=" + amount +
                 "&extraData=" + extraData +
-                "&ipnUrl=" + "https://docs.google.com/spreadsheets/d/1X3omZg__GAkcntodcC783eiFcBMWEibJXOaJn36rAIU/edit#gid=0" +
+                "&ipnUrl=" + notifyurl +
                 "&orderId=" + orderid +
                 "&orderInfo=" + orderInfo +
                 "&partnerCode=" + partnerCode +
-                "&redirectUrl=" + "https://docs.google.com/spreadsheets/d/1X3omZg__GAkcntodcC783eiFcBMWEibJXOaJn36rAIU/edit#gid=0" +
+                "&redirectUrl=" + "https://www.krowd.vn/page-success" +
                 "&requestId=" + requestId +
                 "&requestType=" + requestType
                 ;
@@ -77,9 +78,9 @@ namespace RevenueSharingInvest.API.Controllers
                 { "amount", amount },
                 { "orderId", orderid },
                 { "orderInfo", orderInfo },
-                { "redirectUrl", "https://docs.google.com/spreadsheets/d/1X3omZg__GAkcntodcC783eiFcBMWEibJXOaJn36rAIU/edit#gid=0" },
-                { "ipnUrl", "https://docs.google.com/spreadsheets/d/1X3omZg__GAkcntodcC783eiFcBMWEibJXOaJn36rAIU/edit#gid=0" },
-                { "lang", "en" },
+                { "redirectUrl", "https://www.krowd.vn/page-success" },
+                { "ipnUrl", notifyurl },
+                { "lang", "vi" },
                 { "extraData", extraData },
                 { "requestType", requestType },
                 { "signature", signature }
@@ -98,7 +99,6 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("confirm")]
         public async Task<IActionResult> ConfirmPaymentClient(MomoPaymentResult momoPaymentResult)
         {
-
             var result = await _accountTransactionService.CreateAccountTransaction(momoPaymentResult);
             return Ok(result);
         }
