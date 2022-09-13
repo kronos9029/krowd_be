@@ -36,7 +36,7 @@ namespace RevenueSharingInvest.API.Controllers
         //CREATE
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreatePackage([FromBody] CreateUpdatePackageDTO packageDTO)
+        public async Task<IActionResult> CreatePackage([FromForm] CreateUpdatePackageDTO packageDTO)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
