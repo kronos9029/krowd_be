@@ -22,15 +22,17 @@ namespace RevenueSharingInvest.API.Controllers
     {
         private readonly IAccountTransactionService _accountTransactionService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMomoService _momoService;
         private readonly MomoSettings _momoSettings;
 
-        public MomoController(IOptions<MomoSettings> momoSettings, IAccountTransactionService accountTransactionService, IHttpContextAccessor httpContextAccessor)
+        public MomoController(IOptions<MomoSettings> momoSettings, IAccountTransactionService accountTransactionService, IHttpContextAccessor httpContextAccessor, IMomoService momoService)
         {
             _accountTransactionService = accountTransactionService;
             _httpContextAccessor = httpContextAccessor;
             _momoSettings = momoSettings.Value;
+            _momoService = momoService;
         }
-
+/*
         [HttpPost]
         [Route("request")]
         public async Task<IActionResult> RequestPayment(MomoPaymentRequest request)
@@ -92,6 +94,15 @@ namespace RevenueSharingInvest.API.Controllers
             JObject jmessage = JObject.Parse(responseFromMomo);
 
             return Ok(jmessage.GetValue("payUrl").ToString());
+
+        }        */
+        
+        [HttpPost]
+        [Route("request-web")]
+        public async Task<IActionResult> RequestPaymentTest(MomoPaymentRequest request)
+        {
+            var result = _momoService.RequestPaymentWeb(request);
+            return Ok(result);
 
         }
 

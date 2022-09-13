@@ -173,6 +173,9 @@ namespace RevenueSharingInvest.API
             services.AddScoped<IWalletTypeRepository, WalletTypeRepository>();
             services.AddScoped<IWalletTypeService, WalletTypeService>();
 
+            //MOMO
+            services.AddScoped<IMomoService, MomoService>();
+
             //////////   
             // VALIDATION
             services.AddScoped<IValidationRepository, ValidationRepository>();

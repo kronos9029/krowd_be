@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Models
@@ -16,11 +17,11 @@ namespace RevenueSharingInvest.Business.Models
         public long responseTime { get; set; }
         public string message { get; set; }
         public int resultCode { get; set; }
-        public string payUrl { get; set; }
-        public string deeplink { get;set;}
-        public string qrCodeUrl { get; set; }
+        public string PayUrl { get; set; }
+        public string QrCodeUrl { get; set; }
+        public string Deeplink { get; set; }
         public string partnerClientId { get; set; }
-}
+    }
 
     public class MomoPaymentRequest
     {
@@ -40,4 +41,5 @@ namespace RevenueSharingInvest.Business.Models
         public string extraData { get; set; }
         public string signature { get; set; }
     }
+
 }

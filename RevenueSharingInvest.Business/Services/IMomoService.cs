@@ -1,0 +1,15 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using RevenueSharingInvest.Business.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace RevenueSharingInvest.Business.Services
+{
+    public interface IMomoService
+    {
+        public Task<string> RequestPaymentWeb(MomoPaymentRequest request);
+    }
+}
