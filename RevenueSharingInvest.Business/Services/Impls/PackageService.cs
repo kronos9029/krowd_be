@@ -79,11 +79,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 Package entity = _mapper.Map<Package>(packageDTO);
 
-                foreach (string descriptionItem in packageDTO.descriptionList)
-                {
-                    entity.Description = entity.Description + "\n" + descriptionItem;
-                }
-
                 entity.RemainingQuantity = entity.Quantity;
                 entity.Status = Enum.GetNames(typeof(PackageStatusEnum)).ElementAt(0); //IN_STOCK
                 entity.CreateBy = Guid.Parse(currentUser.userId);
@@ -161,7 +156,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     dto.createDate = await _validationService.FormatDateOutput(dto.createDate);
                     dto.updateDate = await _validationService.FormatDateOutput(dto.updateDate);
-                    string[] split = item.Description.Split("\n", StringSplitOptions.RemoveEmptyEntries);
+                    string[] split = item.Description.Split("\\li", StringSplitOptions.RemoveEmptyEntries);
                     foreach (string descriptionItem in split)
                     {
                         dto.descriptionList.Add(descriptionItem);
@@ -206,7 +201,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 dto.createDate = await _validationService.FormatDateOutput(dto.createDate);
                 dto.updateDate = await _validationService.FormatDateOutput(dto.updateDate);
-                string[] split = package.Description.Split("\n", StringSplitOptions.RemoveEmptyEntries);
+                string[] split = package.Description.Split("\\li", StringSplitOptions.RemoveEmptyEntries);
                 foreach (string descriptionItem in split)
                 {
                     dto.descriptionList.Add(descriptionItem);
@@ -243,22 +238,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
                 //
 
-                if (packageDTO.price != null && packageDTO.price <= 0)
+                if (packageDTO.price != 0 && packageDTO.price <= 0)
                     throw new InvalidFieldException("price must be greater than 0!!!");
 
-                if (packageDTO.quantity != null && packageDTO.quantity <= 0)
+                if (packageDTO.quantity != 0 && packageDTO.quantity <= 0)
                     throw new InvalidFieldException("quantity must be greater than 0!!!");
 
                 Package entity = _mapper.Map<Package>(packageDTO);
 
-                if (packageDTO.descriptionList != null)
-                {
-                    foreach (string descriptionItem in packageDTO.descriptionList)
-                    {
-                        entity.Description = entity.Description + "\n" + descriptionItem;
-                    }
-                }
-                if (packageDTO.quantity != null)
+                if (packageDTO.quantity != 0)
                 {
                     entity.RemainingQuantity = entity.Quantity;
                 }                   
