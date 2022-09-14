@@ -42,11 +42,11 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
 
             entity.Id = newId;
             entity.ProjectId = Guid.Parse(request.entityId);
-            entity.CreateBy = Guid.Parse(request.createBy);
-            entity.UpdateBy = Guid.Parse(request.updateBy);
+            entity.CreateBy = Guid.Parse(request.createBy ?? "00000000-0000-0000-0000-000000000000");
+            entity.UpdateBy = Guid.Parse(request.updateBy ?? "00000000-0000-0000-0000-000000000000");
             entity.Link = url;
             entity.Type = request.type;
-            entity.Description = request.description;
+            entity.Description = request.description ?? "";
 
             return entity;
         }

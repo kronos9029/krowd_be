@@ -5,10 +5,10 @@ namespace RevenueSharingInvest.Data.Models.DTOs
 {
     public class ProjectEntityDTO
     {  
-        public string title { get; set; }
-        public string link { get; set; }
-        public string content { get; set; }
-        public string description { get; set; }             
+        public string? title { get; set; }
+        public string? link { get; set; }
+        public string? content { get; set; }
+        public string? description { get; set; }             
     }
 
     public class ProjectComponentProjectEntityDTO : ProjectEntityDTO
@@ -18,8 +18,8 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     }
     public class CreateProjectEntityDTO : ProjectEntityDTO
     {
-        public string projectId { get; set; }
-        public string type { get; set; }
+        public string? projectId { get; set; }
+        public string? type { get; set; }
     }
 
     public class UpdateProjectEntityDTO : ProjectEntityDTO
