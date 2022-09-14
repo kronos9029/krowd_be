@@ -46,7 +46,7 @@ namespace RevenueSharingInvest.API.Controllers
                 var result = await _userService.CreateUser(userDTO, currentUser);
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUSINESS_MANAGER can perform this action!!!");
 
         }
 
