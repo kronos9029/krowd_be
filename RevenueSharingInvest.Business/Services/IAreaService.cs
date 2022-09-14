@@ -1,4 +1,5 @@
-﻿using RevenueSharingInvest.Data.Models.DTOs;
+﻿using RevenueSharingInvest.API;
+using RevenueSharingInvest.Data.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,17 +11,16 @@ namespace RevenueSharingInvest.Business.Services
     public interface IAreaService
     {
         //CREATE
-        public Task<IdDTO> CreateArea(AreaDTO areaDTO);
+        public Task<IdDTO> CreateArea(CreateUpdateAreaDTO areaDTO, ThisUserObj currentUser);
 
         //READ
-        public Task<List<AreaDTO>> GetAllAreas(int pageIndex, int pageSize);
-        public Task<AreaDTO> GetAreaById(Guid areaId);
+        public Task<List<GetAreaDTO>> GetAllAreas(int pageIndex, int pageSize, ThisUserObj currentUser);
+        public Task<GetAreaDTO> GetAreaById(Guid areaId, ThisUserObj currentUser);
 
         //UPDATE
-        public Task<int> UpdateArea(AreaDTO areaDTO, Guid areaId);
+        public Task<int> UpdateArea(CreateUpdateAreaDTO areaDTO, Guid areaId, ThisUserObj currentUser);
 
         //DELETE
-        public Task<int> DeleteAreaById(Guid areaId);
-        public Task<int> ClearAllAreaData();
+        public Task<int> DeleteAreaById(Guid areaId, ThisUserObj currentUser);
     }
 }

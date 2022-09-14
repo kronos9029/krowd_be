@@ -28,7 +28,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
-        public bool? IsDeleted { get; set; }
 
         [InverseProperty(nameof(Project.Area))]
         public virtual ICollection<Project> Projects { get; set; }

@@ -338,7 +338,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!(await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId))).Status.Equals(ObjectStatusEnum.ACTIVE.ToString()))
                     throw new InvalidFieldException("This PROJECT_MANAGER's status must be ACTIVE!!!");
 
-                if (await _projectRepository.GetAllProjects(0, 0, null, projectDTO.managerId, null, null, null, null, RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")) != null)
+                if ((await _projectRepository.GetAllProjects(0, 0, null, projectDTO.managerId, null, null, null, null, RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"))).Count() != 0)
                     throw new InvalidFieldException("This PROJECT_MANAGER has a project already!!!");
 
                 if (projectDTO.fieldId == null || !await _validationService.CheckUUIDFormat(projectDTO.fieldId))
@@ -390,7 +390,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";               
 
-                long totalDay = DateAndTime.DateDiff(DateInterval.Day, DateTime.ParseExact(projectDTO.startDate, "dd/MM/yyyy HH:mm:ss", null), DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null)) + 1;
+                long totalDay = DateAndTime.DateDiff(DateInterval.Day, (DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null)).AddDays(1), (DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null)).AddMonths(projectDTO.duration)) + 1;
                 int daysPerStage = ((int)totalDay) / projectDTO.numOfStage;
                 int modDays = ((int)totalDay) - (daysPerStage * projectDTO.numOfStage);
 
@@ -417,7 +417,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     stage.ProjectId = Guid.Parse(newId.id);
                     stage.Status = StageStatusEnum.UNDUE.ToString();
                     stage.CreateBy = Guid.Parse(currentUser.userId);
-                    stage.StartDate = entity.StartDate;
+                    //stage.StartDate = entity.EndDate.AddDays(1);
+                    stage.StartDate = DateTime.ParseExact(DateTime.Parse(entity.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(entity.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:00:00", "dd/MM/yyyy HH:mm:ss", null).AddDays(1);
                     stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "23:59:59", "dd/MM/yyyy HH:mm:ss", null);
 
                     periodRevenue.ProjectId = Guid.Parse(newId.id);
@@ -441,8 +442,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
 
                     //Tạo ví B2, B3
-                    await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B2")), Guid.Parse(currentUser.userId));
-                    await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")), Guid.Parse(currentUser.userId));
+                    await _projectWalletRepository.CreateProjectWallet(Guid.Parse(currentUser.userId), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B2")), Guid.Parse(currentUser.userId));
+                    await _projectWalletRepository.CreateProjectWallet(Guid.Parse(currentUser.userId), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")), Guid.Parse(currentUser.userId));
 
                     //Update NumOfProject
                     await _businessRepository.UpdateBusinessNumOfProject(Guid.Parse(currentUser.businessId));
