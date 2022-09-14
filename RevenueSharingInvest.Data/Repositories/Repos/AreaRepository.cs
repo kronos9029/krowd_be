@@ -29,8 +29,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -39,8 +38,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("City", areaDTO.City, DbType.String);
@@ -64,17 +62,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "UPDATE Area " 
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE " 
-                    + "         Id=@Id";
+                var query = "DELETE FROM Area WHERE Id = @Id ";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", areaId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
@@ -98,9 +88,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                 ORDER BY "
                     + "                     City ASC ) AS Num, "
                     + "             * "
-                    + "         FROM [User] "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "         FROM Area ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         City, "
@@ -123,7 +111,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM Area WHERE IsDeleted = 0 ORDER BY City ASC";
+                    var query = "SELECT * FROM Area ORDER BY City ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<Area>(query)).ToList();
                 }             
@@ -158,11 +146,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE Area "
                     + "     SET "
-                    + "         City = @City, "
-                    + "         District = @District, "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         City = ISNULL(@City, City), "
+                    + "         District = ISNULL(@District, District),"
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -171,7 +158,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("District", areaDTO.District, DbType.String);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", areaDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", areaId, DbType.Guid);
 
                 using (var connection = CreateConnection())

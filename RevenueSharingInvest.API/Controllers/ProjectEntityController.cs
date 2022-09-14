@@ -44,7 +44,7 @@ namespace RevenueSharingInvest.API.Controllers
             {
                 var result = await _projectEntityService.CreateProjectEntity(projectEntityDTO, currentUser);
                 return Ok(result);
-        }
+            }
             return StatusCode((int) HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER can perform this action!!!");
     }
 
@@ -111,13 +111,6 @@ namespace RevenueSharingInvest.API.Controllers
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER can perform this action!!!");
         }
-
-        //[HttpPut]
-        //public async Task<IActionResult> UpdateProjectEntityPriority([FromQuery] List<string> idList)
-        //{
-        //    var result = await _projectEntityService.UpdateProjectEntityPriority(idList);
-        //    return Ok(result);
-        //}
 
         //UPDATE PRIORITY
         [HttpPut]
