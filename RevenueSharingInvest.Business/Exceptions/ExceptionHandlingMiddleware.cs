@@ -64,6 +64,10 @@ namespace RevenueSharingInvest.Business.Exceptions
                     errorMessageObject.Code = "I001";
                     statusCode = (int)HttpStatusCode.Conflict;
                     break;
+                case CreateProjectEntityException:
+                    errorMessageObject.Code = "PE001";
+                    statusCode = (int)HttpStatusCode.Ambiguous;
+                    break;
 
             }
 

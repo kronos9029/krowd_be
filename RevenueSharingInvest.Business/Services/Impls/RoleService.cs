@@ -95,8 +95,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 foreach (RoleDTO item in list)
                 {
-                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
-                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                    if(item.createDate != null && item.updateDate != null)
+                    {
+                        item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                        item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                    }
+                    
                 }
 
                 return list;

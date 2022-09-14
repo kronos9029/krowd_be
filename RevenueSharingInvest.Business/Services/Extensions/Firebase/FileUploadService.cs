@@ -6,6 +6,7 @@ using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models;
 using RevenueSharingInvest.Business.Models.Constant;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -22,31 +23,58 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
         private readonly IBusinessRepository _businessRepository;
         private readonly IProjectRepository _projectRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IValidationService _validationService;
 
         public FileUploadService(IOptions<FirebaseSettings> firebaseSettings,
             IProjectEntityRepository projectEntityRepository,
             IBusinessRepository businessRepository,
             IProjectRepository projectRepository,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            IValidationService validationService)
         {
             _firebaseSettings = firebaseSettings.Value;
             _projectEntityRepository = projectEntityRepository;
             _businessRepository = businessRepository;
             _projectRepository = projectRepository;
             _userRepository = userRepository;
+            _validationService = validationService;
         }
 
         private ProjectEntity ParseToProjectentity(FirebaseRequest request, Guid newId, string url)
         {
             ProjectEntity entity = new();
-
+            DateTime localDate = DateTime.Now;
             entity.Id = newId;
             entity.ProjectId = Guid.Parse(request.entityId);
             entity.CreateBy = Guid.Parse(request.createBy ?? "00000000-0000-0000-0000-000000000000");
+            if(entity.CreateBy != Guid.Parse("00000000-0000-0000-0000-000000000000"))
+            {
+                entity.CreateDate = localDate;
+            } else
+            {
+                entity.CreateDate = null;
+            }
             entity.UpdateBy = Guid.Parse(request.updateBy ?? "00000000-0000-0000-0000-000000000000");
-            entity.Link = url;
-            entity.Type = request.type;
+            if (entity.UpdateBy != Guid.Parse("00000000-0000-0000-0000-000000000000"))
+            {
+                entity.UpdateDate = localDate;
+            }
+            else
+            {
+                entity.UpdateDate = null;
+            }
+            entity.Link = url ?? "";
+            entity.Type = request.type ?? "";
             entity.Description = request.description ?? "";
+            entity.Title = request.title ?? "";
+            entity.Content = request.content ?? "";
+            if(request.type != ProjectEntityEnum.PITCH.ToString())
+            {
+                entity.Priority = 0;
+            }
+
+            
+            
 
             return entity;
         }
@@ -161,7 +189,11 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
 
                     ProjectEntity projectEntity = ParseToProjectentity(request, Guid.Parse(newGuid), url);
 
-                    _ = _projectEntityRepository.CreateProjectEntityFromFirebase(projectEntity);
+                    string insertPE = await _projectEntityRepository.CreateProjectEntity(projectEntity);
+                    if(insertPE == null)
+                    {
+                        throw new CreateProjectEntityException("Can Not Create Project Entity!!");
+                    }
 
                     urls.Add(url);
 

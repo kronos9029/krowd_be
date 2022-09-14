@@ -425,6 +425,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", projectEntityDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
+                connection.Open();
                 return connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
