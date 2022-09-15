@@ -106,18 +106,17 @@ namespace RevenueSharingInvest.API.Controllers
         //UPDATE STATUS
         [HttpPut]
         [Route("status/{id},{status}")]
-        [Authorize(Roles = "ADMIN, BUSINESS_MANAGER")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> UpdateProjectStatus(Guid id, string status)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            if (currentUser.roleId.Equals(currentUser.adminRoleId)
-                || currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+            if (currentUser.roleId.Equals(currentUser.adminRoleId))
             {
                 var result = await _businessService.UpdateBusinessStatus(id, status, currentUser);
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUSINESS_MANAGER can perform this action!!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN can perform this action!!!");
         }
 
         //DELETE BY ID

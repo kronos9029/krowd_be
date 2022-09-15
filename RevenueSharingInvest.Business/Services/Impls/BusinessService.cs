@@ -174,7 +174,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 if (currentUser.roleId.Equals(""))
                 {
-                    int[] statusNum = { 2 };
+                    int[] statusNum = { 1 };
 
                     if (status != null)
                     {
@@ -192,7 +192,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 else if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
-                    int[] statusNum = { 0, 1, 2, 3 };
+                    int[] statusNum = { 0, 1, 2 };
 
                     if (status != null)
                     {
@@ -210,7 +210,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 else if(currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                 {
-                    int[] statusNum = { 2 };
+                    int[] statusNum = { 1 };
 
                     if (status != null)
                     {
@@ -388,19 +388,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (currentUser.roleId.Equals(currentUser.adminRoleId))
                 {
-                    if (!status.Equals(BusinessStatusEnum.INACTIVE.ToString()) && !status.Equals(BusinessStatusEnum.WAITING_FOR_APPROVAL.ToString()) && !status.Equals(BusinessStatusEnum.ACTIVE.ToString()) && !status.Equals(BusinessStatusEnum.BLOCKED.ToString()))
-                        throw new InvalidFieldException("Status must be INACTIVE or WAITING_FOR_APPROVAL or ACTIVE or BLOCKED!!!");
-                }
-                else if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
-                {
-                    if (!business.Id.ToString().Equals(currentUser.businessId))
-                        throw new InvalidFieldException("The Business with this Id is not match with this Business's businessId!!!");
-
-                    if (!business.Status.Equals(BusinessStatusEnum.INACTIVE.ToString()))
-                        throw new InvalidFieldException("BUSINESS_MANAGER can update Business's status from INACTIVE to WAITING_FOR_APPROVAL!!!");
-
-                    if (!status.Equals(BusinessStatusEnum.WAITING_FOR_APPROVAL.ToString()))
-                        throw new InvalidFieldException("Status must be WAITING_FOR_APPROVAL!!!");
+                    if (!status.Equals(BusinessStatusEnum.INACTIVE.ToString()) && !status.Equals(BusinessStatusEnum.ACTIVE.ToString()) && !status.Equals(BusinessStatusEnum.BLOCKED.ToString()))
+                        throw new InvalidFieldException("Status must be INACTIVE or ACTIVE or BLOCKED!!!");
                 }
 
                 result = await _businessRepository.UpdateBusinessStatus(businessId, status, Guid.Parse(currentUser.userId));
