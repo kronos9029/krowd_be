@@ -953,15 +953,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     if (!status.Equals(ProjectStatusEnum.DENIED.ToString()) && !status.Equals(ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString()))
                         throw new InvalidFieldException("Status must be DENIED or CALLING_FOR_INVESTMENT!!!");
                 }
-                else if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
+                else if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
                 {
                     if (!project.BusinessId.ToString().Equals(currentUser.businessId))
-                        throw new InvalidFieldException("The Project with this businessId is not match with this BUSINESS_MANAGER's businessId!!!");
+                        throw new InvalidFieldException("The Project with this businessId is not match with this PROJECT_MANAGER's businessId!!!");
 
                     if (!project.Status.Equals(ProjectStatusEnum.DRAFT.ToString()))
                         throw new InvalidFieldException("BUSINESS_MANAGER can update Project's status from DRAFT to WAITING_FOR_APPROVAL!!!");
 
-                    if (!status.Equals(ProjectStatusEnum.DENIED.ToString()) && !status.Equals(ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString()))
+                    if (!status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
                         throw new InvalidFieldException("Status must be WAITING_FOR_APPROVAL!!!");
                 }
 

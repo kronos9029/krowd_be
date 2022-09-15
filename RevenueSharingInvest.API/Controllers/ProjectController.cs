@@ -199,12 +199,12 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        [Authorize(Roles = "ADMIN, PROJECT_MANAGER, BUSINESS_MANAGER")]
+        [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> UpdateProject([FromForm] UpdateProjectDTO projectDTO, Guid id)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            if (currentUser.roleId.Equals(currentUser.businessManagerRoleId) || currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
                 Data.Models.Entities.Business businessDTO = await _businessService.GetBusinessByProjectId(id);
 
@@ -223,7 +223,7 @@ namespace RevenueSharingInvest.API.Controllers
                     }   
                 }               
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role BUSINESS_MANAGER can perform this action!!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER can perform this action!!!");
         }
 
         //UPDATE STATUS
@@ -240,7 +240,7 @@ namespace RevenueSharingInvest.API.Controllers
                 var result = await _projectService.UpdateProjectStatus(id, status, currentUser);
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUSINESS_MANAGER can perform this action!!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or PROJECT_MANAGER can perform this action!!!");
         }
 
         [HttpDelete]

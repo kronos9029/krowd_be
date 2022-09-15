@@ -95,9 +95,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = " SELECT PW.* FROM ProjectWallet PW JOIN WalletType WT ON PW.WalletTypeId = WT.Id WHERE PW.IsDeleted = 0 "
                     + " AND PW.ProjectManagerId = @ProjectManagerId "
-                    + " AND (PW.WalletTypeId = @B1 " 
-                    + "     OR PW.WalletTypeId = @B2 ) "
-                    + "     OR PW.WalletTypeId = @B3 ) "
+                    + " AND ( PW.WalletTypeId = @B1 " 
+                    + "     OR PW.WalletTypeId = @B2 "
+                    + "     OR PW.WalletTypeId = @B3 "
                     + "     OR PW.WalletTypeId = @B4 ) "
                     + " ORDER BY WT.Type ASC ";
                 var parameters = new DynamicParameters();
