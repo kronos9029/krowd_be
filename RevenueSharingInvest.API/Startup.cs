@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,20 +18,16 @@ using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Business.Services.Impls;
-using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.ExtensionsRepos;
 using RevenueSharingInvest.Data.Repositories.ExtensionsRepos.Validation;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using RevenueSharingInvest.Data.Repositories.Repos;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.API
 {
@@ -47,17 +41,17 @@ namespace RevenueSharingInvest.API
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-       
+
         public void ConfigureServices(IServiceCollection services)
         {
             // Read the connection string from appsettings.
-            string dbConnectionString = this.Configuration.GetConnectionString("PROD");
+            string dbConnectionString = this.Configuration.GetConnectionString("DEV");
 
             // Inject IDbConnection, with implementation from SqlConnection class.
             services.AddTransient<IDbConnection>((sp) => new SqlConnection(dbConnectionString));
 
             //Register DBcontext for migration
-           services.AddDbContext<KrowdContext>(options => options.UseSqlServer(dbConnectionString));
+            services.AddDbContext<KrowdContext>(options => options.UseSqlServer(dbConnectionString));
 
             //Authorize
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -114,11 +108,11 @@ namespace RevenueSharingInvest.API
             //PACKAGE VOUCHER
             services.AddScoped<IPackageVoucherRepository, PackageVoucherRepository>();
             services.AddScoped<IPackageVoucherService, PackageVoucherService>();
-            
+
             //PAYMENT
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IPaymentService, PaymentService>();
-            
+
             //PERIOD REVENUE
             services.AddScoped<IPeriodRevenueRepository, PeriodRevenueRepository>();
             services.AddScoped<IPeriodRevenueService, PeriodRevenueService>();
@@ -130,7 +124,7 @@ namespace RevenueSharingInvest.API
             //PROJECT
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IProjectService, ProjectService>();
-            
+
             //PROJECT ENTITY
             services.AddScoped<IProjectEntityRepository, ProjectEntityRepository>();
             services.AddScoped<IProjectEntityService, ProjectEntityService>();
@@ -138,7 +132,7 @@ namespace RevenueSharingInvest.API
             //PROJECT WALLET
             services.AddScoped<IProjectWalletRepository, ProjectWalletRepository>();
             services.AddScoped<IProjectWalletService, ProjectWalletService>();
-            
+
             //RISK
             services.AddScoped<IRiskRepository, RiskRepository>();
             services.AddScoped<IRiskService, RiskService>();
@@ -146,7 +140,7 @@ namespace RevenueSharingInvest.API
             //RISK TYPE
             services.AddScoped<IRiskTypeRepository, RiskTypeRepository>();
             services.AddScoped<IRiskTypeService, RiskTypeService>();
-            
+
             //ROLE
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IRoleService, RoleService>();
@@ -179,6 +173,9 @@ namespace RevenueSharingInvest.API
             services.AddScoped<IWalletTypeRepository, WalletTypeRepository>();
             services.AddScoped<IWalletTypeService, WalletTypeService>();
 
+            //MOMO
+            services.AddScoped<IMomoService, MomoService>();
+
             //////////   
             // VALIDATION
             services.AddScoped<IValidationRepository, ValidationRepository>();
@@ -190,7 +187,7 @@ namespace RevenueSharingInvest.API
             ///
             //Upload File To Firebase
             services.AddScoped<IFileUploadService, FileUploadService>();
-           
+
             // ADMIN SAFE LIST
             services.AddScoped<ClientIpCheckActionFilter>(container =>
             {
@@ -202,7 +199,7 @@ namespace RevenueSharingInvest.API
             });
 
             //CORS
-            services.AddCors(options =>      
+            services.AddCors(options =>
                 options.AddDefaultPolicy(
                 builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
             ));

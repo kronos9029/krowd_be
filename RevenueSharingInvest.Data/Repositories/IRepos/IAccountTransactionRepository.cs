@@ -12,15 +12,15 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //CREATE
         public Task<string> CreateAccountTransaction(AccountTransaction accountTransactionDTO);
 
-        //READ
-        public Task<List<AccountTransaction>> GetAllAccountTransactions(int pageIndex, int pageSize);
-        public Task<AccountTransaction> GetAccountTransactionById(Guid accountTransactionId);
+        ////READ
+        //public Task<List<AccountTransaction>> GetAllAccountTransactions(int pageIndex, int pageSize);
+        //public Task<AccountTransaction> GetAccountTransactionById(Guid accountTransactionId);
 
-        //UPDATE
-        public Task<int> UpdateAccountTransaction(AccountTransaction accountTransactionDTO, Guid accountTransactionId);
+        ////UPDATE
+        //public Task<int> UpdateAccountTransaction(AccountTransaction accountTransactionDTO, Guid accountTransactionId);
 
-        //DELETE
-        public Task<int> DeleteAccountTransactionById(Guid accountTransactionId);
-        public Task<int> ClearAllAccountTransactionData();
+        ////DELETE
+        //public Task<int> DeleteAccountTransactionById(Guid accountTransactionId);
+        //public Task<int> ClearAllAccountTransactionData();
     }
 }

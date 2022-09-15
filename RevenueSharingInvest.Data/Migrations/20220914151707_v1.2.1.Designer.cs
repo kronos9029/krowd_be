@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RevenueSharingInvest.Data.Models.Entities;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
     [DbContext(typeof(KrowdContext))]
-    partial class KrowdContextModelSnapshot : ModelSnapshot
+    [Migration("20220914151707_v1.2.1")]
+    partial class v121
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,6 +112,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("District")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -435,7 +440,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<double>("Price")
+                    b.Property<double?>("Price")
                         .HasColumnType("float");
 
                     b.Property<Guid>("ProjectId")
@@ -589,10 +594,10 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<double?>("PessimisticExpectedRatio")
                         .HasColumnType("float");
 
-                    b.Property<Guid>("ProjectId")
+                    b.Property<Guid?>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("StageId")
+                    b.Property<Guid?>("StageId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
@@ -975,6 +980,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime");
 
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("IsPrivate")
                         .HasColumnType("bit");
 
@@ -982,7 +990,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<Guid>("ProjectId")
+                    b.Property<Guid?>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartDate")
@@ -1492,15 +1500,11 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Project", "Project")
                         .WithMany("PeriodRevenues")
                         .HasForeignKey("ProjectId")
-                        .HasConstraintName("FK_PeriodRevenue_Project")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasConstraintName("FK_PeriodRevenue_Project");
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Stage", "Stage")
                         .WithMany("PeriodRevenues")
-                        .HasForeignKey("StageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("StageId");
 
                     b.Navigation("Project");
 
@@ -1592,9 +1596,7 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Project", "Project")
                         .WithMany("Stages")
                         .HasForeignKey("ProjectId")
-                        .HasConstraintName("FK_Stage_Project")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasConstraintName("FK_Stage_Project");
 
                     b.Navigation("Project");
                 });

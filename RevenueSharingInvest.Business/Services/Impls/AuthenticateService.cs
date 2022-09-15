@@ -53,7 +53,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
             string email = userRecord.Email;
             string lastName = userRecord.DisplayName;
-            DateTime createdDate = (DateTime)userRecord.UserMetaData.CreationTimestamp;
+            //DateTime createdDate = DateTime.UtcNow;
             string ImageUrl = userRecord.PhotoUrl.ToString();
 
             User userObject = await _userRepository.GetUserByEmail(email);
@@ -71,7 +71,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 User newInvestorUser = new();
 
                 newInvestorUser.Email = email;
-                newInvestorUser.CreateDate = createdDate;
+                //newInvestorUser.CreateDate = createdDate;
                 newInvestorUser.Image = ImageUrl;
                 newInvestorUser.RoleId = roleId;
                 newInvestorUser.LastName = lastName;
