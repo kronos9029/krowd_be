@@ -81,7 +81,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("AreaId", projectDTO.AreaId, DbType.Guid);
                 parameters.Add("Name", projectDTO.Name, DbType.String);
                 parameters.Add("Description", projectDTO.Description, DbType.String);
-                parameters.Add("Address", projectDTO.Description, DbType.String);
+                parameters.Add("Address", projectDTO.Address, DbType.String);
                 parameters.Add("InvestmentTargetCapital", projectDTO.InvestmentTargetCapital, DbType.Double);
                 parameters.Add("SharedRevenue", projectDTO.SharedRevenue, DbType.Double);
                 parameters.Add("Multiplier", projectDTO.Multiplier, DbType.Double);
@@ -478,7 +478,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Name", projectDTO.Name, DbType.String);
                 parameters.Add("Image", projectDTO.Image, DbType.String);
                 parameters.Add("Description", projectDTO.Description, DbType.String);
-                parameters.Add("Address", projectDTO.Description, DbType.String);
+                parameters.Add("Address", projectDTO.Address, DbType.String);
                 parameters.Add("InvestmentTargetCapital", projectDTO.InvestmentTargetCapital, DbType.Double);
                 parameters.Add("RemainAmount", projectDTO.RemainAmount, DbType.Double);
                 parameters.Add("InvestedCapital", projectDTO.InvestedCapital, DbType.Double);
