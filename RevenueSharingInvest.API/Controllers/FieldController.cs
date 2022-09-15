@@ -55,7 +55,12 @@ namespace RevenueSharingInvest.API.Controllers
             {
                 var result = await _fieldService.GetAllFields(pageIndex, pageSize);
                 return Ok(result);
-            } else
+            } else if ((currentUser.roleId.Equals(currentUser.businessManagerRoleId) || currentUser.roleId.Equals(currentUser.projectManagerRoleId)) && currentUser.businessId.Equals(""))
+            {
+                var result = await _fieldService.GetAllFields(0, 0);
+                return Ok(result);
+            }
+            else
             {
                 var result = await _fieldService.GetFieldsByBusinessId(Guid.Parse(currentUser.businessId));
                 return Ok(result);
