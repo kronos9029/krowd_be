@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Models.Constants;
+using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
 using System.Collections.Generic;
@@ -134,7 +135,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     else
                     {
                         whereCondition = whereCondition + " AND (Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "')";
+                        + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(2) + "')";
                     }
 
                     if (name != null)
@@ -155,9 +156,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     else
                     {
                         whereCondition = whereCondition + " AND (Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "')";
+                        + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(0) + "' OR Status = '"
+                        + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(1) + "' OR Status = '"
+                        + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(2) + "' OR Status = '"
+                        + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(3) + "')";
                     }
 
                     if (name != null)
@@ -178,7 +180,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     else
                     {
                         whereCondition = whereCondition + " AND (Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "')";
+                        + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(2) + "')";
                     }
 
                     if (name != null)
@@ -326,13 +328,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE STATUS
-        public async Task<int> UpdateBusinessStatus(Guid businessId, String status)
+        public async Task<int> UpdateBusinessStatus(Guid businessId, String status, Guid updaterId)
         {
             try
             {
-                var query = "UPDATE Business SET Status = @Status WHERE Id = @Id";
+                var query = "UPDATE " 
+                    + "         Business " 
+                    + "     SET " 
+                    + "         Status = @Status, " 
+                    + "         UpdateDate = @UpdateDate, "
+                    + "         UpdateBy = @UpdateBy "
+                    + "     WHERE " 
+                    + "         Id = @Id";
                 var parameters = new DynamicParameters();
                 parameters.Add("Status", status, DbType.String);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateBy", updaterId, DbType.Guid);
                 parameters.Add("Id", businessId, DbType.Guid);
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
@@ -415,7 +426,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     else
                     {
                         whereCondition = whereCondition + " AND (Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "')";
+                        + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(2) + "')";
                     }
 
                     if (name != null)
@@ -436,9 +447,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     else
                     {
                         whereCondition = whereCondition + " AND (Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "')";
+                        + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(0) + "' OR Status = '"
+                        + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(1) + "' OR Status = '"
+                        + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(2) + "' OR Status = '"
+                        + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(3) + "')";
                     }
 
                     if (name != null)
@@ -459,7 +471,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     else
                     {
                         whereCondition = whereCondition + " AND (Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "')";
+                        + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(2) + "')";
                     }
 
                     if (name != null)

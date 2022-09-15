@@ -103,6 +103,23 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
         }
 
+        //UPDATE STATUS
+        [HttpPut]
+        [Route("status/{id},{status}")]
+        [Authorize(Roles = "ADMIN, BUSINESS_MANAGER")]
+        public async Task<IActionResult> UpdateProjectStatus(Guid id, string status)
+        {
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+
+            if (currentUser.roleId.Equals(currentUser.adminRoleId)
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+            {
+                var result = await _businessService.UpdateBusinessStatus(id, status, currentUser);
+                return Ok(result);
+            }
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUSINESS_MANAGER can perform this action!!!");
+        }
+
         //DELETE BY ID
         [HttpDelete]
         [Route("{id}")]

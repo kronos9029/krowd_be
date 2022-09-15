@@ -944,6 +944,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             try
             {
                 Project project = await _projectRepository.GetProjectById(projectId);
+                if (project == null)
+                    throw new InvalidFieldException("There are no Project has this Id!!!");
 
                 if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
@@ -959,7 +961,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("The Project with this businessId is not match with this PROJECT_MANAGER's businessId!!!");
 
                     if (!project.Status.Equals(ProjectStatusEnum.DRAFT.ToString()))
-                        throw new InvalidFieldException("BUSINESS_MANAGER can update Project's status from DRAFT to WAITING_FOR_APPROVAL!!!");
+                        throw new InvalidFieldException("PROJECT_MANAGER can update Project's status from DRAFT to WAITING_FOR_APPROVAL!!!");
 
                     if (!status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
                         throw new InvalidFieldException("Status must be WAITING_FOR_APPROVAL!!!");

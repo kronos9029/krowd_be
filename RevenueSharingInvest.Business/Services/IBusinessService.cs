@@ -20,7 +20,7 @@ namespace RevenueSharingInvest.Business.Services
 
         //UPDATE
         public Task<int> UpdateBusiness(UpdateBusinessDTO businessDTO, Guid businessId, ThisUserObj currentUser);
-        public Task<int> UpdateBusinessStatus(Guid businessId, String status);
+        public Task<int> UpdateBusinessStatus(Guid businessId, String status, ThisUserObj currentUser);
 
         //DELETE
         public Task<int> DeleteBusinessById(Guid businessId, ThisUserObj currentUser);

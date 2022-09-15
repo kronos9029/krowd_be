@@ -4,6 +4,7 @@ using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Data.Models.Constants;
+using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -98,7 +99,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 Data.Models.Entities.Business entity = _mapper.Map<Data.Models.Entities.Business>(businessDTO);
 
-                entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1);
+                entity.Status = BusinessStatusEnum.INACTIVE.ToString();
                 entity.CreateBy = Guid.Parse(currentUser.userId);
 
                 newId.id = await _businessRepository.CreateBusiness(entity);
@@ -143,7 +144,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (business != null)
                 {
-                    if (business.Status.Equals(ObjectStatusEnum.INACTIVE.ToString()))
+                    if (business.Status.Equals(BusinessStatusEnum.INACTIVE.ToString()))
                         result = await _businessRepository.DeleteBusinessById(businessId, Guid.Parse(currentUser.userId));
                 }
              
@@ -173,15 +174,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 if (currentUser.roleId.Equals(""))
                 {
-                    int[] statusNum = { 0 };
+                    int[] statusNum = { 2 };
 
                     if (status != null)
                     {
                         foreach (int item in statusNum)
                         {
-                            if (status.Equals(Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item)))
+                            if (status.Equals(Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(item)))
                                 statusCheck = true;
-                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item) + "' or";
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(item) + "' or";
                         }
                         statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
                         if (!statusCheck)
@@ -191,15 +192,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 else if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
-                    int[] statusNum = { 0, 1, 2 };
+                    int[] statusNum = { 0, 1, 2, 3 };
 
                     if (status != null)
                     {
                         foreach (int item in statusNum)
                         {
-                            if (status.Equals(Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item)))
+                            if (status.Equals(Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(item)))
                                 statusCheck = true;
-                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item) + "' or";
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(item) + "' or";
                         }
                         statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
                         if (!statusCheck)
@@ -209,15 +210,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 else if(currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                 {
-                    int[] statusNum = { 0 };
+                    int[] statusNum = { 2 };
 
                     if (status != null)
                     {
                         foreach (int item in statusNum)
                         {
-                            if (status.Equals(Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item)))
+                            if (status.Equals(Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(item)))
                                 statusCheck = true;
-                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(item) + "' or";
+                            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(BusinessStatusEnum)).ElementAt(item) + "' or";
                         }
                         statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
                         if (!statusCheck)
@@ -333,7 +334,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(Guid.Parse(currentUser.businessId));
 
-                if (business.Status.Equals(ObjectStatusEnum.BLOCKED))
+                if (business.Status.Equals(BusinessStatusEnum.BLOCKED))
                 {
                     throw new UnauthorizedException("You Can Not Update This Business Because It Is Blocked!!");
                 }
@@ -375,15 +376,39 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<int> UpdateBusinessStatus(Guid businessId, string status)
+        //UPDATE STATUS
+        public async Task<int> UpdateBusinessStatus(Guid businessId, string status, ThisUserObj currentUser)
         {
+            int result;
             try
             {
+                Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(businessId);
+                if (business == null)
+                    throw new InvalidFieldException("There are no Business has this Id!!!");
 
+                if (currentUser.roleId.Equals(currentUser.adminRoleId))
+                {
+                    if (!status.Equals(BusinessStatusEnum.INACTIVE.ToString()) && !status.Equals(BusinessStatusEnum.WAITING_FOR_APPROVAL.ToString()) && !status.Equals(BusinessStatusEnum.ACTIVE.ToString()) && !status.Equals(BusinessStatusEnum.BLOCKED.ToString()))
+                        throw new InvalidFieldException("Status must be INACTIVE or WAITING_FOR_APPROVAL or ACTIVE or BLOCKED!!!");
+                }
+                else if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+                {
+                    if (!business.Id.ToString().Equals(currentUser.businessId))
+                        throw new InvalidFieldException("The Business with this Id is not match with this Business's businessId!!!");
 
-                int result = await _businessRepository.UpdateBusinessStatus(businessId, status);
+                    if (!business.Status.Equals(BusinessStatusEnum.INACTIVE.ToString()))
+                        throw new InvalidFieldException("BUSINESS_MANAGER can update Business's status from INACTIVE to WAITING_FOR_APPROVAL!!!");
+
+                    if (!status.Equals(BusinessStatusEnum.WAITING_FOR_APPROVAL.ToString()))
+                        throw new InvalidFieldException("Status must be WAITING_FOR_APPROVAL!!!");
+                }
+
+                result = await _businessRepository.UpdateBusinessStatus(businessId, status, Guid.Parse(currentUser.userId));
+                if (result == 0)
+                    throw new UpdateObjectException("Can not update Business status!");
                 return result;
-            } catch(Exception e)
+            } 
+            catch(Exception e)
             {
                 throw new Exception(e.Message);
             }
