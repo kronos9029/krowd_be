@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models;
@@ -12,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
@@ -23,22 +25,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _momoSettings = momoSettings.Value;
         }
 
-        public async Task<string> RequestPaymentWeb(MomoPaymentRequest request)
+        public async Task<MomoPaymentResponse> RequestPaymentWeb(MomoPaymentRequest request)
         {
             //request params need to request to MoMo system
-            string endpoint = _momoSettings.ApiEndpoint;
             string partnerCode = _momoSettings.PartnerCode;
+            string apiEndpoint = _momoSettings.ApiEndpoint;
             string accessKey = _momoSettings.AccessKey;
             string serectkey = _momoSettings.SecretKey;
             string orderInfo = "test";
             string returnUrl = _momoSettings.ReturnUrl;
             string notifyurl = _momoSettings.NotifyUrl; //lưu ý: notifyurl không được sử dụng localhost, có thể sử dụng ngrok để public localhost trong quá trình test
 
-            string amount = "2000000";
+            long amount = request.amount;
             string orderid = Guid.NewGuid().ToString(); //mã đơn hàng
             string requestId = Guid.NewGuid().ToString();
-            string extraData = "topup";
+            string extraData = "";
             string requestType = "captureWallet";
+            //dynamic jsonObject = new JObject();
+
 
             //Before sign HMAC SHA256 signature
             string rawHash = "accessKey=" + accessKey +
@@ -73,15 +77,22 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 { "lang", "vi" },
                 { "extraData", extraData },
                 { "requestType", requestType },
+                //{ "partnerClientId", request.partnerClientId },
+                //{ "userInfo", requestType },
                 { "signature", signature }
 
             };
 
-            string responseFromMomo = PaymentRequest.sendPaymentRequest(endpoint, message.ToString());
+            string responseFromMomo = PaymentRequest.sendPaymentRequest(apiEndpoint, message.ToString());
 
             JObject jmessage = JObject.Parse(responseFromMomo);
 
-            return jmessage.GetValue("payUrl").ToString();
+            MomoPaymentResponse response = jmessage.ToObject<MomoPaymentResponse>();
+
+            //JsonSerializer serializer = new JsonSerializer();
+            //MomoPaymentResponse response = (MomoPaymentResponse)serializer.Deserialize(new JTokenReader(jmessage), typeof(MomoPaymentResponse));
+
+            return response;
 
         }
 

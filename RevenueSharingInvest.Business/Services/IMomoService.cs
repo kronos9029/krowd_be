@@ -10,6 +10,6 @@ namespace RevenueSharingInvest.Business.Services
 {
     public interface IMomoService
     {
-        public Task<string> RequestPaymentWeb(MomoPaymentRequest request);
+        public Task<MomoPaymentResponse> RequestPaymentWeb(MomoPaymentRequest request);
     }
 }

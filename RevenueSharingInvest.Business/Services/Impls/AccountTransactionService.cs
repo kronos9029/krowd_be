@@ -70,11 +70,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 //accountTransactionDTO.isDeleted = false;
 
                 AccountTransaction entity = _mapper.Map<AccountTransaction>(momoPaymentResult);
-                entity.PayUrl = momoPaymentResult.PayUrl;
-                entity.QrCodeUrl = momoPaymentResult.QrCodeUrl;
-                entity.Deeplink = momoPaymentResult.Deeplink;
-                entity.Description = "Momo test description";
-                entity.Status = "MOMO_TEST";
                 newId.id = await _accountTransactionRepository.CreateAccountTransaction(entity);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create AccountTransaction Object!");

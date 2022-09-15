@@ -26,65 +26,64 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "INSERT INTO AccountTransaction ("
                     + "         FromUserId, "
                     + "         ToUserId, "
-                    + "         Description, "
-                    + "         Status, "
-                    + "         CreateDate, "
-                    + "         CreateBy, "
-                    + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted, "
                     + "         PartnerCode, "
                     + "         OrderId, "
                     + "         RequestId, "
+                    + "         PartnerUserId, "
+                    + "         PartnerClientId, "
+                    + "         TransId, "
                     + "         Amount, "
-                    + "         ResponseTime, "
-                    + "         Message, "
+                    + "         OrderInfo, "
+                    + "         OrderType, "
+                    + "         CallbackToken, "
                     + "         ResultCode, "
-                    + "         PayUrl, "
-                    + "         Deeplink, "
-                    + "         QrCodeUrl ) "
+                    + "         Message, "
+                    + "         PayType, "
+                    + "         ResponseTime, "
+                    + "         ExtraData, "
+                    + "         Signature) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @FromUserId, "
                     + "         @ToUserId, "
-                    + "         @Description, "
-                    + "         @Status, "
-                    + "         @CreateDate, "
-                    + "         @CreateBy, "
-                    + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0, "
                     + "         @PartnerCode, "
                     + "         @OrderId, "
                     + "         @RequestId, "
+                    + "         @PartnerUserId, "
+                    + "         @PartnerClientId, "
+                    + "         @TransId, "
                     + "         @Amount, "
-                    + "         @ResponseTime, "
-                    + "         @Message, "
+                    + "         @OrderInfo, "
+                    + "         @OrderType, "
+                    + "         @CallbackToken, "
                     + "         @ResultCode, "
-                    + "         @PayUrl, "
-                    + "         @Deeplink, "
-                    + "         @QrCodeUrl ) ";
+                    + "         @Message, "
+                    + "         @PayType, "
+                    + "         @ResponseTime, "
+                    + "         @ExtraData, "
+                    + "         @Signature) ";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("FromUserId", accountTransactionDTO.FromUserId, DbType.Guid);
                 parameters.Add("ToUserId", accountTransactionDTO.ToUserId, DbType.Guid);
-                parameters.Add("Description", accountTransactionDTO.Description, DbType.String);
-                parameters.Add("Status", accountTransactionDTO.Status, DbType.String);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("CreateBy", accountTransactionDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", accountTransactionDTO.UpdateBy, DbType.Guid);
                 parameters.Add("PartnerCode", accountTransactionDTO.PartnerCode, DbType.String);
                 parameters.Add("OrderId", accountTransactionDTO.OrderId, DbType.String);
                 parameters.Add("RequestId", accountTransactionDTO.RequestId, DbType.String);
+                parameters.Add("PartnerUserId", accountTransactionDTO.PartnerUserId, DbType.String);
+                parameters.Add("PartnerClientId", accountTransactionDTO.PartnerClientId, DbType.Guid);
+                parameters.Add("TransId", accountTransactionDTO.TransId, DbType.Int64);
                 parameters.Add("Amount", accountTransactionDTO.Amount, DbType.Int64);
-                parameters.Add("ResponseTime", accountTransactionDTO.ResponseTime, DbType.Int64);
+                parameters.Add("OrderInfo", accountTransactionDTO.OrderInfo, DbType.String);
+                parameters.Add("OrderType", accountTransactionDTO.OrderType, DbType.String);
+                parameters.Add("CallbackToken", accountTransactionDTO.CallbackToken, DbType.String);
+                parameters.Add("ResultCode", accountTransactionDTO.ResultCode, DbType.Int16);
                 parameters.Add("Message", accountTransactionDTO.Message, DbType.String);
-                parameters.Add("ResultCode", accountTransactionDTO.ResultCode, DbType.String);
-                parameters.Add("PayUrl", accountTransactionDTO.PayUrl, DbType.String);
-                parameters.Add("Deeplink", accountTransactionDTO.Deeplink, DbType.String);
-                parameters.Add("QrCodeUrl", accountTransactionDTO.QrCodeUrl, DbType.String);
+                parameters.Add("PayType", accountTransactionDTO.PayType, DbType.String);
+                parameters.Add("ResponseTime", accountTransactionDTO.ResponseTime, DbType.Int64);
+                parameters.Add("ExtraData", accountTransactionDTO.ExtraData, DbType.String);
+                parameters.Add("Signature", accountTransactionDTO.Signature, DbType.String);
+
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
@@ -96,7 +95,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteAccountTransactionById(Guid accountTransactionId)//thiếu para UpdateBy
+/*        public async Task<int> DeleteAccountTransactionById(Guid accountTransactionId)//thiếu para UpdateBy
         {
             try
             {
@@ -119,10 +118,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 throw new Exception(e.Message);
             }
-        }
+        }*/
 
         //GET ALL
-        public async Task<List<AccountTransaction>> GetAllAccountTransactions(int pageIndex, int pageSize)
+/*        public async Task<List<AccountTransaction>> GetAllAccountTransactions(int pageIndex, int pageSize)
         {
             try
             {
@@ -170,7 +169,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 throw new Exception(e.Message, e);
             }
-        }
+        }*/
 
         //GET BY ID
         public async Task<AccountTransaction> GetAccountTransactionById(Guid accountTransactionId)
@@ -190,7 +189,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdateAccountTransaction(AccountTransaction accountTransactionDTO, Guid accountTransactionId)
+/*        public async Task<int> UpdateAccountTransaction(AccountTransaction accountTransactionDTO, Guid accountTransactionId)
         {
             try
             {
@@ -225,7 +224,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 throw new Exception(e.Message, e);
             }
-        }
+        }*/
 
         //CLEAR DATA
         public async Task<int> ClearAllAccountTransactionData()
