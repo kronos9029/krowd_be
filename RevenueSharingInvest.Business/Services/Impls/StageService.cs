@@ -98,12 +98,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
 
                     periodRevenue = await _periodRevenueRepository.GetPeriodRevenueByStageId(Guid.Parse(item.id));
-                    item.optimisticExpectedAmount = (float)periodRevenue.OptimisticExpectedAmount;
-                    item.normalExpectedAmount = (float)periodRevenue.NormalExpectedAmount;
-                    item.pessimisticExpectedAmount = (float)periodRevenue.PessimisticExpectedAmount;
-                    item.optimisticExpectedRatio = (float)periodRevenue.OptimisticExpectedRatio;
-                    item.normalExpectedRatio = (float)periodRevenue.NormalExpectedRatio;
-                    item.pessimisticExpectedRatio = (float)periodRevenue.PessimisticExpectedRatio;
+                    item.optimisticExpectedAmount = (periodRevenue.OptimisticExpectedAmount == null) ? 0 : (float)periodRevenue.OptimisticExpectedAmount;
+                    item.normalExpectedAmount = (periodRevenue.NormalExpectedAmount == null) ? 0 : (float)periodRevenue.NormalExpectedAmount;
+                    item.pessimisticExpectedAmount = (periodRevenue.PessimisticExpectedAmount == null) ? 0 : (float)periodRevenue.PessimisticExpectedAmount;
+                    item.optimisticExpectedRatio = (periodRevenue.OptimisticExpectedRatio == null) ? 0 : (float)periodRevenue.OptimisticExpectedRatio;
+                    item.normalExpectedRatio = (periodRevenue.NormalExpectedRatio == null) ? 0 : (float)periodRevenue.NormalExpectedRatio;
+                    item.pessimisticExpectedRatio = (periodRevenue.PessimisticExpectedRatio == null) ? 0 : (float)periodRevenue.PessimisticExpectedRatio;
                 }
 
                 result.listOfStage = list;

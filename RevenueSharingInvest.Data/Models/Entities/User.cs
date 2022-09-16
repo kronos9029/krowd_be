@@ -44,9 +44,9 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string DateOfBirth { get; set; }
         [StringLength(20)]
         public string TaxIdentificationNumber { get; set; }
-        [StringLength(20)]
+        [StringLength(255)]
         public string City { get; set; }
-        [StringLength(20)]
+        [StringLength(255)]
         public string District { get; set; }
         public string Address { get; set; }
         [StringLength(50)]

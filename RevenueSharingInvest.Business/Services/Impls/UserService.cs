@@ -118,7 +118,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new CreateObjectException("Can not create User Object!");
                 else
                 {
-                    if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                    if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
                     {
                         //Tạo ví B1, B4
                         await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B1")), Guid.Parse(currentUser.userId));
