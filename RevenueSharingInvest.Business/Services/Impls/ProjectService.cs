@@ -830,7 +830,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-                Project project = await _projectRepository.GetProjectById(projectId);
+                GetProjectDTO project = _mapper.Map<GetProjectDTO>(await _projectRepository.GetProjectById(projectId));
 
                 if (projectDTO.managerId != null)
                 {
@@ -905,51 +905,68 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("multiplier must be greater than 0!!!");
                 }
 
-                ///Update [Stage] and [PeriodRevenue]
+                //Update [Stage] and [PeriodRevenue]
                 if (projectDTO.duration != 0)
                 {
                     if (projectDTO.duration <= 0)
                         throw new InvalidFieldException("duration must be greater than 0!!!");
                 }
                 else
-                    //projectDTO.duration = project.Duration;
-                
+                    projectDTO.duration = project.duration;
 
-                if (projectDTO.numOfStage != 0 && projectDTO.numOfStage <= 0)
-                    throw new InvalidFieldException("numOfStage must be greater than 0!!!");
 
-                if (projectDTO.startDate != null && !await _validationService.CheckDate((projectDTO.startDate)))
-                    throw new InvalidFieldException("Invalid startDate!!!");
-                
+                if (projectDTO.numOfStage != 0)
+                {
+                    if (projectDTO.numOfStage <= 0)
+                        throw new InvalidFieldException("numOfStage must be greater than 0!!!");
+                }
+                else
+                    projectDTO.numOfStage = project.numOfStage;
+
                 if (projectDTO.startDate != null)
-                    projectDTO.startDate = await _validationService.FormatDateInput(projectDTO.startDate);
+                {
+                    if (!await _validationService.CheckDate((projectDTO.startDate)))
+                        throw new InvalidFieldException("Invalid startDate!!!");
 
-                if (projectDTO.endDate != null && !await _validationService.CheckDate((projectDTO.endDate)))
-                    throw new InvalidFieldException("Invalid endDate!!!");
+                    projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
+                }
+                else
+                {
+                    projectDTO.startDate = await _validationService.FormatDateOutput(project.startDate);
+                    projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
+                }
 
                 if (projectDTO.endDate != null)
-                    projectDTO.endDate = await _validationService.FormatDateInput(projectDTO.endDate);
+                {
+                    if (!await _validationService.CheckDate((projectDTO.endDate)))
+                        throw new InvalidFieldException("Invalid endDate!!!");
 
-                ///
+                    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
+                }
+                else
+                {
+                    projectDTO.endDate = await _validationService.FormatDateOutput(project.endDate );
+                    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
+                }
 
                 Project entity = _mapper.Map<Project>(projectDTO);
 
                 if (projectDTO.investmentTargetCapital == 0)
-                    entity.InvestmentTargetCapital = project.InvestmentTargetCapital;
+                    entity.InvestmentTargetCapital = project.investmentTargetCapital;
                 else
                     entity.RemainAmount = entity.InvestmentTargetCapital;
 
                 if (projectDTO.sharedRevenue == 0)
-                    entity.SharedRevenue = project.SharedRevenue;
+                    entity.SharedRevenue = project.sharedRevenue;
 
                 if (projectDTO.multiplier == 0)
-                    entity.Multiplier = project.Multiplier;
+                    entity.Multiplier = project.multiplier;
 
                 if (projectDTO.duration == 0)
-                    entity.Duration = project.Duration;
+                    entity.Duration = project.duration;
 
                 if (projectDTO.numOfStage == 0)
-                    entity.NumOfStage = project.NumOfStage;
+                    entity.NumOfStage = project.numOfStage;
 
                 if (projectDTO.image != null)
                 {
