@@ -194,25 +194,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 ammountChart.chartName = "PeriodRevenue_Ammount_Chart";
                 ammountChart.lineList = new List<StageLineDTO>();
                 StageLineDTO OEA = new StageLineDTO();
-                OEA.lineName = "Optimistic_Expected_Amount";
+                OEA.name = "Optimistic_Expected_Amount";
                 OEA.data = new List<float>();
                 StageLineDTO NEA = new StageLineDTO();
-                NEA.lineName = "Normal_Expected_Amount";
+                NEA.name = "Normal_Expected_Amount";
                 NEA.data = new List<float>();
                 StageLineDTO PEA = new StageLineDTO();
-                PEA.lineName = "Pessimistic_Expected_Amount";
+                PEA.name = "Pessimistic_Expected_Amount";
                 PEA.data = new List<float>();
 
                 ratioChart.chartName = "PeriodRevenue_Ratio_Chart";
                 ratioChart.lineList = new List<StageLineDTO>();
                 StageLineDTO OER = new StageLineDTO();
-                OER.lineName = "Optimistic_Expected_Ratio";
+                OER.name = "Optimistic_Expected_Ratio";
                 OER.data = new List<float>();
                 StageLineDTO NER = new StageLineDTO();
-                NER.lineName = "Normal_Expected_Ratio";
+                NER.name = "Normal_Expected_Ratio";
                 NER.data = new List<float>();
                 StageLineDTO PER = new StageLineDTO();
-                PER.lineName = "Pessimistic_Expected_Ratio";
+                PER.name = "Pessimistic_Expected_Ratio";
                 PER.data = new List<float>();
 
                 List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId);

@@ -102,12 +102,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
-                    entity.RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER"));                   
+                    entity.RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")); 
                 }
                 if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
+                    Data.Models.Entities.Business business = await _businessRepository.GetBusinessByUserId(Guid.Parse(currentUser.userId));
                     entity.RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"));
                     entity.BusinessId = Guid.Parse(currentUser.businessId);
+                    entity.Description = "Project Manager of " + business.Name;
                 }
                 entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
                 entity.CreateBy = Guid.Parse(currentUser.userId);
