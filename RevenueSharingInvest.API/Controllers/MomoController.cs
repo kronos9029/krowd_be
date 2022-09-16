@@ -118,7 +118,20 @@ namespace RevenueSharingInvest.API.Controllers
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
             request.partnerClientId = currentUser.userId;
+            request.email = currentUser.email;
             var result = _momoService.RequestPaymentWeb(request);
+            return Ok(result);
+
+        }        
+        
+        [HttpPost]
+        [Route("request-mobile")]
+        public async Task<IActionResult> RequestLinkAndPay(MomoPaymentRequest request)
+        {
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            request.partnerClientId = currentUser.userId;
+            request.email = currentUser.email;
+            var result = _momoService.RequestLinkAndPayment(request);
             return Ok(result);
 
         }
@@ -141,8 +154,7 @@ namespace RevenueSharingInvest.API.Controllers
                 currentUser.userId = "";
                 currentUser.email = "";
                 currentUser.investorId = "";
-            }
-            else
+            }else
             {
                 currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
                 currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
@@ -159,20 +171,17 @@ namespace RevenueSharingInvest.API.Controllers
             }
             else
             {
+                currentUser.roleId = userDTO.role.id;
                 if (userDTO.business != null)
                 {
-                    currentUser.roleId = userDTO.role.id;
                     currentUser.businessId = userDTO.business.id;
                 }
                 else
                 {
-                    currentUser.roleId = userDTO.role.id;
                     currentUser.businessId = "";
                 }
 
             }
-
-
             foreach (RoleDTO role in roleList)
             {
                 if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(0)))

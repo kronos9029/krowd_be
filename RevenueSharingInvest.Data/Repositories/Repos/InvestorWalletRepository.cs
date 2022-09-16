@@ -116,13 +116,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET BY ID
-        public async Task<InvestorWallet> GetInvestorWalletById(Guid investorWalletId)
+        public async Task<InvestorWallet> GetInvestorWalletByTypeAndInvestorId(Guid investorId, string walletType)
         {
             try
             {
-                string query = "SELECT * FROM InvestorWallet WHERE Id = @Id";
+                string query = "SELECT IW.Id, IW.InvestorId, IW.Balance, IW.WalletTypeId " +
+                    "FROM InvestorWallet IW JOIN WalletType WT ON IW.WalletTypeId = WT.Id " +
+                    "WHERE WT.Type = @Type AND IW.InvestorId = @InvestorId AND IW.IsDeleted = 0";
                 var parameters = new DynamicParameters();
-                parameters.Add("Id", investorWalletId, DbType.Guid);
+                parameters.Add("InvestorId", investorId, DbType.Guid);
+                parameters.Add("Type", walletType, DbType.String);
                 using var connection = CreateConnection();
                 return await connection.QueryFirstOrDefaultAsync<InvestorWallet>(query, parameters);
             }
@@ -154,6 +157,36 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", investorWalletDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", investorWalletId, DbType.Guid);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }        
+        
+        //Investor Top-up 
+        public async Task<int> InvestorTopUpWallet(InvestorWallet investorWalletDTO)
+        {
+            try
+            {
+                var query = "UPDATE InvestorWallet "
+                    + "     SET "
+                    + "         Balance = @Balance, "
+                    + "         UpdateDate = @UpdateDate, "
+                    + "         UpdateBy = @UpdateBy"
+                    + "     WHERE "
+                    + "         Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Balance", investorWalletDTO.Balance, DbType.Int64);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", investorWalletDTO.Id, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {

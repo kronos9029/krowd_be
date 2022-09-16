@@ -9,6 +9,7 @@ namespace RevenueSharingInvest.Business.Helpers
     public class MomoSettings
     {
         public string ApiEndpoint { get;set; }
+        public string ApiMobileEndpoint { get;set; }
         public string PartnerCode { get; set; }
         public string AccessKey { get; set; }
         public string SecretKey { get; set; }
