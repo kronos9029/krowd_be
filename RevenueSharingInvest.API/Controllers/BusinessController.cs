@@ -75,7 +75,8 @@ namespace RevenueSharingInvest.API.Controllers
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
             GetBusinessDTO dto = new GetBusinessDTO();
 
-            if((currentUser.roleId.Equals(currentUser.businessManagerRoleId) || currentUser.roleId.Equals(currentUser.projectManagerRoleId)) && !currentUser.businessId.Equals(""))
+            if(((currentUser.roleId.Equals(currentUser.businessManagerRoleId) || currentUser.roleId.Equals(currentUser.projectManagerRoleId)) && !currentUser.businessId.Equals("")) 
+                || currentUser.roleId.Equals(currentUser.adminRoleId))
             {
                 dto = await _businessService.GetBusinessById(Guid.Parse(currentUser.businessId));
                 return Ok(dto);
