@@ -70,15 +70,18 @@ namespace RevenueSharingInvest.API.Controllers
         //GET BY ID
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetBusinessById()
+        public async Task<IActionResult> GetBusinessById([FromRoute]string id)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
             GetBusinessDTO dto = new GetBusinessDTO();
 
-            if(((currentUser.roleId.Equals(currentUser.businessManagerRoleId) || currentUser.roleId.Equals(currentUser.projectManagerRoleId)) && !currentUser.businessId.Equals("")) 
-                || currentUser.roleId.Equals(currentUser.adminRoleId))
+            if((currentUser.roleId.Equals(currentUser.businessManagerRoleId) || currentUser.roleId.Equals(currentUser.projectManagerRoleId)) && !currentUser.businessId.Equals(""))
             {
                 dto = await _businessService.GetBusinessById(Guid.Parse(currentUser.businessId));
+                return Ok(dto);
+            } else if (currentUser.roleId.Equals(currentUser.adminRoleId) && id != null)
+            {
+                dto = await _businessService.GetBusinessById(Guid.Parse(id));
                 return Ok(dto);
             }
 
