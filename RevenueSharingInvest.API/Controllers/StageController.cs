@@ -67,7 +67,7 @@ namespace RevenueSharingInvest.API.Controllers
             //ALL ROLES
             if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
-                var result = new ChartListDTO();
+                var result = new List<StageChartDTO>();
                 result = await _stageService.GetStageChartByProjectId(project_id, currentUser);
                 return Ok(result);
             }

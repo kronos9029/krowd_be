@@ -179,11 +179,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
 
         //GET CHART DATA
-        public async Task<ChartListDTO> GetStageChartByProjectId(Guid projectId, ThisUserObj currentUser)
+        public async Task<List<StageChartDTO>> GetStageChartByProjectId(Guid projectId, ThisUserObj currentUser)
         {
-            ChartListDTO result = new ChartListDTO();
-            result.chartList = new List<StageChartDTO>();
-            List<StageChartDTO> stageChartDTOs = new List<StageChartDTO>();
+            List<StageChartDTO> result = new List<StageChartDTO>();
             StageChartDTO ammountChart = new StageChartDTO();
             StageChartDTO ratioChart = new StageChartDTO();
             try
@@ -257,10 +255,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 ratioChart.lineList.Add(OER);
                 ratioChart.lineList.Add(NER);
                 ratioChart.lineList.Add(PER);
-                stageChartDTOs.Add(ammountChart);
-                stageChartDTOs.Add(ratioChart);
-
-                result.chartList = stageChartDTOs;
+                result.Add(ammountChart);
+                result.Add(ratioChart);
 
                 return result;
             }

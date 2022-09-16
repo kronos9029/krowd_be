@@ -380,6 +380,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (projectDTO.numOfStage <= 0)
                     throw new InvalidFieldException("numOfStage must be greater than 0!!!");
 
+                if (projectDTO.startDate != null && projectDTO.endDate != null)
+                {
+                    if ((DateAndTime.DateDiff(DateInterval.Day, DateTime.ParseExact(projectDTO.startDate, "dd/MM/yyyy HH:mm:ss", null), DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null))) < 0)
+                        throw new InvalidFieldException("startDate can not bigger than endDate!!!");
+                }
+
                 if (!await _validationService.CheckDate((projectDTO.startDate)))
                     throw new InvalidFieldException("Invalid startDate!!!");
 
@@ -830,7 +836,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-                GetProjectDTO project = _mapper.Map<GetProjectDTO>(await _projectRepository.GetProjectById(projectId));
+                GetProjectDTO getProject = _mapper.Map<GetProjectDTO>(await _projectRepository.GetProjectById(projectId));
+                Project project = new Project();
 
                 if (projectDTO.managerId != null)
                 {
@@ -912,7 +919,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("duration must be greater than 0!!!");
                 }
                 else
-                    projectDTO.duration = project.duration;
+                    projectDTO.duration = getProject.duration;
 
 
                 if (projectDTO.numOfStage != 0)
@@ -921,60 +928,124 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("numOfStage must be greater than 0!!!");
                 }
                 else
-                    projectDTO.numOfStage = project.numOfStage;
+                    projectDTO.numOfStage = getProject.numOfStage;
 
-                if (projectDTO.startDate != null)
+                if (projectDTO.duration != 0 || projectDTO.numOfStage != 0 || projectDTO.startDate != null || projectDTO.endDate != null)
                 {
-                    if (!await _validationService.CheckDate((projectDTO.startDate)))
-                        throw new InvalidFieldException("Invalid startDate!!!");
+                    if (projectDTO.startDate != null && projectDTO.endDate != null)
+                    {
+                        if ((DateAndTime.DateDiff(DateInterval.Day, DateTime.ParseExact(projectDTO.startDate, "dd/MM/yyyy HH:mm:ss", null), DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null))) < 0)
+                            throw new InvalidFieldException("startDate can not bigger than endDate!!!");
+                    }
+                    
+                    if ((projectDTO.startDate != null || projectDTO.endDate != null) && (projectDTO.startDate == null || projectDTO.endDate == null))
+                        throw new InvalidFieldException("startDate and endDate must be update at the same time!!!");
 
-                    projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
+                    if (projectDTO.startDate != null)
+                    {
+                        if (!await _validationService.CheckDate((projectDTO.startDate)))
+                            throw new InvalidFieldException("Invalid startDate!!!");
+
+                        projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
+                    }
+                    else
+                    {
+                        projectDTO.startDate = await _validationService.FormatDateOutput(getProject.startDate);
+                        projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
+                    }
+
+                    if (projectDTO.endDate != null)
+                    {
+                        if (!await _validationService.CheckDate((projectDTO.endDate)))
+                            throw new InvalidFieldException("Invalid endDate!!!");
+
+                        projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
+                    }
+                    else
+                    {
+                        projectDTO.endDate = await _validationService.FormatDateOutput(getProject.endDate);
+                        projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
+                    }
+
+                    //Xóa [Stage] và [PeriodRevenue] cũ
+                    await _periodRevenueRepository.DeletePeriodRevenueByProjectId(projectId);
+                    await _stageRepository.DeleteStageByProjectId(projectId);
+
+                    //Tạo lại [Stage] và [PeriodRevenue]
+
+                    long totalDay = DateAndTime.DateDiff(DateInterval.Day, (DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null)).AddDays(1), (DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null)).AddMonths(projectDTO.duration)) + 1;
+                    int daysPerStage = ((int)totalDay) / projectDTO.numOfStage;
+                    int modDays = ((int)totalDay) - (daysPerStage * projectDTO.numOfStage);
+
+                    projectDTO.name = getProject.name;
+                    projectDTO.startDate = await _validationService.FormatDateInput(projectDTO.startDate);
+                    projectDTO.endDate = await _validationService.FormatDateInput(projectDTO.endDate);
+
+                    project = _mapper.Map<Project>(projectDTO);
+                   
+                    Stage stage = new Stage();
+                    PeriodRevenue periodRevenue = new PeriodRevenue();
+                    string newStageId;
+                    string newPeriodRevenueId;
+
+                    stage.ProjectId = projectId;
+                    stage.Status = StageStatusEnum.UNDUE.ToString();
+                    stage.CreateBy = Guid.Parse(currentUser.userId);
+                    stage.StartDate = DateTime.ParseExact(DateTime.Parse(project.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(project.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:00:00", "dd/MM/yyyy HH:mm:ss", null).AddDays(1);
+                    stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "23:59:59", "dd/MM/yyyy HH:mm:ss", null);
+
+                    periodRevenue.ProjectId = projectId;
+                    periodRevenue.Status = StageStatusEnum.UNDUE.ToString();
+                    periodRevenue.CreateBy = Guid.Parse(currentUser.userId);
+
+                    for (int i = 1; i <= projectDTO.numOfStage - 1; i++)
+                    {
+                        stage.Name = projectDTO.name + " giai đoạn " + i;
+                        newStageId = await _stageRepository.CreateStage(stage);
+                        periodRevenue.StageId = Guid.Parse(newStageId);
+                        newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
+                        stage.StartDate = stage.StartDate.AddDays(daysPerStage);
+                        stage.EndDate = stage.EndDate.AddDays(daysPerStage);
+
+                    }
+                    stage.Name = projectDTO.name + " giai đoạn " + projectDTO.numOfStage;
+                    stage.EndDate = stage.EndDate.AddDays(modDays);
+                    newStageId = await _stageRepository.CreateStage(stage);
+                    periodRevenue.StageId = Guid.Parse(newStageId);
+                    newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
+                    
                 }
                 else
                 {
-                    projectDTO.startDate = await _validationService.FormatDateOutput(project.startDate);
-                    projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
-                }
-
-                if (projectDTO.endDate != null)
-                {
-                    if (!await _validationService.CheckDate((projectDTO.endDate)))
-                        throw new InvalidFieldException("Invalid endDate!!!");
-
-                    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
-                }
-                else
-                {
-                    projectDTO.endDate = await _validationService.FormatDateOutput(project.endDate );
-                    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
-                }
-
-                Project entity = _mapper.Map<Project>(projectDTO);
+                    projectDTO.startDate = null;
+                    projectDTO.endDate = null;
+                    project = _mapper.Map<Project>(projectDTO);
+                }                
 
                 if (projectDTO.investmentTargetCapital == 0)
-                    entity.InvestmentTargetCapital = project.investmentTargetCapital;
+                    project.InvestmentTargetCapital = getProject.investmentTargetCapital;
                 else
-                    entity.RemainAmount = entity.InvestmentTargetCapital;
+                    project.RemainAmount = project.InvestmentTargetCapital;
 
                 if (projectDTO.sharedRevenue == 0)
-                    entity.SharedRevenue = project.sharedRevenue;
+                    project.SharedRevenue = getProject.sharedRevenue;
 
                 if (projectDTO.multiplier == 0)
-                    entity.Multiplier = project.multiplier;
+                    project.Multiplier = getProject.multiplier;
 
-                if (projectDTO.duration == 0)
-                    entity.Duration = project.duration;
+                //if (projectDTO.duration == 0)
+                //    project.Duration = getProject.duration;
 
-                if (projectDTO.numOfStage == 0)
-                    entity.NumOfStage = project.numOfStage;
+                //if (projectDTO.numOfStage == 0)
+                //    project.NumOfStage = getProject.numOfStage;
 
                 if (projectDTO.image != null)
                 {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, RoleDictionary.role.GetValueOrDefault("ADMIN"));
+                    project.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, RoleDictionary.role.GetValueOrDefault("ADMIN"));
                 }
-                entity.UpdateBy = Guid.Parse(currentUser.userId);
+                project.UpdateBy = Guid.Parse(currentUser.userId);
 
-                result = await _projectRepository.UpdateProject(entity, projectId);
+                result = await _projectRepository.UpdateProject(project, projectId);
                 if (result == 0)
                     throw new UpdateObjectException("Can not update Project Object!");
                 return result;
