@@ -132,8 +132,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             GetStageDTO result;
             try
-            {
-                
+            {              
                 Stage stage = await _stageRepository.GetStageById(stageId);               
                 if (stage == null)
                     throw new NotFoundException("No Stage Object Found!");
@@ -153,12 +152,22 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result.createDate = await _validationService.FormatDateOutput(result.createDate);
                 result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
                 periodRevenue = await _periodRevenueRepository.GetPeriodRevenueByStageId(Guid.Parse(result.id));
-                result.optimisticExpectedAmount = (float)periodRevenue.OptimisticExpectedAmount;
-                result.normalExpectedAmount = (float)periodRevenue.NormalExpectedAmount;
-                result.pessimisticExpectedAmount = (float)periodRevenue.PessimisticExpectedAmount;
-                result.optimisticExpectedRatio = (float)periodRevenue.OptimisticExpectedRatio;
-                result.normalExpectedRatio = (float)periodRevenue.NormalExpectedRatio;
-                result.pessimisticExpectedRatio = (float)periodRevenue.PessimisticExpectedRatio;
+                if (periodRevenue == null)
+                {
+                    periodRevenue = new PeriodRevenue();
+                    periodRevenue.ProjectId = Guid.Parse(result.projectId);
+                    periodRevenue.StageId = Guid.Parse(result.id);
+                    periodRevenue.Status = result.status;
+                    periodRevenue.CreateBy = (result.createBy == null) ? null : Guid.Parse(result.projectId);
+                    periodRevenue.UpdateBy = (result.updateBy == null) ? null : Guid.Parse(result.projectId);
+                    await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
+                }
+                result.optimisticExpectedAmount = (periodRevenue.OptimisticExpectedAmount == null) ? 0 : (float)periodRevenue.OptimisticExpectedAmount;
+                result.normalExpectedAmount = (periodRevenue.NormalExpectedAmount == null) ? 0 : (float)periodRevenue.NormalExpectedAmount;
+                result.pessimisticExpectedAmount = (periodRevenue.PessimisticExpectedAmount == null) ? 0 : (float)periodRevenue.PessimisticExpectedAmount;
+                result.optimisticExpectedRatio = (periodRevenue.OptimisticExpectedRatio == null) ? 0 : (float)periodRevenue.OptimisticExpectedRatio;
+                result.normalExpectedRatio = (periodRevenue.NormalExpectedRatio == null) ? 0 : (float)periodRevenue.NormalExpectedRatio;
+                result.pessimisticExpectedRatio = (periodRevenue.PessimisticExpectedRatio == null) ? 0 : (float)periodRevenue.PessimisticExpectedRatio;
 
                 return result;
             }
@@ -170,9 +179,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
 
         //GET CHART DATA
-        public async Task<List<StageChartDTO>> GetStageChartByProjectId(Guid projectId, ThisUserObj currentUser)
+        public async Task<ChartListDTO> GetStageChartByProjectId(Guid projectId, ThisUserObj currentUser)
         {
-            List<StageChartDTO> result = new List<StageChartDTO>();
+            ChartListDTO result = new ChartListDTO();
+            result.chartList = new List<StageChartDTO>();
+            List<StageChartDTO> stageChartDTOs = new List<StageChartDTO>();
             StageChartDTO ammountChart = new StageChartDTO();
             StageChartDTO ratioChart = new StageChartDTO();
             try
@@ -246,8 +257,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 ratioChart.lineList.Add(OER);
                 ratioChart.lineList.Add(NER);
                 ratioChart.lineList.Add(PER);
-                result.Add(ammountChart);
-                result.Add(ratioChart);
+                stageChartDTOs.Add(ammountChart);
+                stageChartDTOs.Add(ratioChart);
+
+                result.chartList = stageChartDTOs;
 
                 return result;
             }
