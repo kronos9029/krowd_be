@@ -3,6 +3,7 @@ using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Data.Models.Constants;
+using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -98,6 +99,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
 
                     periodRevenue = await _periodRevenueRepository.GetPeriodRevenueByStageId(Guid.Parse(item.id));
+                    if (periodRevenue == null)
+                    {
+                        periodRevenue = new PeriodRevenue();
+                        periodRevenue.ProjectId = Guid.Parse(item.projectId);             
+                        periodRevenue.StageId = Guid.Parse(item.id);
+                        periodRevenue.Status = item.status;
+                        periodRevenue.CreateBy = (item.createBy == null) ? null : Guid.Parse(item.projectId);
+                        periodRevenue.UpdateBy = (item.updateBy == null) ? null : Guid.Parse(item.projectId);
+                        await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
+                    }    
                     item.optimisticExpectedAmount = (periodRevenue.OptimisticExpectedAmount == null) ? 0 : (float)periodRevenue.OptimisticExpectedAmount;
                     item.normalExpectedAmount = (periodRevenue.NormalExpectedAmount == null) ? 0 : (float)periodRevenue.NormalExpectedAmount;
                     item.pessimisticExpectedAmount = (periodRevenue.PessimisticExpectedAmount == null) ? 0 : (float)periodRevenue.PessimisticExpectedAmount;
