@@ -16,6 +16,7 @@ namespace RevenueSharingInvest.Business.Services
         //READ
         public Task<AllStageDTO> GetAllStagesByProjectId(Guid projectId, ThisUserObj currentUser);
         public Task<GetStageDTO> GetStageById(Guid stageId, ThisUserObj currentUser);
+        public Task<List<StageChartDTO>> GetStageChartByProjectId(Guid projectId, ThisUserObj currentUser);
 
         //UPDATE
         public Task<int> UpdateStage(UpdateStageDTO stageDTO, Guid stageId, ThisUserObj currentUser);

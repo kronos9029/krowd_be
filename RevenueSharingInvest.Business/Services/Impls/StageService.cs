@@ -168,6 +168,95 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
+
+        //GET CHART DATA
+        public async Task<List<StageChartDTO>> GetStageChartByProjectId(Guid projectId, ThisUserObj currentUser)
+        {
+            List<StageChartDTO> result = new List<StageChartDTO>();
+            StageChartDTO ammountChart = new StageChartDTO();
+            StageChartDTO ratioChart = new StageChartDTO();
+            try
+            {
+                Project project = await _projectRepository.GetProjectById(projectId);
+
+                if (!project.ManagerId.ToString().Equals(currentUser.userId))
+                    throw new InvalidFieldException("This projectId is not belong to your Project!!!");
+
+                ammountChart.chartName = "PeriodRevenue_Ammount_Chart";
+                ammountChart.lineList = new List<StageLineDTO>();
+                StageLineDTO OEA = new StageLineDTO();
+                OEA.lineName = "Optimistic_Expected_Amount";
+                OEA.data = new List<float>();
+                StageLineDTO NEA = new StageLineDTO();
+                NEA.lineName = "Normal_Expected_Amount";
+                NEA.data = new List<float>();
+                StageLineDTO PEA = new StageLineDTO();
+                PEA.lineName = "Pessimistic_Expected_Amount";
+                PEA.data = new List<float>();
+
+                ratioChart.chartName = "PeriodRevenue_Ratio_Chart";
+                ratioChart.lineList = new List<StageLineDTO>();
+                StageLineDTO OER = new StageLineDTO();
+                OER.lineName = "Optimistic_Expected_Ratio";
+                OER.data = new List<float>();
+                StageLineDTO NER = new StageLineDTO();
+                NER.lineName = "Normal_Expected_Ratio";
+                NER.data = new List<float>();
+                StageLineDTO PER = new StageLineDTO();
+                PER.lineName = "Pessimistic_Expected_Ratio";
+                PER.data = new List<float>();
+
+                List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId);
+                List<GetStageDTO> list = _mapper.Map<List<GetStageDTO>>(stageList);
+                PeriodRevenue periodRevenue = new PeriodRevenue();
+
+                foreach (GetStageDTO item in list)
+                {
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+
+                    periodRevenue = await _periodRevenueRepository.GetPeriodRevenueByStageId(Guid.Parse(item.id));
+                    if (periodRevenue == null)
+                    {
+                        periodRevenue = new PeriodRevenue();
+                        periodRevenue.ProjectId = Guid.Parse(item.projectId);
+                        periodRevenue.StageId = Guid.Parse(item.id);
+                        periodRevenue.Status = item.status;
+                        periodRevenue.CreateBy = (item.createBy == null) ? null : Guid.Parse(item.projectId);
+                        periodRevenue.UpdateBy = (item.updateBy == null) ? null : Guid.Parse(item.projectId);
+                        await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
+                    }
+                    item.optimisticExpectedAmount = (periodRevenue.OptimisticExpectedAmount == null) ? 0 : (float)periodRevenue.OptimisticExpectedAmount;
+                    item.normalExpectedAmount = (periodRevenue.NormalExpectedAmount == null) ? 0 : (float)periodRevenue.NormalExpectedAmount;
+                    item.pessimisticExpectedAmount = (periodRevenue.PessimisticExpectedAmount == null) ? 0 : (float)periodRevenue.PessimisticExpectedAmount;
+                    item.optimisticExpectedRatio = (periodRevenue.OptimisticExpectedRatio == null) ? 0 : (float)periodRevenue.OptimisticExpectedRatio;
+                    item.normalExpectedRatio = (periodRevenue.NormalExpectedRatio == null) ? 0 : (float)periodRevenue.NormalExpectedRatio;
+                    item.pessimisticExpectedRatio = (periodRevenue.PessimisticExpectedRatio == null) ? 0 : (float)periodRevenue.PessimisticExpectedRatio;
+
+                    OEA.data.Add(item.optimisticExpectedAmount);
+                    NEA.data.Add(item.normalExpectedAmount);
+                    PEA.data.Add(item.pessimisticExpectedAmount);
+                    OER.data.Add(item.optimisticExpectedRatio);
+                    NER.data.Add(item.normalExpectedRatio);
+                    PER.data.Add(item.pessimisticExpectedRatio);
+                }
+                ammountChart.lineList.Add(OEA);
+                ammountChart.lineList.Add(NEA);
+                ammountChart.lineList.Add(PEA);
+                ratioChart.lineList.Add(OER);
+                ratioChart.lineList.Add(NER);
+                ratioChart.lineList.Add(PER);
+                result.Add(ammountChart);
+                result.Add(ratioChart);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         //UPDATE
         public async Task<int> UpdateStage(UpdateStageDTO stageDTO, Guid stageId, ThisUserObj currentUser)
         {

@@ -42,11 +42,13 @@ namespace RevenueSharingInvest.Business.Models
         public string deeplink { get; set; }
         public string qrCodeUrl { get; set; }
         public string deeplinkMiniApp { get; set; }
+        public string partnerClientId { get; set; }
     }
 
     public class MomoPaymentRequest
     {
         public string partnerClientId { get; set; }
+        public string email { get; set; }
         public string partnerCode { get; set; }
         public string requestId { get; set; }
         public long amount { get; set; }

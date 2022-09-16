@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models;
+using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
+using RevenueSharingInvest.Data.Repositories.Repos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,15 +18,26 @@ namespace RevenueSharingInvest.Business.Services.Impls
     public class AccountTransactionService : IAccountTransactionService
     {
         private readonly IAccountTransactionRepository _accountTransactionRepository;
+        private readonly IInvestorWalletRepository _investorWalletRepository;
         private readonly IValidationService _validationService;
+        private readonly IWalletTypeRepository _walletTypeRepository;
+        private readonly IInvestorRepository _investorRepository;
         private readonly IMapper _mapper;
 
 
-        public AccountTransactionService(IAccountTransactionRepository accountTransactionRepository, IValidationService validationService, IMapper mapper)
+        public AccountTransactionService(IAccountTransactionRepository accountTransactionRepository, 
+            IValidationService validationService, 
+            IMapper mapper, 
+            IInvestorWalletRepository investorWalletRepository,
+            IWalletTypeRepository walletTypeRepository,
+            IInvestorRepository investorRepository)
         {
             _accountTransactionRepository = accountTransactionRepository;
+            _investorWalletRepository = investorWalletRepository;
             _validationService = validationService;
+            _walletTypeRepository = walletTypeRepository;
             _mapper = mapper;
+            _investorRepository = investorRepository;
         }
 
         //CREATE
@@ -70,9 +83,26 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 //accountTransactionDTO.isDeleted = false;
 
                 AccountTransaction entity = _mapper.Map<AccountTransaction>(momoPaymentResult);
+                entity.PartnerClientId = Guid.Parse(momoPaymentResult.partnerClientId);
+                entity.FromUserId = entity.PartnerClientId;
                 newId.id = await _accountTransactionRepository.CreateAccountTransaction(entity);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create AccountTransaction Object!");
+                Investor investor = await _investorRepository.GetInvestorByUserId((Guid)entity.PartnerClientId);
+
+                if(entity.ResultCode == 0)
+                {
+                    InvestorWallet I1 = await _investorWalletRepository.GetInvestorWalletByTypeAndInvestorId(investor.Id, WalletTypeEnum.I1.ToString());
+                    I1.Balance += entity.Amount;
+                    I1.UpdateDate = DateTime.Now;
+                    I1.UpdateBy = entity.FromUserId;
+                    int checkTopUp = await _investorWalletRepository.InvestorTopUpWallet(I1);
+                    if(checkTopUp == 0)
+                    {
+                        throw new CreateObjectException("Investor Top Up Failed!!");
+                    }
+                }
+
                 return newId;
             }
             catch (Exception e)
@@ -80,6 +110,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 throw new Exception(e.Message);
             }
         }
+
+        
 
         ////DELETE
         //public async Task<int> DeleteAccountTransactionById(Guid accountTransactionId)

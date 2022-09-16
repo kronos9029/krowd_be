@@ -56,6 +56,25 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
         }
 
+        //GET CHART
+        [HttpGet]
+        [Route("chart/{project_id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetStageChartByProjectId(Guid project_id)
+        {
+            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+
+            //ALL ROLES
+            if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            {
+                var result = new List<StageChartDTO>();
+                result = await _stageService.GetStageChartByProjectId(project_id, currentUser);
+                return Ok(result);
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
+        }
+
         //GET BY ID
         [HttpGet]
         [Route("{id}")]

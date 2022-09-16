@@ -172,5 +172,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+
+
+        //DELETE ALL BY PROJECT ID
+        public async Task<int> DeleteStageByProjectId(Guid projectId)
+        {
+            try
+            {
+                var query = "DELETE FROM Stage WHERE ProjectId = @ProjectId ";
+                using var connection = CreateConnection();
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

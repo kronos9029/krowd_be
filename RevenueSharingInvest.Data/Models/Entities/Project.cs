@@ -27,22 +27,22 @@ namespace RevenueSharingInvest.Data.Models.Entities
 
         [Key]
         public Guid Id { get; set; }
-        public Guid? ManagerId { get; set; }
-        public Guid? BusinessId { get; set; }
-        public Guid? FieldId { get; set; }
-        public Guid? AreaId { get; set; }
+        public Guid ManagerId { get; set; }
+        public Guid BusinessId { get; set; }
+        public Guid FieldId { get; set; }
+        public Guid AreaId { get; set; }
         [StringLength(50)]
         public string Name { get; set; }
         public string Image { get; set; }
         public string Description { get; set; }
         public string Address { get; set; }
-        public double? InvestmentTargetCapital { get; set; }
-        public double? InvestedCapital { get; set; }
-        public double? SharedRevenue { get; set; }
-        public double? Multiplier { get; set; }
-        public int? Duration { get; set; }
-        public int? NumOfStage { get; set; }
-        public double? RemainAmount { get; set; }
+        public double InvestmentTargetCapital { get; set; }
+        public double InvestedCapital { get; set; }
+        public double SharedRevenue { get; set; }
+        public double Multiplier { get; set; }
+        public int Duration { get; set; }
+        public int NumOfStage { get; set; }
+        public double RemainAmount { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime StartDate { get; set; }
         [Column(TypeName = "datetime")]

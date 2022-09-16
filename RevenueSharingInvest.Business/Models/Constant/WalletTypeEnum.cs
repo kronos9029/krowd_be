@@ -11,12 +11,20 @@ namespace RevenueSharingInvest.Business.Models.Constant
         PROJECT_INVESTMENT_WALLET,
         UNIVERSAL_PAYMENT_WALLET,
         TEMPORARY_WALLET,
-        STRATEGIC_INVESTOR,
         GENERAL_INVESTMENT_WALLET,
         INVESTOR_COLLECTING_WALLET,
         BUSINESS_COLLECTING_WALLET,
         ADVANCE_WALLET,
         PROJECT_PAYMENT_WALLET,
-        BUSINESS_PAYMENT_WALLET
+        BUSINESS_PAYMENT_WALLET,
+        I1,
+        I2,
+        I3,
+        I4,
+        I5,
+        B1,
+        B2,
+        B3,
+        B4,
     }
 }

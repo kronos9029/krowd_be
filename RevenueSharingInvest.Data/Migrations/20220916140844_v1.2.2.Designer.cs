@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RevenueSharingInvest.Data.Models.Entities;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
     [DbContext(typeof(KrowdContext))]
-    partial class KrowdContextModelSnapshot : ModelSnapshot
+    [Migration("20220916140844_v1.2.2")]
+    partial class v122
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,6 +115,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("District")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -438,7 +443,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<double>("Price")
+                    b.Property<double?>("Price")
                         .HasColumnType("float");
 
                     b.Property<Guid>("ProjectId")
@@ -592,10 +597,10 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<double?>("PessimisticExpectedRatio")
                         .HasColumnType("float");
 
-                    b.Property<Guid>("ProjectId")
+                    b.Property<Guid?>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("StageId")
+                    b.Property<Guid?>("StageId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
@@ -676,10 +681,10 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid>("AreaId")
+                    b.Property<Guid?>("AreaId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("BusinessId")
+                    b.Property<Guid?>("BusinessId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BusinessLicense")
@@ -695,44 +700,44 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Duration")
+                    b.Property<int?>("Duration")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid>("FieldId")
+                    b.Property<Guid?>("FieldId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("InvestedCapital")
+                    b.Property<double?>("InvestedCapital")
                         .HasColumnType("float");
 
-                    b.Property<double>("InvestmentTargetCapital")
+                    b.Property<double?>("InvestmentTargetCapital")
                         .HasColumnType("float");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ManagerId")
+                    b.Property<Guid?>("ManagerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double>("Multiplier")
+                    b.Property<double?>("Multiplier")
                         .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("NumOfStage")
+                    b.Property<int?>("NumOfStage")
                         .HasColumnType("int");
 
-                    b.Property<double>("RemainAmount")
+                    b.Property<double?>("RemainAmount")
                         .HasColumnType("float");
 
-                    b.Property<double>("SharedRevenue")
+                    b.Property<double?>("SharedRevenue")
                         .HasColumnType("float");
 
                     b.Property<DateTime>("StartDate")
@@ -978,6 +983,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime");
 
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("IsPrivate")
                         .HasColumnType("bit");
 
@@ -985,7 +993,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<Guid>("ProjectId")
+                    b.Property<Guid?>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartDate")
@@ -1065,8 +1073,8 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("City")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
@@ -1082,8 +1090,8 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("District")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(50)
@@ -1500,15 +1508,11 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Project", "Project")
                         .WithMany("PeriodRevenues")
                         .HasForeignKey("ProjectId")
-                        .HasConstraintName("FK_PeriodRevenue_Project")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasConstraintName("FK_PeriodRevenue_Project");
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Stage", "Stage")
                         .WithMany("PeriodRevenues")
-                        .HasForeignKey("StageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("StageId");
 
                     b.Navigation("Project");
 
@@ -1530,23 +1534,17 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Area", "Area")
                         .WithMany("Projects")
                         .HasForeignKey("AreaId")
-                        .HasConstraintName("FK_Project_Area")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasConstraintName("FK_Project_Area");
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Business", "Business")
                         .WithMany("Projects")
                         .HasForeignKey("BusinessId")
-                        .HasConstraintName("FK_Project_Business")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasConstraintName("FK_Project_Business");
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "Manager")
                         .WithMany("Projects")
                         .HasForeignKey("ManagerId")
-                        .HasConstraintName("FK_Project_User")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasConstraintName("FK_Project_User");
 
                     b.Navigation("Area");
 
@@ -1606,9 +1604,7 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Project", "Project")
                         .WithMany("Stages")
                         .HasForeignKey("ProjectId")
-                        .HasConstraintName("FK_Stage_Project")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasConstraintName("FK_Stage_Project");
 
                     b.Navigation("Project");
                 });

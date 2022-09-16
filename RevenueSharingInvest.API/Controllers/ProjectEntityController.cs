@@ -52,7 +52,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpGet]
         [Route("project/{project_id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetProjectEntityByProjectIdAndType(Guid project_Id, string type)
+        public async Task<IActionResult> GetProjectEntityByProjectIdAndType(Guid project_id, string type)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
@@ -64,7 +64,7 @@ namespace RevenueSharingInvest.API.Controllers
                 || currentUser.roleId.Equals(""))
             {
                 var result = new List<GetProjectEntityDTO>();
-                result = await _projectEntityService.GetProjectEntityByProjectIdAndType(project_Id, type, currentUser);
+                result = await _projectEntityService.GetProjectEntityByProjectIdAndType(project_id, type, currentUser);
                 return Ok(result);
             }
 

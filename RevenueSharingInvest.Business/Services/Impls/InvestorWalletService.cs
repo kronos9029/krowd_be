@@ -138,7 +138,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 throw new Exception(e.Message);
             }
-        }
+        }        
 
         //GET BY ID
         //public async Task<InvestorWalletDTO> GetInvestorWalletById(Guid investorWalletId)

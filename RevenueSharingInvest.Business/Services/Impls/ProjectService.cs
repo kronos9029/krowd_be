@@ -830,6 +830,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                Project project = await _projectRepository.GetProjectById(projectId);
+
                 if (projectDTO.managerId != null)
                 {
                     if (!await _validationService.CheckUUIDFormat(projectDTO.managerId))
@@ -866,26 +868,52 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new NotFoundException("This areaId is not existed!!!");
                 }
 
-                if (projectDTO.name != null && !await _validationService.CheckText(projectDTO.name))
-                    throw new InvalidFieldException("Invalid name!!!");
+                if (projectDTO.name != null)
+                {
+                    if (!await _validationService.CheckText(projectDTO.name))
+                        throw new InvalidFieldException("Invalid name!!!");
+                }
 
-                if (projectDTO.image != null && (projectDTO.image.Equals("string") || projectDTO.image.Length == 0))
-                    projectDTO.image = null;
+                if (projectDTO.image != null)
+                {
+                    if (projectDTO.image.Equals("string") || projectDTO.image.Length == 0)
+                        projectDTO.image = null;
+                }
 
-                if (projectDTO.description != null && (projectDTO.description.Equals("string") || projectDTO.description.Length == 0))
-                    projectDTO.description = null;
+                if (projectDTO.description != null)
+                {
+                    if (projectDTO.description.Equals("string") || projectDTO.description.Length == 0)
+                        projectDTO.description = null;
+                }
+                
                 ///
-                if (projectDTO.investmentTargetCapital != 0 && projectDTO.investmentTargetCapital <= 0)
-                    throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+                if (projectDTO.investmentTargetCapital != 0)
+                {
+                    if (projectDTO.investmentTargetCapital <= 0)
+                        throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+                }
 
-                if (projectDTO.sharedRevenue != 0 && projectDTO.sharedRevenue <= 0)
-                    throw new InvalidFieldException("sharedRevenue must be greater than 0!!!");
+                if (projectDTO.sharedRevenue != 0)
+                {
+                    if (projectDTO.sharedRevenue <= 0)
+                        throw new InvalidFieldException("sharedRevenue must be greater than 0!!!");
+                }
+                
+                if (projectDTO.multiplier != 0)
+                {
+                    if (projectDTO.multiplier <= 0)
+                        throw new InvalidFieldException("multiplier must be greater than 0!!!");
+                }
 
-                if (projectDTO.multiplier != 0 && projectDTO.multiplier <= 0)
-                    throw new InvalidFieldException("multiplier must be greater than 0!!!");
-
-                if (projectDTO.duration != 0 && projectDTO.duration <= 0)
-                    throw new InvalidFieldException("duration must be greater than 0!!!");
+                ///Update [Stage] and [PeriodRevenue]
+                if (projectDTO.duration != 0)
+                {
+                    if (projectDTO.duration <= 0)
+                        throw new InvalidFieldException("duration must be greater than 0!!!");
+                }
+                else
+                    //projectDTO.duration = project.Duration;
+                
 
                 if (projectDTO.numOfStage != 0 && projectDTO.numOfStage <= 0)
                     throw new InvalidFieldException("numOfStage must be greater than 0!!!");
@@ -902,24 +930,26 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (projectDTO.endDate != null)
                     projectDTO.endDate = await _validationService.FormatDateInput(projectDTO.endDate);
 
+                ///
+
                 Project entity = _mapper.Map<Project>(projectDTO);
 
                 if (projectDTO.investmentTargetCapital == 0)
-                    entity.InvestmentTargetCapital = null;
+                    entity.InvestmentTargetCapital = project.InvestmentTargetCapital;
                 else
                     entity.RemainAmount = entity.InvestmentTargetCapital;
 
                 if (projectDTO.sharedRevenue == 0)
-                    entity.SharedRevenue = null;
+                    entity.SharedRevenue = project.SharedRevenue;
 
                 if (projectDTO.multiplier == 0)
-                    entity.Multiplier = null;
+                    entity.Multiplier = project.Multiplier;
 
                 if (projectDTO.duration == 0)
-                    entity.Duration = null;
+                    entity.Duration = project.Duration;
 
                 if (projectDTO.numOfStage == 0)
-                    entity.NumOfStage = null;
+                    entity.NumOfStage = project.NumOfStage;
 
                 if (projectDTO.image != null)
                 {

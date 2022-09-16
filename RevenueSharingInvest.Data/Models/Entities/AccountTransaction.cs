@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 #nullable disable
 
@@ -34,6 +35,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public long ResponseTime { get; set; }
         public string ExtraData { get; set; }
         public string Signature { get; set; }
+        public string CreateDate { get; set; }
 
 
         [ForeignKey(nameof(FromUserId))]

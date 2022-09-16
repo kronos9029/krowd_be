@@ -14,10 +14,11 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //READ
         public Task<List<InvestorWallet>> GetInvestorWalletsByInvestorId(Guid investorId);
-        public Task<InvestorWallet> GetInvestorWalletById(Guid investorWalletId);
+        public Task<InvestorWallet> GetInvestorWalletByTypeAndInvestorId(Guid investorId, string walletType);
 
         //UPDATE
         public Task<int> UpdateInvestorWallet(InvestorWallet investorWalletDTO, Guid investorWalletId);
+        public Task<int> InvestorTopUpWallet(InvestorWallet investorWalletDTO);
 
         //DELETE
         public Task<int> DeleteInvestorWalletById(Guid investorWalletId);
