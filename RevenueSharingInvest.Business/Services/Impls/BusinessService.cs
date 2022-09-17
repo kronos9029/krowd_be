@@ -339,23 +339,41 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new UnauthorizedException("You Can Not Update This Business Because It Is Blocked!!");
                 }
 
-                if (businessDTO.phoneNum != null && (businessDTO.phoneNum.Length == 0 || !await _validationService.CheckPhoneNumber(businessDTO.phoneNum)))
-                    throw new InvalidFieldException("Invalid phoneNum!!!");
-
-                if (businessDTO.image != null && (businessDTO.image.Equals("string") || businessDTO.image.Length == 0))
-                    businessDTO.image = null;
-
-                if (businessDTO.email != null && (businessDTO.email.Length == 0 || !await _validationService.CheckEmail(businessDTO.email)))
-                    throw new InvalidFieldException("Invalid email!!!");
-
-                if (businessDTO.description != null && (businessDTO.description.Equals("string") || businessDTO.description.Length == 0))
-                    businessDTO.description = null;
-
-                if (!await _validationService.CheckText(businessDTO.taxIdentificationNumber))
-                    throw new InvalidFieldException("Invalid taxIdentificationNumber!!!");
-
-                if (!await _validationService.CheckText(businessDTO.address))
-                    throw new InvalidFieldException("Invalid address!!!");
+                if (businessDTO.phoneNum != null)
+                {
+                    if (businessDTO.phoneNum.Length == 0 || !await _validationService.CheckPhoneNumber(businessDTO.phoneNum))
+                        throw new InvalidFieldException("Invalid phoneNum!!!");
+                }
+                
+                if (businessDTO.image != null)
+                {
+                    if (businessDTO.image.Equals("string") || businessDTO.image.Length == 0)
+                        businessDTO.image = null;
+                }
+                
+                if (businessDTO.email != null)
+                {
+                    if (businessDTO.email.Length == 0 || !await _validationService.CheckEmail(businessDTO.email))
+                        throw new InvalidFieldException("Invalid email!!!");
+                }
+                
+                if (businessDTO.description != null)
+                {
+                    if (businessDTO.description.Equals("string") || businessDTO.description.Length == 0)
+                        businessDTO.description = null;
+                }
+                
+                if (businessDTO.taxIdentificationNumber != null)
+                {
+                    if (!await _validationService.CheckText(businessDTO.taxIdentificationNumber))
+                        throw new InvalidFieldException("Invalid taxIdentificationNumber!!!");
+                }
+                
+                if (businessDTO.address != null)
+                {
+                    if (!await _validationService.CheckText(businessDTO.address))
+                        throw new InvalidFieldException("Invalid address!!!");
+                }             
 
                 RevenueSharingInvest.Data.Models.Entities.Business entity = _mapper.Map<RevenueSharingInvest.Data.Models.Entities.Business>(businessDTO);
 
