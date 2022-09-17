@@ -93,6 +93,9 @@ namespace RevenueSharingInvest.Business.Helpers
 
             CreateMap<Area, CreateUpdateAreaDTO>().ReverseMap();
             CreateMap<Area, GetAreaDTO>().ReverseMap();
+
+            CreateMap<Investment, CreateInvestmentDTO>().ReverseMap();
+            CreateMap<Investment, GetInvestmentDTO>().ReverseMap();
         }
     }
 }

@@ -72,30 +72,30 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteInvestmentById(Guid investmentId)
-        {
-            try
-            {
-                var query = "UPDATE Investment "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
-                using var connection = CreateConnection();
-                var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", investmentId, DbType.Guid);
+        //public async Task<int> DeleteInvestmentById(Guid investmentId)
+        //{
+        //    try
+        //    {
+        //        var query = "UPDATE Investment "
+        //            + "     SET "
+        //            + "         UpdateDate = @UpdateDate, "
+        //            //+ "         UpdateBy = @UpdateBy, "
+        //            + "         IsDeleted = 1 "
+        //            + "     WHERE "
+        //            + "         Id=@Id";
+        //        using var connection = CreateConnection();
+        //        var parameters = new DynamicParameters();
+        //        parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+        //        //parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
+        //        parameters.Add("Id", investmentId, DbType.Guid);
 
-                return await connection.ExecuteAsync(query, parameters);
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
+        //        return await connection.ExecuteAsync(query, parameters);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new Exception(e.Message);
+        //    }
+        //}
 
         //GET ALL
         public async Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize)
@@ -188,57 +188,66 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdateInvestment(Investment investmentDTO, Guid investmentId)
+        //public async Task<int> UpdateInvestment(Investment investmentDTO, Guid investmentId)
+        //{
+        //    try
+        //    {
+        //        var query = "UPDATE Investment "
+        //            + "     SET "
+        //            + "         InvestorId = @InvestorId, "
+        //            + "         ProjectId = @ProjectId, "
+        //            + "         PackageId = @PackageId, "
+        //            + "         Quantity = @Quantity, "
+        //            + "         TotalPrice = @TotalPrice, "
+        //            + "         UpdateDate = @UpdateDate, "
+        //            + "         UpdateBy = @UpdateBy, "
+        //            + "         IsDeleted = @IsDeleted"
+        //            + "     WHERE "
+        //            + "         Id = @Id";
+
+        //        var parameters = new DynamicParameters();
+        //        parameters.Add("InvestorId", investmentDTO.InvestorId, DbType.Guid);
+        //        parameters.Add("ProjectId", investmentDTO.ProjectId, DbType.Guid);
+        //        parameters.Add("PackageId", investmentDTO.PackageId, DbType.Guid);
+        //        parameters.Add("Quantity", investmentDTO.Quantity, DbType.Int16);
+        //        parameters.Add("TotalPrice", investmentDTO.TotalPrice, DbType.Double);
+        //        parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+        //        parameters.Add("UpdateBy", investmentDTO.UpdateBy, DbType.Guid);
+        //        parameters.Add("IsDeleted", investmentDTO.IsDeleted, DbType.Boolean);
+        //        parameters.Add("Id", investmentId, DbType.Guid);
+
+        //        using (var connection = CreateConnection())
+        //        {
+        //            return await connection.ExecuteAsync(query, parameters);
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new Exception(e.Message, e);
+        //    }
+        //}
+
+        public async Task<List<Investment>> GetInvestmentForWallet(Guid investorId, string status)
         {
             try
             {
-                var query = "UPDATE Investment "
-                    + "     SET "
-                    + "         InvestorId = @InvestorId, "
-                    + "         ProjectId = @ProjectId, "
-                    + "         PackageId = @PackageId, "
-                    + "         Quantity = @Quantity, "
-                    + "         TotalPrice = @TotalPrice, "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
-                    + "     WHERE "
-                    + "         Id = @Id";
-
+                var query = "SELECT " 
+                    + "         I.* " 
+                    + "     FROM " 
+                    + "         Investment I JOIN Project P ON I.ProjectId = P.Id "
+                    + "     WHERE " 
+                    + "         I.InvestorId = @InvestorId AND P.Status = @Status "
+                    + "     ORDER BY " 
+                    + "         I.CreateDate DESC";
                 var parameters = new DynamicParameters();
-                parameters.Add("InvestorId", investmentDTO.InvestorId, DbType.Guid);
-                parameters.Add("ProjectId", investmentDTO.ProjectId, DbType.Guid);
-                parameters.Add("PackageId", investmentDTO.PackageId, DbType.Guid);
-                parameters.Add("Quantity", investmentDTO.Quantity, DbType.Int16);
-                parameters.Add("TotalPrice", investmentDTO.TotalPrice, DbType.Double);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", investmentDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", investmentDTO.IsDeleted, DbType.Boolean);
-                parameters.Add("Id", investmentId, DbType.Guid);
-
-                using (var connection = CreateConnection())
-                {
-                    return await connection.ExecuteAsync(query, parameters);
-                }
+                parameters.Add("InvestorId", investorId, DbType.Guid);
+                parameters.Add("Status", status, DbType.String);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<Investment>(query, parameters)).ToList();
             }
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
-            }
-        }
-
-        //CLEAR DATA
-        public async Task<int> ClearAllInvestmentData()
-        {
-            try
-            {
-                var query = "DELETE FROM Investment";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
             }
         }
     }

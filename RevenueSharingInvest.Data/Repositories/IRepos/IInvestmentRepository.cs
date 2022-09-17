@@ -17,12 +17,13 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize);
         public Task<Investment> GetInvestmentById(Guid investmentId);
         public Task<List<InvestorInvestmentDTO>> GetInvestmentByProjectIdForAuthor(Guid projectId);
+        public Task<List<Investment>> GetInvestmentForWallet(Guid investorId, string status);
 
         //UPDATE
-        public Task<int> UpdateInvestment(Investment investmentDTO, Guid investmentId);
+        //public Task<int> UpdateInvestment(Investment investmentDTO, Guid investmentId);
 
         //DELETE
-        public Task<int> DeleteInvestmentById(Guid investmentId);
-        public Task<int> ClearAllInvestmentData();
+        //public Task<int> DeleteInvestmentById(Guid investmentId);
+        //public Task<int> ClearAllInvestmentData();
     }
 }
