@@ -3,6 +3,8 @@ using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Data.Models.Constants;
+using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -18,14 +20,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
     {
         private readonly IInvestmentRepository _investmentRepository;
         private readonly IInvestorRepository _investorRepository;
+        private readonly IPackageRepository _packageRepository;
+        private readonly IInvestorWalletRepository _investorWalletRepository;
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
-        public InvestmentService(IInvestmentRepository investmentRepository, IInvestorRepository investorRepository, IValidationService validationService, IMapper mapper)
+        public InvestmentService(IInvestmentRepository investmentRepository, IInvestorRepository investorRepository, IPackageRepository packageRepository, IInvestorWalletRepository investorWalletRepository, IValidationService validationService, IMapper mapper)
         {
             _investorRepository = investorRepository;
             //_investorWalletRepository = investorWalletRepository;
             _investmentRepository = investmentRepository;
+            _packageRepository = packageRepository;
+            _investorWalletRepository = investorWalletRepository;
             _validationService = validationService;
             _mapper = mapper;
         }
@@ -57,10 +63,36 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (investmentDTO.quantity <= 0)
                     throw new InvalidFieldException("quantity must be greater than 0!!!");
 
-                Investment dto = _mapper.Map<Investment>(investmentDTO);
-                newId.id = await _investmentRepository.CreateInvestment(dto);
+                Package package = await _packageRepository.GetPackageById(Guid.Parse(investmentDTO.packageId));
+
+                Investment entity = _mapper.Map<Investment>(investmentDTO);
+                entity.TotalPrice = entity.Quantity * package.Price;
+                entity.Status = InvestmentStatusEnum.WAITING.ToString();
+                entity.CreateBy = Guid.Parse(currentUser.userId);
+                entity.UpdateBy = Guid.Parse(currentUser.userId);
+
+                newId.id = await _investmentRepository.CreateInvestment(entity);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create Investment Object!");
+                else
+                {
+                    InvestorWallet investorWallet = new InvestorWallet();
+                    investorWallet.InvestorId = Guid.Parse(currentUser.investorId);
+                    investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"));
+                    investorWallet.Balance = entity.TotalPrice;
+                    investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
+
+                    if (await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet) == 1)
+                    {
+                        Investment investment = new Investment();
+                        investment.Id = Guid.Parse(newId.id);
+                        investment.Status = InvestmentStatusEnum.SUCCESS.ToString();
+                        investment.UpdateBy = Guid.Parse(currentUser.userId);
+
+                        await _investmentRepository.UpdateInvestmentStatus(investment);
+                    }
+                }
+
                 return newId;
             }
             catch (Exception e)
@@ -79,10 +111,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 foreach (GetInvestmentDTO item in list)
                 {
-                    if (item.lastPayment != null)
-                    {
-                        item.lastPayment = await _validationService.FormatDateOutput(item.lastPayment);
-                    }
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
                 }
@@ -106,10 +134,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (result == null)
                     throw new NotFoundException("No Investment Object Found!");
 
-                if (result.lastPayment != null)
-                {
-                    result.lastPayment = await _validationService.FormatDateOutput(result.lastPayment);
-                }
                 result.createDate = await _validationService.FormatDateOutput(result.createDate);
                 result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
 
@@ -152,7 +176,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 foreach (GetInvestmentDTO item in list)
                 {
-                    item.lastPayment = item.lastPayment == null ? null : await _validationService.FormatDateOutput(item.lastPayment);
                     item.createDate = item.createDate == null ? null : await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = item.updateDate == null ? null : await _validationService.FormatDateOutput(item.updateDate);
                 }

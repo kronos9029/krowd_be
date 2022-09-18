@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RevenueSharingInvest.Data.Models.Entities;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
     [DbContext(typeof(KrowdContext))]
-    partial class KrowdContextModelSnapshot : ModelSnapshot
+    [Migration("20220918113556_Krowd_v.1.0.9")]
+    partial class Krowd_v109
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1298,6 +1300,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex(new[] { "InvestorWalletId" }, "IX_WalletTransaction_InvestorWalletId");
@@ -1307,6 +1312,8 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasIndex(new[] { "ProjectWalletId" }, "IX_WalletTransaction_ProjectWalletId");
 
                     b.HasIndex(new[] { "SystemWalletId" }, "IX_WalletTransaction_SystemWalletId");
+
+                    b.HasIndex(new[] { "UserId" }, "IX_WalletTransaction_User");
 
                     b.ToTable("WalletTransaction");
                 });
@@ -1675,6 +1682,12 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasForeignKey("SystemWalletId")
                         .HasConstraintName("FK_Transaction_SystemWallet");
 
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "User")
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("InvestorWallet");
 
                     b.Navigation("Payment");
@@ -1682,6 +1695,8 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("ProjectWallet");
 
                     b.Navigation("SystemWallet");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Area", b =>
@@ -1794,6 +1809,8 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("Projects");
 
                     b.Navigation("ProjectWallets");
+
+                    b.Navigation("WalletTransactions");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Voucher", b =>

@@ -30,12 +30,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         PackageId, "
                     + "         Quantity, "
                     + "         TotalPrice, "
-                    + "         LastPayment, "
+                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -44,12 +43,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @PackageId, "
                     + "         @Quantity, "
                     + "         @TotalPrice, "
-                    + "         null, "
+                    + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("InvestorId", investmentDTO.InvestorId, DbType.Guid);
@@ -57,6 +55,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("PackageId", investmentDTO.PackageId, DbType.Guid);
                 parameters.Add("Quantity", investmentDTO.Quantity, DbType.Int16);
                 parameters.Add("TotalPrice", investmentDTO.TotalPrice, DbType.Double);
+                parameters.Add("Status", investmentDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", investmentDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
@@ -112,8 +111,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     PackageId ASC ) AS Num, "
                     + "             * "
                     + "         FROM Investment "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "         ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         InvestorId, "
@@ -121,12 +119,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         PackageId, "
                     + "         Quantity, "
                     + "         TotalPrice, "
-                    + "         LastPayment, "
+                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -140,7 +137,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM Investment WHERE IsDeleted = 0 ORDER BY ProjectId, PackageId ASC";
+                    var query = "SELECT * FROM Investment ORDER BY ProjectId, PackageId ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<Investment>(query)).ToList();
                 }               
@@ -227,6 +224,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         //    }
         //}
 
+        //GET FOR WALLET
         public async Task<List<Investment>> GetInvestmentForWallet(Guid investorId, string status)
         {
             try
@@ -244,6 +242,36 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Status", status, DbType.String);
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<Investment>(query, parameters)).ToList();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //UPDATE STATUS
+        public async Task<int> UpdateInvestmentStatus(Investment investmentDTO)
+        {
+            try
+            {
+                var query = "UPDATE Investment "
+                    + "     SET "
+                    + "         Status = @Status, "
+                    + "         UpdateDate = @UpdateDate, "
+                    + "         UpdateBy = @UpdateBy "
+                    + "     WHERE "
+                    + "         Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Status", investmentDTO.Status, DbType.String);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateBy", investmentDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", investmentDTO.Id, DbType.Guid);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
             }
             catch (Exception e)
             {

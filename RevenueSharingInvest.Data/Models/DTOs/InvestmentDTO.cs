@@ -23,11 +23,10 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     {
         public string id { get; set; }
         public float totalPrice { get; set; }
-        public string lastPayment { get; set; }
+        public string status { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
         public string updateDate { get; set; }
         public string updateBy { get; set; }
-        public bool isDeleted { get; set; }
     }
 }
