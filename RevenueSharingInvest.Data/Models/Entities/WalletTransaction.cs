@@ -13,12 +13,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
     [Index(nameof(PaymentId), Name = "IX_WalletTransaction_PaymentId")]
     [Index(nameof(ProjectWalletId), Name = "IX_WalletTransaction_ProjectWalletId")]
     [Index(nameof(SystemWalletId), Name = "IX_WalletTransaction_SystemWalletId")]
-    [Index(nameof(UserId), Name = "IX_WalletTransaction_User")]
     public partial class WalletTransaction
     {
         [Key]
         public Guid Id { get; set; }
-        public Guid UserId { get; set; }
         public Guid? PaymentId { get; set; }
         public Guid? SystemWalletId { get; set; }
         public Guid? ProjectWalletId { get; set; }
@@ -50,8 +48,5 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [ForeignKey(nameof(SystemWalletId))]
         [InverseProperty("WalletTransactions")]
         public virtual SystemWallet SystemWallet { get; set; }
-        [ForeignKey(nameof(UserId))]
-        [InverseProperty("WalletTransactions")]
-        public virtual User User { get; set; }
     }
 }

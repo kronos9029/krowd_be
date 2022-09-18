@@ -78,7 +78,5 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public virtual ICollection<ProjectWallet> ProjectWallets { get; set; }
         [InverseProperty(nameof(Project.Manager))]
         public virtual ICollection<Project> Projects { get; set; }
-        [InverseProperty(nameof(WalletTransaction.User))]
-        public virtual ICollection<WalletTransaction> WalletTransactions { get; set; }
     }
 }

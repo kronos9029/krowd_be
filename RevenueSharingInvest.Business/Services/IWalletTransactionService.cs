@@ -1,4 +1,6 @@
-﻿using RevenueSharingInvest.Data.Models.DTOs;
+﻿using RevenueSharingInvest.API;
+using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,7 @@ namespace RevenueSharingInvest.Business.Services
     {
         //CREATE
         public Task<IdDTO> CreateWalletTransaction(WalletTransactionDTO walletTransactionDTO);
+        public Task<string> TransferFromI1ToI2(ThisUserObj currentUser, double amount);
 
         //READ
         public Task<List<WalletTransactionDTO>> GetAllWalletTransactions(int pageIndex, int pageSize);

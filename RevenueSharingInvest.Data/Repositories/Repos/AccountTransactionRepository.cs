@@ -41,7 +41,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         PayType, "
                     + "         ResponseTime, "
                     + "         ExtraData, "
-                    + "         Signature) "
+                    + "         Signature, " 
+                    + "         CreateDate) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -62,7 +63,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @PayType, "
                     + "         @ResponseTime, "
                     + "         @ExtraData, "
-                    + "         @Signature) ";
+                    + "         @Signature, " 
+                    + "         @CreateDate) ";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("FromUserId", accountTransactionDTO.FromUserId, DbType.Guid);
@@ -83,6 +85,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("ResponseTime", accountTransactionDTO.ResponseTime, DbType.Int64);
                 parameters.Add("ExtraData", accountTransactionDTO.ExtraData, DbType.String);
                 parameters.Add("Signature", accountTransactionDTO.Signature, DbType.String);
+                parameters.Add("CreateDate", DateTime.UtcNow, DbType.DateTime);
 
 
                 using var connection = CreateConnection();

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
+using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -16,14 +18,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
     {
         private readonly IWalletTransactionRepository _walletTransactionRepository;
         private readonly IValidationService _validationService;
+        private readonly IInvestorWalletRepository _investorWalletRepository;
         private readonly IMapper _mapper;
 
 
-        public WalletTransactionService(IWalletTransactionRepository walletTransactionRepository, IValidationService validationService, IMapper mapper)
+        public WalletTransactionService(IWalletTransactionRepository walletTransactionRepository, 
+            IValidationService validationService, 
+            IMapper mapper,
+            IInvestorWalletRepository investorWalletRepository)
         {
             _walletTransactionRepository = walletTransactionRepository;
             _validationService = validationService;
             _mapper = mapper;
+            _investorWalletRepository = investorWalletRepository;
         }
 
         //CLEAR DATA
@@ -106,6 +113,61 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 throw new Exception(e.Message);
             }
+        }
+
+        public async Task<string> TransferFromI1ToI2(ThisUserObj currentUser, double amount)
+        {
+            InvestorWallet I1 = await _investorWalletRepository.GetInvestorWalletByTypeAndInvestorId(Guid.Parse(currentUser.investorId), WalletTypeEnum.I1.ToString());
+
+            if(I1 == null)
+                throw new NotFoundException("I1 Wallet not Found!!");
+        
+
+            if(I1.Balance < amount || amount < 0)
+            {
+                throw new WalletBalanceException("Insufficient Fund!!");
+            } 
+            else
+            {
+                InvestorWallet I2 = await _investorWalletRepository.GetInvestorWalletByTypeAndInvestorId(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString());
+                if (I2 == null)
+                    throw new NotFoundException("I2 Wallet Not Found!!");
+
+                I1.Balance -= amount;
+                I1.UpdateBy = Guid.Parse(currentUser.userId);
+                int checkSuccess = await _investorWalletRepository.UpdateWalletBalance(I1);
+                if(checkSuccess == 0)
+                {
+                    throw new CreateObjectException("Update I1 Wallet Balance Failed!!");
+                }
+                I2.Balance += amount;
+                I2.UpdateBy = I1.UpdateBy;
+                checkSuccess = await _investorWalletRepository.UpdateWalletBalance(I2);
+                if(checkSuccess == 0)
+                {
+                    throw new CreateObjectException("Update I2 Wallet Balance Failed!!");
+                }
+
+                WalletTransaction walletTransaction = new();
+
+                walletTransaction.Amount = amount;
+                walletTransaction.Description = "Investor Transfer Money From I1 Wallet To I2 Wallet";
+                walletTransaction.FromWalletId = I1.Id;
+                walletTransaction.ToWalletId = I2.Id;
+                walletTransaction.Type = "Top-up";
+                walletTransaction.CreateBy = Guid.Parse(currentUser.investorId);
+
+                string transactionId = await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+                if(transactionId == null)
+                {
+                    throw new CreateObjectException("Create Wallet Transaction Failed!!");
+                }
+
+                return transactionId;
+
+            }
+
+
         }
 
         //DELETE

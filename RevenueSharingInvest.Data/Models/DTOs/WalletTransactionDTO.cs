@@ -9,6 +9,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class WalletTransactionDTO
     {
         public string id { get; set; }
+        public string userId { get; set; }
         public string paymentId { get; set; }
         public string systemWalletId { get; set; }
         public string projectWalletId { get; set; }
