@@ -219,6 +219,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
             try
             {
                 Package package = await _packageRepository.GetPackageById(packageId);
+                if (package == null)
+                    throw new InvalidFieldException("No Package Found!!!");
+
                 Project project = await _projectRepository.GetProjectById(package.ProjectId);
                 if (!project.ManagerId.ToString().Equals(currentUser.userId))
                 {
@@ -235,6 +238,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new InvalidFieldException("quantity must be greater than 0!!!");
 
                 Package entity = _mapper.Map<Package>(packageDTO);
+
+                if (packageDTO.price == 0)
+                    entity.Price = package.Price;
+
+                if (packageDTO.quantity == 0)
+                    entity.Quantity = package.Quantity;
 
                 if (packageDTO.quantity != 0)
                 {
