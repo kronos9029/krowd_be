@@ -186,7 +186,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Balance", investorWalletDTO.Balance, DbType.Double);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", investorWalletDTO.Id, DbType.Guid);
+                parameters.Add("Id", investorWalletDTO.Id, DbType.Guid);    
 
                 using (var connection = CreateConnection())
                 {
