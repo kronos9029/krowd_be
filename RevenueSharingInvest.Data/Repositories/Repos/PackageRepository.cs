@@ -136,7 +136,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "UPDATE Package "
                     + "     SET "
                     + "         Name = ISNULL(@Name, Name),"
-                    + "         ProjectId = ISNULL(@ProjectId, ProjectId), "
                     + "         Price = ISNULL(@Price, Price), "
                     + "         Image = ISNULL(@Image, Image), "
                     + "         Quantity = ISNULL(@Quantity, Quantity), "
@@ -149,7 +148,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", packageDTO.Name, DbType.String);
-                parameters.Add("ProjectId", packageDTO.ProjectId, DbType.Guid);
                 parameters.Add("Price", packageDTO.Price, DbType.Double);
                 parameters.Add("Image", packageDTO.Image, DbType.String);
                 parameters.Add("Quantity", packageDTO.Quantity, DbType.Int16);
