@@ -100,11 +100,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 User entity = _mapper.Map<User>(userDTO);
 
-                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN"), StringComparison.InvariantCultureIgnoreCase))
                 {
                     entity.RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")); 
                 }
-                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
+                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER"), StringComparison.InvariantCultureIgnoreCase))
                 {
                     Data.Models.Entities.Business business = await _businessRepository.GetBusinessByUserId(Guid.Parse(currentUser.userId));
                     entity.RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"));
@@ -166,7 +166,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             try
             {
-                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN"), StringComparison.InvariantCultureIgnoreCase))
                 {
                     int[] statusNum = { 0, 1, 2 };
                     int[] roleNum = { 0, 1, 2, 3 };
@@ -213,12 +213,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     listEntity = await _userRepository.GetAllUsers(pageIndex, pageSize, businessId, null, role, status, currentUser.roleId);
                 }
 
-                else if(currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
+                else if(currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER"), StringComparison.InvariantCultureIgnoreCase))
                 {
                     int[] statusNum = { 0, 1, 2 };
                     int[] roleNum = { 2, 3 };
 
-                    if (businessId != null && !businessId.Equals(currentUser.businessId))
+                    if (businessId != null && !businessId.Equals(currentUser.businessId, StringComparison.InvariantCultureIgnoreCase))
                         throw new InvalidFieldException("businessId is not match with this BUSINESS_MANAGER's businessId!!!");
                     businessId = currentUser.businessId;
 
@@ -253,7 +253,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     listEntity = await _userRepository.GetAllUsers(pageIndex, pageSize, businessId, null, role, status, currentUser.roleId);
                 }
 
-                else if(currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                else if(currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"), StringComparison.InvariantCultureIgnoreCase))
                 {
                     int[] statusNum = { 0, 1, 2 };
                     int[] roleNum = { 3 };
@@ -299,7 +299,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
 
                     item.role = _mapper.Map<RoleDTO>(await _roleRepository.GetRoleByUserId(Guid.Parse(item.id)));
-                    if (item.role.id.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")) || item.role.id.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                    if (item.role.id.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER"), StringComparison.InvariantCultureIgnoreCase) || item.role.id.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"), StringComparison.InvariantCultureIgnoreCase))
                     {
                         item.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByUserId(Guid.Parse(item.id)));
                         if (item.business != null)
@@ -461,10 +461,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-                if (!userId.ToString().Equals(currentUser.userId))
+                if (!userId.ToString().Equals(currentUser.userId, StringComparison.InvariantCultureIgnoreCase))
                     throw new InvalidFieldException("id is not match with this Updater's Id!!!");
 
-                if (userDTO.businessId != null && !userDTO.businessId.Equals(currentUser.businessId))
+                if (userDTO.businessId != null && !userDTO.businessId.Equals(currentUser.businessId, StringComparison.InvariantCultureIgnoreCase))
                     throw new InvalidFieldException("businessId is not match with this Updater's businessId!!!");
 
                 if (userDTO.description != null && (userDTO.description.Equals("string") || userDTO.description.Length == 0))
@@ -515,14 +515,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 User user = await _userRepository.GetUserById(userId);
 
-                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")) && user.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN"), StringComparison.InvariantCultureIgnoreCase) && user.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault("ADMIN"), StringComparison.InvariantCultureIgnoreCase))
                     throw new InvalidFieldException("Can not update ADMIN's status!!!");
 
-                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
+                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER"), StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (!user.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                    if (!user.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"), StringComparison.InvariantCultureIgnoreCase))
                         throw new InvalidFieldException("BUSINESS_MANAGER can update status of PROJECT_MANAGER only!!!");
-                    if (!user.BusinessId.ToString().Equals(currentUser.businessId))
+                    if (!user.BusinessId.ToString().Equals(currentUser.businessId, StringComparison.InvariantCultureIgnoreCase))
                         throw new InvalidFieldException("The PROJECT_MANAGER with this businessId is not match with this BUSINESS_MANAGER's businessId!!!");
                 }
 
@@ -555,17 +555,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 User user = await _userRepository.GetUserById(userId);
 
-                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN"), StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (!user.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
+                    if (!user.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER"), StringComparison.InvariantCultureIgnoreCase))
                         throw new InvalidFieldException("ADMIN can update email of BUSINESS_MANAGER only!!!");
                 }
 
-                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
+                if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER"), StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (!user.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                    if (!user.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"), StringComparison.InvariantCultureIgnoreCase))
                         throw new InvalidFieldException("BUSINESS_MANAGER can update email of PROJECT_MANAGER only!!!");
-                    if (!user.BusinessId.ToString().Equals(currentUser.businessId))
+                    if (!user.BusinessId.ToString().Equals(currentUser.businessId, StringComparison.InvariantCultureIgnoreCase))
                         throw new InvalidFieldException("The PROJECT_MANAGER with this businessId is not match with this BUSINESS_MANAGER's businessId!!!");
                 }
 
