@@ -22,6 +22,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IValidationService _validationService;
         private readonly IWalletTypeRepository _walletTypeRepository;
         private readonly IInvestorRepository _investorRepository;
+        private readonly IWalletTransactionRepository _walletTransactionRepository;
         private readonly IMapper _mapper;
 
 
@@ -30,7 +31,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IMapper mapper, 
             IInvestorWalletRepository investorWalletRepository,
             IWalletTypeRepository walletTypeRepository,
-            IInvestorRepository investorRepository)
+            IInvestorRepository investorRepository,
+            IWalletTransactionRepository walletTransactionRepository)
         {
             _accountTransactionRepository = accountTransactionRepository;
             _investorWalletRepository = investorWalletRepository;
@@ -38,6 +40,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _walletTypeRepository = walletTypeRepository;
             _mapper = mapper;
             _investorRepository = investorRepository;
+            _walletTransactionRepository = walletTransactionRepository;
         }
 
         //CREATE
@@ -92,6 +95,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if(entity.ResultCode == 0)
                 {
+                    //investor top-up I1 Wallet
                     double realAmount = Convert.ToDouble(entity.Amount);
                     InvestorWallet I1 = await _investorWalletRepository.GetInvestorWalletByTypeAndInvestorId(investor.Id, WalletTypeEnum.I1.ToString());
                     I1.Balance += realAmount;
@@ -102,6 +106,43 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     {
                         throw new CreateObjectException("Investor Top Up Failed!!");
                     }
+
+                    //Money From I1 Wallet automaticly tranfer from I1 to I2
+                    InvestorWallet I2 = await _investorWalletRepository.GetInvestorWalletByTypeAndInvestorId((Guid)entity.PartnerClientId, WalletTypeEnum.I2.ToString());
+                    if (I2 == null)
+                        throw new NotFoundException("I2 Wallet Not Found!!");
+
+                    I1.UpdateDate = DateTime.Now;
+                    I1.Balance -= realAmount;
+                    I1.UpdateBy = entity.FromUserId;
+                    int checkSuccess = await _investorWalletRepository.UpdateWalletBalance(I1);
+                    if (checkSuccess == 0)
+                    {
+                        throw new CreateObjectException("Update I1 Wallet Balance Failed!!");
+                    }
+
+                    I2.Balance += realAmount;
+                    I2.UpdateBy = I1.UpdateBy;
+                    checkSuccess = await _investorWalletRepository.UpdateWalletBalance(I2);
+                    if (checkSuccess == 0)
+                    {
+                        throw new CreateObjectException("Update I2 Wallet Balance Failed!!");
+                    }
+                    WalletTransaction walletTransaction = new();
+
+                    walletTransaction.Amount = realAmount;
+                    walletTransaction.Description = "Investor Transfer Money From I1 Wallet To I2 Wallet";
+                    walletTransaction.FromWalletId = I1.Id;
+                    walletTransaction.ToWalletId = I2.Id;
+                    walletTransaction.Type = "Top-up";
+                    walletTransaction.CreateBy = I2.UpdateBy;
+
+                    string transactionId = await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+                    if (transactionId == null)
+                    {
+                        throw new CreateObjectException("Create Wallet Transaction Failed!!");
+                    }
+
                 }
 
                 return newId;
