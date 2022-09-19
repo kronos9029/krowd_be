@@ -13,6 +13,6 @@ namespace RevenueSharingInvest.Business.Services
         public Task<MomoPaymentResponse> RequestPaymentWeb(MomoPaymentRequest request);
         public Task<MomoPaymentResponse> RequestLinkAndPayment(MomoPaymentRequest request);
         public Task<QueryResponse> QueryTransactionStatus(QueryRequest request);
-        public Task<ConfirmResponse> ConfirmMomoTransaction(ConfirmRequest request)
+        public Task<ConfirmResponse> ConfirmMomoTransaction(ConfirmRequest request);
     }
 }
