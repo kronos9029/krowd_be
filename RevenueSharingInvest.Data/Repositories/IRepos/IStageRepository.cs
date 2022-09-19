@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<string> CreateStage(Stage stageDTO);
 
         //READ
-        public Task<List<Stage>> GetAllStagesByProjectId(Guid projectId);
+        public Task<List<Stage>> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pagesize);
         public Task<Stage> GetStageById(Guid stageId);
 
         //UPDATE

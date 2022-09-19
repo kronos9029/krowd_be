@@ -38,35 +38,35 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
 
         //DELETE
-        public async Task<int> DeleteStageById(Guid stageId)
-        {
-            int result;
-            try
-            {
-                if (!await _validationService.CheckUUIDFormat(stageId.ToString()))
-                    throw new InvalidFieldException("Invalid stageId!!!");
+        //public async Task<int> DeleteStageById(Guid stageId)
+        //{
+        //    int result;
+        //    try
+        //    {
+        //        if (!await _validationService.CheckUUIDFormat(stageId.ToString()))
+        //            throw new InvalidFieldException("Invalid stageId!!!");
 
-                Stage stage = await _stageRepository.GetStageById(stageId);
-                if (stage == null)
-                    throw new NotFoundException("No Stage Object Found!");
+        //        Stage stage = await _stageRepository.GetStageById(stageId);
+        //        if (stage == null)
+        //            throw new NotFoundException("No Stage Object Found!");
 
-                result = await _stageRepository.DeleteStageById(stageId);
-                if (result == 0)
-                    throw new DeleteObjectException("Can Not Delete Stage Object!");
-                else
-                {
-                    await _periodRevenueRepository.DeletePeriodRevenueByStageId(stageId);
-                }
-                return result;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
+        //        result = await _stageRepository.DeleteStageById(stageId);
+        //        if (result == 0)
+        //            throw new DeleteObjectException("Can Not Delete Stage Object!");
+        //        else
+        //        {
+        //            await _periodRevenueRepository.DeletePeriodRevenueByStageId(stageId);
+        //        }
+        //        return result;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new Exception(e.Message);
+        //    }
+        //}
 
         //GET ALL
-        public async Task<AllStageDTO> GetAllStagesByProjectId(Guid projectId, ThisUserObj currentUser)
+        public async Task<AllStageDTO> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pageSize, ThisUserObj currentUser)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result.listOfStage = new List<GetStageDTO>();
                 PeriodRevenue periodRevenue = new PeriodRevenue();
 
-                List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId);
+                List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, pageIndex, pageSize);
                 List<GetStageDTO> list = _mapper.Map<List<GetStageDTO>>(stageList);
                 result.numOfStage = list.Count;              
 
@@ -215,7 +215,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 PER.name = "Pessimistic_Expected_Ratio";
                 PER.data = new List<float>();
 
-                List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId);
+                List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0);
                 List<GetStageDTO> list = _mapper.Map<List<GetStageDTO>>(stageList);
                 PeriodRevenue periodRevenue = new PeriodRevenue();
 
@@ -287,22 +287,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (stageDTO.description != null && (stageDTO.description.Equals("string") || stageDTO.description.Length == 0))
                     stageDTO.description = null;
-
-                if (stageDTO.startDate != null)
-                {
-                    if (!await _validationService.CheckDate((stageDTO.startDate)))
-                        throw new InvalidFieldException("Invalid startDate!!!");
-
-                    stageDTO.startDate = await _validationService.FormatDateInput(stageDTO.startDate);
-                }
-
-                if (stageDTO.endDate != null)
-                {
-                    if (!await _validationService.CheckDate((stageDTO.endDate)))
-                        throw new InvalidFieldException("Invalid endDate!!!");
-
-                    stageDTO.endDate = await _validationService.FormatDateInput(stageDTO.endDate);
-                }
 
                 if (stageDTO.pessimisticExpectedAmount != 0 
                     || stageDTO.normalExpectedAmount != 0

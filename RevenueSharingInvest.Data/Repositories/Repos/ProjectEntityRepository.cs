@@ -227,7 +227,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE ProjectEntity "
                     + "     SET "
-                    + "         ProjectId = ISNULL(@ProjectId, ProjectId), "
                     + "         Title = ISNULL(@Title, Title), "
                     + "         Link = ISNULL(@Link, Link), "
                     + "         Content = ISNULL(@Content, Content), "
@@ -239,7 +238,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("ProjectId", projectEntityDTO.ProjectId, DbType.Guid);
                 parameters.Add("Title", projectEntityDTO.Title, DbType.String);
                 parameters.Add("Link", projectEntityDTO.Link, DbType.String);
                 parameters.Add("Content", projectEntityDTO.Content, DbType.String);

@@ -37,7 +37,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpGet]
         [Route("project/{project_id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAllStagesByProjectId(Guid project_id)
+        public async Task<IActionResult> GetAllStagesByProjectId(Guid project_id, int pageIndex, int pageSize)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
@@ -49,7 +49,7 @@ namespace RevenueSharingInvest.API.Controllers
                 || currentUser.roleId.Equals(""))
             {
                 var result = new AllStageDTO();
-                result = await _stageService.GetAllStagesByProjectId(project_id, currentUser);
+                result = await _stageService.GetAllStagesByProjectId(project_id, pageIndex, pageSize, currentUser);
                 return Ok(result);
             }
 
@@ -113,22 +113,6 @@ namespace RevenueSharingInvest.API.Controllers
                 return Ok(result);
             }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER can perform this action!!!");
-        }
-
-        [HttpDelete]
-        [Route("{id}")]
-        [Authorize]
-        public async Task<IActionResult> DeleteStage(Guid id)
-        {
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
-
-            //PROJECT_MANAGER
-            if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
-            {
-                var result = await _stageService.DeleteStageById(id);
-                return Ok(result);
-            }
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER can perform this action!!!");
         }
 

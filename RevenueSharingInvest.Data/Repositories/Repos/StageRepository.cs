@@ -89,15 +89,53 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Stage>> GetAllStagesByProjectId(Guid projectId)
+        public async Task<List<Stage>> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pageSize)
         {
             try
             {
-                var query = "SELECT * FROM Stage WHERE ProjectId = @ProjectId ORDER BY CreateDate ASC";
                 var parameters = new DynamicParameters();
-                parameters.Add("ProjectId", projectId, DbType.Guid);
-                using var connection = CreateConnection();
-                return (await connection.QueryAsync<Stage>(query, parameters)).ToList();                        
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     CreateDate ASC ) AS Num, "
+                    + "             * "
+                    + "         FROM Stage "
+                    + "         WHERE "
+                    + "             ProjectId = @ProjectId ) "
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         Name, "
+                    + "         ProjectId, "
+                    + "         Description, "
+                    + "         Status, "
+                    + "         StartDate, "
+                    + "         EndDate, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    
+                    parameters.Add("ProjectId", projectId, DbType.Guid);
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Stage>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * FROM Stage WHERE ProjectId = @ProjectId ORDER BY CreateDate ASC";
+                    parameters.Add("ProjectId", projectId, DbType.Guid);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<Stage>(query, parameters)).ToList();
+                }
             }
             catch (Exception e)
             {
@@ -131,8 +169,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SET "
                     + "         Name = ISNULL(@Name, Name), "
                     + "         Description = ISNULL(@Description, Description), "
-                    + "         StartDate = ISNULL(@StartDate, StartDate), "
-                    + "         EndDate = ISNULL(@EndDate, EndDate), "
                     + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
                     + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
                     + "     WHERE "
@@ -141,8 +177,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", stageDTO.Name, DbType.String);
                 parameters.Add("Description", stageDTO.Description, DbType.String);
-                parameters.Add("StartDate", stageDTO.StartDate, DbType.DateTime);
-                parameters.Add("EndDate", stageDTO.EndDate, DbType.DateTime);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("UpdateBy", stageDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", stageId, DbType.Guid);

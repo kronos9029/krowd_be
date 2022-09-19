@@ -14,7 +14,7 @@ namespace RevenueSharingInvest.Business.Services
         //CREATE
 
         //READ
-        public Task<AllStageDTO> GetAllStagesByProjectId(Guid projectId, ThisUserObj currentUser);
+        public Task<AllStageDTO> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pageSize, ThisUserObj currentUser);
         public Task<GetStageDTO> GetStageById(Guid stageId, ThisUserObj currentUser);
         public Task<List<StageChartDTO>> GetStageChartByProjectId(Guid projectId, ThisUserObj currentUser);
 
@@ -22,6 +22,6 @@ namespace RevenueSharingInvest.Business.Services
         public Task<int> UpdateStage(UpdateStageDTO stageDTO, Guid stageId, ThisUserObj currentUser);
 
         //DELETE
-        public Task<int> DeleteStageById(Guid stageId);
+        //public Task<int> DeleteStageById(Guid stageId);
     }
 }

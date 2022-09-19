@@ -9,14 +9,14 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class StageDTO
     {
         public string name { get; set; }          
-        //public float percents { get; set; }
-        public string startDate { get; set; }
-        public string endDate { get; set; }
+        //public float percents { get; set; }        
     }
 
     public class CreateStageDTO : StageDTO
     {
         public string projectId { get; set; }
+        public string startDate { get; set; }
+        public string endDate { get; set; }
     }
 
     public class UpdateStageDTO : StageDTO
@@ -34,6 +34,9 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     {
         public string id { get; set; }
         public string projectId { get; set; }
+        public string description { get; set; }
+        public string startDate { get; set; }
+        public string endDate { get; set; }
         public string status { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }

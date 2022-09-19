@@ -82,13 +82,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     investorWallet.Balance = entity.TotalPrice;
                     investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
 
+                    Investment investment = new Investment();
+                    investment.Id = Guid.Parse(newId.id);
+                    investment.Status = InvestmentStatusEnum.SUCCESS.ToString();
+                    investment.UpdateBy = Guid.Parse(currentUser.userId);
+
                     if (await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet) == 1)
                     {
-                        Investment investment = new Investment();
-                        investment.Id = Guid.Parse(newId.id);
                         investment.Status = InvestmentStatusEnum.SUCCESS.ToString();
-                        investment.UpdateBy = Guid.Parse(currentUser.userId);
-
+                        await _investmentRepository.UpdateInvestmentStatus(investment);
+                    }
+                    else
+                    {
+                        investment.Status = InvestmentStatusEnum.CANCELED.ToString();
                         await _investmentRepository.UpdateInvestmentStatus(investment);
                     }
                 }
