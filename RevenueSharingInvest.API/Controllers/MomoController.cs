@@ -137,10 +137,26 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        [Route("confirm")]
+        [Route("response")]
         public async Task<IActionResult> ConfirmPaymentClient(MomoPaymentResult momoPaymentResult)
         {
             var result = await _accountTransactionService.CreateAccountTransaction(momoPaymentResult);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("query")]
+        public async Task<IActionResult> QueryTransactionStatus(QueryRequest request)
+        {
+            var result = await _momoService.QueryTransactionStatus(request);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("confirm")]
+        public async Task<IActionResult> ConfirmMomoTransaction(ConfirmRequest request)
+        {
+            var result = await _momoService.ConfirmMomoTransaction(request);
             return Ok(result);
         }
 

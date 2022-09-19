@@ -164,5 +164,89 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
         }
 
+        public async Task<QueryResponse> QueryTransactionStatus(QueryRequest request)
+        {
+            string partnerCode = _momoSettings.PartnerCode;
+            string accessKey = _momoSettings.AccessKey;
+            string requestId = request.requestId;
+            string orderId = request.orderId;
+            string secrectKey = _momoSettings.SecretKey;
+            string apiEndpoint = _momoSettings.ApiQueryStatus;
+            string lang = "vi";
+
+            string rawHash = "accessKey=" + accessKey +
+                "&orderId=" + orderId +
+                "&partnerCode=" + partnerCode +
+                "&requestId=" + requestId
+                ;
+
+            MomoSecurity crypto = new MomoSecurity();
+            //sign signature SHA256
+            string signature = crypto.signSHA256(rawHash, secrectKey);
+
+            JObject message = new JObject
+            {
+                { "partnerCode", partnerCode },
+                { "requestId", requestId },
+                { "orderId", orderId },
+                { "lang", "vi" },
+                { "signature", signature }
+            };
+
+            string responseFromMomo = PaymentRequest.sendPaymentRequest(apiEndpoint, message.ToString());
+
+            JObject jmessage = JObject.Parse(responseFromMomo);
+
+            QueryResponse response = jmessage.ToObject<QueryResponse>();
+
+            return response;
+
+        }
+
+        public async Task<ConfirmResponse> ConfirmMomoTransaction(ConfirmRequest request)
+        {
+            string partnerCode = _momoSettings.PartnerCode;
+            string accessKey = _momoSettings.AccessKey;
+            string requestId = request.requestId;
+            string orderId = request.orderId;
+            string secrectKey = _momoSettings.SecretKey;
+            string apiEndpoint = _momoSettings.ApiQueryStatus;
+            string lang = "vi";
+
+            string rawHash = "accessKey=" + accessKey +
+                "&amount=" + request.amount +
+                "&amount=" + request.description +
+                "&orderId=" + orderId +
+                "&partnerCode=" + partnerCode +
+                "&requestId=" + requestId +
+                "&requestType=" + request.requestType
+                ;
+
+            MomoSecurity crypto = new MomoSecurity();
+            //sign signature SHA256
+            string signature = crypto.signSHA256(rawHash, secrectKey);
+
+            JObject message = new JObject
+            {
+                { "partnerCode", partnerCode },
+                { "requestId", requestId },
+                { "orderId", orderId },
+                { "requestType", request.requestType },
+                { "amount", request.amount },
+                { "lang", "vi" },
+                { "description", request.description },
+                { "signature", signature }
+            };
+
+            string responseFromMomo = PaymentRequest.sendPaymentRequest(apiEndpoint, message.ToString());
+
+            JObject jmessage = JObject.Parse(responseFromMomo);
+
+            ConfirmResponse response = jmessage.ToObject<ConfirmResponse>();
+
+            return response;
+
+        }
+
     }
 }
