@@ -99,7 +99,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPut]
         [Route("{id}")]
         [Authorize(Roles = "PROJECT_MANAGER")]
-        public async Task<IActionResult> UpdateProjectEntity([FromForm] UpdateProjectEntityDTO projectEntityDTO, Guid id)
+        public async Task<IActionResult> UpdateProjectEntity([FromBody] UpdateProjectEntityDTO projectEntityDTO, Guid id)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
