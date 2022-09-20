@@ -50,62 +50,55 @@ namespace RevenueSharingInvest.API.Controllers
         //GET ALL
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAllInvestments(int pageIndex, int pageSize)
+        public async Task<IActionResult> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-            if (currentUser.roleId.Equals(currentUser.investorRoleId))
+            if (currentUser.roleId.Equals(currentUser.adminRoleId)
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId)
+                || currentUser.roleId.Equals(currentUser.projectManagerRoleId)
+                || currentUser.roleId.Equals(currentUser.investorRoleId))
             {
                 var result = new List<GetInvestmentDTO>();
-                result = await _investmentService.GetAllInvestments(pageIndex, pageSize, currentUser);
+                result = await _investmentService.GetAllInvestments(pageIndex, pageSize, walletTypeId, businessId, projectId, investorId, currentUser);
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUINESS_MANAGER or PROJECT_MANAGER or INVESTOR can perform this action!!!");
         }
 
+        //GET BY ID
         [HttpGet]
         [Route("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetInvestmentById(Guid id)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
-
-            InvestmentDTO dto = new GetInvestmentDTO();
-            dto = await _investmentService.GetInvestmentById(id, currentUser);
-            return Ok(dto);
-        }
-
-        [HttpGet]
-        [Route("wallet/{walletType}")]
-        [Authorize]
-        public async Task<IActionResult> GetInvestmentByForWallet(string walletType)
-        {
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
-
-            if (currentUser.roleId.Equals(currentUser.investorRoleId))
+            if (currentUser.roleId.Equals(currentUser.adminRoleId)
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId)
+                || currentUser.roleId.Equals(currentUser.projectManagerRoleId)
+                || currentUser.roleId.Equals(currentUser.investorRoleId))
             {
-                var result = new List<GetInvestmentDTO>();
-                result = await _investmentService.GetInvestmentForWallet(walletType, currentUser);
-                return Ok(result);
+                InvestmentDTO dto = new GetInvestmentDTO();
+                dto = await _investmentService.GetInvestmentById(id, currentUser);
+                return Ok(dto);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUINESS_MANAGER or PROJECT_MANAGER or INVESTOR can perform this action!!!");
         }
 
-        //[HttpPut]
-        //[Route("{id}")]
-        //public async Task<IActionResult> UpdateInvestment([FromBody] InvestmentDTO investmentDTO, Guid id)
+        //[HttpGet]
+        //[Route("wallet/{walletType}")]
+        //[Authorize]
+        //public async Task<IActionResult> GetInvestmentByForWallet(string walletType)
         //{
         //    ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
-        //    var result = await _investmentService.UpdateInvestment(investmentDTO, id);
-        //    return Ok(result);
-        //}
-
-        //[HttpDelete]
-        //[Route("{id}")]
-        //public async Task<IActionResult> DeleteInvestment(Guid id)
-        //{
-        //    var result = await _investmentService.DeleteInvestmentById(id);
-        //    return Ok(result);
+        //    if (currentUser.roleId.Equals(currentUser.investorRoleId))
+        //    {
+        //        var result = new List<GetInvestmentDTO>();
+        //        result = await _investmentService.GetInvestmentForWallet(walletType, currentUser);
+        //        return Ok(result);
+        //    }
+        //    return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
         //}
 
         private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)

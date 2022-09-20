@@ -14,10 +14,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<string> CreateInvestment(Investment investmentDTO);
 
         //READ
-        public Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize);
+        public Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize, string projectStatus, string businessId, string projectId, string investorId, Guid roleId);
         public Task<Investment> GetInvestmentById(Guid investmentId);
         public Task<List<InvestorInvestmentDTO>> GetInvestmentByProjectIdForAuthor(Guid projectId);
-        public Task<List<Investment>> GetInvestmentForWallet(Guid investorId, string status);
+        //public Task<List<Investment>> GetInvestmentForWallet(Guid investorId, string status);
 
         //UPDATE
         //public Task<int> UpdateInvestment(Investment investmentDTO, Guid investmentId);

@@ -16,7 +16,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
     {
         public Project()
         {
-            Investments = new HashSet<Investment>();
+            //Investments = new HashSet<Investment>();
             Packages = new HashSet<Package>();
             PeriodRevenues = new HashSet<PeriodRevenue>();
             ProjectEntities = new HashSet<ProjectEntity>();
@@ -71,8 +71,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [ForeignKey(nameof(ManagerId))]
         [InverseProperty(nameof(User.Projects))]
         public virtual User Manager { get; set; }
-        [InverseProperty(nameof(Investment.Project))]
-        public virtual ICollection<Investment> Investments { get; set; }
+        //[InverseProperty(nameof(Investment.Project))]
+        //public virtual ICollection<Investment> Investments { get; set; }
         [InverseProperty(nameof(Package.Project))]
         public virtual ICollection<Package> Packages { get; set; }
         [InverseProperty(nameof(PeriodRevenue.Project))]

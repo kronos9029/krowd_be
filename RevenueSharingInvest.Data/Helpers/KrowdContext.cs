@@ -112,20 +112,20 @@ namespace RevenueSharingInvest.Data.Models.Entities
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
-                entity.HasOne(d => d.Investor)
-                    .WithMany(p => p.Investments)
-                    .HasForeignKey(d => d.InvestorId)
-                    .HasConstraintName("FK_Investment_Investor");
+                //entity.HasOne(d => d.Investor)
+                //    .WithMany(p => p.Investments)
+                //    .HasForeignKey(d => d.InvestorId)
+                //    .HasConstraintName("FK_Investment_Investor");
 
-                entity.HasOne(d => d.Package)
-                    .WithMany(p => p.Investments)
-                    .HasForeignKey(d => d.PackageId)
-                    .HasConstraintName("FK_Investment_Package");
+                //entity.HasOne(d => d.Package)
+                //    .WithMany(p => p.Investments)
+                //    .HasForeignKey(d => d.PackageId)
+                //    .HasConstraintName("FK_Investment_Package");
 
-                entity.HasOne(d => d.Project)
-                    .WithMany(p => p.Investments)
-                    .HasForeignKey(d => d.ProjectId)
-                    .HasConstraintName("FK_Investment_Project");
+                //entity.HasOne(d => d.Project)
+                //    .WithMany(p => p.Investments)
+                //    .HasForeignKey(d => d.ProjectId)
+                //    .HasConstraintName("FK_Investment_Project");
             });
 
             modelBuilder.Entity<Investor>(entity =>

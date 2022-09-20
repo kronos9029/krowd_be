@@ -22,16 +22,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IInvestorRepository _investorRepository;
         private readonly IPackageRepository _packageRepository;
         private readonly IInvestorWalletRepository _investorWalletRepository;
+        private readonly IProjectRepository _projectRepository;
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
-        public InvestmentService(IInvestmentRepository investmentRepository, IInvestorRepository investorRepository, IPackageRepository packageRepository, IInvestorWalletRepository investorWalletRepository, IValidationService validationService, IMapper mapper)
+        public InvestmentService(IInvestmentRepository investmentRepository, IInvestorRepository investorRepository, IPackageRepository packageRepository, IInvestorWalletRepository investorWalletRepository, IProjectRepository projectRepository, IValidationService validationService, IMapper mapper)
         {
             _investorRepository = investorRepository;
             //_investorWalletRepository = investorWalletRepository;
             _investmentRepository = investmentRepository;
             _packageRepository = packageRepository;
             _investorWalletRepository = investorWalletRepository;
+            _projectRepository = projectRepository;
             _validationService = validationService;
             _mapper = mapper;
         }
@@ -108,17 +110,88 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<GetInvestmentDTO>> GetAllInvestments(int pageIndex, int pageSize, ThisUserObj currentUser)
+        public async Task<List<GetInvestmentDTO>> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId, ThisUserObj currentUser)
         {
             try
             {
-                List<Investment> investmentList = await _investmentRepository.GetAllInvestments(pageIndex, pageSize);
+                string projectStatus = null;
+
+                if (walletTypeId != null)
+                {
+                    if (!await _validationService.CheckUUIDFormat(walletTypeId.ToString()))
+                        throw new InvalidFieldException("Invalid walletTypeId!!!");
+
+                    if (!await _validationService.CheckExistenceId("WalletType", Guid.Parse(walletTypeId)))
+                        throw new NotFoundException("This walletTypeId is not existed!!!");
+
+                    if (!walletTypeId.Equals(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"), StringComparison.InvariantCultureIgnoreCase)
+                        && !walletTypeId.Equals(WalletTypeDictionary.walletTypes.GetValueOrDefault("I4"), StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        throw new InvalidFieldException("walletTypeId must be the id of type I3 or I4 WalletType!!!");
+                    }
+
+                    projectStatus = walletTypeId.Equals(
+                        WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"), 
+                        StringComparison.InvariantCultureIgnoreCase) ? ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString() : ProjectStatusEnum.ACTIVE.ToString();
+                }
+                if (businessId != null)
+                {
+                    if (!await _validationService.CheckUUIDFormat(businessId.ToString()))
+                        throw new InvalidFieldException("Invalid businessId!!!");
+
+                    if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
+                        throw new NotFoundException("This businessId is not existed!!!");
+                }
+                if (projectId != null)
+                {
+                    if (!await _validationService.CheckUUIDFormat(projectId.ToString()))
+                        throw new InvalidFieldException("Invalid projectId!!!");
+
+                    if (!await _validationService.CheckExistenceId("Project", Guid.Parse(projectId)))
+                        throw new NotFoundException("This projectId is not existed!!!");
+                }
+                if (investorId != null)
+                {
+                    if (!await _validationService.CheckUUIDFormat(investorId.ToString()))
+                        throw new InvalidFieldException("Invalid investorId!!!");
+
+                    if (!await _validationService.CheckExistenceId("Investor", Guid.Parse(investorId)))
+                        throw new NotFoundException("This investorId is not existed!!!");
+                }
+
+                if (currentUser.roleId.Equals(currentUser.businessManagerRoleId, StringComparison.InvariantCultureIgnoreCase) 
+                    || currentUser.roleId.Equals(currentUser.projectManagerRoleId, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    if (businessId != null && !currentUser.businessId.Equals(businessId, StringComparison.InvariantCultureIgnoreCase))
+                        throw new InvalidFieldException("This businessId is not match with your businessId!!!");
+
+                    if (projectId != null)
+                    {
+                        Project project = await _projectRepository.GetProjectById(Guid.Parse(projectId));
+                        if (currentUser.roleId.Equals(currentUser.businessManagerRoleId, StringComparison.InvariantCultureIgnoreCase) 
+                            && !currentUser.businessId.Equals(project.BusinessId.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                            throw new InvalidFieldException("This projectId is not belong to your Business!!!");
+
+                        if (currentUser.roleId.Equals(currentUser.projectManagerRoleId, StringComparison.InvariantCultureIgnoreCase)
+                                && !currentUser.userId.Equals(project.ManagerId.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                            throw new InvalidFieldException("This projectId is not belong to your Project!!!");
+                    }
+                }
+                else if (currentUser.roleId.Equals(currentUser.investorRoleId, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    if (investorId != null && !currentUser.investorId.Equals(investorId, StringComparison.InvariantCultureIgnoreCase))
+                        throw new InvalidFieldException("This investorId is not match with your investorId!!!");
+                    else
+                        investorId = currentUser.investorId;
+                }
+
+                List<Investment> investmentList = await _investmentRepository.GetAllInvestments(pageIndex, pageSize, projectStatus, businessId, projectId, investorId, Guid.Parse(currentUser.roleId));
                 List<GetInvestmentDTO> list = _mapper.Map<List<GetInvestmentDTO>>(investmentList);
 
                 foreach (GetInvestmentDTO item in list)
                 {
-                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
-                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                    item.createDate = item.createDate == null ? null : await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = item.updateDate == null ? null : await _validationService.FormatDateOutput(item.updateDate);
                 }
 
                 return list;
@@ -135,13 +208,32 @@ namespace RevenueSharingInvest.Business.Services.Impls
             GetInvestmentDTO result;
             try
             {
-                Investment dto = await _investmentRepository.GetInvestmentById(investmentId);
-                result = _mapper.Map<GetInvestmentDTO>(dto);
+                Investment investment = await _investmentRepository.GetInvestmentById(investmentId);
+                if (investment == null)
+                    throw new InvalidFieldException("No Investment Object Found!!!");
+
+                if (currentUser.roleId.Equals(currentUser.businessManagerRoleId) || currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+                {
+                    Project project = await _projectRepository.GetProjectById(investment.ProjectId);
+
+                    if (currentUser.roleId.Equals(currentUser.businessManagerRoleId) && !project.BusinessId.ToString().Equals(currentUser.businessId))
+                        throw new InvalidFieldException("This investmentId is not belong to your Business!!!");
+
+                    if (currentUser.roleId.Equals(currentUser.projectManagerRoleId) && !project.ManagerId.ToString().Equals(currentUser.userId))
+                        throw new InvalidFieldException("This investmentId is not belong to your Project!!!");
+                }
+                else if (currentUser.roleId.Equals(currentUser.investorRoleId))
+                {
+                    if (!investment.InvestorId.ToString().Equals(currentUser.investorId))
+                        throw new InvalidFieldException("This investmentId is not belong to your Investment!!!");
+                }
+
+                result = _mapper.Map<GetInvestmentDTO>(investment);
                 if (result == null)
                     throw new NotFoundException("No Investment Object Found!");
 
-                result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+                result.createDate = result.createDate == null ? null : await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = result.updateDate == null ? null : await _validationService.FormatDateOutput(result.updateDate);
 
                 return result;
             }
@@ -165,34 +257,34 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET FOR WALLET
-        public async Task<List<GetInvestmentDTO>> GetInvestmentForWallet(string walletType, ThisUserObj currentUser)
-        {
-            try
-            {
-                if (await _investorRepository.GetInvestorById(Guid.Parse(currentUser.investorId)) == null)
-                {
-                    throw new NotFoundException("No Investor Object Found!!!");
-                }
+        //public async Task<List<GetInvestmentDTO>> GetInvestmentForWallet(string walletType, ThisUserObj currentUser)
+        //{
+        //    try
+        //    {
+        //        if (await _investorRepository.GetInvestorById(Guid.Parse(currentUser.investorId)) == null)
+        //        {
+        //            throw new NotFoundException("No Investor Object Found!!!");
+        //        }
 
-                if (!walletType.Equals("I3") && !walletType.Equals("I4"))
-                    throw new InvalidFieldException("walletType must be I3 or I4!!!");
+        //        if (!walletType.Equals("I3") && !walletType.Equals("I4"))
+        //            throw new InvalidFieldException("walletType must be I3 or I4!!!");
 
-                List<Investment> investmentList = await _investmentRepository.GetInvestmentForWallet(Guid.Parse(currentUser.investorId), walletType.Equals("I3") ? ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString() : ProjectStatusEnum.ACTIVE.ToString());
-                List<GetInvestmentDTO> list = _mapper.Map<List<GetInvestmentDTO>>(investmentList);
+        //        List<Investment> investmentList = await _investmentRepository.GetInvestmentForWallet(Guid.Parse(currentUser.investorId), walletType.Equals("I3") ? ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString() : ProjectStatusEnum.ACTIVE.ToString());
+        //        List<GetInvestmentDTO> list = _mapper.Map<List<GetInvestmentDTO>>(investmentList);
 
-                foreach (GetInvestmentDTO item in list)
-                {
-                    item.createDate = item.createDate == null ? null : await _validationService.FormatDateOutput(item.createDate);
-                    item.updateDate = item.updateDate == null ? null : await _validationService.FormatDateOutput(item.updateDate);
-                }
+        //        foreach (GetInvestmentDTO item in list)
+        //        {
+        //            item.createDate = item.createDate == null ? null : await _validationService.FormatDateOutput(item.createDate);
+        //            item.updateDate = item.updateDate == null ? null : await _validationService.FormatDateOutput(item.updateDate);
+        //        }
 
-                return list;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
+        //        return list;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new Exception(e.Message);
+        //    }
+        //}
 
         //UPDATE
         //public async Task<int> UpdateInvestment(InvestmentDTO investmentDTO, Guid investmentId)
