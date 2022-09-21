@@ -11,7 +11,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string id { get; set; }
         public string periodRevenueId { get; set; }
         public string investmentId { get; set; }       
-        public float amount { get; set; }
+        public double amount { get; set; }
         public string description { get; set; }
         public string type { get; set; }
         public string fromId { get; set; }

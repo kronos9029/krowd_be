@@ -938,6 +938,23 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (projectDTO.duration != 0 || projectDTO.numOfStage != 0 || projectDTO.startDate != null || projectDTO.endDate != null)
                 {
+                    if (projectDTO.duration != 0)
+                    {
+                        if (projectDTO.duration <= 0)
+                            throw new InvalidFieldException("duration must be greater than 0!!!");
+                    }
+                    else
+                        projectDTO.duration = getProject.duration;
+
+
+                    if (projectDTO.numOfStage != 0)
+                    {
+                        if (projectDTO.numOfStage <= 0)
+                            throw new InvalidFieldException("numOfStage must be greater than 0!!!");
+                    }
+                    else
+                        projectDTO.numOfStage = getProject.numOfStage;
+
                     if (projectDTO.startDate != null && projectDTO.endDate != null)
                     {
                         if ((DateAndTime.DateDiff(DateInterval.Day, DateTime.ParseExact(projectDTO.startDate, "dd/MM/yyyy HH:mm:ss", null), DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null))) < 0)
@@ -983,7 +1000,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     int daysPerStage = ((int)totalDay) / projectDTO.numOfStage;
                     int modDays = ((int)totalDay) - (daysPerStage * projectDTO.numOfStage);
 
-                    projectDTO.name = getProject.name;
+                    //projectDTO.name = getProject.name;
                     projectDTO.startDate = await _validationService.FormatDateInput(projectDTO.startDate);
                     projectDTO.endDate = await _validationService.FormatDateInput(projectDTO.endDate);
 
