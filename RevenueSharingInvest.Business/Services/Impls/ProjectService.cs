@@ -455,29 +455,47 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     User user = await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId));
                     Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(entity.BusinessId);
 
-                    ProjectEntity projectEntity = new ProjectEntity();
-                    projectEntity.ProjectId = Guid.Parse(newId.id);
-                    projectEntity.Type = ProjectEntityEnum.EXTENSION.ToString();
-                    projectEntity.Title = "Doanh nghiệp";
-                    projectEntity.Content = business.Name;
-                    projectEntity.Description = "Email: " + business.Email;
-                    projectEntity.Priority = 1;
-                    await _projectEntityRepository.CreateProjectEntity(projectEntity);
-                    projectEntity.Title = "Chủ dự án";
-                    projectEntity.Content = user.FirstName + " " + user.LastName;
-                    projectEntity.Description = "Liên hệ: " + user.PhoneNum;
-                    projectEntity.Priority = 2;
-                    await _projectEntityRepository.CreateProjectEntity(projectEntity);
-                    projectEntity.Title = "Ngày kết thúc gọi vốn";
-                    projectEntity.Content = (await _validationService.FormatDateOutput(projectDTO.endDate)).Remove(projectDTO.endDate.Length - 8);
-                    projectEntity.Description = "";
-                    projectEntity.Priority = 3;
-                    await _projectEntityRepository.CreateProjectEntity(projectEntity);
-                    projectEntity.Title = "Ngày dự đoán đóng dự án";
-                    projectEntity.Content = (await _validationService.FormatDateOutput(stage.EndDate.ToString())).Remove(projectDTO.endDate.Length - 8);
-                    projectEntity.Description = "";
-                    projectEntity.Priority = 4;
-                    await _projectEntityRepository.CreateProjectEntity(projectEntity);                    
+                    ProjectEntity extension = new ProjectEntity();
+
+                    extension.ProjectId = Guid.Parse(newId.id);
+                    extension.Type = ProjectEntityEnum.EXTENSION.ToString();
+                    extension.CreateBy = Guid.Parse(currentUser.userId);
+                    extension.Title = "Doanh nghiệp";
+                    extension.Content = business.Name;
+                    extension.Description = "Email: " + business.Email;
+                    extension.Priority = 1;
+                    await _projectEntityRepository.CreateProjectEntity(extension);
+                    extension.Title = "Chủ dự án";
+                    extension.Content = user.FirstName + " " + user.LastName;
+                    extension.Description = "Liên hệ: " + user.PhoneNum;
+                    extension.Priority = 2;
+                    await _projectEntityRepository.CreateProjectEntity(extension);
+                    extension.Title = "Ngày kết thúc gọi vốn";
+                    extension.Content = (await _validationService.FormatDateOutput(projectDTO.endDate)).Remove(projectDTO.endDate.Length - 8);
+                    extension.Description = "";
+                    extension.Priority = 3;
+                    await _projectEntityRepository.CreateProjectEntity(extension);
+                    extension.Title = "Ngày dự đoán đóng dự án";
+                    extension.Content = (await _validationService.FormatDateOutput(stage.EndDate.ToString())).Remove(projectDTO.endDate.Length - 8);
+                    extension.Description = "";
+                    extension.Priority = 4;
+                    await _projectEntityRepository.CreateProjectEntity(extension);
+
+                    //Tạo ABOUT ProjectEntity
+                    ProjectEntity about = new ProjectEntity();
+
+                    about.ProjectId = Guid.Parse(newId.id);
+                    about.Type = ProjectEntityEnum.EXTENSION.ToString();
+                    about.CreateBy = Guid.Parse(currentUser.userId);
+                    about.Title = "Facebook";
+                    about.Priority = 1;
+                    await _projectEntityRepository.CreateProjectEntity(about);
+                    about.Title = "YouTube";
+                    about.Priority = 2;
+                    await _projectEntityRepository.CreateProjectEntity(about);
+                    about.Title = "Instagram";
+                    about.Priority = 3;
+                    await _projectEntityRepository.CreateProjectEntity(about);
 
                     //Update NumOfProject
                     await _businessRepository.UpdateBusinessNumOfProject(Guid.Parse(currentUser.businessId));
