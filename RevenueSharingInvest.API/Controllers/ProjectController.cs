@@ -119,7 +119,8 @@ namespace RevenueSharingInvest.API.Controllers
                 dto = await _projectService.GetProjectById(id);
                 return Ok(dto);
 
-            } else if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+            } 
+            else if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
             {
                 if (currentUser.businessId.Equals(""))
                 {
@@ -135,7 +136,8 @@ namespace RevenueSharingInvest.API.Controllers
                     dto = await _projectService.GetProjectById(id);
                     return Ok(dto);
                 }
-            } else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            } 
+            else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
                 if (currentUser.businessId.Equals(""))
                 {
@@ -152,16 +154,29 @@ namespace RevenueSharingInvest.API.Controllers
                     return Ok(dto);
                 }
 
-            } else if (currentUser.roleId.Equals(currentUser.investorRoleId))
+            } 
+            else if (currentUser.roleId.Equals(currentUser.investorRoleId))
             {
-                List<InvestorInvestmentDTO> investorList = await _investmentService.GetInvestmentByProjectIdForAuthor(id);
-                InvestorInvestmentDTO investor = (InvestorInvestmentDTO)investorList
-                    .Where(investor => investor.UserId.ToString().Equals(currentUser.userId)).FirstOrDefault();
-
-                if (investor != null)
+                AllProjectDTO projectList = await _projectService.GetInvestedProjects(0, 0, currentUser);
+                bool investedCheck = false;
+                if (projectList.listOfProject.Count != 0)
                 {
-                    dto = await _projectService.GetProjectById(id);
-                    return Ok(dto);
+                    foreach (GetProjectDTO item in projectList.listOfProject)
+                    {
+                        if (id.ToString().Equals(item.id))
+                            investedCheck = true;
+                    }
+                    if (investedCheck)
+                    {
+                        dto = await _projectService.GetProjectById(id);
+                        return Ok(dto);
+                    }
+                    else
+                        throw new InvalidFieldException("You have not invested in the project have this Id!!!");
+                }
+                else
+                {
+                    throw new InvalidFieldException("You have not invested in the project have this Id!!!");
                 }
             }
             else

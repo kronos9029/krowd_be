@@ -451,6 +451,28 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     await _projectWalletRepository.CreateProjectWallet(Guid.Parse(currentUser.userId), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B2")), Guid.Parse(currentUser.userId));
                     await _projectWalletRepository.CreateProjectWallet(Guid.Parse(currentUser.userId), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")), Guid.Parse(currentUser.userId));
 
+                    //Tạo EXTENSION ProjectEntity
+                    User user = await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId));
+                    Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(entity.BusinessId);
+
+                    ProjectEntity projectEntity = new ProjectEntity();
+                    projectEntity.ProjectId = Guid.Parse(newId.id);
+                    projectEntity.Type = ProjectEntityEnum.EXTENSION.ToString();
+                    projectEntity.Title = "Doanh nghiệp";
+                    projectEntity.Content = business.Name;
+                    projectEntity.Description = "Email: " + business.Email;
+                    await _projectEntityRepository.CreateProjectEntity(projectEntity);
+                    projectEntity.Title = "Chủ dự án";
+                    projectEntity.Content = user.FirstName + " " + user.LastName;
+                    projectEntity.Description = "Liên hệ: " + user.PhoneNum;
+                    await _projectEntityRepository.CreateProjectEntity(projectEntity);
+                    projectEntity.Title = "Ngày kết thúc gọi vốn";
+                    projectEntity.Description = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8);
+                    await _projectEntityRepository.CreateProjectEntity(projectEntity);
+                    projectEntity.Title = "Ngày dự đoán đóng dự án";
+                    projectEntity.Description = await _validationService.FormatDateOutput(stage.EndDate.ToString().Remove(projectDTO.endDate.Length - 8));
+                    await _projectEntityRepository.CreateProjectEntity(projectEntity);                    
+
                     //Update NumOfProject
                     await _businessRepository.UpdateBusinessNumOfProject(Guid.Parse(currentUser.businessId));
                 }    
@@ -1106,8 +1128,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             try
             {
-                result.numOfProject = await _projectRepository.CountInvestedProjects(Guid.Parse(thisUserObj.roleId));
-                listEntity = await _projectRepository.GetInvestedProjects(pageIndex, pageSize, Guid.Parse(thisUserObj.roleId));
+                result.numOfProject = await _projectRepository.CountInvestedProjects(Guid.Parse(thisUserObj.investorId));
+                listEntity = await _projectRepository.GetInvestedProjects(pageIndex, pageSize, Guid.Parse(thisUserObj.investorId));
 
                 List<GetProjectDTO> listDTO = _mapper.Map<List<GetProjectDTO>>(listEntity);
 

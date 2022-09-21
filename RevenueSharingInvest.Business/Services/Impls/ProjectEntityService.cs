@@ -184,8 +184,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 foreach (GetProjectEntityDTO item in list)
                 {
-                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
-                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                    item.createDate = item.createDate == null ? null : await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = item.updateDate == null ? null : await _validationService.FormatDateOutput(item.updateDate);
                 }
 
                 return list;
@@ -223,8 +223,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (result == null)
                     throw new NotFoundException("No ProjectEntity Object Found!");
 
-                result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+                result.createDate = result.createDate == null ? null : await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = result.updateDate == null ? null : await _validationService.FormatDateOutput(result.updateDate);
 
                 return result;
             }

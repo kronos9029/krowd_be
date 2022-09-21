@@ -832,7 +832,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var parameters = new DynamicParameters();
 
-                var whereCondition = " (Status = '"
+                var whereCondition = " WHERE (Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "' OR Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
@@ -911,7 +911,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var parameters = new DynamicParameters();
 
-                var whereCondition = " (Status = '"
+                var whereCondition = " WHERE (Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "' OR Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
