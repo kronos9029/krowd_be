@@ -195,25 +195,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 ammountChart.lineList = new List<StageLineDTO>();
                 StageLineDTO OEA = new StageLineDTO();
                 OEA.name = "Optimistic_Expected_Amount";
-                OEA.data = new List<float>();
+                OEA.data = new List<double>();
                 StageLineDTO NEA = new StageLineDTO();
                 NEA.name = "Normal_Expected_Amount";
-                NEA.data = new List<float>();
+                NEA.data = new List<double>();
                 StageLineDTO PEA = new StageLineDTO();
                 PEA.name = "Pessimistic_Expected_Amount";
-                PEA.data = new List<float>();
+                PEA.data = new List<double>();
 
                 ratioChart.chartName = "PeriodRevenue_Ratio_Chart";
                 ratioChart.lineList = new List<StageLineDTO>();
                 StageLineDTO OER = new StageLineDTO();
                 OER.name = "Optimistic_Expected_Ratio";
-                OER.data = new List<float>();
+                OER.data = new List<double>();
                 StageLineDTO NER = new StageLineDTO();
                 NER.name = "Normal_Expected_Ratio";
-                NER.data = new List<float>();
+                NER.data = new List<double>();
                 StageLineDTO PER = new StageLineDTO();
                 PER.name = "Pessimistic_Expected_Ratio";
-                PER.data = new List<float>();
+                PER.data = new List<double>();
 
                 List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0);
                 List<GetStageDTO> list = _mapper.Map<List<GetStageDTO>>(stageList);
@@ -295,7 +295,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     || stageDTO.normalExpectedRatio != 0
                     || stageDTO.optimisticExpectedRatio != 0)
                 {
-                    float[] periodRevenueInput = { stageDTO.pessimisticExpectedAmount, stageDTO.normalExpectedAmount, stageDTO.optimisticExpectedAmount, stageDTO.pessimisticExpectedRatio, stageDTO.normalExpectedRatio, stageDTO.optimisticExpectedAmount };
+                    double[] periodRevenueInput = { stageDTO.pessimisticExpectedAmount, stageDTO.normalExpectedAmount, stageDTO.optimisticExpectedAmount, stageDTO.pessimisticExpectedRatio, stageDTO.normalExpectedRatio, stageDTO.optimisticExpectedAmount };
                     foreach (float item in periodRevenueInput)
                     {
                         if (item == 0)
