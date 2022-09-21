@@ -201,8 +201,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
                     urls.Add(url);
 
                 }
-            }
-            else if (request.entityName.ToLower().Equals(StoragePathEnum.ProjectEntity.ToString().ToLower()))
+            } else if (request.entityName.ToLower().Equals(StoragePathEnum.ProjectEntity.ToString().ToLower()) && !request.type.Equals("Press", StringComparison.InvariantCultureIgnoreCase))
             {
                 foreach(var file in request.files)
                 {
