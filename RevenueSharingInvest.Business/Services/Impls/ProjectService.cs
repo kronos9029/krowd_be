@@ -461,16 +461,22 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     projectEntity.Title = "Doanh nghiệp";
                     projectEntity.Content = business.Name;
                     projectEntity.Description = "Email: " + business.Email;
+                    projectEntity.Priority = 1;
                     await _projectEntityRepository.CreateProjectEntity(projectEntity);
                     projectEntity.Title = "Chủ dự án";
                     projectEntity.Content = user.FirstName + " " + user.LastName;
                     projectEntity.Description = "Liên hệ: " + user.PhoneNum;
+                    projectEntity.Priority = 2;
                     await _projectEntityRepository.CreateProjectEntity(projectEntity);
                     projectEntity.Title = "Ngày kết thúc gọi vốn";
-                    projectEntity.Description = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8);
+                    projectEntity.Content = (await _validationService.FormatDateOutput(projectDTO.endDate)).Remove(projectDTO.endDate.Length - 8);
+                    projectEntity.Description = "";
+                    projectEntity.Priority = 3;
                     await _projectEntityRepository.CreateProjectEntity(projectEntity);
                     projectEntity.Title = "Ngày dự đoán đóng dự án";
-                    projectEntity.Description = await _validationService.FormatDateOutput(stage.EndDate.ToString().Remove(projectDTO.endDate.Length - 8));
+                    projectEntity.Content = (await _validationService.FormatDateOutput(stage.EndDate.ToString())).Remove(projectDTO.endDate.Length - 8);
+                    projectEntity.Description = "";
+                    projectEntity.Priority = 4;
                     await _projectEntityRepository.CreateProjectEntity(projectEntity);                    
 
                     //Update NumOfProject
