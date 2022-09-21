@@ -935,22 +935,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
 
                 //Update [Stage] and [PeriodRevenue]
-                if (projectDTO.duration != 0)
-                {
-                    if (projectDTO.duration <= 0)
-                        throw new InvalidFieldException("duration must be greater than 0!!!");
-                }
-                else
-                    projectDTO.duration = getProject.duration;
-
-
-                if (projectDTO.numOfStage != 0)
-                {
-                    if (projectDTO.numOfStage <= 0)
-                        throw new InvalidFieldException("numOfStage must be greater than 0!!!");
-                }
-                else
-                    projectDTO.numOfStage = getProject.numOfStage;
 
                 if (projectDTO.duration != 0 || projectDTO.numOfStage != 0 || projectDTO.startDate != null || projectDTO.endDate != null)
                 {
@@ -1039,8 +1023,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
                 else
                 {
-                    projectDTO.startDate = null;
-                    projectDTO.endDate = null;
+                    if (projectDTO.duration != 0)
+                    {
+                        if (projectDTO.duration <= 0)
+                            throw new InvalidFieldException("duration must be greater than 0!!!");
+                    }
+                    else
+                        projectDTO.duration = getProject.duration;
+
+
+                    if (projectDTO.numOfStage != 0)
+                    {
+                        if (projectDTO.numOfStage <= 0)
+                            throw new InvalidFieldException("numOfStage must be greater than 0!!!");
+                    }
+                    else
+                        projectDTO.numOfStage = getProject.numOfStage;
+                    projectDTO.startDate = getProject.startDate;
+                    projectDTO.endDate = getProject.endDate;
                     project = _mapper.Map<Project>(projectDTO);
                 }                
 
