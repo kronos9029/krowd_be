@@ -119,7 +119,7 @@ namespace RevenueSharingInvest.API.Controllers
                 dto = await _projectService.GetProjectById(id);
                 return Ok(dto);
 
-            } 
+            }
             else if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
             {
                 if (currentUser.businessId.Equals(""))
@@ -136,7 +136,7 @@ namespace RevenueSharingInvest.API.Controllers
                     dto = await _projectService.GetProjectById(id);
                     return Ok(dto);
                 }
-            } 
+            }
             else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
                 if (currentUser.businessId.Equals(""))
@@ -147,37 +147,61 @@ namespace RevenueSharingInvest.API.Controllers
                 List<BusinessProjectDTO> projectList = await _projectService.GetBusinessProjectsToAuthor(Guid.Parse(currentUser.businessId));
                 BusinessProjectDTO projectInfo = (BusinessProjectDTO)projectList
                     .Where(project => project.ManagerId.ToString().Equals(currentUser.userId)).FirstOrDefault();
-                
+
                 if (projectInfo != null)
                 {
                     dto = await _projectService.GetProjectById(id);
                     return Ok(dto);
                 }
 
-            } 
+            }
             else if (currentUser.roleId.Equals(currentUser.investorRoleId))
             {
-                AllProjectDTO projectList = await _projectService.GetInvestedProjects(0, 0, currentUser);
-                bool investedCheck = false;
-                if (projectList.listOfProject.Count != 0)
+                dto = await _projectService.GetProjectById(id);
+                if (dto.status.Equals(ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString())
+                    || dto.status.Equals(ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString())
+                    || dto.status.Equals(ProjectStatusEnum.ACTIVE.ToString())
+                    || dto.status.Equals(ProjectStatusEnum.CLOSED.ToString()))
                 {
-                    foreach (GetProjectDTO item in projectList.listOfProject)
-                    {
-                        if (id.ToString().Equals(item.id))
-                            investedCheck = true;
-                    }
-                    if (investedCheck)
-                    {
-                        dto = await _projectService.GetProjectById(id);
-                        return Ok(dto);
-                    }
-                    else
-                        throw new InvalidFieldException("You have not invested in the project have this Id!!!");
+                    return Ok(dto);
                 }
                 else
                 {
-                    throw new InvalidFieldException("You have not invested in the project have this Id!!!");
+                    throw new System.UnauthorizedAccessException("You Don't Have Permission Perform This Action!!");
                 }
+                //AllProjectDTO projectList = await _projectService.GetInvestedProjects(0, 0, currentUser);
+                //bool investedCheck = false;
+                //if (projectList.listOfProject.Count != 0)
+                //{
+                //    foreach (GetProjectDTO item in projectList.listOfProject)
+                //    {
+                //        if (id.ToString().Equals(item.id))
+                //            investedCheck = true;
+                //    }
+                //    if (investedCheck)
+                //    {
+                //        dto = await _projectService.GetProjectById(id);
+                //        return Ok(dto);
+                //    }
+                //    else
+                //        throw new InvalidFieldException("You have not invested in the project have this Id!!!");
+                //}
+                //else
+                //{
+                //    throw new InvalidFieldException("You have not invested in the project have this Id!!!");
+                //}
+
+
+
+                //List<InvestorInvestmentDTO> investorList = await _investmentService.GetInvestmentByProjectIdForAuthor(id);
+                //InvestorInvestmentDTO investor = (InvestorInvestmentDTO)investorList
+                //    .Where(investor => investor.UserId.ToString().Equals(currentUser.userId)).FirstOrDefault();
+
+                //if (investor != null)
+                //{
+                //    dto = await _projectService.GetProjectById(id);
+                //    return Ok(dto);
+                //}
             }
             else
             {
@@ -185,11 +209,12 @@ namespace RevenueSharingInvest.API.Controllers
                 if (dto.status.Equals(ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString()))
                 {
                     return Ok(dto);
-                } else
+                }
+                else
                 {
                     throw new System.UnauthorizedAccessException("You Don't Have Permission Perform This Action!!");
                 }
-                
+
             }
 
             return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");

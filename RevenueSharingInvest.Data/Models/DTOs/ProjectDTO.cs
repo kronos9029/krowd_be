@@ -13,8 +13,8 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string description { get; set; }
         public string address { get; set; }       
         public double investmentTargetCapital { get; set; }
-        public double sharedRevenue { get; set; }
-        public double multiplier { get; set; }
+        public float sharedRevenue { get; set; }
+        public float multiplier { get; set; }
         public int duration { get; set; }
         public string startDate { get; set; }
         public string endDate { get; set; }
