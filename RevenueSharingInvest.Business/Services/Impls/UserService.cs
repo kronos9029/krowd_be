@@ -122,8 +122,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
                     {
-                        //Tạo ví B1, B4
+                        //Tạo ví B1, B2, B3, B4
                         await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B1")), Guid.Parse(currentUser.userId));
+                        await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B2")), Guid.Parse(currentUser.userId));
+                        await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")), Guid.Parse(currentUser.userId));
                         await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B4")), Guid.Parse(currentUser.userId));
                     }
                 }
