@@ -95,6 +95,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 foreach (GetStageDTO item in list)
                 {
+                    item.startDate = await _validationService.FormatDateOutput(item.startDate);
+                    item.endDate = await _validationService.FormatDateOutput(item.endDate);
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
 
@@ -149,6 +151,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 PeriodRevenue periodRevenue = new PeriodRevenue();
 
+                result.startDate = await _validationService.FormatDateOutput(result.startDate);
+                result.endDate = await _validationService.FormatDateOutput(result.endDate);
                 result.createDate = await _validationService.FormatDateOutput(result.createDate);
                 result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
                 periodRevenue = await _periodRevenueRepository.GetPeriodRevenueByStageId(Guid.Parse(result.id));
@@ -224,6 +228,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 foreach (GetStageDTO item in list)
                 {
+                    item.startDate = await _validationService.FormatDateOutput(item.startDate);
+                    item.endDate = await _validationService.FormatDateOutput(item.endDate);
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
 
