@@ -433,7 +433,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     for (int i = 1; i <= projectDTO.numOfStage - 1; i++)
                     {
-                        stage.Name = projectDTO.name + " giai đoạn " + i;
+                        stage.Name = " Kỳ " + i;
                         newStageId = await _stageRepository.CreateStage(stage);
                         periodRevenue.StageId = Guid.Parse(newStageId);
                         newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
@@ -441,7 +441,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         stage.EndDate = stage.EndDate.AddDays(daysPerStage);
                         
                     }
-                    stage.Name = projectDTO.name + " giai đoạn " + projectDTO.numOfStage;
+                    stage.Name = " Kỳ " + projectDTO.numOfStage;
                     stage.EndDate = stage.EndDate.AddDays(modDays);
                     newStageId = await _stageRepository.CreateStage(stage);
                     periodRevenue.StageId = Guid.Parse(newStageId);
@@ -1047,7 +1047,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     for (int i = 1; i <= projectDTO.numOfStage - 1; i++)
                     {
-                        stage.Name = projectDTO.name + " giai đoạn " + i;
+                        stage.Name = " Kỳ " + i;
                         newStageId = await _stageRepository.CreateStage(stage);
                         periodRevenue.StageId = Guid.Parse(newStageId);
                         newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
@@ -1055,7 +1055,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         stage.EndDate = stage.EndDate.AddDays(daysPerStage);
 
                     }
-                    stage.Name = projectDTO.name + " giai đoạn " + projectDTO.numOfStage;
+                    stage.Name = " Kỳ " + projectDTO.numOfStage;
                     stage.EndDate = stage.EndDate.AddDays(modDays);
                     newStageId = await _stageRepository.CreateStage(stage);
                     periodRevenue.StageId = Guid.Parse(newStageId);

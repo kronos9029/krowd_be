@@ -98,6 +98,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 ProjectEntity entity = _mapper.Map<ProjectEntity>(projectEntityDTO);
 
+                if (entity.Type.Equals(ProjectEntityEnum.HIGHLIGHT.ToString()))
+                    entity.Title = "List";
                 entity.Priority = (await _projectEntityRepository.CountProjectEntityByProjectIdAndType(entity.ProjectId, entity.Type)) + 1;
                 entity.CreateBy = Guid.Parse(currentUser.userId);
                 entity.UpdateBy = Guid.Parse(currentUser.userId);
