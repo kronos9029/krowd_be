@@ -188,7 +188,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 Project project = await _projectRepository.GetProjectById(projectId);
 
-                if (!project.ManagerId.ToString().Equals(currentUser.userId))
+                if (currentUser.roleId.Equals(currentUser.businessManagerRoleId) && !project.BusinessId.ToString().Equals(currentUser.businessId))
+                    throw new InvalidFieldException("The project has this projectId is not belong to your Business!!!");
+
+                if (currentUser.roleId.Equals(currentUser.projectManagerRoleId) && !project.ManagerId.ToString().Equals(currentUser.userId))
                     throw new InvalidFieldException("This projectId is not belong to your Project!!!");
 
                 ammountChart.chartName = "PeriodRevenue_Ammount_Chart";

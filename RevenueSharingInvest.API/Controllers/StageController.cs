@@ -65,7 +65,11 @@ namespace RevenueSharingInvest.API.Controllers
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 
             //ALL ROLES
-            if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            if (currentUser.roleId.Equals(currentUser.adminRoleId)
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId)
+                || currentUser.roleId.Equals(currentUser.projectManagerRoleId)
+                || currentUser.roleId.Equals(currentUser.investorRoleId)
+                || currentUser.roleId.Equals(""))
             {
                 var result = new List<StageChartDTO>();
                 result = await _stageService.GetStageChartByProjectId(project_id, currentUser);
