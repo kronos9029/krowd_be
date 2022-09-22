@@ -167,7 +167,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
 
                 }
             }
-            else if (request.entityName.ToLower().Equals(StoragePathEnum.ProjectEntity.ToString().ToLower()) && request.type.Equals("Press", StringComparison.InvariantCultureIgnoreCase))
+            else if (request.entityName.ToLower().Equals(StoragePathEnum.ProjectEntity.ToString().ToLower()) && request.type.Equals("PRESS", StringComparison.InvariantCultureIgnoreCase))
             {
                 foreach (var file in request.files)
                 {
@@ -201,7 +201,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
                     urls.Add(url);
 
                 }
-            } else if (request.entityName.ToLower().Equals(StoragePathEnum.ProjectEntity.ToString().ToLower()) && !request.type.Equals("Press", StringComparison.InvariantCultureIgnoreCase))
+            } else if (request.entityName.ToLower().Equals(StoragePathEnum.ProjectEntity.ToString().ToLower()) && !request.type.Equals("PRESS", StringComparison.InvariantCultureIgnoreCase))
             {
                 foreach(var file in request.files)
                 {
