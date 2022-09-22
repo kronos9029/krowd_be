@@ -194,28 +194,28 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (currentUser.roleId.Equals(currentUser.projectManagerRoleId) && !project.ManagerId.ToString().Equals(currentUser.userId))
                     throw new InvalidFieldException("This projectId is not belong to your Project!!!");
 
-                ammountChart.chartName = "PeriodRevenue_Ammount_Chart";
+                ammountChart.chartName = "Biểu đồ số tiền doanh thu từng kỳ";
                 ammountChart.lineList = new List<StageLineDTO>();
                 StageLineDTO OEA = new StageLineDTO();
-                OEA.name = "Optimistic_Expected_Amount";
+                OEA.name = "Số tiền mong đợi lạc quan";
                 OEA.data = new List<double>();
                 StageLineDTO NEA = new StageLineDTO();
-                NEA.name = "Normal_Expected_Amount";
+                NEA.name = "Số tiền mong đợi";
                 NEA.data = new List<double>();
                 StageLineDTO PEA = new StageLineDTO();
-                PEA.name = "Pessimistic_Expected_Amount";
+                PEA.name = "Số tiền mong đợi bi quan";
                 PEA.data = new List<double>();
 
-                ratioChart.chartName = "PeriodRevenue_Ratio_Chart";
+                ratioChart.chartName = "Biểu đồ tỷ lệ doanh thu từng kỳ";
                 ratioChart.lineList = new List<StageLineDTO>();
                 StageLineDTO OER = new StageLineDTO();
-                OER.name = "Optimistic_Expected_Ratio";
+                OER.name = "Tỷ lệ mong đợi lạc quan";
                 OER.data = new List<double>();
                 StageLineDTO NER = new StageLineDTO();
-                NER.name = "Normal_Expected_Ratio";
+                NER.name = "Tỷ lệ mong đợi";
                 NER.data = new List<double>();
                 StageLineDTO PER = new StageLineDTO();
-                PER.name = "Pessimistic_Expected_Ratio";
+                PER.name = "Tỷ lệ mong đợi bi quan";
                 PER.data = new List<double>();
 
                 List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0);
