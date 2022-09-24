@@ -20,7 +20,7 @@ namespace RevenueSharingInvest.Business.Services
         public Task<int> UpdatePeriodRevenueHistory(PeriodRevenueHistoryDTO periodRevenueHistoryDTO, Guid periodRevenueHistoryId);
 
         //DELETE
-        public Task<int> DeletePeriodRevenueHistoryById(Guid periodRevenueHistoryId);
+        //public Task<int> DeletePeriodRevenueHistoryById(Guid periodRevenueHistoryId);
         public Task<int> ClearAllPeriodRevenueHistoryData();
     }
 }

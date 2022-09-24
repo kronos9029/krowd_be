@@ -312,24 +312,24 @@ namespace RevenueSharingInvest.API.Controllers
                 }
             }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUSINESS_MANAGER can perform this action!!!");
 
         }
 
-        [HttpDelete]
-        [Authorize]
-        public async Task<IActionResult> ClearAllProjectData()
-        {
-            //string userId = _httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
+        //[HttpDelete]
+        //[Authorize]
+        //public async Task<IActionResult> ClearAllProjectData()
+        //{
+        //    //string userId = _httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.SerialNumber).Value;
 
-            //if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.ADMIN.ToString()))
-            //{
-                var result = await _projectService.ClearAllProjectData();
-                return Ok(result);
-            //}
-            //return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
+        //    //if (await _authenticateService.CheckRoleForAction(userId, RoleEnum.ADMIN.ToString()))
+        //    //{
+        //        var result = await _projectService.ClearAllProjectData();
+        //        return Ok(result);
+        //    //}
+        //    //return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
 
-        }
+        //}
 
         private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
         {

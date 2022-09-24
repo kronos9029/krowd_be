@@ -431,5 +431,25 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        public async Task<int> DeleteProjectEntityByProjectId(Guid projectId)
+        {
+            try
+            {
+                var query = "DELETE FROM "
+                    + "         ProjectEntity "
+                    + "     WHERE "
+                    + "         ProjectId = @ProjectId ";
+                using var connection = CreateConnection();
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

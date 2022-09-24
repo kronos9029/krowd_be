@@ -199,5 +199,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+
+        //DELETE BY PROJECT ID
+        public async Task<int> DeletePackageByProjectId(Guid projectId)
+        {
+            try
+            {
+                var query = "DELETE FROM Package WHERE ProjectId = @ProjectId";
+
+                using var connection = CreateConnection();
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

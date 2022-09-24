@@ -29,6 +29,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IProjectEntityRepository _projectEntityRepository;
         private readonly IStageRepository _stageRepository;
         private readonly IPeriodRevenueRepository _periodRevenueRepository;
+        private readonly IPeriodRevenueHistoryRepository _periodRevenueHistoryRepository;
+        private readonly IPackageRepository _packageRepository;
         private readonly IProjectWalletRepository _projectWalletRepository;
 
         private readonly IValidationService _validationService;
@@ -46,6 +48,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IProjectEntityRepository projectEntityRepository,
             IStageRepository stageRepository,
             IPeriodRevenueRepository periodRevenueRepository,
+            IPeriodRevenueHistoryRepository periodRevenueHistoryRepository,
+            IPackageRepository packageRepository,
             IProjectWalletRepository projectWalletRepository,
             IValidationService validationService,
             IProjectTagService projectTagService,
@@ -61,6 +65,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _projectEntityRepository = projectEntityRepository;
             _stageRepository = stageRepository;
             _periodRevenueRepository = periodRevenueRepository;
+            _periodRevenueHistoryRepository = periodRevenueHistoryRepository;
+            _packageRepository = packageRepository;
             _projectWalletRepository = projectWalletRepository;
 
             _validationService = validationService;
@@ -516,7 +522,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-
+                //Xóa PeriodRevenueHistory
+                await _periodRevenueHistoryRepository.DeletePeriodRevenueHistoryByProjectId(projectId);
+                //Xóa PeriodRevenue
+                await _periodRevenueRepository.DeletePeriodRevenueByProjectId(projectId);
+                //Xóa Stage
+                await _stageRepository.DeleteStageByProjectId(projectId);
+                //Xóa ProjectEntity
+                await _projectEntityRepository.DeleteProjectEntityByProjectId(projectId);
+                //Xóa Package
+                await _packageRepository.DeletePackageByProjectId(projectId);
+                //Xóa ProjectWallet
+                await _projectWalletRepository.DeleteProjectWalletByProjectId(projectId);
+                //Xóa Project
                 result = await _projectRepository.DeleteProjectById(projectId);
                 if (result == 0)
                     throw new CreateObjectException("Can not delete Project Object!");

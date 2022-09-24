@@ -58,12 +58,12 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeletePeriodRevenueHistory(Guid id)
-        {
-            var result = await _periodRevenueHistoryService.DeletePeriodRevenueHistoryById(id);
-            return Ok(result);
-        }
+        //[HttpDelete]
+        //[Route("{id}")]
+        //public async Task<IActionResult> DeletePeriodRevenueHistory(Guid id)
+        //{
+        //    var result = await _periodRevenueHistoryService.DeletePeriodRevenueHistoryById(id);
+        //    return Ok(result);
+        //}
     }
 }
