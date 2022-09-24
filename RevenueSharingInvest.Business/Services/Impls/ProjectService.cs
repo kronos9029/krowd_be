@@ -485,7 +485,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     ProjectEntity about = new ProjectEntity();
 
                     about.ProjectId = Guid.Parse(newId.id);
-                    about.Type = ProjectEntityEnum.EXTENSION.ToString();
+                    about.Type = ProjectEntityEnum.ABOUT.ToString();
                     about.CreateBy = Guid.Parse(currentUser.userId);
                     about.Title = "Facebook";
                     about.Priority = 1;
