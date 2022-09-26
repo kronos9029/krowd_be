@@ -108,7 +108,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     }
 
                     //Money From I1 Wallet automaticly tranfer from I1 to I2
-                    InvestorWallet I2 = await _investorWalletRepository.GetInvestorWalletByTypeAndInvestorId((Guid)entity.PartnerClientId, WalletTypeEnum.I2.ToString());
+                    InvestorWallet I2 = await _investorWalletRepository.GetInvestorWalletByTypeAndInvestorId(investor.Id, WalletTypeEnum.I2.ToString());
                     if (I2 == null)
                         throw new NotFoundException("I2 Wallet Not Found!!");
 
