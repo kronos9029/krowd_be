@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models;
 using RevenueSharingInvest.Business.Models.Constant;
@@ -114,13 +115,21 @@ namespace RevenueSharingInvest.API.Controllers
         
         [HttpPost]
         [Route("request")]
-        public async Task<IActionResult> RequestPaymentTest([FromBody]long amount)
+        public async Task<IActionResult> RequestPaymentTest([FromForm]long amount)
         {
             MomoPaymentRequest request = new();
             request.amount = amount;
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            if (currentUser.email == null 
+                || currentUser.email == "" 
+                || currentUser.userId == null 
+                || currentUser.userId == "")
+            {
+                throw new LoginException("You Have To Login First!!");
+            }
             request.partnerClientId = currentUser.userId;
             request.email = currentUser.email;
+
             var result = _momoService.RequestPaymentWeb(request);
             return Ok(result);
 

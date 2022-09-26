@@ -72,6 +72,10 @@ namespace RevenueSharingInvest.Business.Exceptions
                     errorMessageObject.Code = "PE001";
                     statusCode = (int)HttpStatusCode.Ambiguous;
                     break;
+                case LoginException:
+                    errorMessageObject.Code = "L001";
+                    statusCode= (int)HttpStatusCode.BadRequest;
+                    break;
 
             }
 
