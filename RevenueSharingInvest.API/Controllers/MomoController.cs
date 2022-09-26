@@ -113,9 +113,11 @@ namespace RevenueSharingInvest.API.Controllers
         }        */
         
         [HttpPost]
-        [Route("request-web")]
-        public async Task<IActionResult> RequestPaymentTest(MomoPaymentRequest request)
+        [Route("request")]
+        public async Task<IActionResult> RequestPaymentTest([FromBody]long amount)
         {
+            MomoPaymentRequest request = new();
+            request.amount = amount;
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
             request.partnerClientId = currentUser.userId;
             request.email = currentUser.email;
@@ -124,7 +126,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         }        
         
-        [HttpPost]
+/*        [HttpPost]
         [Route("request-mobile")]
         public async Task<IActionResult> RequestLinkAndPay(MomoPaymentRequest request)
         {
@@ -134,11 +136,11 @@ namespace RevenueSharingInvest.API.Controllers
             var result = _momoService.RequestLinkAndPayment(request);
             return Ok(result);
 
-        }
+        }*/
 
         [HttpPost]
         [Route("response")]
-        public async Task<IActionResult> ConfirmPaymentClient(MomoPaymentResult momoPaymentResult)
+        public async Task<IActionResult> ResponseFromMomo(MomoPaymentResult momoPaymentResult)
         {
             var result = await _accountTransactionService.CreateAccountTransaction(momoPaymentResult);
             return Ok(result);

@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.API.Extensions
         public static void AddApplicationDatabaseContext(this IServiceCollection services, IConfiguration configuration)
         {
             // Read the connection string from appsettings.
-            string dbConnectionString = configuration.GetConnectionString("DEV");
+            string dbConnectionString = configuration.GetConnectionString("PROD");
 
             // Inject IDbConnection, with implementation from SqlConnection class.
             services.AddTransient<IDbConnection>((sp) => new SqlConnection(dbConnectionString));
