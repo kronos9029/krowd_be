@@ -64,11 +64,11 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> ClearAllBusinessFieldData()
-        {
-            var result = await _businessFieldService.ClearAllBusinessFieldData();
-            return Ok(result);
-        }
+        //[HttpDelete]
+        //public async Task<IActionResult> ClearAllBusinessFieldData()
+        //{
+        //    var result = await _businessFieldService.ClearAllBusinessFieldData();
+        //    return Ok(result);
+        //}
     }
 }

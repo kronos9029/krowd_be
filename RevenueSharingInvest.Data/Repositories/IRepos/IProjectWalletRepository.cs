@@ -21,7 +21,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteProjectWalletById(Guid projectWalletId);
-        public Task<int> DeleteProjectWalletByProjectManagerId(Guid projectManagerId);
+        public Task<int> DeleteProjectWalletByBusinessId(Guid businessId);
         public Task<int> ClearAllProjectWalletData();
     }
 }

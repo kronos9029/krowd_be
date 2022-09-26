@@ -205,7 +205,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "DELETE FROM BusisnessField WHERE BusinessId = @BusinessId";
+                var query = "DELETE FROM BusinessField WHERE BusinessId = @BusinessId";
                 var parameters = new DynamicParameters();
                 parameters.Add("BusinessId", businessId, DbType.Guid);
                 using var connection = CreateConnection();

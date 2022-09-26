@@ -160,9 +160,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         List<Project> projectList = await _projectRepository.GetAllProjects(0, 0, businessId.ToString(), null, null , null, null, null, currentUser.roleId);
                         foreach (Project item in projectList)
                         {
-                            await _projectService.DeleteProjectById(item.Id);
-                            await _projectWalletRepository.DeleteProjectWalletByProjectManagerId(item.ManagerId);
-                        }                       
+                            await _projectService.DeleteProjectById(item.Id);                           
+                        }
+                        await _projectWalletRepository.DeleteProjectWalletByBusinessId(businessId);
                         await _userRepository.DeleteUserByBusinessId(businessId);
                         await _businessFieldRepository.DeleteBusinessFieldByBusinessId(businessId);
                         result = await _businessRepository.DeleteBusinessById(businessId);

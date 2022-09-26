@@ -139,19 +139,19 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         //CLEAR DATA
-        [HttpDelete]
-        public async Task<IActionResult> ClearAllBusinessData()
-        {
-            ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
+        //[HttpDelete]
+        //public async Task<IActionResult> ClearAllBusinessData()
+        //{
+        //    ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
 
-            if (userInfo.roleId.Equals(userInfo.adminRoleId))
-            {
-                var result = await _businessService.ClearAllBusinessData();
-                return Ok(result);
-            }
+        //    if (userInfo.roleId.Equals(userInfo.adminRoleId))
+        //    {
+        //        var result = await _businessService.ClearAllBusinessData();
+        //        return Ok(result);
+        //    }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
-        }
+        //    return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
+        //}
 
         private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
         {
