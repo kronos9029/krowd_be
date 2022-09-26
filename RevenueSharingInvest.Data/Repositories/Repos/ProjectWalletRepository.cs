@@ -181,26 +181,19 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //DELETE BY PROJECT ID
-        public async Task<int> DeleteProjectWalletByProjectId(Guid projectId)
+        //DELETE BY PROJECT_MANAGER ID
+        public async Task<int> DeleteProjectWalletByProjectManagerId(Guid projectManagerId)
         {
             try
             {
                 var query = "DELETE FROM ProjectWallet "
                     + "     WHERE "
-                    + "         ProjectManagerId IN "
-                    + "             (SELECT " 
-                    + "                   ManagerId " 
-                    + "               FROM " 
-                    + "                   Project " 
-                    + "               WHERE " 
-                    + "                   Id = @ProjectId) " 
-                    + "                   AND WalletTypeId IN (@B2, @B3) ";
+                    + "         ProjectManagerId = @ProjectManagerId ";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("ProjectId", projectId, DbType.Guid);
-                parameters.Add("B2", WalletTypeDictionary.walletTypes.GetValueOrDefault("B2"), DbType.Guid);
-                parameters.Add("B3", WalletTypeDictionary.walletTypes.GetValueOrDefault("B3"), DbType.Guid);
+                parameters.Add("ProjectManagerId", projectManagerId, DbType.Guid);
+                //parameters.Add("B2", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B2")), DbType.Guid);
+                //parameters.Add("B3", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")), DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }

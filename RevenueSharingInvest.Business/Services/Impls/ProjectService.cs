@@ -30,8 +30,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IStageRepository _stageRepository;
         private readonly IPeriodRevenueRepository _periodRevenueRepository;
         private readonly IPeriodRevenueHistoryRepository _periodRevenueHistoryRepository;
-        private readonly IPackageRepository _packageRepository;
-        private readonly IProjectWalletRepository _projectWalletRepository;
+        private readonly IPackageRepository _packageRepository;       
 
         private readonly IValidationService _validationService;
         private readonly IProjectTagService _projectTagService;
@@ -50,7 +49,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IPeriodRevenueRepository periodRevenueRepository,
             IPeriodRevenueHistoryRepository periodRevenueHistoryRepository,
             IPackageRepository packageRepository,
-            IProjectWalletRepository projectWalletRepository,
             IValidationService validationService,
             IProjectTagService projectTagService,
             IFileUploadService fileUploadService,
@@ -67,8 +65,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _periodRevenueRepository = periodRevenueRepository;
             _periodRevenueHistoryRepository = periodRevenueHistoryRepository;
             _packageRepository = packageRepository;
-            _projectWalletRepository = projectWalletRepository;
-
+            
             _validationService = validationService;
             _projectTagService = projectTagService;
             _fileUploadService = fileUploadService;
@@ -532,8 +529,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 await _projectEntityRepository.DeleteProjectEntityByProjectId(projectId);
                 //Xóa Package
                 await _packageRepository.DeletePackageByProjectId(projectId);
-                //Xóa ProjectWallet
-                await _projectWalletRepository.DeleteProjectWalletByProjectId(projectId);
+                ////Xóa ProjectWallet
+                //result = await _projectWalletRepository.DeleteProjectWalletByProjectId(projectId);
                 //Xóa Project
                 result = await _projectRepository.DeleteProjectById(projectId);
                 if (result == 0)

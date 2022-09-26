@@ -27,10 +27,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
 
         [Key]
         public Guid Id { get; set; }
-        public Guid? ManagerId { get; set; }
+        public Guid ManagerId { get; set; }
         public Guid BusinessId { get; set; }
-        public Guid? FieldId { get; set; }
-        public Guid? AreaId { get; set; }
+        public Guid FieldId { get; set; }
+        public Guid AreaId { get; set; }
         [StringLength(50)]
         public string Name { get; set; }
         public string Image { get; set; }
