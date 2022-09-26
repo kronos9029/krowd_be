@@ -42,7 +42,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         ResponseTime, "
                     + "         ExtraData, "
                     + "         Signature, " 
-                    + "         CreateDate) "
+                    + "         CreateDate," 
+                    + "         Type  ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -64,7 +65,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @ResponseTime, "
                     + "         @ExtraData, "
                     + "         @Signature, " 
-                    + "         @CreateDate) ";
+                    + "         @CreateDate," 
+                    + "         @Type) ";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("FromUserId", accountTransactionDTO.FromUserId, DbType.Guid);

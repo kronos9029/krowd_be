@@ -88,6 +88,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 AccountTransaction entity = _mapper.Map<AccountTransaction>(momoPaymentResult);
                 entity.PartnerClientId = Guid.Parse(momoPaymentResult.partnerClientId);
                 entity.FromUserId = entity.PartnerClientId;
+                entity.Type = "Top-up";
                 newId.id = await _accountTransactionRepository.CreateAccountTransaction(entity);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create AccountTransaction Object!");
@@ -101,6 +102,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     I1.Balance += realAmount;
                     I1.UpdateDate = DateTime.Now;
                     I1.UpdateBy = entity.FromUserId;
+                    
                     int checkTopUp = await _investorWalletRepository.UpdateWalletBalance(I1);
                     if(checkTopUp == 0)
                     {

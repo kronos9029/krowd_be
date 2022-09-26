@@ -18,6 +18,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid Id { get; set; }
         public Guid? FromUserId { get; set; }
         public Guid? ToUserId { get; set; }
+        public string Type { get; set; }
         ///MOMO
         public string PartnerCode { get; set; }
         public string OrderId { get; set; }
