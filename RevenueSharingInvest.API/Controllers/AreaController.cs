@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using System;
@@ -24,14 +25,14 @@ namespace RevenueSharingInvest.API.Controllers
         private readonly IAreaService _areaService;
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IAuthenticateService _authenticateService;
         public AreaController(IAreaService areaService, IUserService userService, IRoleService roleService, IHttpContextAccessor httpContextAccessor, IAuthenticateService authenticateService)
         {
             _areaService = areaService;
             _userService = userService;
             _roleService = roleService;
-            this.httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor;
             _authenticateService = authenticateService;
         }
 

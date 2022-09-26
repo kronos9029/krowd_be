@@ -8,6 +8,7 @@ using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
+using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -73,6 +74,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -133,6 +135,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -150,6 +153,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -325,6 +329,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -367,6 +372,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         } 
@@ -393,6 +399,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch(Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -417,6 +424,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch(Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -439,6 +447,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -453,6 +462,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -497,6 +507,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -546,6 +557,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -582,6 +594,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }

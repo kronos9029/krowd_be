@@ -3,6 +3,7 @@ using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
+using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
@@ -66,6 +67,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -120,7 +122,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     if (await _userRepository.UpdateBusinessIdForBuM(Guid.Parse(newId.id), Guid.Parse(currentUser.userId)) == 0)
                     {
-                        _businessRepository.DeleteBusinessByBusinessId(Guid.Parse(newId.id));
+                        await _businessRepository.DeleteBusinessByBusinessId(Guid.Parse(newId.id));
                         throw new UpdateObjectException("Can not update businessId for User(BUSINESS_MANAGER) Object!");
                     }
                     foreach (string fieldId in fieldIdList)
@@ -141,6 +143,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -175,6 +178,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -294,6 +298,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -318,6 +323,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }        
@@ -343,6 +349,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -411,6 +418,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -438,6 +446,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             } 
             catch(Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -453,6 +462,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             }catch(Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }

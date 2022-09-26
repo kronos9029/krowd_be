@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Business.Services.Extensions.Momo;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -28,47 +29,49 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
         public async Task<MomoPaymentResponse> RequestPaymentWeb(MomoPaymentRequest request)
         {
-            //request params need to request to MoMo system
-            string partnerCode = _momoSettings.PartnerCode;
-            string apiEndpoint = _momoSettings.ApiEndpoint;
-            string accessKey = _momoSettings.AccessKey;
-            string serectkey = _momoSettings.SecretKey;
-            string orderInfo = "test";
-            string returnUrl = _momoSettings.ReturnUrl;
-            string notifyurl = _momoSettings.NotifyUrl; //lưu ý: notifyurl không được sử dụng localhost, có thể sử dụng ngrok để public localhost trong quá trình test
+            try
+            {
+                //request params need to request to MoMo system
+                string partnerCode = _momoSettings.PartnerCode;
+                string apiEndpoint = _momoSettings.ApiEndpoint;
+                string accessKey = _momoSettings.AccessKey;
+                string serectkey = _momoSettings.SecretKey;
+                string orderInfo = "test";
+                string returnUrl = _momoSettings.ReturnUrl;
+                string notifyurl = _momoSettings.NotifyUrl; //lưu ý: notifyurl không được sử dụng localhost, có thể sử dụng ngrok để public localhost trong quá trình test
 
-            long amount = request.amount;
-            string orderid = Guid.NewGuid().ToString(); //mã đơn hàng
-            string requestId = Guid.NewGuid().ToString();
-            string extraData = "";
-            string requestType = "captureWallet";
-            dynamic userInfoJson = new JObject();
-            userInfoJson.Add("name", "");
-            userInfoJson.Add("phoneNumber", "");
-            userInfoJson.Add("email", request.email);
-
-
-            //Before sign HMAC SHA256 signature
-            string rawHash = "accessKey=" + accessKey +
-                "&amount=" + amount +
-                "&extraData=" + extraData +
-                "&ipnUrl=" + notifyurl +
-                "&orderId=" + orderid +
-                "&orderInfo=" + orderInfo +
-                "&partnerClientId=" + request.partnerClientId +
-                "&partnerCode=" + partnerCode +
-                "&redirectUrl=" + returnUrl +
-                "&requestId=" + requestId +
-                "&requestType=" + requestType
-                ;
-
-            MomoSecurity crypto = new MomoSecurity();
-            //sign signature SHA256
-            string signature = crypto.signSHA256(rawHash, serectkey);
+                long amount = request.amount;
+                string orderid = Guid.NewGuid().ToString(); //mã đơn hàng
+                string requestId = Guid.NewGuid().ToString();
+                string extraData = "";
+                string requestType = "captureWallet";
+                dynamic userInfoJson = new JObject();
+                userInfoJson.Add("name", "");
+                userInfoJson.Add("phoneNumber", "");
+                userInfoJson.Add("email", request.email);
 
 
-            //build body json request
-            JObject message = new JObject
+                //Before sign HMAC SHA256 signature
+                string rawHash = "accessKey=" + accessKey +
+                    "&amount=" + amount +
+                    "&extraData=" + extraData +
+                    "&ipnUrl=" + notifyurl +
+                    "&orderId=" + orderid +
+                    "&orderInfo=" + orderInfo +
+                    "&partnerClientId=" + request.partnerClientId +
+                    "&partnerCode=" + partnerCode +
+                    "&redirectUrl=" + returnUrl +
+                    "&requestId=" + requestId +
+                    "&requestType=" + requestType
+                    ;
+
+                MomoSecurity crypto = new MomoSecurity();
+                //sign signature SHA256
+                string signature = crypto.signSHA256(rawHash, serectkey);
+
+
+                //build body json request
+                JObject message = new JObject
             {
                 { "partnerCode", partnerCode },
                 { "partnerName", "Revenue Sharing Invest" },
@@ -88,54 +91,62 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             };
 
-            string responseFromMomo = PaymentRequest.sendPaymentRequest(apiEndpoint, message.ToString());
+                string responseFromMomo = PaymentRequest.sendPaymentRequest(apiEndpoint, message.ToString());
 
-            JObject jmessage = JObject.Parse(responseFromMomo);
+                JObject jmessage = JObject.Parse(responseFromMomo);
 
-            MomoPaymentResponse response = jmessage.ToObject<MomoPaymentResponse>();
+                MomoPaymentResponse response = jmessage.ToObject<MomoPaymentResponse>();
 
-            //JsonSerializer serializer = new JsonSerializer();
-            //MomoPaymentResponse response = (MomoPaymentResponse)serializer.Deserialize(new JTokenReader(jmessage), typeof(MomoPaymentResponse));
+                //JsonSerializer serializer = new JsonSerializer();
+                //MomoPaymentResponse response = (MomoPaymentResponse)serializer.Deserialize(new JTokenReader(jmessage), typeof(MomoPaymentResponse));
 
-            return response;
+                return response;
+            } catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+
 
         }
 
         public async Task<MomoPaymentResponse> RequestLinkAndPayment(MomoPaymentRequest request)
         {
-            //request params need to request to MoMo system
-            string partnerCode = _momoSettings.PartnerCode;
-            string accessKey = _momoSettings.AccessKey;
-            string apiEndpoint = _momoSettings.ApiEndpoint;
-            string serectkey = _momoSettings.SecretKey;
-            string requestId = Guid.NewGuid().ToString();
-            long amount = request.amount;
-            string orderid = Guid.NewGuid().ToString(); //mã đơn hàng
-            string notifyurl = _momoSettings.NotifyUrl; //lưu ý: notifyurl không được sử dụng localhost, có thể sử dụng ngrok để public localhost trong quá trình test
-            string returnUrl = _momoSettings.ReturnUrl;
-            string extraData = "";
-            string requestType = "linkWallet";
-            string orderInfo = "test Link and Pay";
+            try
+            {
+                //request params need to request to MoMo system
+                string partnerCode = _momoSettings.PartnerCode;
+                string accessKey = _momoSettings.AccessKey;
+                string apiEndpoint = _momoSettings.ApiEndpoint;
+                string serectkey = _momoSettings.SecretKey;
+                string requestId = Guid.NewGuid().ToString();
+                long amount = request.amount;
+                string orderid = Guid.NewGuid().ToString(); //mã đơn hàng
+                string notifyurl = _momoSettings.NotifyUrl; //lưu ý: notifyurl không được sử dụng localhost, có thể sử dụng ngrok để public localhost trong quá trình test
+                string returnUrl = _momoSettings.ReturnUrl;
+                string extraData = "";
+                string requestType = "linkWallet";
+                string orderInfo = "test Link and Pay";
 
-            string rawHash = "accessKey=" + accessKey +
-                            "&amount=" + amount +
-                            "&extraData=" + extraData +
-                            "&ipnUrl=" + notifyurl +
-                            "&orderId=" + orderid +
-                            "&orderInfo=" + orderInfo +
-                            "&partnerClientId=" + request.email +
-                            "&partnerCode=" + partnerCode +
-                            "&redirectUrl=" + returnUrl +
-                            "&requestId=" + requestId +
-                            "&requestType=" + requestType
-                            ;
+                string rawHash = "accessKey=" + accessKey +
+                                "&amount=" + amount +
+                                "&extraData=" + extraData +
+                                "&ipnUrl=" + notifyurl +
+                                "&orderId=" + orderid +
+                                "&orderInfo=" + orderInfo +
+                                "&partnerClientId=" + request.email +
+                                "&partnerCode=" + partnerCode +
+                                "&redirectUrl=" + returnUrl +
+                                "&requestId=" + requestId +
+                                "&requestType=" + requestType
+                                ;
 
-            MomoSecurity crypto = new MomoSecurity();
-            //sign signature SHA256
-            string signature = crypto.signSHA256(rawHash, serectkey);
+                MomoSecurity crypto = new MomoSecurity();
+                //sign signature SHA256
+                string signature = crypto.signSHA256(rawHash, serectkey);
 
 
-            JObject message = new JObject
+                JObject message = new JObject
             {
                 { "partnerCode", partnerCode },
                 { "partnerName", "Revenue Sharing Invest" },
@@ -154,37 +165,46 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             };
 
-            string responseFromMomo = PaymentRequest.sendPaymentRequest(apiEndpoint, message.ToString());
+                string responseFromMomo = PaymentRequest.sendPaymentRequest(apiEndpoint, message.ToString());
 
-            JObject jmessage = JObject.Parse(responseFromMomo);
+                JObject jmessage = JObject.Parse(responseFromMomo);
 
-            MomoPaymentResponse response = jmessage.ToObject<MomoPaymentResponse>();
+                MomoPaymentResponse response = jmessage.ToObject<MomoPaymentResponse>();
 
-            return response;
+                return response;
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+
 
         }
 
         public async Task<QueryResponse> QueryTransactionStatus(QueryRequest request)
         {
-            string partnerCode = _momoSettings.PartnerCode;
-            string accessKey = _momoSettings.AccessKey;
-            string requestId = request.requestId;
-            string orderId = request.orderId;
-            string secrectKey = _momoSettings.SecretKey;
-            string apiEndpoint = _momoSettings.ApiQueryStatus;
-            string lang = "vi";
+            try
+            {
+                string partnerCode = _momoSettings.PartnerCode;
+                string accessKey = _momoSettings.AccessKey;
+                string requestId = request.requestId;
+                string orderId = request.orderId;
+                string secrectKey = _momoSettings.SecretKey;
+                string apiEndpoint = _momoSettings.ApiQueryStatus;
+                string lang = "vi";
 
-            string rawHash = "accessKey=" + accessKey +
-                "&orderId=" + orderId +
-                "&partnerCode=" + partnerCode +
-                "&requestId=" + requestId
-                ;
+                string rawHash = "accessKey=" + accessKey +
+                    "&orderId=" + orderId +
+                    "&partnerCode=" + partnerCode +
+                    "&requestId=" + requestId
+                    ;
 
-            MomoSecurity crypto = new MomoSecurity();
-            //sign signature SHA256
-            string signature = crypto.signSHA256(rawHash, secrectKey);
+                MomoSecurity crypto = new MomoSecurity();
+                //sign signature SHA256
+                string signature = crypto.signSHA256(rawHash, secrectKey);
 
-            JObject message = new JObject
+                JObject message = new JObject
             {
                 { "partnerCode", partnerCode },
                 { "requestId", requestId },
@@ -193,40 +213,49 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 { "signature", signature }
             };
 
-            string responseFromMomo = PaymentRequest.sendPaymentRequest(apiEndpoint, message.ToString());
+                string responseFromMomo = PaymentRequest.sendPaymentRequest(apiEndpoint, message.ToString());
 
-            JObject jmessage = JObject.Parse(responseFromMomo);
+                JObject jmessage = JObject.Parse(responseFromMomo);
 
-            QueryResponse response = jmessage.ToObject<QueryResponse>();
+                QueryResponse response = jmessage.ToObject<QueryResponse>();
 
-            return response;
+                return response;
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+
 
         }
 
         public async Task<ConfirmResponse> ConfirmMomoTransaction(ConfirmRequest request)
         {
-            string partnerCode = _momoSettings.PartnerCode;
-            string accessKey = _momoSettings.AccessKey;
-            string requestId = request.requestId;
-            string orderId = request.orderId;
-            string secrectKey = _momoSettings.SecretKey;
-            string apiEndpoint = _momoSettings.ApiQueryStatus;
-            string lang = "vi";
+            try
+            {
+                string partnerCode = _momoSettings.PartnerCode;
+                string accessKey = _momoSettings.AccessKey;
+                string requestId = request.requestId;
+                string orderId = request.orderId;
+                string secrectKey = _momoSettings.SecretKey;
+                string apiEndpoint = _momoSettings.ApiQueryStatus;
+                string lang = "vi";
 
-            string rawHash = "accessKey=" + accessKey +
-                "&amount=" + request.amount +
-                "&amount=" + request.description +
-                "&orderId=" + orderId +
-                "&partnerCode=" + partnerCode +
-                "&requestId=" + requestId +
-                "&requestType=" + request.requestType
-                ;
+                string rawHash = "accessKey=" + accessKey +
+                    "&amount=" + request.amount +
+                    "&amount=" + request.description +
+                    "&orderId=" + orderId +
+                    "&partnerCode=" + partnerCode +
+                    "&requestId=" + requestId +
+                    "&requestType=" + request.requestType
+                    ;
 
-            MomoSecurity crypto = new MomoSecurity();
-            //sign signature SHA256
-            string signature = crypto.signSHA256(rawHash, secrectKey);
+                MomoSecurity crypto = new MomoSecurity();
+                //sign signature SHA256
+                string signature = crypto.signSHA256(rawHash, secrectKey);
 
-            JObject message = new JObject
+                JObject message = new JObject
             {
                 { "partnerCode", partnerCode },
                 { "requestId", requestId },
@@ -238,13 +267,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 { "signature", signature }
             };
 
-            string responseFromMomo = PaymentRequest.sendPaymentRequest(apiEndpoint, message.ToString());
+                string responseFromMomo = PaymentRequest.sendPaymentRequest(apiEndpoint, message.ToString());
 
-            JObject jmessage = JObject.Parse(responseFromMomo);
+                JObject jmessage = JObject.Parse(responseFromMomo);
 
-            ConfirmResponse response = jmessage.ToObject<ConfirmResponse>();
+                ConfirmResponse response = jmessage.ToObject<ConfirmResponse>();
 
-            return response;
+                return response;
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
 
         }
 

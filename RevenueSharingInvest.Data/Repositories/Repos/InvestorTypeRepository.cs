@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -55,6 +56,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
         }
@@ -81,6 +83,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -130,6 +133,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
         }
@@ -147,6 +151,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
         }
@@ -181,6 +186,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
         }
@@ -196,6 +202,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -213,6 +220,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
         }

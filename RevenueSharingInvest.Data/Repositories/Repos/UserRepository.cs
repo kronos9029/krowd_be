@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Data.Helpers;
+using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -72,6 +73,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
         }
@@ -98,6 +100,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -336,6 +339,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
         }
@@ -353,6 +357,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
         }        
@@ -369,6 +374,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
         }
@@ -444,28 +450,37 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch(Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
 
         public async Task<User> ProjectManagerGetUserbyId(Guid managerId, Guid id)
         {
-            var query = "SELECT * "+
-                        "FROM(SELECT U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted "+
-                        "FROM[User] U "+
-                        "    JOIN Investor INS ON U.Id = INS.UserId "+
-                        "    JOIN Investment INM ON INS.Id = INM.InvestorId "+
-                        "   WHERE INM.ProjectId IN(SELECT Id "+
-                        "                        FROM Project "+
-                        "                        WHERE ManagerId = @ManagerId) "+
-                        " GROUP BY U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted "+
-                        " ) AS X "+
-                        " WHERE Id = @Id";
-            var parameters = new DynamicParameters();
-            parameters.Add("ManagerId", managerId, DbType.Guid);
-            parameters.Add("Id", id, DbType.Guid);
-            using var connection = CreateConnection();
-            return await connection.QueryFirstOrDefaultAsync<User>(query, parameters);
+            try
+            {
+                var query = "SELECT * "+
+                            "FROM(SELECT U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted "+
+                            "FROM[User] U "+
+                            "    JOIN Investor INS ON U.Id = INS.UserId "+
+                            "    JOIN Investment INM ON INS.Id = INM.InvestorId "+
+                            "   WHERE INM.ProjectId IN(SELECT Id "+
+                            "                        FROM Project "+
+                            "                        WHERE ManagerId = @ManagerId) "+
+                            " GROUP BY U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted "+
+                            " ) AS X "+
+                            " WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("ManagerId", managerId, DbType.Guid);
+                parameters.Add("Id", id, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<User>(query, parameters);
+
+            } catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
 
         }
 
@@ -525,6 +540,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
         }
@@ -543,6 +559,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
         }
@@ -558,6 +575,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -575,6 +593,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
         }
@@ -763,6 +782,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -785,6 +805,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
         }
@@ -809,6 +830,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -826,6 +848,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -843,6 +866,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
@@ -872,30 +896,39 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
         }
 
         public async Task<int> UpdateUserEmail(Guid userId, string email, Guid currentUserId)
         {
-            var query = "UPDATE [User] "
-                    + "     SET "
-                    + "         Email = ISNULL(@Email, Email), "
-                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
-                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
-                    + "     WHERE "
-                    + "         Id = @Id";
-
-            var parameters = new DynamicParameters();
-            parameters.Add("Email", email, DbType.String);
-            parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-            parameters.Add("UpdateBy", currentUserId, DbType.Guid);
-            parameters.Add("Id", userId, DbType.Guid);
-
-            using (var connection = CreateConnection())
+            try
             {
-                return await connection.ExecuteAsync(query, parameters);
+                var query = "UPDATE [User] "
+                        + "     SET "
+                        + "         Email = ISNULL(@Email, Email), "
+                        + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
+                        + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
+                        + "     WHERE "
+                        + "         Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Email", email, DbType.String);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateBy", currentUserId, DbType.Guid);
+                parameters.Add("Id", userId, DbType.Guid);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
+            }catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
             }
+
         }
 
         public async Task<int> DeleteUserByBusinessId(Guid businessId)
@@ -913,6 +946,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
