@@ -22,9 +22,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IBusinessFieldRepository _businessFieldRepository;
         private readonly IFieldRepository _fieldRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IProjectRepository _projectRepository;
 
         private readonly IValidationService _validationService;
         private readonly IFileUploadService _fileUploadService;
+        private readonly IProjectService _projectService;
         private readonly IMapper _mapper;
 
         public BusinessService(IBusinessRepository businessRepository, 
@@ -32,15 +34,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IValidationService validationService, 
             IUserRepository userRepository,
             IFieldRepository fieldRepository,
+            IProjectRepository projectRepository,
             IFileUploadService fileUploadService,
+            IProjectService projectService,
             IMapper mapper)
         {
             _businessRepository = businessRepository;
             _businessFieldRepository = businessFieldRepository;
             _fieldRepository = fieldRepository;
             _userRepository = userRepository;
+            _projectRepository = projectRepository;
+
             _validationService = validationService;
             _fileUploadService = fileUploadService;
+            _projectService = projectService;
+
             _mapper = mapper;
         }
 
@@ -117,11 +125,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         if (await _businessFieldRepository.CreateBusinessField(Guid.Parse(newId.id), Guid.Parse(fieldId), Guid.Parse(currentUser.userId)) == 0)//ráp authen sửa createBy và updateBy
                         {
                             //Xóa các object BusinessField vừa mới tạo
-                            _businessFieldRepository.DeleteBusinessFieldByBusinessId(Guid.Parse(newId.id));
+                            await _businessFieldRepository.DeleteBusinessFieldByBusinessId(Guid.Parse(newId.id));
                             //Xóa object Business vừa mới tạo
-                            _businessRepository.DeleteBusinessByBusinessId(Guid.Parse(newId.id));
+                            await _businessRepository.DeleteBusinessByBusinessId(Guid.Parse(newId.id));
                             //Update businessId của BuM lại thành null
-                            _userRepository.UpdateBusinessIdForBuM(null, Guid.Parse(currentUser.userId));
+                            await _userRepository.UpdateBusinessIdForBuM(null, Guid.Parse(currentUser.userId));
                             throw new CreateObjectException("Can not create BusinessField Object has businessId: " + newId.id + " and fieldId: " + fieldId + " ! Create Business object failed!");
                         }                           
                     }
@@ -145,7 +153,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (business != null)
                 {
                     if (business.Status.Equals(BusinessStatusEnum.INACTIVE.ToString()))
-                        result = await _businessRepository.DeleteBusinessById(businessId, Guid.Parse(currentUser.userId));
+                    {
+                        List<Project> projectList = await _projectRepository.GetAllProjects(0, 0, businessId.ToString(), null, null , null, null, null, currentUser.roleId);
+                        foreach (Project item in projectList)
+                        {
+                            await _projectService.DeleteProjectById(businessId);
+                        }
+                        await _userRepository.DeleteUserByBusinessId(businessId);
+                        await _businessFieldRepository.DeleteBusinessFieldByBusinessId(businessId);
+                        result = await _businessRepository.DeleteBusinessById(businessId);
+                    }                       
                 }
              
                 if (result == 0)
@@ -421,6 +438,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
+        //GET BY PROJECT ID
         public async Task<Data.Models.Entities.Business> GetBusinessByProjectId(Guid projectId)
         {
             try

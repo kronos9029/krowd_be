@@ -22,7 +22,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class GetInvestmentDTO : InvestmentDTO
     {
         public string id { get; set; }
-        public float totalPrice { get; set; }
+        public double totalPrice { get; set; }
         public string status { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }

@@ -61,7 +61,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
                 parameters.Add("CreateBy", projectEntityDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", projectEntityDTO.UpdateBy, DbType.Guid);
+                parameters.Add("UpdateBy", projectEntityDTO.CreateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
@@ -429,6 +429,26 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<int> DeleteProjectEntityByProjectId(Guid projectId)
+        {
+            try
+            {
+                var query = "DELETE FROM "
+                    + "         ProjectEntity "
+                    + "     WHERE "
+                    + "         ProjectId = @ProjectId ";
+                using var connection = CreateConnection();
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

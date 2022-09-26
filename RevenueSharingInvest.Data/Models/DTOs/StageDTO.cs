@@ -22,9 +22,9 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class UpdateStageDTO : StageDTO
     {
         public string description { get; set; }
-        public float pessimisticExpectedAmount { get; set; }
-        public float normalExpectedAmount { get; set; }
-        public float optimisticExpectedAmount { get; set; }
+        public double pessimisticExpectedAmount { get; set; }
+        public double normalExpectedAmount { get; set; }
+        public double optimisticExpectedAmount { get; set; }
         public float pessimisticExpectedRatio { get; set; }
         public float normalExpectedRatio { get; set; }
         public float optimisticExpectedRatio { get; set; }
@@ -43,9 +43,9 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string updateDate { get; set; }
         public string updateBy { get; set; }
         public bool isDeleted { get; set; }
-        public float pessimisticExpectedAmount { get; set; }
-        public float normalExpectedAmount { get; set; }
-        public float optimisticExpectedAmount { get; set; }
+        public double pessimisticExpectedAmount { get; set; }
+        public double normalExpectedAmount { get; set; }
+        public double optimisticExpectedAmount { get; set; }
         public float pessimisticExpectedRatio { get; set; }
         public float normalExpectedRatio { get; set; }
         public float optimisticExpectedRatio { get; set; }

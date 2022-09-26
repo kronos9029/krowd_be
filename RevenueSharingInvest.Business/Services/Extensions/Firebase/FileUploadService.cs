@@ -166,7 +166,42 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
                     urls.Add(url);
 
                 }
-            } else if (request.entityName.ToLower().Equals(StoragePathEnum.ProjectEntity.ToString().ToLower()))
+            }
+            else if (request.entityName.ToLower().Equals(StoragePathEnum.ProjectEntity.ToString().ToLower()) && request.type.Equals("PRESS", StringComparison.InvariantCultureIgnoreCase))
+            {
+                foreach (var file in request.files)
+                {
+                    string newGuid = Guid.NewGuid().ToString();
+
+                    string[] type = file.ContentType.Split("/");
+
+                    if (type[0].ToLower().Equals(CategoryEnum.Image.ToString().ToLower()))
+                    {
+                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + CategoryEnum.Image + "/" + newGuid;
+                    }
+                    else if (type[0].ToLower().Equals(CategoryEnum.Video.ToString().ToLower()))
+                    {
+                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + CategoryEnum.Video + "/" + newGuid;
+                    }
+                    else if (type[0].ToLower().Equals(CategoryEnum.Application.ToString().ToLower()))
+                    {
+                        path = StoragePathEnum.Project.ToString() + "/" + request.entityId + "/" + StoragePathEnum.ProjectEntity.ToString() + "/" + CategoryEnum.Application + "/" + newGuid;
+                    }
+
+                    string url = await uploadTask.Child(path).PutAsync(file.OpenReadStream());
+
+                    ProjectEntity projectEntity = ParseToProjectentity(request, Guid.Parse(newGuid), url);
+
+                    string insertPE = await _projectEntityRepository.CreateProjectEntity(projectEntity);
+                    if (insertPE == null)
+                    {
+                        throw new CreateProjectEntityException("Can Not Create Project Entity!!");
+                    }
+
+                    urls.Add(url);
+
+                }
+            } else if (request.entityName.ToLower().Equals(StoragePathEnum.ProjectEntity.ToString().ToLower()) && !request.type.Equals("PRESS", StringComparison.InvariantCultureIgnoreCase))
             {
                 foreach(var file in request.files)
                 {
@@ -229,42 +264,6 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
 
                 }
             }
-/*
-            foreach (var file in request.files)
-            {
-                
-                string newGuid = Guid.NewGuid().ToString();
-
-                string[] type = file.ContentType.Split("/");
-
-                if (type[0].ToLower().Equals(CategoryEnum.Images.ToString().ToLower()))
-                {
-                    string url = await uploadTask.Child(StoragePathEnum.ProjectEntity.ToString())
-                                                 .Child(request.entityId)
-                                                 .Child(CategoryEnum.Images.ToString())
-                                                 .Child(newGuid)
-                                                 .PutAsync(file.OpenReadStream());
-                    urls.Add(newGuid, url);
-                } else if (type[0].ToLower().Equals(CategoryEnum.Videos.ToString().ToLower()))
-                {
-                    string url = await uploadTask.Child(StoragePathEnum.ProjectEntity.ToString())
-                                                 .Child(request.entityId)
-                                                 .Child(CategoryEnum.Videos.ToString())
-                                                 .Child(newGuid)
-                                                 .PutAsync(file.OpenReadStream());
-                    urls.Add(newGuid, url);
-                } else if (type[0].ToLower().Equals(CategoryEnum.Applications.ToString().ToLower()))
-                {
-                    string url = await uploadTask.Child(StoragePathEnum.ProjectEntity.ToString())
-                                                 .Child(request.entityId)
-                                                 .Child(CategoryEnum.Applications.ToString())
-                                                 .Child(newGuid)
-                                                 .PutAsync(file.OpenReadStream());
-                    urls.Add(newGuid, url);
-                }
-
-                
-            }*/
 
 
 

@@ -29,6 +29,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IProjectEntityRepository _projectEntityRepository;
         private readonly IStageRepository _stageRepository;
         private readonly IPeriodRevenueRepository _periodRevenueRepository;
+        private readonly IPeriodRevenueHistoryRepository _periodRevenueHistoryRepository;
+        private readonly IPackageRepository _packageRepository;
         private readonly IProjectWalletRepository _projectWalletRepository;
 
         private readonly IValidationService _validationService;
@@ -46,6 +48,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IProjectEntityRepository projectEntityRepository,
             IStageRepository stageRepository,
             IPeriodRevenueRepository periodRevenueRepository,
+            IPeriodRevenueHistoryRepository periodRevenueHistoryRepository,
+            IPackageRepository packageRepository,
             IProjectWalletRepository projectWalletRepository,
             IValidationService validationService,
             IProjectTagService projectTagService,
@@ -61,6 +65,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _projectEntityRepository = projectEntityRepository;
             _stageRepository = stageRepository;
             _periodRevenueRepository = periodRevenueRepository;
+            _periodRevenueHistoryRepository = periodRevenueHistoryRepository;
+            _packageRepository = packageRepository;
             _projectWalletRepository = projectWalletRepository;
 
             _validationService = validationService;
@@ -433,7 +439,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     for (int i = 1; i <= projectDTO.numOfStage - 1; i++)
                     {
-                        stage.Name = projectDTO.name + " giai đoạn " + i;
+                        stage.Name = " Kỳ " + i;
                         newStageId = await _stageRepository.CreateStage(stage);
                         periodRevenue.StageId = Guid.Parse(newStageId);
                         newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
@@ -441,15 +447,61 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         stage.EndDate = stage.EndDate.AddDays(daysPerStage);
                         
                     }
-                    stage.Name = projectDTO.name + " giai đoạn " + projectDTO.numOfStage;
+                    stage.Name = " Kỳ " + projectDTO.numOfStage;
                     stage.EndDate = stage.EndDate.AddDays(modDays);
                     newStageId = await _stageRepository.CreateStage(stage);
                     periodRevenue.StageId = Guid.Parse(newStageId);
                     newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
 
-                    //Tạo ví B2, B3
-                    await _projectWalletRepository.CreateProjectWallet(Guid.Parse(currentUser.userId), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B2")), Guid.Parse(currentUser.userId));
-                    await _projectWalletRepository.CreateProjectWallet(Guid.Parse(currentUser.userId), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")), Guid.Parse(currentUser.userId));
+                    ////Tạo ví B2, B3
+                    //await _projectWalletRepository.CreateProjectWallet(Guid.Parse(currentUser.userId), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B2")), Guid.Parse(currentUser.userId));
+                    //await _projectWalletRepository.CreateProjectWallet(Guid.Parse(currentUser.userId), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")), Guid.Parse(currentUser.userId));
+
+                    //Tạo EXTENSION ProjectEntity
+                    User user = await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId));
+                    Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(entity.BusinessId);
+
+                    ProjectEntity extension = new ProjectEntity();
+
+                    extension.ProjectId = Guid.Parse(newId.id);
+                    extension.Type = ProjectEntityEnum.EXTENSION.ToString();
+                    extension.CreateBy = Guid.Parse(currentUser.userId);
+                    extension.Title = "Doanh nghiệp";
+                    extension.Content = business.Name;
+                    extension.Description = "Email: " + business.Email;
+                    extension.Priority = 1;
+                    await _projectEntityRepository.CreateProjectEntity(extension);
+                    extension.Title = "Chủ dự án";
+                    extension.Content = user.FirstName + " " + user.LastName;
+                    extension.Description = "Liên hệ: " + user.PhoneNum;
+                    extension.Priority = 2;
+                    await _projectEntityRepository.CreateProjectEntity(extension);
+                    extension.Title = "Ngày kết thúc gọi vốn";
+                    extension.Content = (await _validationService.FormatDateOutput(projectDTO.endDate)).Remove(projectDTO.endDate.Length - 8);
+                    extension.Description = "";
+                    extension.Priority = 3;
+                    await _projectEntityRepository.CreateProjectEntity(extension);
+                    extension.Title = "Ngày dự đoán đóng dự án";
+                    extension.Content = (await _validationService.FormatDateOutput(stage.EndDate.ToString())).Remove(projectDTO.endDate.Length - 8);
+                    extension.Description = "";
+                    extension.Priority = 4;
+                    await _projectEntityRepository.CreateProjectEntity(extension);
+
+                    //Tạo ABOUT ProjectEntity
+                    ProjectEntity about = new ProjectEntity();
+
+                    about.ProjectId = Guid.Parse(newId.id);
+                    about.Type = ProjectEntityEnum.ABOUT.ToString();
+                    about.CreateBy = Guid.Parse(currentUser.userId);
+                    about.Title = "Facebook";
+                    about.Priority = 1;
+                    await _projectEntityRepository.CreateProjectEntity(about);
+                    about.Title = "YouTube";
+                    about.Priority = 2;
+                    await _projectEntityRepository.CreateProjectEntity(about);
+                    about.Title = "Instagram";
+                    about.Priority = 3;
+                    await _projectEntityRepository.CreateProjectEntity(about);
 
                     //Update NumOfProject
                     await _businessRepository.UpdateBusinessNumOfProject(Guid.Parse(currentUser.businessId));
@@ -470,7 +522,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-
+                //Xóa PeriodRevenueHistory
+                await _periodRevenueHistoryRepository.DeletePeriodRevenueHistoryByProjectId(projectId);
+                //Xóa PeriodRevenue
+                await _periodRevenueRepository.DeletePeriodRevenueByProjectId(projectId);
+                //Xóa Stage
+                await _stageRepository.DeleteStageByProjectId(projectId);
+                //Xóa ProjectEntity
+                await _projectEntityRepository.DeleteProjectEntityByProjectId(projectId);
+                //Xóa Package
+                await _packageRepository.DeletePackageByProjectId(projectId);
+                //Xóa ProjectWallet
+                await _projectWalletRepository.DeleteProjectWalletByProjectId(projectId);
+                //Xóa Project
                 result = await _projectRepository.DeleteProjectById(projectId);
                 if (result == 0)
                     throw new CreateObjectException("Can not delete Project Object!");
@@ -913,25 +977,26 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
 
                 //Update [Stage] and [PeriodRevenue]
-                if (projectDTO.duration != 0)
-                {
-                    if (projectDTO.duration <= 0)
-                        throw new InvalidFieldException("duration must be greater than 0!!!");
-                }
-                else
-                    projectDTO.duration = getProject.duration;
-
-
-                if (projectDTO.numOfStage != 0)
-                {
-                    if (projectDTO.numOfStage <= 0)
-                        throw new InvalidFieldException("numOfStage must be greater than 0!!!");
-                }
-                else
-                    projectDTO.numOfStage = getProject.numOfStage;
 
                 if (projectDTO.duration != 0 || projectDTO.numOfStage != 0 || projectDTO.startDate != null || projectDTO.endDate != null)
                 {
+                    if (projectDTO.duration != 0)
+                    {
+                        if (projectDTO.duration <= 0)
+                            throw new InvalidFieldException("duration must be greater than 0!!!");
+                    }
+                    else
+                        projectDTO.duration = getProject.duration;
+
+
+                    if (projectDTO.numOfStage != 0)
+                    {
+                        if (projectDTO.numOfStage <= 0)
+                            throw new InvalidFieldException("numOfStage must be greater than 0!!!");
+                    }
+                    else
+                        projectDTO.numOfStage = getProject.numOfStage;
+
                     if (projectDTO.startDate != null && projectDTO.endDate != null)
                     {
                         if ((DateAndTime.DateDiff(DateInterval.Day, DateTime.ParseExact(projectDTO.startDate, "dd/MM/yyyy HH:mm:ss", null), DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null))) < 0)
@@ -977,7 +1042,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     int daysPerStage = ((int)totalDay) / projectDTO.numOfStage;
                     int modDays = ((int)totalDay) - (daysPerStage * projectDTO.numOfStage);
 
-                    projectDTO.name = getProject.name;
+                    //projectDTO.name = getProject.name;
                     projectDTO.startDate = await _validationService.FormatDateInput(projectDTO.startDate);
                     projectDTO.endDate = await _validationService.FormatDateInput(projectDTO.endDate);
 
@@ -1000,7 +1065,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     for (int i = 1; i <= projectDTO.numOfStage - 1; i++)
                     {
-                        stage.Name = projectDTO.name + " giai đoạn " + i;
+                        stage.Name = " Kỳ " + i;
                         newStageId = await _stageRepository.CreateStage(stage);
                         periodRevenue.StageId = Guid.Parse(newStageId);
                         newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
@@ -1008,7 +1073,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         stage.EndDate = stage.EndDate.AddDays(daysPerStage);
 
                     }
-                    stage.Name = projectDTO.name + " giai đoạn " + projectDTO.numOfStage;
+                    stage.Name = " Kỳ " + projectDTO.numOfStage;
                     stage.EndDate = stage.EndDate.AddDays(modDays);
                     newStageId = await _stageRepository.CreateStage(stage);
                     periodRevenue.StageId = Guid.Parse(newStageId);
@@ -1017,8 +1082,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
                 else
                 {
-                    projectDTO.startDate = null;
-                    projectDTO.endDate = null;
+                    if (projectDTO.duration != 0)
+                    {
+                        if (projectDTO.duration <= 0)
+                            throw new InvalidFieldException("duration must be greater than 0!!!");
+                    }
+                    else
+                        projectDTO.duration = getProject.duration;
+
+
+                    if (projectDTO.numOfStage != 0)
+                    {
+                        if (projectDTO.numOfStage <= 0)
+                            throw new InvalidFieldException("numOfStage must be greater than 0!!!");
+                    }
+                    else
+                        projectDTO.numOfStage = getProject.numOfStage;
+                    projectDTO.startDate = getProject.startDate;
+                    projectDTO.endDate = getProject.endDate;
                     project = _mapper.Map<Project>(projectDTO);
                 }                
 
@@ -1106,8 +1187,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             try
             {
-                result.numOfProject = await _projectRepository.CountInvestedProjects(Guid.Parse(thisUserObj.roleId));
-                listEntity = await _projectRepository.GetInvestedProjects(pageIndex, pageSize, Guid.Parse(thisUserObj.roleId));
+                result.numOfProject = await _projectRepository.CountInvestedProjects(Guid.Parse(thisUserObj.investorId));
+                listEntity = await _projectRepository.GetInvestedProjects(pageIndex, pageSize, Guid.Parse(thisUserObj.investorId));
 
                 List<GetProjectDTO> listDTO = _mapper.Map<List<GetProjectDTO>>(listEntity);
 

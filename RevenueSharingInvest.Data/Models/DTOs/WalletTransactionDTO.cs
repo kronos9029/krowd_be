@@ -14,7 +14,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string systemWalletId { get; set; }
         public string projectWalletId { get; set; }
         public string investorWalletId { get; set; }
-        public float amount { get; set; }       
+        public double amount { get; set; }       
         public string description { get; set; }
         public string type { get; set; }
         public string fromWalletId { get; set; }

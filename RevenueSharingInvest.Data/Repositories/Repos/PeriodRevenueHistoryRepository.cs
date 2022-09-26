@@ -66,22 +66,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeletePeriodRevenueHistoryById(Guid periodRevenueHistoryId)//thiếu para UpdateBy
+        public async Task<int> DeletePeriodRevenueHistoryByProjectId(Guid projectIdId)
         {
             try
             {
-                var query = "UPDATE PeriodRevenueHistory "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
+                var query = "DELETE FROM PeriodRevenueHistory "
                     + "     WHERE "
-                    + "         Id=@Id";
+                    + "         Id IN  "
+                    + "         (SELECT " 
+                    + "             PH.Id " 
+                    + "         FROM " 
+                    + "             PeriodRevenueHistory PH " 
+                    + "             JOIN PeriodRevenue P ON PH.PeriodRevenueId = P.Id " 
+                    + "         WHERE " 
+                    + "             P.ProjectId = @ProjectId)";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", periodRevenueHistoryDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", periodRevenueHistoryId, DbType.Guid);
+                parameters.Add("ProjectId", projectIdId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }

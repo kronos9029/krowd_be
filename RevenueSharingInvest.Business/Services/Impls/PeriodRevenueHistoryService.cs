@@ -93,21 +93,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //DELETE
-        public async Task<int> DeletePeriodRevenueHistoryById(Guid periodRevenueHistoryId)
-        {
-            int result;
-            try
-            {
-                result = await _periodRevenueHistoryRepository.DeletePeriodRevenueHistoryById(periodRevenueHistoryId);
-                if (result == 0)
-                    throw new DeleteObjectException("Can not delete PeriodRevenueHistory Object!");
-                return result;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
+        //public async Task<int> DeletePeriodRevenueHistoryById(Guid periodRevenueHistoryId)
+        //{
+        //    int result;
+        //    try
+        //    {
+        //        result = await _periodRevenueHistoryRepository.DeletePeriodRevenueHistoryById(periodRevenueHistoryId);
+        //        if (result == 0)
+        //            throw new DeleteObjectException("Can not delete PeriodRevenueHistory Object!");
+        //        return result;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new Exception(e.Message);
+        //    }
+        //}
 
         //GET ALL
         public async Task<List<PeriodRevenueHistoryDTO>> GetAllPeriodRevenueHistories(int pageIndex, int pageSize)

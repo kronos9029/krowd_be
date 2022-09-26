@@ -95,6 +95,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 foreach (GetStageDTO item in list)
                 {
+                    item.startDate = await _validationService.FormatDateOutput(item.startDate);
+                    item.endDate = await _validationService.FormatDateOutput(item.endDate);
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
 
@@ -149,6 +151,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 PeriodRevenue periodRevenue = new PeriodRevenue();
 
+                result.startDate = await _validationService.FormatDateOutput(result.startDate);
+                result.endDate = await _validationService.FormatDateOutput(result.endDate);
                 result.createDate = await _validationService.FormatDateOutput(result.createDate);
                 result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
                 periodRevenue = await _periodRevenueRepository.GetPeriodRevenueByStageId(Guid.Parse(result.id));
@@ -188,32 +192,35 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 Project project = await _projectRepository.GetProjectById(projectId);
 
-                if (!project.ManagerId.ToString().Equals(currentUser.userId))
+                if (currentUser.roleId.Equals(currentUser.businessManagerRoleId) && !project.BusinessId.ToString().Equals(currentUser.businessId))
+                    throw new InvalidFieldException("The project has this projectId is not belong to your Business!!!");
+
+                if (currentUser.roleId.Equals(currentUser.projectManagerRoleId) && !project.ManagerId.ToString().Equals(currentUser.userId))
                     throw new InvalidFieldException("This projectId is not belong to your Project!!!");
 
-                ammountChart.chartName = "PeriodRevenue_Ammount_Chart";
+                ammountChart.chartName = "Biểu đồ số tiền doanh thu từng kỳ";
                 ammountChart.lineList = new List<StageLineDTO>();
                 StageLineDTO OEA = new StageLineDTO();
-                OEA.name = "Optimistic_Expected_Amount";
-                OEA.data = new List<float>();
+                OEA.name = "Số tiền mong đợi lạc quan";
+                OEA.data = new List<double>();
                 StageLineDTO NEA = new StageLineDTO();
-                NEA.name = "Normal_Expected_Amount";
-                NEA.data = new List<float>();
+                NEA.name = "Số tiền mong đợi";
+                NEA.data = new List<double>();
                 StageLineDTO PEA = new StageLineDTO();
-                PEA.name = "Pessimistic_Expected_Amount";
-                PEA.data = new List<float>();
+                PEA.name = "Số tiền mong đợi bi quan";
+                PEA.data = new List<double>();
 
-                ratioChart.chartName = "PeriodRevenue_Ratio_Chart";
+                ratioChart.chartName = "Biểu đồ tỷ lệ doanh thu từng kỳ";
                 ratioChart.lineList = new List<StageLineDTO>();
                 StageLineDTO OER = new StageLineDTO();
-                OER.name = "Optimistic_Expected_Ratio";
-                OER.data = new List<float>();
+                OER.name = "Tỷ lệ mong đợi lạc quan";
+                OER.data = new List<double>();
                 StageLineDTO NER = new StageLineDTO();
-                NER.name = "Normal_Expected_Ratio";
-                NER.data = new List<float>();
+                NER.name = "Tỷ lệ mong đợi";
+                NER.data = new List<double>();
                 StageLineDTO PER = new StageLineDTO();
-                PER.name = "Pessimistic_Expected_Ratio";
-                PER.data = new List<float>();
+                PER.name = "Tỷ lệ mong đợi bi quan";
+                PER.data = new List<double>();
 
                 List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0);
                 List<GetStageDTO> list = _mapper.Map<List<GetStageDTO>>(stageList);
@@ -221,6 +228,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 foreach (GetStageDTO item in list)
                 {
+                    item.startDate = await _validationService.FormatDateOutput(item.startDate);
+                    item.endDate = await _validationService.FormatDateOutput(item.endDate);
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
 
@@ -295,7 +304,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     || stageDTO.normalExpectedRatio != 0
                     || stageDTO.optimisticExpectedRatio != 0)
                 {
-                    float[] periodRevenueInput = { stageDTO.pessimisticExpectedAmount, stageDTO.normalExpectedAmount, stageDTO.optimisticExpectedAmount, stageDTO.pessimisticExpectedRatio, stageDTO.normalExpectedRatio, stageDTO.optimisticExpectedAmount };
+                    double[] periodRevenueInput = { stageDTO.pessimisticExpectedAmount, stageDTO.normalExpectedAmount, stageDTO.optimisticExpectedAmount, stageDTO.pessimisticExpectedRatio, stageDTO.normalExpectedRatio, stageDTO.optimisticExpectedAmount };
                     foreach (float item in periodRevenueInput)
                     {
                         if (item == 0)

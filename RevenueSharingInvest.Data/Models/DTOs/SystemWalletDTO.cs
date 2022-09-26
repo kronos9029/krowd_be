@@ -9,7 +9,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class SystemWalletDTO
     {
         public string id { get; set; }
-        public float balance { get; set; }
+        public double balance { get; set; }
         public string walletTypeId { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }

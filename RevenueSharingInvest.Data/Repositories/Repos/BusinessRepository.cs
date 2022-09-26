@@ -81,21 +81,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteBusinessById(Guid businesssId, Guid deleteUserId)
+        public async Task<int> DeleteBusinessById(Guid businesssId)
         {
             try
             {
-                var query = "UPDATE Business "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
+                var query = "DELETE FROM Business "
                     + "     WHERE "
-                    + "         Id=@Id";
+                    + "         Id = @Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                parameters.Add("UpdateBy", deleteUserId, DbType.Guid);
                 parameters.Add("Id", businesssId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
@@ -387,7 +381,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE BY BUSINESSID
-        public async void DeleteBusinessByBusinessId(Guid businessId)
+        public async Task<int> DeleteBusinessByBusinessId(Guid businessId)
         {
             try
             {
@@ -395,7 +389,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", businessId, DbType.Guid);
                 using var connection = CreateConnection();
-                await connection.ExecuteAsync(query, parameters);
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
             {

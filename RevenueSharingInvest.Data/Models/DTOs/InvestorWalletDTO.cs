@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     {
         public string id { get; set; }
         public string investorId { get; set; }
-        public float balance { get; set; }        
+        public double balance { get; set; }        
         public string createDate { get; set; }
         public string createBy { get; set; }
         public string updateDate { get; set; }

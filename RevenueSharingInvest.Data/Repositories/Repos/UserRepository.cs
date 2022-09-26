@@ -897,5 +897,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 return await connection.ExecuteAsync(query, parameters);
             }
         }
+
+        public async Task<int> DeleteUserByBusinessId(Guid businessId)
+        {
+            try
+            {
+                var query = "DELETE FROM [User] "
+                    + "     WHERE "
+                    + "         BusinessId = @BusinessId";
+                using var connection = CreateConnection();
+                var parameters = new DynamicParameters();
+                parameters.Add("BusinessId", businessId, DbType.Guid);
+
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

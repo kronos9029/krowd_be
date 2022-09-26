@@ -201,7 +201,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public async void DeleteBusinessFieldByBusinessId(Guid businessId)
+        public async Task<int> DeleteBusinessFieldByBusinessId(Guid businessId)
         {
             try
             {
@@ -209,7 +209,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("BusinessId", businessId, DbType.Guid);
                 using var connection = CreateConnection();
-                await connection.ExecuteAsync(query, parameters);
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
             {

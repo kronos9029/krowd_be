@@ -98,6 +98,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 ProjectEntity entity = _mapper.Map<ProjectEntity>(projectEntityDTO);
 
+                if (entity.Type.Equals(ProjectEntityEnum.HIGHLIGHT.ToString()))
+                    entity.Title = "List";
                 entity.Priority = (await _projectEntityRepository.CountProjectEntityByProjectIdAndType(entity.ProjectId, entity.Type)) + 1;
                 entity.CreateBy = Guid.Parse(currentUser.userId);
                 entity.UpdateBy = Guid.Parse(currentUser.userId);
@@ -184,8 +186,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 foreach (GetProjectEntityDTO item in list)
                 {
-                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
-                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                    item.createDate = item.createDate == null ? null : await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = item.updateDate == null ? null : await _validationService.FormatDateOutput(item.updateDate);
                 }
 
                 return list;
@@ -223,8 +225,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (result == null)
                     throw new NotFoundException("No ProjectEntity Object Found!");
 
-                result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+                result.createDate = result.createDate == null ? null : await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = result.updateDate == null ? null : await _validationService.FormatDateOutput(result.updateDate);
 
                 return result;
             }

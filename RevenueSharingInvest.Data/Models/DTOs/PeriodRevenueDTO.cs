@@ -8,10 +8,10 @@ namespace RevenueSharingInvest.Data.Models.DTOs
 {
     public class PeriodRevenueDTO
     {
-        public float actualAmount { get; set; }
-        public float pessimisticExpectedAmount { get; set; }
-        public float normalExpectedAmount { get; set; }
-        public float optimisticExpectedAmount { get; set; }
+        public double actualAmount { get; set; }
+        public double pessimisticExpectedAmount { get; set; }
+        public double normalExpectedAmount { get; set; }
+        public double optimisticExpectedAmount { get; set; }
         public float pessimisticExpectedRatio { get; set; }
         public float normalExpectedRatio { get; set; }
         public float optimisticExpectedRatio { get; set; }

@@ -129,7 +129,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     dto = _mapper.Map<GetInvestorWalletDTO>(item);
                     dto.walletType = _mapper.Map<GetWalletTypeForWalletDTO>(await _walletTypeRepository.GetWalletTypeById(Guid.Parse(item.walletTypeId)));
 
-                    result.totalAsset += item.balance;
+                    result.totalAsset += (float)item.balance;
                     result.listOfInvestorWallet.Add(dto);
                 }
                 return result;
