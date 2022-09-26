@@ -111,17 +111,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "UPDATE Project "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
+                var query = "DELETE FROM Project "
                     + "     WHERE "
-                    + "         Id=@Id";
+                    + "         Id = @Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", projectId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);

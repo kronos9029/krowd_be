@@ -23,6 +23,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IFieldRepository _fieldRepository;
         private readonly IUserRepository _userRepository;
         private readonly IProjectRepository _projectRepository;
+        private readonly IProjectWalletRepository _projectWalletRepository;
 
         private readonly IValidationService _validationService;
         private readonly IFileUploadService _fileUploadService;
@@ -35,6 +36,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IUserRepository userRepository,
             IFieldRepository fieldRepository,
             IProjectRepository projectRepository,
+            IProjectWalletRepository projectWalletRepository,
             IFileUploadService fileUploadService,
             IProjectService projectService,
             IMapper mapper)
@@ -44,6 +46,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _fieldRepository = fieldRepository;
             _userRepository = userRepository;
             _projectRepository = projectRepository;
+            _projectWalletRepository = projectWalletRepository;
 
             _validationService = validationService;
             _fileUploadService = fileUploadService;
@@ -157,8 +160,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         List<Project> projectList = await _projectRepository.GetAllProjects(0, 0, businessId.ToString(), null, null , null, null, null, currentUser.roleId);
                         foreach (Project item in projectList)
                         {
-                            await _projectService.DeleteProjectById(businessId);
-                        }
+                            await _projectService.DeleteProjectById(item.Id);
+                            await _projectWalletRepository.DeleteProjectWalletByProjectManagerId(item.ManagerId);
+                        }                       
                         await _userRepository.DeleteUserByBusinessId(businessId);
                         await _businessFieldRepository.DeleteBusinessFieldByBusinessId(businessId);
                         result = await _businessRepository.DeleteBusinessById(businessId);
