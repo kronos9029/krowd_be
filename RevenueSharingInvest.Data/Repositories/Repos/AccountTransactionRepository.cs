@@ -88,6 +88,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("ExtraData", accountTransactionDTO.ExtraData, DbType.String);
                 parameters.Add("Signature", accountTransactionDTO.Signature, DbType.String);
                 parameters.Add("CreateDate", DateTime.UtcNow, DbType.DateTime);
+                parameters.Add("Type", accountTransactionDTO.Type, DbType.String);
 
 
                 using var connection = CreateConnection();
