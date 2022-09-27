@@ -31,9 +31,9 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class UpdateProjectDTO : ProjectDTO
     {
         public IFormFile image { get; set; }
-        public string managerId { get; set; }
-        public string fieldId { get; set; }
-        public string areaId { get; set; }
+        //public string managerId { get; set; }
+        //public string fieldId { get; set; }
+        //public string areaId { get; set; }
         public int numOfStage { get; set; }
         public string businessLicense { get; set; }
     }

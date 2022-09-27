@@ -908,41 +908,41 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 GetProjectDTO getProject = _mapper.Map<GetProjectDTO>(await _projectRepository.GetProjectById(projectId));
                 Project project = new Project();
 
-                if (projectDTO.managerId != null)
-                {
-                    if (!await _validationService.CheckUUIDFormat(projectDTO.managerId))
-                        throw new InvalidFieldException("Invalid managerId!!!");
+                //if (projectDTO.managerId != null)
+                //{
+                //    if (!await _validationService.CheckUUIDFormat(projectDTO.managerId))
+                //        throw new InvalidFieldException("Invalid managerId!!!");
 
-                    if (!await _validationService.CheckExistenceUserWithRole(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"), Guid.Parse(projectDTO.managerId)))
-                        throw new NotFoundException("This ManagerId is not existed!!!");
+                //    if (!await _validationService.CheckExistenceUserWithRole(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"), Guid.Parse(projectDTO.managerId)))
+                //        throw new NotFoundException("This ManagerId is not existed!!!");
 
-                    if (!await _validationService.CheckManagerOfBusiness(Guid.Parse(projectDTO.managerId), Guid.Parse(currentUser.businessId)))
-                        throw new InvalidFieldException("This manager does not belong to this business!!!");
+                //    if (!await _validationService.CheckManagerOfBusiness(Guid.Parse(projectDTO.managerId), Guid.Parse(currentUser.businessId)))
+                //        throw new InvalidFieldException("This manager does not belong to this business!!!");
 
-                    if (!(await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId))).Status.Equals(ObjectStatusEnum.ACTIVE.ToString()))
-                        throw new InvalidFieldException("This PROJECT_MANAGER's status must be ACTIVE!!!");
-                }
+                //    if (!(await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId))).Status.Equals(ObjectStatusEnum.ACTIVE.ToString()))
+                //        throw new InvalidFieldException("This PROJECT_MANAGER's status must be ACTIVE!!!");
+                //}
 
-                if (projectDTO.fieldId != null)
-                {
-                    if (!await _validationService.CheckUUIDFormat(projectDTO.fieldId))
-                        throw new InvalidFieldException("Invalid fieldId!!!");
+                //if (projectDTO.fieldId != null)
+                //{
+                //    if (!await _validationService.CheckUUIDFormat(projectDTO.fieldId))
+                //        throw new InvalidFieldException("Invalid fieldId!!!");
 
-                    if (!await _validationService.CheckExistenceId("Field", Guid.Parse(projectDTO.fieldId)))
-                        throw new NotFoundException("This fieldId is not existed!!!");
+                //    if (!await _validationService.CheckExistenceId("Field", Guid.Parse(projectDTO.fieldId)))
+                //        throw new NotFoundException("This fieldId is not existed!!!");
 
-                    if (!await _validationService.CheckProjectFieldInBusinessField(Guid.Parse(currentUser.businessId), Guid.Parse(projectDTO.fieldId)))
-                        throw new InvalidFieldException("This fieldId is not suitable with this business!!!");
-                }
+                //    if (!await _validationService.CheckProjectFieldInBusinessField(Guid.Parse(currentUser.businessId), Guid.Parse(projectDTO.fieldId)))
+                //        throw new InvalidFieldException("This fieldId is not suitable with this business!!!");
+                //}
                 
-                if (projectDTO.areaId != null)
-                {
-                    if (!await _validationService.CheckUUIDFormat(projectDTO.areaId))
-                        throw new InvalidFieldException("Invalid areaId!!!");
+                //if (projectDTO.areaId != null)
+                //{
+                //    if (!await _validationService.CheckUUIDFormat(projectDTO.areaId))
+                //        throw new InvalidFieldException("Invalid areaId!!!");
 
-                    if (!await _validationService.CheckExistenceId("Area", Guid.Parse(projectDTO.areaId)))
-                        throw new NotFoundException("This areaId is not existed!!!");
-                }
+                //    if (!await _validationService.CheckExistenceId("Area", Guid.Parse(projectDTO.areaId)))
+                //        throw new NotFoundException("This areaId is not existed!!!");
+                //}
 
                 if (projectDTO.name != null)
                 {

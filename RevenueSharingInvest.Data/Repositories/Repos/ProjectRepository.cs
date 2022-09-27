@@ -449,9 +449,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE Project "
                     + "     SET "
-                    + "         ManagerId = ISNULL(@ManagerId, ManagerId), "
-                    + "         FieldId = ISNULL(@FieldId, FieldId), "
-                    + "         AreaId = ISNULL(@AreaId, AreaId), "
+                    //+ "         ManagerId = ISNULL(@ManagerId, ManagerId), "
+                    //+ "         FieldId = ISNULL(@FieldId, FieldId), "
+                    //+ "         AreaId = ISNULL(@AreaId, AreaId), "
                     + "         Name = ISNULL(@Name, Name), "
                     + "         Image = ISNULL(@Image, Image), "
                     + "         Description = ISNULL(@Description, Description), "
@@ -471,9 +471,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("ManagerId", projectDTO.ManagerId, DbType.Guid);
-                parameters.Add("FieldId", projectDTO.FieldId, DbType.Guid);
-                parameters.Add("AreaId", projectDTO.AreaId, DbType.Guid);
+                //parameters.Add("ManagerId", projectDTO.ManagerId, DbType.Guid);
+                //parameters.Add("FieldId", projectDTO.FieldId, DbType.Guid);
+                //parameters.Add("AreaId", projectDTO.AreaId, DbType.Guid);
                 parameters.Add("Name", projectDTO.Name, DbType.String);
                 parameters.Add("Image", projectDTO.Image, DbType.String);
                 parameters.Add("Description", projectDTO.Description, DbType.String);
