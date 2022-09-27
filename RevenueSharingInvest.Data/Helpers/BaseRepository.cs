@@ -19,8 +19,8 @@ namespace RevenueSharingInvest.Data.Helpers
 
         protected IDbConnection CreateConnection()
         {
-            //return new SqlConnection(_configuration.GetConnectionString("PROD"));
-            return new SqlConnection(_configuration.GetConnectionString("DEV"));
+            return new SqlConnection(_configuration.GetConnectionString("PROD"));
+            //return new SqlConnection(_configuration.GetConnectionString("DEV"));
         }
     }
 }
