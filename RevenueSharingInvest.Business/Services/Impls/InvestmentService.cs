@@ -24,10 +24,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IPackageRepository _packageRepository;
         private readonly IInvestorWalletRepository _investorWalletRepository;
         private readonly IProjectRepository _projectRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
-        public InvestmentService(IInvestmentRepository investmentRepository, IInvestorRepository investorRepository, IPackageRepository packageRepository, IInvestorWalletRepository investorWalletRepository, IProjectRepository projectRepository, IValidationService validationService, IMapper mapper)
+        public InvestmentService(
+            IInvestmentRepository investmentRepository, 
+            IInvestorRepository investorRepository, 
+            IPackageRepository packageRepository, 
+            IInvestorWalletRepository investorWalletRepository, 
+            IProjectRepository projectRepository,
+            IUserRepository userRepository,
+            IValidationService validationService, 
+            IMapper mapper)
         {
             _investorRepository = investorRepository;
             //_investorWalletRepository = investorWalletRepository;
@@ -35,6 +44,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _packageRepository = packageRepository;
             _investorWalletRepository = investorWalletRepository;
             _projectRepository = projectRepository;
+            _userRepository = userRepository;
+
             _validationService = validationService;
             _mapper = mapper;
         }
@@ -45,12 +56,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IdDTO newId = new IdDTO();
             try
             {
-                if (investmentDTO.investorId == null || !await _validationService.CheckUUIDFormat(investmentDTO.investorId))
-                    throw new InvalidFieldException("Invalid investorId!!!");
-
-                if (!await _validationService.CheckExistenceId("Investor", Guid.Parse(investmentDTO.investorId)))
-                    throw new NotFoundException("This investorId is not existed!!!");
-
                 if (investmentDTO.projectId == null || !await _validationService.CheckUUIDFormat(investmentDTO.projectId))
                     throw new InvalidFieldException("Invalid projectId!!!");
 
@@ -69,6 +74,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Package package = await _packageRepository.GetPackageById(Guid.Parse(investmentDTO.packageId));
 
                 Investment entity = _mapper.Map<Investment>(investmentDTO);
+                entity.InvestorId = Guid.Parse(currentUser.investorId);
                 entity.TotalPrice = entity.Quantity * package.Price;
                 entity.Status = InvestmentStatusEnum.WAITING.ToString();
                 entity.CreateBy = Guid.Parse(currentUser.userId);

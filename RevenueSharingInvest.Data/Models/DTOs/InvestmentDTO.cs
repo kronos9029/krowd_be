@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.Data.Models.DTOs
 {
     public class InvestmentDTO
-    {
-        public string investorId { get; set; }
+    {        
         public string projectId { get; set; }
         public string packageId { get; set; }
         public int quantity { get; set; }
@@ -22,6 +21,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class GetInvestmentDTO : InvestmentDTO
     {
         public string id { get; set; }
+        public string investorId { get; set; }
         public double totalPrice { get; set; }
         public string status { get; set; }
         public string createDate { get; set; }
