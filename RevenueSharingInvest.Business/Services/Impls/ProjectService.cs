@@ -993,7 +993,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     if (projectDTO.duration <= 0)
                         throw new InvalidFieldException("duration must be greater than 0!!!");
-                    if (projectDTO.duration == project.Duration)
+                    if (projectDTO.duration == getProject.duration)
                         projectDTO.duration = 0;
                 }
 
@@ -1001,7 +1001,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     if (projectDTO.numOfStage <= 0)
                         throw new InvalidFieldException("numOfStage must be greater than 0!!!");
-                    if (projectDTO.numOfStage == project.NumOfStage)
+                    if (projectDTO.numOfStage == getProject.numOfStage)
                         projectDTO.numOfStage = 0;
                 }
 
