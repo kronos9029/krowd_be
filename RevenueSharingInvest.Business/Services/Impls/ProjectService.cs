@@ -906,6 +906,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             try
             {
                 GetProjectDTO getProject = _mapper.Map<GetProjectDTO>(await _projectRepository.GetProjectById(projectId));
+                if (getProject == null)
+                    throw new NotFoundException("No Project Object Found!!!");
                 Project project = new Project();
 
                 //if (projectDTO.managerId != null)
@@ -968,71 +970,114 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     if (projectDTO.investmentTargetCapital <= 0)
                         throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
                 }
+                else
+                    projectDTO.investmentTargetCapital = getProject.investmentTargetCapital;
 
                 if (projectDTO.sharedRevenue != 0)
                 {
                     if (projectDTO.sharedRevenue <= 0)
                         throw new InvalidFieldException("sharedRevenue must be greater than 0!!!");
                 }
-                
+                else
+                    projectDTO.sharedRevenue = getProject.sharedRevenue;
+
                 if (projectDTO.multiplier != 0)
                 {
                     if (projectDTO.multiplier <= 0)
                         throw new InvalidFieldException("multiplier must be greater than 0!!!");
                 }
+                else
+                    projectDTO.multiplier = getProject.multiplier;
+
+                if (projectDTO.duration != 0)
+                {
+                    if (projectDTO.duration <= 0)
+                        throw new InvalidFieldException("duration must be greater than 0!!!");
+                    if (projectDTO.duration == project.Duration)
+                        projectDTO.duration = 0;
+                }
+
+                if (projectDTO.numOfStage != 0)
+                {
+                    if (projectDTO.numOfStage <= 0)
+                        throw new InvalidFieldException("numOfStage must be greater than 0!!!");
+                    if (projectDTO.numOfStage == project.NumOfStage)
+                        projectDTO.numOfStage = 0;
+                }
+
+                if ((projectDTO.startDate != null || projectDTO.endDate != null) && (projectDTO.startDate == null || projectDTO.endDate == null))
+                    throw new InvalidFieldException("startDate and endDate must be update at the same time!!!");
+
+                if (projectDTO.startDate != null && projectDTO.endDate != null)
+                {                   
+                    if (!await _validationService.CheckDate((projectDTO.startDate)))
+                        throw new InvalidFieldException("Invalid startDate!!!");
+
+                    if (!await _validationService.CheckDate((projectDTO.endDate)))
+                        throw new InvalidFieldException("Invalid endDate!!!");
+
+                    if ((DateAndTime.DateDiff(DateInterval.Day, DateTime.ParseExact(projectDTO.startDate, "dd/MM/yyyy HH:mm:ss", null), DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null))) < 0)
+                        throw new InvalidFieldException("startDate can not bigger than endDate!!!");
+
+                    projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
+                    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
+
+                    if (DateAndTime.DateDiff(DateInterval.Day,
+                        DateTime.ParseExact(projectDTO.startDate, "dd/MM/yyyy HH:mm:ss", null),
+                        DateTime.ParseExact(await _validationService.FormatDateOutput(getProject.startDate), "dd/MM/yyyy HH:mm:ss", null)) == 0)
+                        projectDTO.startDate = null;
+
+                    if (DateAndTime.DateDiff(DateInterval.Day,
+                        DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null),
+                        DateTime.ParseExact(await _validationService.FormatDateOutput(getProject.endDate), "dd/MM/yyyy HH:mm:ss", null)) == 0)
+                        projectDTO.endDate = null;
+                }
 
                 //Update [Stage] and [PeriodRevenue]
-
-                if (projectDTO.duration != 0 || projectDTO.numOfStage != 0 || projectDTO.startDate != null || projectDTO.endDate != null)
+                if (projectDTO.duration != 0 || projectDTO.numOfStage != 0 || (projectDTO.startDate != null && projectDTO.endDate != null))
                 {
-                    if (projectDTO.duration != 0)
-                    {
-                        if (projectDTO.duration <= 0)
-                            throw new InvalidFieldException("duration must be greater than 0!!!");
-                    }
-                    else
+                    if (projectDTO.duration == 0)
                         projectDTO.duration = getProject.duration;
 
-
-                    if (projectDTO.numOfStage != 0)
-                    {
-                        if (projectDTO.numOfStage <= 0)
-                            throw new InvalidFieldException("numOfStage must be greater than 0!!!");
-                    }
-                    else
+                    if (projectDTO.numOfStage == 0)
                         projectDTO.numOfStage = getProject.numOfStage;
+
+                    //if (projectDTO.startDate != null && projectDTO.endDate != null)
+                    //{
+                    //    if ((DateAndTime.DateDiff(DateInterval.Day, DateTime.ParseExact(projectDTO.startDate, "dd/MM/yyyy HH:mm:ss", null), DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null))) < 0)
+                    //        throw new InvalidFieldException("startDate can not bigger than endDate!!!");
+                    //}
+
+                    //if (projectDTO.startDate != null)
+                    //{
+                    //    if (!await _validationService.CheckDate((projectDTO.startDate)))
+                    //        throw new InvalidFieldException("Invalid startDate!!!");
+
+                    //    projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
+                    //}
+                    //else
+                    //{
+                    //    projectDTO.startDate = await _validationService.FormatDateOutput(getProject.startDate);
+                    //    projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
+                    //}
+
+                    //if (projectDTO.endDate != null)
+                    //{
+                    //    if (!await _validationService.CheckDate((projectDTO.endDate)))
+                    //        throw new InvalidFieldException("Invalid endDate!!!");
+
+                    //    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
+                    //}
+                    //else
+                    //{
+                    //    projectDTO.endDate = await _validationService.FormatDateOutput(getProject.endDate);
+                    //    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
+                    //}
 
                     if (projectDTO.startDate != null && projectDTO.endDate != null)
                     {
-                        if ((DateAndTime.DateDiff(DateInterval.Day, DateTime.ParseExact(projectDTO.startDate, "dd/MM/yyyy HH:mm:ss", null), DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null))) < 0)
-                            throw new InvalidFieldException("startDate can not bigger than endDate!!!");
-                    }
-                    
-                    if ((projectDTO.startDate != null || projectDTO.endDate != null) && (projectDTO.startDate == null || projectDTO.endDate == null))
-                        throw new InvalidFieldException("startDate and endDate must be update at the same time!!!");
-
-                    if (projectDTO.startDate != null)
-                    {
-                        if (!await _validationService.CheckDate((projectDTO.startDate)))
-                            throw new InvalidFieldException("Invalid startDate!!!");
-
-                        projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
-                    }
-                    else
-                    {
                         projectDTO.startDate = await _validationService.FormatDateOutput(getProject.startDate);
                         projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
-                    }
-
-                    if (projectDTO.endDate != null)
-                    {
-                        if (!await _validationService.CheckDate((projectDTO.endDate)))
-                            throw new InvalidFieldException("Invalid endDate!!!");
-
-                        projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
-                    }
-                    else
-                    {
                         projectDTO.endDate = await _validationService.FormatDateOutput(getProject.endDate);
                         projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
                     }
@@ -1082,53 +1127,22 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     stage.EndDate = stage.EndDate.AddDays(modDays);
                     newStageId = await _stageRepository.CreateStage(stage);
                     periodRevenue.StageId = Guid.Parse(newStageId);
-                    newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
-                    
+                    newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);                   
                 }
                 else
                 {
-                    if (projectDTO.duration != 0)
-                    {
-                        if (projectDTO.duration <= 0)
-                            throw new InvalidFieldException("duration must be greater than 0!!!");
-                    }
-                    else
-                        projectDTO.duration = getProject.duration;
-
-
-                    if (projectDTO.numOfStage != 0)
-                    {
-                        if (projectDTO.numOfStage <= 0)
-                            throw new InvalidFieldException("numOfStage must be greater than 0!!!");
-                    }
-                    else
-                        projectDTO.numOfStage = getProject.numOfStage;
+                    projectDTO.duration = getProject.duration;
+                    projectDTO.numOfStage = getProject.numOfStage;
                     projectDTO.startDate = getProject.startDate;
                     projectDTO.endDate = getProject.endDate;
                     project = _mapper.Map<Project>(projectDTO);
                 }                
 
-                if (projectDTO.investmentTargetCapital == 0)
-                    project.InvestmentTargetCapital = getProject.investmentTargetCapital;
-                else
-                    project.RemainAmount = project.InvestmentTargetCapital;
-
-                if (projectDTO.sharedRevenue == 0)
-                    project.SharedRevenue = getProject.sharedRevenue;
-
-                if (projectDTO.multiplier == 0)
-                    project.Multiplier = getProject.multiplier;
-
-                //if (projectDTO.duration == 0)
-                //    project.Duration = getProject.duration;
-
-                //if (projectDTO.numOfStage == 0)
-                //    project.NumOfStage = getProject.numOfStage;
-
                 if (projectDTO.image != null)
                 {
                     project.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, RoleDictionary.role.GetValueOrDefault("ADMIN"));
                 }
+                project.RemainAmount = project.InvestmentTargetCapital;
                 project.UpdateBy = Guid.Parse(currentUser.userId);
 
                 result = await _projectRepository.UpdateProject(project, projectId);
