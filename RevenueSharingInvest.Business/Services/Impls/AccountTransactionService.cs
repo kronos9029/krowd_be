@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Firebase.Auth;
 using Microsoft.Extensions.Logging;
+using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models;
 using RevenueSharingInvest.Business.Models.Constant;
@@ -158,7 +160,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        
+
 
         ////DELETE
         //public async Task<int> DeleteAccountTransactionById(Guid accountTransactionId)
@@ -179,24 +181,64 @@ namespace RevenueSharingInvest.Business.Services.Impls
         //}
 
         ////GET ALL
-        //public async Task<List<AccountTransactionDTO>> GetAllAccountTransactions(int pageIndex, int pageSize)
-        //{
-        //    try
-        //    {
-        //        List<AccountTransaction> accountTransactionList = await _accountTransactionRepository.GetAllAccountTransactions(pageIndex, pageSize);
-        //        List<AccountTransactionDTO> list = _mapper.Map<List<AccountTransactionDTO>>(accountTransactionList);
-        //        foreach (AccountTransactionDTO item in list)
-        //        {
-        //            item.createDate = await _validationService.FormatDateOutput(item.createDate);
-        //            item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
-        //        }
-        //        return list;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
+        public async Task<List<AccountTransactionDTO>> GetAllAccountTransactions(int pageIndex, int pageSize, string sort, ThisUserObj currentUser)
+        {
+            try
+            {
+                List<AccountTransaction> accountTransactionList = new();
+                if (currentUser.roleId.Equals(currentUser.adminRoleId))
+                {
+                    accountTransactionList = await _accountTransactionRepository.GetAllAccountTransactions(pageIndex, pageSize, "", sort);
+                }
+                else
+                {
+                    accountTransactionList = await _accountTransactionRepository.GetAllAccountTransactions(pageIndex, pageSize, currentUser.userId, sort);
+                }
+
+                
+                List<AccountTransactionDTO> list = _mapper.Map<List<AccountTransactionDTO>>(accountTransactionList);
+                foreach (AccountTransactionDTO item in list)
+                {
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                }
+                return list;
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+        public async Task<List<AccountTransactionDTO>> GetAccountTransactionsByDate(int pageIndex, int pageSize, string fromDate, string toDate, string sort, ThisUserObj currentUser)
+        {
+            try
+            {
+                fromDate += " 00:00:00";
+                toDate += " 23:59:59";
+                List<AccountTransaction> accountTransactionList = new();
+                if (currentUser.roleId.Equals(currentUser.adminRoleId))
+                {
+                    accountTransactionList = await _accountTransactionRepository.GetAccountTransactionsByDate(pageIndex, pageSize, fromDate, toDate, sort, "");
+                }
+                else
+                {
+                    accountTransactionList = await _accountTransactionRepository.GetAccountTransactionsByDate(pageIndex, pageSize, fromDate, toDate, sort, currentUser.userId);
+                }
+
+
+                List<AccountTransactionDTO> list = _mapper.Map<List<AccountTransactionDTO>>(accountTransactionList);
+                foreach (AccountTransactionDTO item in list)
+                {
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                }
+                return list;
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
 
         ////GET BY ID
         //public async Task<AccountTransactionDTO> GetAccountTransactionById(Guid accountTransactionId)

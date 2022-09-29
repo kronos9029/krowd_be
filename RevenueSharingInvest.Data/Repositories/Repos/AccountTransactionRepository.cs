@@ -130,53 +130,157 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }*/
 
         //GET ALL
-        public async Task<List<AccountTransaction>> GetAllAccountTransactions(int pageIndex, int pageSize)
+        public async Task<List<AccountTransaction>> GetAllAccountTransactions(int pageIndex, int pageSize, string userId, string sort)
         {
             try
             {
+                string whereClause;
+                if (userId.Equals("") || userId == null)
+                {
+                    whereClause = "FROM AccountTransaction";
+                }
+                else
+                {
+                    whereClause = "FROM AccountTransaction WHERE PartnerClientId = '" + userId + "'";
+                }
+                sort ??= "";
+                if(sort.Equals(""))
+                {
+                    sort = "DESC";
+                } else
+                {
+                    sort = "ASC";
+                }
+
+
                 if (pageIndex != 0 && pageSize != 0)
                 {
                     var query = "WITH X AS ( "
                     + "         SELECT "
                     + "             ROW_NUMBER() OVER ( "
                     + "                 ORDER BY "
-                    + "                     Status ASC ) AS Num, "
+                    + "                     CreateDate "+sort+" ) AS Num, "
                     + "             * "
-                    + "         FROM AccountTransaction "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + whereClause + " )"
                     + "     SELECT "
                     + "         Id, "
                     + "         FromUserId, "
-                    + "         ToUserId, "
-                    + "         Description, "
-                    + "         Status, "
+                    + "         PartnerClientId, "
+                    + "         Amount, "
+                    + "         OrderType, "
+                    + "         Message, "
+                    + "         OrderId, "
+                    + "         PartnerCode, "
+                    + "         PayType, "
+                    + "         Signature, "
+                    + "         RequestId, "
+                    + "         Responsetime, "
+                    + "         ResultCode, "
+                    + "         ExtraData, "
+                    + "         OrderInfo, "
+                    + "         TransId, "
                     + "         CreateDate, "
-                    + "         CreateBy, "
-                    + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         Type "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
                     + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
                     + "         AND @PageIndex * @PageSize";
                     var parameters = new DynamicParameters();
-                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
-                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    parameters.Add("PageIndex", pageIndex, DbType.Int32);
+                    parameters.Add("PageSize", pageSize, DbType.Int32);
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<AccountTransaction>(query, parameters)).ToList();
                 }
                 else
                 {
-                    var query = "SELECT * FROM AccountTransaction WHERE IsDeleted = 0 ORDER BY Status ASC";
+                    var query = "SELECT * "+whereClause+" ORDER BY CreateDate "+sort;
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<AccountTransaction>(query)).ToList();
                 }
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message, e);
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.ToString());
+            }
+        }
+
+        public async Task<List<AccountTransaction>> GetAccountTransactionsByDate(int pageIndex,int pageSize, string fromDate, string toDate, string sort, string userId)
+        {
+            try
+            {
+                string whereClause;
+                if (userId.Equals("") || userId == null)
+                {
+                    whereClause = "FROM AccountTransaction WHERE CreateDate >= '"+fromDate+"' AND CreateDate <= '"+toDate+"'";
+                }
+                else
+                {
+                    whereClause = "FROM AccountTransaction WHERE PartnerClientId = '" + userId + "'" + "AND CreateDate >= '" + fromDate + "' AND CreateDate <= '" + toDate + "'";
+                }
+                sort ??= "";
+                if (sort.Equals(""))
+                {
+                    sort = "DESC";
+                }
+                else
+                {
+                    sort = "ASC";
+                }
+
+
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     CreateDate " + sort + " ) AS Num, "
+                    + "             * "
+                    + whereClause + " )"
+                    + "     SELECT "
+                    + "         Id, "
+                    + "         FromUserId, "
+                    + "         PartnerClientId, "
+                    + "         Amount, "
+                    + "         OrderType, "
+                    + "         Message, "
+                    + "         OrderId, "
+                    + "         PartnerCode, "
+                    + "         PayType, "
+                    + "         Signature, "
+                    + "         RequestId, "
+                    + "         Responsetime, "
+                    + "         ResultCode, "
+                    + "         ExtraData, "
+                    + "         OrderInfo, "
+                    + "         TransId, "
+                    + "         CreateDate, "
+                    + "         Type "
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("PageIndex", pageIndex, DbType.Int32);
+                    parameters.Add("PageSize", pageSize, DbType.Int32);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<AccountTransaction>(query, parameters)).ToList();
+                }
+                else
+                {
+                    var query = "SELECT * " + whereClause + " ORDER BY CreateDate " + sort;
+                    var parameters = new DynamicParameters();
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<AccountTransaction>(query)).ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.ToString());
             }
         }
 

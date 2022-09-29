@@ -13,7 +13,8 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<string> CreateAccountTransaction(AccountTransaction accountTransactionDTO);
 
         ////READ
-        //public Task<List<AccountTransaction>> GetAllAccountTransactions(int pageIndex, int pageSize);
+        public Task<List<AccountTransaction>> GetAllAccountTransactions(int pageIndex, int pageSize, string userId, string sort);
+        public Task<List<AccountTransaction>> GetAccountTransactionsByDate(int pageIndex, int pageSize, string fromDate, string toDate, string sort, string userId);
         //public Task<AccountTransaction> GetAccountTransactionById(Guid accountTransactionId);
 
         ////UPDATE
