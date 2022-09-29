@@ -125,18 +125,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<AllProjectPackageDTO> GetAllPackagesByProjectId(string projectId, ThisUserObj currentUser)
+        public async Task<AllProjectPackageDTO> GetAllPackagesByProjectId(Guid projectId, ThisUserObj currentUser)
         {
             try
             {
                 if (projectId == null || !await _validationService.CheckUUIDFormat(projectId.ToString()))
                     throw new InvalidFieldException("Invalid projectId!!!");
 
-                if (!await _validationService.CheckExistenceId("Project", Guid.Parse(projectId)))
+                if (!await _validationService.CheckExistenceId("Project", projectId))
                     throw new NotFoundException("This projectId is not existed!!!");
 
                 //Kiểm tra projectId có thuộc về business của người xem có role BuM hay PM không
-                Project project = await _projectRepository.GetProjectById(Guid.Parse(projectId));
+                Project project = await _projectRepository.GetProjectById(projectId);
                 if ((currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")) || currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"))) 
                     && !project.BusinessId.ToString().Equals(currentUser.businessId))
                 {
@@ -147,9 +147,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 AllProjectPackageDTO result = new AllProjectPackageDTO();
                 result.listOfPackage = new List<GetPackageDTO>();
 
-                result.numOfPackage = await _packageRepository.CountPackageByProjectId(Guid.Parse(projectId));
+                result.numOfPackage = await _packageRepository.CountPackageByProjectId(projectId);
 
-                List<Package> packageList = await _packageRepository.GetAllPackagesByProjectId(Guid.Parse(projectId));
+                List<Package> packageList = await _packageRepository.GetAllPackagesByProjectId(projectId);
                 //List<GetPackageDTO> list = _mapper.Map<List<GetPackageDTO>>(packageList);
                 GetPackageDTO dto = new GetPackageDTO();
 

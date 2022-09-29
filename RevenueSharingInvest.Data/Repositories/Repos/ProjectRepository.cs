@@ -936,6 +936,38 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        //UPDATE INVESTED CAPITAL AND REMAIN AMOUNT
+        public async Task<int> UpdateProjectInvestedCapitalAndRemainAmount(Guid projectId, double investedAmount, Guid updateBy)
+        {
+            try
+            {
+                var query = "UPDATE Project "
+                    + "     SET "
+                    + "         RemainAmount = ISNULL(RemainAmount - @InvestedAmount, RemainAmount), "
+                    + "         InvestedCapital = ISNULL(InvestedCapital + @InvestedAmount, InvestedCapital), "
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
+                    + "     WHERE "
+                    + "         Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("InvestedAmount", investedAmount, DbType.Double);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateBy", updateBy, DbType.Guid);
+                parameters.Add("Id", projectId, DbType.Guid);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 
     public enum RoleEnum

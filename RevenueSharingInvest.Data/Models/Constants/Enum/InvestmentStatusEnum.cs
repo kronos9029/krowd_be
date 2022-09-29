@@ -10,6 +10,7 @@ namespace RevenueSharingInvest.Data.Models.Constants.Enum
     {
         WAITING,
         SUCCESS,
+        FAILED,
         CANCELED
     }
 }

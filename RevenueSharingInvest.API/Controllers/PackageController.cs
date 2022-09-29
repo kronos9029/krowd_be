@@ -54,7 +54,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpGet]
         [Route("project/{project_id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAllPackagesByProjectId(string project_id)
+        public async Task<IActionResult> GetAllPackagesByProjectId(Guid project_id)
         {
             ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
 

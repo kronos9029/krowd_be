@@ -227,5 +227,36 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+
+        //UPDATE REMAINING QUANTITY
+        public async Task<int> UpdatePackageRemainingQuantity(Guid packageId, int remainingQuantity, Guid updateBy)
+        {
+            try
+            {
+                var query = "UPDATE Package "
+                    + "     SET "
+                    + "         RemainingQuantity = ISNULL(@RemainingQuantity, RemainingQuantity), "
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
+                    + "     WHERE "
+                    + "         Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("RemainingQuantity", remainingQuantity, DbType.Int16);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateBy", updateBy, DbType.Guid);
+                parameters.Add("Id", packageId, DbType.Guid);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

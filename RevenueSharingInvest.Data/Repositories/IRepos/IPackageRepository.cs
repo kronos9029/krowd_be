@@ -19,6 +19,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //UPDATE
         public Task<int> UpdatePackage(Package packageDTO, Guid packageId);
+        public Task<int> UpdatePackageRemainingQuantity(Guid packageId, int remainingQuantity, Guid updateBy);
 
         //DELETE
         public Task<int> DeletePackageById(Guid packageId);

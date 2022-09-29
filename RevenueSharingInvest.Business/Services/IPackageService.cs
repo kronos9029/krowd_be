@@ -14,7 +14,7 @@ namespace RevenueSharingInvest.Business.Services
         public Task<IdDTO> CreatePackage(CreatePackageDTO packageDTO, ThisUserObj currentUser);
 
         //READ
-        public Task<AllProjectPackageDTO> GetAllPackagesByProjectId(string projectId, ThisUserObj currentUser);
+        public Task<AllProjectPackageDTO> GetAllPackagesByProjectId(Guid projectId, ThisUserObj currentUser);
         public Task<GetPackageDTO> GetPackageById(Guid packageId, ThisUserObj currentUser);
 
         //UPDATE

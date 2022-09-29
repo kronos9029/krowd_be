@@ -73,14 +73,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 Package package = await _packageRepository.GetPackageById(Guid.Parse(investmentDTO.packageId));
 
-                Investment entity = _mapper.Map<Investment>(investmentDTO);
-                entity.InvestorId = Guid.Parse(currentUser.investorId);
-                entity.TotalPrice = entity.Quantity * package.Price;
-                entity.Status = InvestmentStatusEnum.WAITING.ToString();
-                entity.CreateBy = Guid.Parse(currentUser.userId);
-                entity.UpdateBy = Guid.Parse(currentUser.userId);
+                if (investmentDTO.quantity > package.RemainingQuantity)
+                    throw new InvalidFieldException("This package remainingQuantity is " + package.RemainingQuantity + "!!!");
 
-                newId.id = await _investmentRepository.CreateInvestment(entity);
+                Investment investment = _mapper.Map<Investment>(investmentDTO);
+                investment.InvestorId = Guid.Parse(currentUser.investorId);
+                investment.TotalPrice = investment.Quantity * package.Price;
+                investment.Status = InvestmentStatusEnum.WAITING.ToString();
+                investment.CreateBy = Guid.Parse(currentUser.userId);
+                investment.UpdateBy = Guid.Parse(currentUser.userId);
+
+                newId.id = await _investmentRepository.CreateInvestment(investment);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create Investment Object!");
                 else
@@ -88,22 +91,23 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     InvestorWallet investorWallet = new InvestorWallet();
                     investorWallet.InvestorId = Guid.Parse(currentUser.investorId);
                     investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"));
-                    investorWallet.Balance = entity.TotalPrice;
+                    investorWallet.Balance = investment.TotalPrice;
                     investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
 
-                    Investment investment = new Investment();
+                    investment = new Investment();
                     investment.Id = Guid.Parse(newId.id);
-                    investment.Status = InvestmentStatusEnum.SUCCESS.ToString();
                     investment.UpdateBy = Guid.Parse(currentUser.userId);
 
                     if (await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet) == 1)
                     {
                         investment.Status = InvestmentStatusEnum.SUCCESS.ToString();
                         await _investmentRepository.UpdateInvestmentStatus(investment);
+                        await _packageRepository.UpdatePackageRemainingQuantity(package.Id, package.RemainingQuantity - investmentDTO.quantity, Guid.Parse(currentUser.userId));
+                        await _projectRepository.UpdateProjectInvestedCapitalAndRemainAmount(package.ProjectId, (double)investorWallet.Balance, Guid.Parse(currentUser.userId));
                     }
                     else
                     {
-                        investment.Status = InvestmentStatusEnum.CANCELED.ToString();
+                        investment.Status = InvestmentStatusEnum.FAILED.ToString();
                         await _investmentRepository.UpdateInvestmentStatus(investment);
                     }
                 }
