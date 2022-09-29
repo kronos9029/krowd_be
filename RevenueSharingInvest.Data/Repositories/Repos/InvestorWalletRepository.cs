@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
@@ -47,9 +48,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("InvestorId", investorId, DbType.Guid);
                 parameters.Add("WalletTypeId", walletTypeId, DbType.Guid);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", currentUserId, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", currentUserId, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -76,7 +77,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id=@Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 //parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", investorWalletId, DbType.Guid);
 
@@ -158,7 +159,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("InvestorId", investorWalletDTO.InvestorId, DbType.Guid);
                 parameters.Add("WalletTypeId", investorWalletDTO.WalletTypeId, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", investorWalletDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", investorWalletId, DbType.Guid);
@@ -190,7 +191,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Balance", investorWalletDTO.Balance, DbType.Double);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", investorWalletDTO.Id, DbType.Guid);    
 
@@ -237,7 +238,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Balance", investorWalletDTO.Balance, DbType.Double);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
                 parameters.Add("InvestorId", investorWalletDTO.InvestorId, DbType.Guid);
                 parameters.Add("WalletTypeId", investorWalletDTO.WalletTypeId, DbType.Guid);

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
+using System;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.API.Controllers
@@ -51,18 +52,21 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
-        /*        [HttpPost]
-                [Route("upload-file")]
-                public async Task<IActionResult> UploadFile(IFormFile file)
-                {
-                    string uid = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "uid").Value;
-
-                    String link = await _fileUploadService.UploadImageToFirebase(file, uid);
-
-
-
-                    return Ok(link);
-                }*/
+        [HttpPost]
+        [Route("test")]
+        public async Task<IActionResult> UploadFile()
+        {
+            TimeZoneInfo timeZoneInfo;
+            DateTime dateTime;
+            //Set the time zone information to US Mountain Standard Time 
+            timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            //Get date and time in US Mountain Standard Time 
+            dateTime = TimeZoneInfo.ConvertTime(DateTime.Now, timeZoneInfo);
+            //Print out the date and time
+            string timeString = dateTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            DateTime now = DateTime.Parse(timeString);
+            return Ok(now);
+        }
 
 
     }

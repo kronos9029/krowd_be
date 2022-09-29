@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -59,9 +60,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", projectEntityDTO.Description, DbType.String);
                 parameters.Add("Type", projectEntityDTO.Type, DbType.String);
                 parameters.Add("Priority", projectEntityDTO.Priority, DbType.Int16);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", projectEntityDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", projectEntityDTO.CreateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -248,7 +249,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Content", projectEntityDTO.Content, DbType.String);
                 parameters.Add("Description", projectEntityDTO.Description, DbType.String);
                 parameters.Add("Type", projectEntityDTO.Type, DbType.String);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", projectEntityDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", projectEntityId, DbType.Guid);
 
@@ -375,7 +376,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Priority", priority, DbType.Int16);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", updaterId, DbType.Guid);
                 parameters.Add("Id", projectEntityId, DbType.Guid);
 
@@ -428,9 +429,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Content", projectEntityDTO.Content, DbType.String);
                 parameters.Add("Description", projectEntityDTO.Description, DbType.String);
                 parameters.Add("Type", projectEntityDTO.Type, DbType.String);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", projectEntityDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", projectEntityDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();

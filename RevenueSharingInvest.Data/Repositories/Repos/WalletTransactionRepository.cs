@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -70,9 +71,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("FromWalletId", walletTransactionDTO.FromWalletId, DbType.Guid);
                 parameters.Add("ToWalletId", walletTransactionDTO.ToWalletId, DbType.Guid);
                 parameters.Add("Fee", walletTransactionDTO.Fee, DbType.Double);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", walletTransactionDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", walletTransactionDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -99,7 +100,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id=@Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 //parameters.Add("UpdateBy", walletTransactionDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", walletTransactionId, DbType.Guid);
 
@@ -222,7 +223,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("FromWalletId", walletTransactionDTO.FromWalletId, DbType.Guid);
                 parameters.Add("ToWalletId", walletTransactionDTO.ToWalletId, DbType.Guid);
                 parameters.Add("Fee", walletTransactionDTO.Fee, DbType.Double);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", walletTransactionDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", walletTransactionDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", walletTransactionId, DbType.Guid);

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -49,9 +50,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("ProjectId", periodRevenueDTO.ProjectId, DbType.Guid);
                 parameters.Add("StageId", periodRevenueDTO.StageId, DbType.Guid);
                 parameters.Add("Status", periodRevenueDTO.Status, DbType.String);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", periodRevenueDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", periodRevenueDTO.CreateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -194,7 +195,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 //parameters.Add("NormalExpectedRatio", periodRevenueDTO.NormalExpectedRatio, DbType.Double);
                 //parameters.Add("OptimisticExpectedRatio", periodRevenueDTO.OptimisticExpectedRatio, DbType.Double);
                 parameters.Add("Status", periodRevenueDTO.Status, DbType.String);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", periodRevenueDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", periodRevenueDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", periodRevenueId, DbType.Guid);
@@ -270,7 +271,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("PessimisticExpectedRatio", periodRevenueDTO.PessimisticExpectedRatio, DbType.Double);
                 parameters.Add("NormalExpectedRatio", periodRevenueDTO.NormalExpectedRatio, DbType.Double);
                 parameters.Add("OptimisticExpectedRatio", periodRevenueDTO.OptimisticExpectedRatio, DbType.Double);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", periodRevenueDTO.UpdateBy, DbType.Guid);
                 parameters.Add("StageId", stageId, DbType.Guid);
 

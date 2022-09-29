@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Business.Models.Constant;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.DTOs;
@@ -58,9 +59,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Quantity", investmentDTO.Quantity, DbType.Int16);
                 parameters.Add("TotalPrice", investmentDTO.TotalPrice, DbType.Double);
                 parameters.Add("Status", investmentDTO.Status, DbType.String);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", investmentDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", investmentDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -87,7 +88,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         //            + "         Id=@Id";
         //        using var connection = CreateConnection();
         //        var parameters = new DynamicParameters();
-        //        parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+        //        parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
         //        //parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
         //        parameters.Add("Id", investmentId, DbType.Guid);
 
@@ -258,7 +259,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         //        parameters.Add("PackageId", investmentDTO.PackageId, DbType.Guid);
         //        parameters.Add("Quantity", investmentDTO.Quantity, DbType.Int16);
         //        parameters.Add("TotalPrice", investmentDTO.TotalPrice, DbType.Double);
-        //        parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+        //        parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
         //        parameters.Add("UpdateBy", investmentDTO.UpdateBy, DbType.Guid);
         //        parameters.Add("IsDeleted", investmentDTO.IsDeleted, DbType.Boolean);
         //        parameters.Add("Id", investmentId, DbType.Guid);
@@ -314,7 +315,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Status", investmentDTO.Status, DbType.String);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", investmentDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", investmentDTO.Id, DbType.Guid);
 

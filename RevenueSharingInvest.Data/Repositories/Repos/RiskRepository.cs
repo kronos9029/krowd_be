@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -52,9 +53,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("ProjectId", riskDTO.ProjectId, DbType.Guid);
                 parameters.Add("RiskTypeId", riskDTO.RiskTypeId, DbType.Guid);
                 parameters.Add("Description", riskDTO.Description, DbType.String);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", riskDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", riskDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -81,7 +82,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id=@Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 //parameters.Add("UpdateBy", riskDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", riskId, DbType.Guid);
 
@@ -272,7 +273,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("ProjectId", riskDTO.ProjectId, DbType.Guid);
                 parameters.Add("RiskTypeId", riskDTO.RiskTypeId, DbType.Guid);
                 parameters.Add("Description", riskDTO.Description, DbType.String);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", riskDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", riskDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", riskId, DbType.Guid);

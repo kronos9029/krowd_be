@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -67,9 +68,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Status", voucherDTO.Status, DbType.String);
                 parameters.Add("StartDate", Convert.ToDateTime(voucherDTO.StartDate), DbType.DateTime);
                 parameters.Add("EndDate", Convert.ToDateTime(voucherDTO.StartDate), DbType.DateTime);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", voucherDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", voucherDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -96,7 +97,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id=@Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 //parameters.Add("UpdateBy", voucherDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", voucherId, DbType.Guid);
 
@@ -217,7 +218,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Status", voucherDTO.Status, DbType.String);
                 parameters.Add("StartDate", voucherDTO.StartDate, DbType.DateTime);
                 parameters.Add("EndDate", voucherDTO.EndDate, DbType.DateTime);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", voucherDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", voucherDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", voucherId, DbType.Guid);

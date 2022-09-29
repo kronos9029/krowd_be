@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -62,9 +63,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("RemainingQuantity", packageDTO.RemainingQuantity, DbType.Int16);
                 parameters.Add("Description", packageDTO.Description, DbType.String);
                 parameters.Add("Status", packageDTO.Status, DbType.String);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", packageDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", packageDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -158,7 +159,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Quantity", packageDTO.Quantity, DbType.Int16);
                 parameters.Add("RemainingQuantity", packageDTO.RemainingQuantity, DbType.Int16);
                 parameters.Add("Description", packageDTO.Description, DbType.String);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", packageDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", packageId, DbType.Guid);
 

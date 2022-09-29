@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -50,9 +51,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("VoucherId", packageVoucherDTO.VoucherId, DbType.Guid);
                 parameters.Add("Quantity", packageVoucherDTO.Quantity, DbType.Int16);
                 parameters.Add("MaxQuantity", packageVoucherDTO.MaxQuantity, DbType.Int16);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", packageVoucherDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", packageVoucherDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -80,7 +81,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         AND VoucherId=@VoucherId";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 //parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
                 parameters.Add("PackageId", packageId, DbType.Guid);
                 parameters.Add("VoucherId", voucherId, DbType.Guid);
@@ -187,7 +188,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("VoucherId", packageVoucherDTO.VoucherId, DbType.Guid);
                 parameters.Add("Quantity", packageVoucherDTO.Quantity, DbType.Int16);
                 parameters.Add("MaxQuantity", packageVoucherDTO.MaxQuantity, DbType.Int16);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", packageVoucherDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", packageVoucherDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("PId", packageId, DbType.Guid);

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
@@ -57,9 +58,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("StartDate", stageDTO.StartDate, DbType.DateTime);
                 parameters.Add("EndDate", stageDTO.EndDate, DbType.DateTime);
                 parameters.Add("Status", stageDTO.Status, DbType.String);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", stageDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", stageDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -182,7 +183,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", stageDTO.Name, DbType.String);
                 parameters.Add("Description", stageDTO.Description, DbType.String);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", stageDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", stageId, DbType.Guid);
 

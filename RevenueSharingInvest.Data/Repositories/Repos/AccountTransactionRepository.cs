@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -88,7 +89,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("ResponseTime", accountTransactionDTO.ResponseTime, DbType.Int64);
                 parameters.Add("ExtraData", accountTransactionDTO.ExtraData, DbType.String);
                 parameters.Add("Signature", accountTransactionDTO.Signature, DbType.String);
-                parameters.Add("CreateDate", DateTime.UtcNow, DbType.DateTime);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("Type", accountTransactionDTO.Type, DbType.String);
 
 
@@ -103,33 +104,33 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-/*        public async Task<int> DeleteAccountTransactionById(Guid accountTransactionId)//thiếu para UpdateBy
-        {
-            try
-            {
-                var query = "UPDATE AccountTransaction "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
-                using var connection = CreateConnection();
-                var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
-                //parameters.Add("UpdateBy", accountTransactionDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", accountTransactionId, DbType.Guid);
+        /*        public async Task<int> DeleteAccountTransactionById(Guid accountTransactionId)//thiếu para UpdateBy
+                {
+                    try
+                    {
+                        var query = "UPDATE AccountTransaction "
+                            + "     SET "
+                            + "         UpdateDate = @UpdateDate, "
+                            //+ "         UpdateBy = @UpdateBy, "
+                            + "         IsDeleted = 1 "
+                            + "     WHERE "
+                            + "         Id=@Id";
+                        using var connection = CreateConnection();
+                        var parameters = new DynamicParameters();
+                        parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                        //parameters.Add("UpdateBy", accountTransactionDTO.UpdateBy, DbType.Guid);
+                        parameters.Add("Id", accountTransactionId, DbType.Guid);
 
-                return await connection.ExecuteAsync(query, parameters);
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }*/
+                        return await connection.ExecuteAsync(query, parameters);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception(e.Message);
+                    }
+                }*/
 
         //GET ALL
-/*        public async Task<List<AccountTransaction>> GetAllAccountTransactions(int pageIndex, int pageSize)
+        public async Task<List<AccountTransaction>> GetAllAccountTransactions(int pageIndex, int pageSize)
         {
             try
             {
@@ -171,13 +172,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     var query = "SELECT * FROM AccountTransaction WHERE IsDeleted = 0 ORDER BY Status ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<AccountTransaction>(query)).ToList();
-                }              
+                }
             }
             catch (Exception e)
             {
                 throw new Exception(e.Message, e);
             }
-        }*/
+        }
 
         //GET BY ID
         public async Task<AccountTransaction> GetAccountTransactionById(Guid accountTransactionId)
@@ -219,7 +220,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("ToUserId", accountTransactionDTO.ToUserId, DbType.Guid);
                 parameters.Add("Description", accountTransactionDTO.Description, DbType.String);
                 parameters.Add("Status", accountTransactionDTO.Status, DbType.String);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", accountTransactionDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", accountTransactionDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", accountTransactionId, DbType.Guid);

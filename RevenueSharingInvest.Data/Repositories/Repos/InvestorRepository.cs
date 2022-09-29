@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
@@ -50,9 +51,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UserId", investorDTO.UserId, DbType.Guid);
                 parameters.Add("InvestorTypeId", Guid.Parse(InvestorTypeDictionary.investorType.GetValueOrDefault("Nhà đầu tư ngắn hạn")), DbType.Guid);
                 parameters.Add("Status", ObjectStatusEnum.ACTIVE.ToString(), DbType.String);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", investorDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", investorDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -79,7 +80,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id=@Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 //parameters.Add("UpdateBy", investorDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", investorId, DbType.Guid);
 
@@ -282,7 +283,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UserId", investorDTO.UserId, DbType.Guid);
                 parameters.Add("InvestorTypeId", investorDTO.InvestorTypeId, DbType.Guid);
                 parameters.Add("Status", investorDTO.Status, DbType.Int16);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", investorDTO.UpdateBy, DbType.Guid);
                 parameters.Add("IsDeleted", investorDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", investorId, DbType.Guid);
@@ -347,7 +348,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Status", status, DbType.String);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", currentUserId, DbType.Guid);
                 parameters.Add("Id", userId, DbType.Guid);
 

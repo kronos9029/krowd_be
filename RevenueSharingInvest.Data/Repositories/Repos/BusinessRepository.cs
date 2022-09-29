@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Business.Models.Constant;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
@@ -67,9 +68,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("TaxIdentificationNumber", businessDTO.TaxIdentificationNumber, DbType.String);
                 parameters.Add("Address", businessDTO.Address, DbType.String);
                 parameters.Add("Status", businessDTO.Status, DbType.String);
-                parameters.Add("CreateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", businessDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", businessDTO.CreateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -313,7 +314,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", businessDTO.Description, DbType.String);
                 parameters.Add("TaxIdentificationNumber", businessDTO.TaxIdentificationNumber, DbType.String);
                 parameters.Add("Address", businessDTO.Address, DbType.String);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", businessDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", businesssId, DbType.Guid);
 
@@ -342,7 +343,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
                 var parameters = new DynamicParameters();
                 parameters.Add("Status", status, DbType.String);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", updaterId, DbType.Guid);
                 parameters.Add("Id", businessId, DbType.Guid);
                 using var connection = CreateConnection();
