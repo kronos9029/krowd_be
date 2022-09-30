@@ -36,7 +36,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public long ResponseTime { get; set; }
         public string ExtraData { get; set; }
         public string Signature { get; set; }
-        public string CreateDate { get; set; }
+        public DateTime CreateDate { get; set; }
 
 
         [ForeignKey(nameof(FromUserId))]

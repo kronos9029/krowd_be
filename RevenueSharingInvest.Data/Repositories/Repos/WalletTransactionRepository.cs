@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
@@ -116,6 +115,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         //GET ALL
         public async Task<List<WalletTransaction>> GetAllWalletTransactions(int pageIndex, int pageSize)
         {
+
             try
             {
                 if (pageIndex != 0 && pageSize != 0)
@@ -162,7 +162,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     var query = "SELECT * FROM WalletTransaction WHERE IsDeleted = 0 ORDER BY Type ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<WalletTransaction>(query)).ToList();
-                }               
+                }
             }
             catch (Exception e)
             {

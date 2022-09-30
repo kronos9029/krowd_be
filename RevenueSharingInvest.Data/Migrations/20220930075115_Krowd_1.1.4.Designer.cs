@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RevenueSharingInvest.Data.Models.Entities;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
     [DbContext(typeof(KrowdContext))]
-    partial class KrowdContextModelSnapshot : ModelSnapshot
+    [Migration("20220930075115_Krowd_1.1.4")]
+    partial class Krowd_114
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +36,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ExtraData")
                         .HasColumnType("nvarchar(max)");
