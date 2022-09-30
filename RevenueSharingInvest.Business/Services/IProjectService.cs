@@ -1,5 +1,6 @@
 ﻿using RevenueSharingInvest.API;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace RevenueSharingInvest.Business.Services
             string status,
             ThisUserObj thisUserObj
         );
-        public Task<AllProjectDTO> GetInvestedProjects(int pageIndex, int pageSize, ThisUserObj thisUserObj);
+        public Task<AllInvestedProjectDTO> GetInvestedProjects(int pageIndex, int pageSize, ThisUserObj thisUserObj);
         public Task<GetProjectDTO> GetProjectById(Guid projectId);
         public Task<ProjectCountDTO> CountProjects
         (

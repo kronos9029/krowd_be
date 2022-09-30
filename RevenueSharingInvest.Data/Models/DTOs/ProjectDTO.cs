@@ -65,6 +65,22 @@ namespace RevenueSharingInvest.Data.Models.DTOs
 
     public class InvestedProjectDTO : ProjectDTO
     {
-
+        public string id { get; set; }
+        public string managerId { get; set; }
+        public string fieldId { get; set; }
+        public string areaId { get; set; }
+        public string image { get; set; }
+        public double investedCapital { get; set; }
+        public int numOfStage { get; set; }
+        public double remainAmount { get; set; }
+        public string businessLicense { get; set; }
+        public string approvedDate { get; set; }
+        public string approvedBy { get; set; }
+        public string status { get; set; }
+        public string createDate { get; set; }
+        public string createBy { get; set; }
+        public string updateDate { get; set; }
+        public string updateBy { get; set; }
+        public bool isDeleted { get; set; }
     }
 }
