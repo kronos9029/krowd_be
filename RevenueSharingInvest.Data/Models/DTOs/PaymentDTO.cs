@@ -21,12 +21,22 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string status { get; set; }
     }
 
-    public class GetPaymentDTO : PaymentDTO
+    public class InvestmentPaymentDTO : PaymentDTO
     {
         public string projectId { get; set; }
         public string projectName { get; set; }
         public string packageId { get; set; }
         public string packageName { get; set; }
+        public int investedQuantity { get; set; }
+        public string fromWalletName { get; set; }
+        public string fee { get; set; }
+    }
+    public class PeriodRevenuePaymentDTO : PaymentDTO
+    {
+        public string projectId { get; set; }
+        public string projectName { get; set; }
+        public string stageId { get; set; }
+        public string stageName { get; set; }
         public int investedQuantity { get; set; }
         public string fromWalletName { get; set; }
         public string fee { get; set; }

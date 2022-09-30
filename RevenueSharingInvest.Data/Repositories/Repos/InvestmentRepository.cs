@@ -121,7 +121,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    whereCondition = whereCondition + " AND P.Status = @I3 AND P.Status = @I4 ";
+                    whereCondition = whereCondition + " AND (P.Status = @I3 OR P.Status = @I4) ";
                     parameters.Add("I3", ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), DbType.String);
                     parameters.Add("I4", ProjectStatusEnum.ACTIVE.ToString(), DbType.String);
                 }

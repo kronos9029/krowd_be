@@ -63,9 +63,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<GetPaymentDTO> CreateInvestment(CreateInvestmentDTO investmentDTO, ThisUserObj currentUser)
+        public async Task<InvestmentPaymentDTO> CreateInvestment(CreateInvestmentDTO investmentDTO, ThisUserObj currentUser)
         {
-            GetPaymentDTO result = new GetPaymentDTO();
+            InvestmentPaymentDTO result = new InvestmentPaymentDTO();
             string investmentId = "";
             try
             {
@@ -102,7 +102,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 investment.UpdateBy = Guid.Parse(currentUser.userId);
 
                 investmentId = await _investmentRepository.CreateInvestment(investment);
-                if (!investmentId.Equals(""))
+                if (investmentId.Equals(""))
                 {
                     //Create Payment
                     Payment payment = new Payment();
@@ -118,7 +118,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     string paymentId = await _paymentRepository.CreatePayment(payment);
 
-                    result = _mapper.Map<GetPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
+                    result = _mapper.Map<InvestmentPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
                     result.createDate = await _validationService.FormatDateOutput(result.createDate);
                     Project project = await _projectRepository.GetProjectById(package.ProjectId);
                     result.projectId = project.Id.ToString();
@@ -211,7 +211,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         //await _projectWalletRepository.UpdateProjectWalletBalance(projectWallet);
 
                         //Format Payment response
-                        result = _mapper.Map<GetPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
+                        result = _mapper.Map<InvestmentPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
                         result.createDate = await _validationService.FormatDateOutput(result.createDate);
                         Project project = await _projectRepository.GetProjectById(package.ProjectId);
                         result.projectId = project.Id.ToString();
@@ -226,7 +226,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     {
                         payment.Status = TransactionStatusEnum.FAILED.ToString();
                         paymentId = await _paymentRepository.CreatePayment(payment);
-                        result = _mapper.Map<GetPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
+                        result = _mapper.Map<InvestmentPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
                         result.createDate = await _validationService.FormatDateOutput(result.createDate);
                         Project project = await _projectRepository.GetProjectById(package.ProjectId);
                         result.projectId = project.Id.ToString();
