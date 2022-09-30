@@ -66,7 +66,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         public async Task<GetPaymentDTO> CreateInvestment(CreateInvestmentDTO investmentDTO, ThisUserObj currentUser)
         {
             GetPaymentDTO result = new GetPaymentDTO();
-            string investmentId;
+            string investmentId = "";
             try
             {
                 //Check information
@@ -101,7 +101,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 investment.CreateBy = Guid.Parse(currentUser.userId);
                 investment.UpdateBy = Guid.Parse(currentUser.userId);
 
-                investmentId = await _investmentRepository.CreateInvestment(investment);
+                //investmentId = await _investmentRepository.CreateInvestment(investment);
                 if (investmentId.Equals(""))
                 {
                     //Create Payment
@@ -184,31 +184,31 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         investorWallet.Balance = payment.Amount;
                         await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
 
-                        //Subtract I3 balance
-                        investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"));
-                        investorWallet.Balance = -payment.Amount;
-                        await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
+                        ////Subtract I3 balance
+                        //investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"));
+                        //investorWallet.Balance = -payment.Amount;
+                        //await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
 
-                        //Create WalletTransaction from I3 to P3
-                        walletTransaction.PaymentId = Guid.Parse(paymentId);
-                        walletTransaction.InvestorWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString())).Id;
-                        walletTransaction.ProjectWalletId = (await _projectWalletRepository.GetProjectWalletByProjectOwnerIdAndType(projectManager.Id, WalletTypeEnum.B3.ToString())).Id;
-                        walletTransaction.Amount = payment.Amount;
-                        walletTransaction.Fee = 0;
-                        walletTransaction.Description = "Transfer from I3 to P3 to invest";
-                        walletTransaction.FromWalletId = walletTransaction.InvestorWalletId;
-                        walletTransaction.ToWalletId = walletTransaction.ProjectWalletId;
-                        walletTransaction.Type = TransactionTypeEnum.INVESTMENT.ToString();
-                        walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
-                        await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+                        ////Create WalletTransaction from I3 to P3
+                        //walletTransaction.PaymentId = Guid.Parse(paymentId);
+                        //walletTransaction.InvestorWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString())).Id;
+                        //walletTransaction.ProjectWalletId = (await _projectWalletRepository.GetProjectWalletByProjectOwnerIdAndType(projectManager.Id, WalletTypeEnum.B3.ToString())).Id;
+                        //walletTransaction.Amount = payment.Amount;
+                        //walletTransaction.Fee = 0;
+                        //walletTransaction.Description = "Transfer from I3 to P3 to invest";
+                        //walletTransaction.FromWalletId = walletTransaction.InvestorWalletId;
+                        //walletTransaction.ToWalletId = walletTransaction.ProjectWalletId;
+                        //walletTransaction.Type = TransactionTypeEnum.INVESTMENT.ToString();
+                        //walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
+                        //await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
-                        //Add P3 balance
-                        ProjectWallet projectWallet = new ProjectWallet();
-                        projectWallet.ProjectManagerId = projectManager.Id;
-                        projectWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3"));
-                        projectWallet.Balance = payment.Amount;
-                        projectWallet.UpdateBy = Guid.Parse(currentUser.userId);
-                        await _projectWalletRepository.UpdateProjectWalletBalance(projectWallet);
+                        ////Add P3 balance
+                        //ProjectWallet projectWallet = new ProjectWallet();
+                        //projectWallet.ProjectManagerId = projectManager.Id;
+                        //projectWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3"));
+                        //projectWallet.Balance = payment.Amount;
+                        //projectWallet.UpdateBy = Guid.Parse(currentUser.userId);
+                        //await _projectWalletRepository.UpdateProjectWalletBalance(projectWallet);
 
                         //Format Payment response
                         result = _mapper.Map<GetPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
