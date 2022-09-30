@@ -17,10 +17,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<WalletTransaction> GetWalletTransactionById(Guid walletTransactionId);
 
         //UPDATE
-        public Task<int> UpdateWalletTransaction(WalletTransaction walletTransactionDTO, Guid walletTransactionId);
 
         //DELETE
-        public Task<int> DeleteWalletTransactionById(Guid walletTransactionId);
-        public Task<int> ClearAllWalletTransactionData();
     }
 }

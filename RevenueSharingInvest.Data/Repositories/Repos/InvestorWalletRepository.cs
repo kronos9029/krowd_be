@@ -33,8 +33,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     VALUES ( "
                     + "         @InvestorId, "
                     + "         0, "
@@ -42,8 +41,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("InvestorId", investorId, DbType.Guid);
@@ -70,9 +68,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE InvestorWallet "
                     + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
+                    + "         UpdateDate = @UpdateDate "
                     //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
                     + "     WHERE "
                     + "         Id=@Id";
                 using var connection = CreateConnection();
@@ -95,7 +92,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = " SELECT IW.* FROM InvestorWallet IW JOIN WalletType WT ON IW.WalletTypeId = WT.Id WHERE IW.IsDeleted = 0 "
+                var query = " SELECT IW.* FROM InvestorWallet IW JOIN WalletType WT ON IW.WalletTypeId = WT.Id "
                     + " AND IW.InvestorId = @InvestorId "
                     + " AND (IW.WalletTypeId = @I1 "
                     + "     OR IW.WalletTypeId = @I2 "
@@ -135,8 +132,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "             JOIN WalletType WT ON IW.WalletTypeId = WT.Id " 
                     + "         WHERE " 
                     + "             WT.Type = @Type " 
-                    + "             AND IW.InvestorId = @InvestorId " 
-                    + "             AND IW.IsDeleted = 0";
+                    + "             AND IW.InvestorId = @InvestorId ";
                 var parameters = new DynamicParameters();
                 parameters.Add("InvestorId", investorId, DbType.Guid);
                 parameters.Add("Type", walletType, DbType.String);
@@ -160,8 +156,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         InvestorId = @InvestorId, "
                     + "         WalletTypeId = @WalletTypeId, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         UpdateBy = @UpdateBy "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -170,7 +165,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("WalletTypeId", investorWalletDTO.WalletTypeId, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", investorWalletDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", investorWalletId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -213,22 +207,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
-            }
-        }
-
-        //CLEAR DATA
-        public async Task<int> ClearAllInvestorWalletData()
-        {
-            try
-            {
-                var query = "DELETE FROM InvestorWallet";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
             }
         }
 

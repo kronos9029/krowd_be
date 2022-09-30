@@ -31,86 +31,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
-        //CLEAR DATA
-        //public async Task<int> ClearAllProjectWalletData()
-        //{
-        //    int result;
-        //    try
-        //    {
-        //        result = await _projectWalletRepository.ClearAllProjectWalletData();
-        //        return result;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
-
-        //CREATE
-        //public async Task<IdDTO> CreateProjectWallet(ProjectWalletDTO projectWalletDTO)
-        //{
-        //    IdDTO newId = new IdDTO();
-        //    try
-        //    {
-        //        if (projectWalletDTO.projectId == null || !await _validationService.CheckUUIDFormat(projectWalletDTO.projectId))
-        //            throw new InvalidFieldException("Invalid projectId!!!");
-
-        //        if (!await _validationService.CheckExistenceId("Project", Guid.Parse(projectWalletDTO.projectId)))
-        //            throw new NotFoundException("This projectId is not existed!!!");
-
-        //        if (projectWalletDTO.walletTypeId == null || !await _validationService.CheckUUIDFormat(projectWalletDTO.walletTypeId))
-        //            throw new InvalidFieldException("Invalid walletTypeId!!!");
-
-        //        if (!await _validationService.CheckExistenceId("WalletType", Guid.Parse(projectWalletDTO.walletTypeId)))
-        //            throw new NotFoundException("This walletTypeId is not existed!!!");
-
-        //        if (projectWalletDTO.createBy != null && projectWalletDTO.createBy.Length >= 0)
-        //        {
-        //            if (projectWalletDTO.createBy.Equals("string"))
-        //                projectWalletDTO.createBy = null;
-        //            else if (!await _validationService.CheckUUIDFormat(projectWalletDTO.createBy))
-        //                throw new InvalidFieldException("Invalid createBy!!!");
-        //        }
-
-        //        if (projectWalletDTO.updateBy != null && projectWalletDTO.updateBy.Length >= 0)
-        //        {
-        //            if (projectWalletDTO.updateBy.Equals("string"))
-        //                projectWalletDTO.updateBy = null;
-        //            else if (!await _validationService.CheckUUIDFormat(projectWalletDTO.updateBy))
-        //                throw new InvalidFieldException("Invalid updateBy!!!");
-        //        }
-
-        //        projectWalletDTO.isDeleted = false;
-
-        //        ProjectWallet dto = _mapper.Map<ProjectWallet>(projectWalletDTO);
-        //        newId.id = await _projectWalletRepository.CreateProjectWallet(dto);
-        //        if (newId.id.Equals(""))
-        //            throw new CreateObjectException("Can not create ProjectWallet Object!");
-        //        return newId;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
-
-        //DELETE
-        //public async Task<int> DeleteProjectWalletById(Guid projectWalletId)
-        //{
-        //    int result;
-        //    try
-        //    {
-        //        result = await _projectWalletRepository.DeleteProjectWalletById(projectWalletId);
-        //        if (result == 0)
-        //            throw new DeleteObjectException("Can not delete ProjectWallet Object!");
-        //        return result;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
-
         //GET ALL
         public async Task<UserWalletsDTO> GetAllProjectWallets(ThisUserObj currentUser)
         {
@@ -158,52 +78,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
         //        result.createDate = await _validationService.FormatDateOutput(result.createDate);
         //        result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
 
-        //        return result;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
-
-        //UPDATE
-        //public async Task<int> UpdateProjectWallet(ProjectWalletDTO projectWalletDTO, Guid projectWalletId)
-        //{
-        //    int result;
-        //    try
-        //    {
-        //        if (projectWalletDTO.projectId == null || !await _validationService.CheckUUIDFormat(projectWalletDTO.projectId))
-        //            throw new InvalidFieldException("Invalid projectId!!!");
-
-        //        if (!await _validationService.CheckExistenceId("Project", Guid.Parse(projectWalletDTO.projectId)))
-        //            throw new NotFoundException("This projectId is not existed!!!");
-
-        //        if (projectWalletDTO.walletTypeId == null || !await _validationService.CheckUUIDFormat(projectWalletDTO.walletTypeId))
-        //            throw new InvalidFieldException("Invalid walletTypeId!!!");
-
-        //        if (!await _validationService.CheckExistenceId("WalletType", Guid.Parse(projectWalletDTO.walletTypeId)))
-        //            throw new NotFoundException("This walletTypeId is not existed!!!");
-
-        //        if (projectWalletDTO.createBy != null && projectWalletDTO.createBy.Length >= 0)
-        //        {
-        //            if (projectWalletDTO.createBy.Equals("string"))
-        //                projectWalletDTO.createBy = null;
-        //            else if (!await _validationService.CheckUUIDFormat(projectWalletDTO.createBy))
-        //                throw new InvalidFieldException("Invalid createBy!!!");
-        //        }
-
-        //        if (projectWalletDTO.updateBy != null && projectWalletDTO.updateBy.Length >= 0)
-        //        {
-        //            if (projectWalletDTO.updateBy.Equals("string"))
-        //                projectWalletDTO.updateBy = null;
-        //            else if (!await _validationService.CheckUUIDFormat(projectWalletDTO.updateBy))
-        //                throw new InvalidFieldException("Invalid updateBy!!!");
-        //        }
-
-        //        ProjectWallet dto = _mapper.Map<ProjectWallet>(projectWalletDTO);
-        //        result = await _projectWalletRepository.UpdateProjectWallet(dto, projectWalletId);
-        //        if (result == 0)
-        //            throw new UpdateObjectException("Can not update ProjectWallet Object!");
         //        return result;
         //    }
         //    catch (Exception e)

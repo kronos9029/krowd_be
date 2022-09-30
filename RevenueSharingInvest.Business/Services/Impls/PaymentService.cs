@@ -38,7 +38,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 foreach (PaymentDTO item in list)
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
-                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
                 }
 
                 return list;
@@ -62,7 +61,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new NotFoundException("No Payment Object Found!");
 
                 result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
 
                 return result;
             }

@@ -33,8 +33,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -44,8 +43,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectManagerId", projectManagerId, DbType.Guid);
@@ -65,39 +63,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //DELETE
-        public async Task<int> DeleteProjectWalletById(Guid projectWalletId)//thiếu para UpdateBy
-        {
-            try
-            {
-                var query = "UPDATE ProjectWallet "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
-                using var connection = CreateConnection();
-                var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                //parameters.Add("UpdateBy", projectWalletDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", projectWalletId, DbType.Guid);
-
-                return await connection.ExecuteAsync(query, parameters);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
         //GET ALL
         public async Task<List<ProjectWallet>> GetProjectWalletsByProjectManagerId(Guid projectManagerId)
         {
             try
             {
-                var query = " SELECT PW.* FROM ProjectWallet PW JOIN WalletType WT ON PW.WalletTypeId = WT.Id WHERE PW.IsDeleted = 0 "
+                var query = " SELECT PW.* FROM ProjectWallet PW JOIN WalletType WT ON PW.WalletTypeId = WT.Id "
                     + " AND PW.ProjectManagerId = @ProjectManagerId "
                     + " AND ( PW.WalletTypeId = @B1 " 
                     + "     OR PW.WalletTypeId = @B2 "
@@ -148,8 +119,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         ProjectManagerId = @ProjectManagerId, "
                     + "         WalletTypeId = @WalletTypeId, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         UpdateBy = @UpdateBy"
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -158,7 +128,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("WalletTypeId", projectWalletDTO.WalletTypeId, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", projectWalletDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", projectWalletDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", projectWalletId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -170,22 +139,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
-            }
-        }
-
-        //CLEAR DATA
-        public async Task<int> ClearAllProjectWalletData()
-        {
-            try
-            {
-                var query = "DELETE FROM ProjectWallet";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
             }
         }
 
@@ -227,8 +180,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "             JOIN WalletType WT ON PW.WalletTypeId = WT.Id "
                     + "         WHERE "
                     + "             WT.Type = @Type "
-                    + "             AND PW.ProjectManagerId = @ProjectManagerId "
-                    + "             AND PW.IsDeleted = 0";
+                    + "             AND PW.ProjectManagerId = @ProjectManagerId ";
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectManagerId", projectOwnerId, DbType.Guid);
                 parameters.Add("Type", walletType, DbType.String);

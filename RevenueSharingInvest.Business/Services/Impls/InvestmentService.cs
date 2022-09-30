@@ -149,6 +149,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         walletTransaction.FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString())).Id;
                         walletTransaction.ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString())).Id;
                         walletTransaction.Type = WalletTransactionTypeEnum.INVESTMENT.ToString();
+                        walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
                         //Add I3 balance
@@ -171,6 +172,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         walletTransaction.FromWalletId = walletTransaction.InvestorWalletId;
                         walletTransaction.ToWalletId = walletTransaction.ProjectWalletId;
                         walletTransaction.Type = WalletTransactionTypeEnum.INVESTMENT.ToString();
+                        walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
                         //Add P3 balance
@@ -184,7 +186,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         //Format Payment response
                         result = _mapper.Map<GetPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
                         result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                        result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
                         result.projectName = (await _projectRepository.GetProjectById(package.ProjectId)).Name;
                         result.packageName = package.Name;
                         result.investedQuantity = investmentDTO.quantity;

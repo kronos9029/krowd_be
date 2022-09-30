@@ -36,23 +36,6 @@ namespace RevenueSharingInvest.API.Controllers
             _userService = userService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateWalletTransaction([FromBody] WalletTransactionDTO walletTransactionDTO)
-        {
-            var result = await _walletTransactionService.CreateWalletTransaction(walletTransactionDTO);
-            return Ok(result);
-        }
-
-        [HttpPost]
-        [Route("I1ToI2")]
-        public async Task<IActionResult> TransferFromI1ToI2([FromForm] double amount)
-        {
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
-
-            var result = await _walletTransactionService.TransferFromI1ToI2(currentUser, amount);
-            return Ok(result);
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetAllWalletTransactions(int pageIndex, int pageSize)
         {
@@ -69,23 +52,6 @@ namespace RevenueSharingInvest.API.Controllers
             dto = await _walletTransactionService.GetWalletTransactionById(id);
             return Ok(dto);
         }
-
-        [HttpPut]
-        [Route("{id}")]
-        public async Task<IActionResult> UpdateWalletTransaction([FromBody] WalletTransactionDTO walletTransactionDTO, Guid id)
-        {
-            var result = await _walletTransactionService.UpdateWalletTransaction(walletTransactionDTO, id);
-            return Ok(result);
-        }
-
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteWalletTransaction(Guid id)
-        {
-            var result = await _walletTransactionService.DeleteWalletTransactionById(id);
-            return Ok(result);
-        }
-
 
         private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
         {

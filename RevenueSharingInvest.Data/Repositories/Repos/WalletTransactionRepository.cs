@@ -36,10 +36,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         ToWalletId, "
                     + "         Fee, "
                     + "         CreateDate, "
-                    + "         CreateBy, "
-                    + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         CreateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -54,10 +51,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @ToWalletId, "
                     + "         @Fee, "
                     + "         @CreateDate, "
-                    + "         @CreateBy, "
-                    + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @CreateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("PaymentId", walletTransactionDTO.PaymentId, DbType.Guid);
@@ -72,8 +66,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Fee", walletTransactionDTO.Fee, DbType.Double);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", walletTransactionDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                parameters.Add("UpdateBy", walletTransactionDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
@@ -82,33 +74,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
-            }
-        }
-
-        //DELETE
-        public async Task<int> DeleteWalletTransactionById(Guid walletTransactionId)//thiếu para UpdateBy
-        {
-            try
-            {
-                var query = "UPDATE WalletTransaction "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
-                using var connection = CreateConnection();
-                var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                //parameters.Add("UpdateBy", walletTransactionDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", walletTransactionId, DbType.Guid);
-
-                return await connection.ExecuteAsync(query, parameters);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
             }
         }
 
@@ -127,8 +92,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     Type ASC ) AS Num, "
                     + "             * "
                     + "         FROM WalletTransaction "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "         ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         PaymentId, "
@@ -142,10 +106,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         ToWalletId, "
                     + "         Fee, "
                     + "         CreateDate, "
-                    + "         CreateBy, "
-                    + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         CreateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -159,7 +120,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM WalletTransaction WHERE IsDeleted = 0 ORDER BY Type ASC";
+                    var query = "SELECT * FROM WalletTransaction ORDER BY Type ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<WalletTransaction>(query)).ToList();
                 }
@@ -205,10 +166,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Type = @Type, "
                     + "         FromWalletId = @FromWalletId, "
                     + "         ToWalletId = @ToWalletId, "
-                    + "         Fee = @Fee, "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         Fee = @Fee"
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -223,9 +181,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("FromWalletId", walletTransactionDTO.FromWalletId, DbType.Guid);
                 parameters.Add("ToWalletId", walletTransactionDTO.ToWalletId, DbType.Guid);
                 parameters.Add("Fee", walletTransactionDTO.Fee, DbType.Double);
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                parameters.Add("UpdateBy", walletTransactionDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", walletTransactionDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", walletTransactionId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -237,22 +192,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
-            }
-        }
-
-        //CLEAR DATA
-        public async Task<int> ClearAllWalletTransactionData()
-        {
-            try
-            {
-                var query = "DELETE FROM WalletTransaction";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
             }
         }
     }

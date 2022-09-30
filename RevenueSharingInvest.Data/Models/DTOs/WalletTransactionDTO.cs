@@ -22,8 +22,5 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public float fee { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
-        public string updateDate { get; set; }
-        public string updateBy { get; set; }
-        public bool isDeleted { get; set; }
     }
 }

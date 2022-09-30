@@ -13,17 +13,12 @@ namespace RevenueSharingInvest.Business.Services
     public interface IInvestorWalletService
     {
         //CREATE
-        //public Task<IdDTO> CreateInvestorWallet(InvestorWalletDTO investorWalletDTO);
 
         //READ
         public Task<UserWalletsDTO> GetAllInvestorWallets(ThisUserObj currentUser);
-        //public Task<InvestorWalletDTO> GetInvestorWalletById(Guid investorWalletId);
 
         //UPDATE
-        //public Task<int> UpdateInvestorWallet(InvestorWalletDTO investorWalletDTO, Guid investorWalletId);
 
         //DELETE
-        //public Task<int> DeleteInvestorWalletById(Guid investorWalletId);
-        //public Task<int> ClearAllInvestorWalletData();
     }
 }

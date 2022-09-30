@@ -18,9 +18,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string toId { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
-        public string updateDate { get; set; }
-        public string updateBy { get; set; }
-        public bool isDeleted { get; set; }
     }
 
     public class GetPaymentDTO : PaymentDTO
