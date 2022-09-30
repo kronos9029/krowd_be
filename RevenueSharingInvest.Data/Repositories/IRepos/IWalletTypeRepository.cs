@@ -15,7 +15,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //READ
         public Task<List<WalletType>> GetAllWalletTypes();
         public Task<WalletType> GetWalletTypeById(Guid walletTypeId);
-
+        public Task<List<WalletType>> GetWalletByMode(string mode);
         //UPDATE
         public Task<int> UpdateWalletType(WalletType walletTypeDTO, Guid walletTypeId);
 

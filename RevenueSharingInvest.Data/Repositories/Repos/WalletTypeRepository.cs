@@ -145,6 +145,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET BY MODE
+        public async Task<List<WalletType>> GetWalletByMode(string mode)
+        {
+            try
+            {
+                string query = "SELECT * FROM WalletType WHERE Mode = @Mode";
+                var parameters = new DynamicParameters();
+                parameters.Add("Mode", mode, DbType.String);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<WalletType>(query)).ToList();
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //UPDATE
         public async Task<int> UpdateWalletType(WalletType walletTypeDTO, Guid walletTypeId)
         {

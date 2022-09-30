@@ -78,9 +78,40 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<WalletTransaction>> GetAllWalletTransactions(int pageIndex, int pageSize)
+        public async Task<List<WalletTransaction>> GetAllWalletTransactions(int pageIndex, int pageSize, string userId, string sort, string fromDate, string toDate, string walletId)
         {
+            string whereClause = "";
+            if(!userId.Equals("")){
 
+                whereClause = "WHERE CreateBy = '"+Guid.Parse(userId)+"'";
+                if(!fromDate.Equals("") || !toDate.Equals(""))
+                {
+                    whereClause += " AND CreateDate >= '"+fromDate+"' AND CreateDate <= '"+toDate+"'";
+                }
+                if (!walletId.Equals(""))
+                {
+                    whereClause += " AND (FromWalletId = '" + Guid.Parse(walletId) + "' OR ToWalletId = '" + Guid.Parse(walletId) + "')";
+                }
+            } else 
+            {
+                if (!fromDate.Equals("") || !toDate.Equals(""))
+                {
+                    whereClause += " WHERE CreateDate >= '" + fromDate + "' AND CreateDate <= '" + toDate + "'";
+                }
+                if (!walletId.Equals(""))
+                {
+                    whereClause += " AND (FromWalletId = '" + Guid.Parse(walletId) + "' OR ToWalletId = '" + Guid.Parse(walletId) + "')";
+                }
+            }
+            
+            sort ??= "";
+            if (sort.Equals(""))
+            {
+                sort = "DESC";
+            } else
+            {
+                sort = "ASC";
+            }
             try
             {
                 if (pageIndex != 0 && pageSize != 0)
@@ -89,10 +120,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         SELECT "
                     + "             ROW_NUMBER() OVER ( "
                     + "                 ORDER BY "
-                    + "                     Type ASC ) AS Num, "
+                    + "                     CreateDate "+sort+" ) AS Num, "
                     + "             * "
-                    + "         FROM WalletTransaction "
-                    + "         ) "
+                    + "         FROM WalletTransaction "+whereClause+ " )"
                     + "     SELECT "
                     + "         Id, "
                     + "         PaymentId, "
@@ -120,7 +150,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM WalletTransaction ORDER BY Type ASC";
+                    var query = "SELECT * FROM WalletTransaction "+whereClause+" ORDER BY CreateDate "+sort+"";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<WalletTransaction>(query)).ToList();
                 }

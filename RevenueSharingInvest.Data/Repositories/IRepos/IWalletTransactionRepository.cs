@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<string> CreateWalletTransaction(WalletTransaction walletTransactionDTO);
 
         //READ
-        public Task<List<WalletTransaction>> GetAllWalletTransactions(int pageIndex, int pageSize);
+        public Task<List<WalletTransaction>> GetAllWalletTransactions(int pageIndex, int pageSize, string userId, string sort, string fromDate, string toDate, string walletId);
         public Task<WalletTransaction> GetWalletTransactionById(Guid walletTransactionId);
 
         //UPDATE

@@ -8,6 +8,7 @@ using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,18 +21,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IWalletTransactionRepository _walletTransactionRepository;
         private readonly IValidationService _validationService;
         private readonly IInvestorWalletRepository _investorWalletRepository;
+        private readonly IWalletTypeRepository _walletTypeRepository;
         private readonly IMapper _mapper;
 
 
         public WalletTransactionService(IWalletTransactionRepository walletTransactionRepository, 
             IValidationService validationService, 
             IMapper mapper,
-            IInvestorWalletRepository investorWalletRepository)
+            IInvestorWalletRepository investorWalletRepository,
+            IWalletTypeRepository walletTypeRepository)
         {
             _walletTransactionRepository = walletTransactionRepository;
             _validationService = validationService;
             _mapper = mapper;
             _investorWalletRepository = investorWalletRepository;
+            _walletTypeRepository = walletTypeRepository;
         }
 
         public async Task<string> TransferFromI1ToI2(ThisUserObj currentUser, double amount)
@@ -99,11 +103,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<WalletTransactionDTO>> GetAllWalletTransactions(int pageIndex, int pageSize)
+        public async Task<List<WalletTransactionDTO>> GetAllWalletTransactions(int pageIndex, int pageSize, string sort,string fromDate, string toDate, string userId, string walletId)
         {
+            fromDate ??= "";
+            toDate ??= "";
+            walletId ??= "";
             try
             {
-                List<WalletTransaction> walletTransactionList = await _walletTransactionRepository.GetAllWalletTransactions(pageIndex, pageSize);
+                if(!fromDate.Equals("") || !toDate.Equals(""))
+                {
+                    fromDate += " 00:00:00";
+                    toDate += " 23:59:59";
+                }
+
+                List<WalletTransaction> walletTransactionList = await _walletTransactionRepository.GetAllWalletTransactions(pageIndex, pageSize,userId,sort, fromDate, toDate, walletId);
                 List<WalletTransactionDTO> list = _mapper.Map<List<WalletTransactionDTO>>(walletTransactionList);
 
                 foreach (WalletTransactionDTO item in list)
@@ -136,6 +149,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 return result;
             }
             catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<List<WalletType>> GetUserWallet(string Mode)
+        {
+            try
+            {
+                List<WalletType> walletTypes = await _walletTypeRepository.GetWalletByMode(RoleEnum.INVESTOR.ToString());
+                return walletTypes;
+            }catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
