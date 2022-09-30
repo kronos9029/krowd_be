@@ -97,13 +97,38 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Investment investment = _mapper.Map<Investment>(investmentDTO);
                 investment.InvestorId = Guid.Parse(currentUser.investorId);
                 investment.TotalPrice = investment.Quantity * package.Price;
-                investment.Status = InvestmentStatusEnum.WAITING.ToString();
+                investment.Status = TransactionStatusEnum.WAITING.ToString();
                 investment.CreateBy = Guid.Parse(currentUser.userId);
                 investment.UpdateBy = Guid.Parse(currentUser.userId);
 
                 investmentId = await _investmentRepository.CreateInvestment(investment);
                 if (investmentId.Equals(""))
-                    throw new CreateObjectException("Can not create Investment Object!");
+                {
+                    //Create Payment
+                    Payment payment = new Payment();
+                    User projectManager = await _userRepository.GetProjectManagerByProjectId(package.ProjectId);
+                    payment.InvestmentId = Guid.Parse(investmentId);
+                    payment.Amount = investment.TotalPrice;
+                    payment.Description = "Đầu tư gói '" + package.Name + "' x" + investmentDTO.quantity;
+                    payment.Type = TransactionTypeEnum.INVESTMENT.ToString();
+                    payment.FromId = Guid.Parse(currentUser.userId);
+                    payment.ToId = projectManager.Id;
+                    payment.CreateBy = Guid.Parse(currentUser.userId);
+                    payment.Status = TransactionStatusEnum.FAILED.ToString();
+
+                    string paymentId = await _paymentRepository.CreatePayment(payment);
+
+                    result = _mapper.Map<GetPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
+                    result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                    Project project = await _projectRepository.GetProjectById(package.ProjectId);
+                    result.projectId = project.Id.ToString();
+                    result.projectName = project.Name;
+                    result.packageId = package.Id.ToString();
+                    result.packageName = package.Name;
+                    result.investedQuantity = investmentDTO.quantity;
+                    result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")))).Name;
+                    result.fee = "0%";
+                }
                 else
                 {
                     //Create Payment
@@ -112,9 +137,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     payment.InvestmentId = Guid.Parse(investmentId);
                     payment.Amount = investment.TotalPrice;
                     payment.Description = "Đầu tư gói '" + package.Name + "' x" + investmentDTO.quantity;
+                    payment.Type = TransactionTypeEnum.INVESTMENT.ToString();
                     payment.FromId = Guid.Parse(currentUser.userId);
                     payment.ToId = projectManager.Id;
                     payment.CreateBy = Guid.Parse(currentUser.userId);
+                    payment.Status = TransactionStatusEnum.SUCCESS.ToString();
 
                     string paymentId = await _paymentRepository.CreatePayment(payment);
                     if (paymentId != "")
@@ -123,7 +150,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         investment = new Investment();
                         investment.Id = Guid.Parse(investmentId);
                         investment.UpdateBy = Guid.Parse(currentUser.userId);
-                        investment.Status = InvestmentStatusEnum.SUCCESS.ToString();
+                        investment.Status = TransactionStatusEnum.SUCCESS.ToString();
                         await _investmentRepository.UpdateInvestmentStatus(investment);
 
                         //Update Package Quantity
@@ -148,7 +175,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         walletTransaction.Description = "Transfer from I2 to I3 to invest";
                         walletTransaction.FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString())).Id;
                         walletTransaction.ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString())).Id;
-                        walletTransaction.Type = WalletTransactionTypeEnum.INVESTMENT.ToString();
+                        walletTransaction.Type = TransactionTypeEnum.INVESTMENT.ToString();
                         walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
@@ -171,7 +198,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         walletTransaction.Description = "Transfer from I3 to P3 to invest";
                         walletTransaction.FromWalletId = walletTransaction.InvestorWalletId;
                         walletTransaction.ToWalletId = walletTransaction.ProjectWalletId;
-                        walletTransaction.Type = WalletTransactionTypeEnum.INVESTMENT.ToString();
+                        walletTransaction.Type = TransactionTypeEnum.INVESTMENT.ToString();
                         walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
@@ -186,69 +213,36 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         //Format Payment response
                         result = _mapper.Map<GetPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
                         result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                        result.projectName = (await _projectRepository.GetProjectById(package.ProjectId)).Name;
+                        Project project = await _projectRepository.GetProjectById(package.ProjectId);
+                        result.projectId = project.Id.ToString();
+                        result.projectName = project.Name;
+                        result.packageId = package.Id.ToString();
                         result.packageName = package.Name;
                         result.investedQuantity = investmentDTO.quantity;
                         result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")))).Name;
-                        result.fee = walletTransaction.Fee  + "%";
+                        result.fee = walletTransaction.Fee + "%";
                     }
                     else
                     {
+                        payment.Status = TransactionStatusEnum.FAILED.ToString();
+                        paymentId = await _paymentRepository.CreatePayment(payment);
+                        result = _mapper.Map<GetPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
+                        result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                        Project project = await _projectRepository.GetProjectById(package.ProjectId);
+                        result.projectId = project.Id.ToString();
+                        result.projectName = project.Name;
+                        result.packageId = package.Id.ToString();
+                        result.packageName = package.Name;
+                        result.investedQuantity = investmentDTO.quantity;
+                        result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")))).Name;
+                        result.fee = "0%";
+
                         investment = new Investment();
                         investment.Id = Guid.Parse(investmentId);
                         investment.UpdateBy = Guid.Parse(currentUser.userId);
-                        investment.Status = InvestmentStatusEnum.FAILED.ToString();
+                        investment.Status = TransactionStatusEnum.FAILED.ToString();
                         await _investmentRepository.UpdateInvestmentStatus(investment);
-                        throw new CreateObjectException("Investment failed!!!");
                     }
-                    
-
-
-                    ////Subtract I2 balance
-                    //InvestorWallet investorWallet = new InvestorWallet();
-                    //investorWallet.InvestorId = Guid.Parse(currentUser.investorId);
-                    //investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2"));
-                    //investorWallet.Balance = -investment.TotalPrice;
-                    //investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
-
-                    
-
-                    //if (await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet) == 1)
-                    //{
-                        ////Create WalletTransaction from I2 to I3
-                        //WalletTransaction walletTransaction = new WalletTransaction();
-                        //walletTransaction.
-
-                        //Add I3 balance
-                        //investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"));
-                        //investorWallet.Balance = investment.TotalPrice;
-                        //await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
-
-                        ////Update Investment Status
-                        //investment = new Investment();
-                        //investment.Id = Guid.Parse(investmentId);
-                        //investment.UpdateBy = Guid.Parse(currentUser.userId);
-                        //investment.Status = InvestmentStatusEnum.SUCCESS.ToString();
-                        //await _investmentRepository.UpdateInvestmentStatus(investment);
-                        ////Update Package Quantity
-                        //await _packageRepository.UpdatePackageRemainingQuantity(package.Id, package.RemainingQuantity - investmentDTO.quantity, Guid.Parse(currentUser.userId));
-                        ////Update Project Amount
-                        //await _projectRepository.UpdateProjectInvestedCapitalAndRemainAmount(package.ProjectId, (double)investorWallet.Balance, Guid.Parse(currentUser.userId));
-                        
-
-                        //Subtract I3 balance
-                        //Create WalletTransaction from I3 to P3
-                        //Add P3 balance
-                    //}
-                    //else
-                    //{
-                        //investment = new Investment();
-                        //investment.Id = Guid.Parse(investmentId);
-                        //investment.UpdateBy = Guid.Parse(currentUser.userId);
-                        //investment.Status = InvestmentStatusEnum.FAILED.ToString();
-                        //await _investmentRepository.UpdateInvestmentStatus(investment);
-                        //throw new CreateObjectException("Investment failed!!!");
-                    //}
                 }
 
                 return result;

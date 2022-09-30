@@ -18,11 +18,14 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string toId { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
+        public string status { get; set; }
     }
 
     public class GetPaymentDTO : PaymentDTO
     {
+        public string projectId { get; set; }
         public string projectName { get; set; }
+        public string packageId { get; set; }
         public string packageName { get; set; }
         public int investedQuantity { get; set; }
         public string fromWalletName { get; set; }
