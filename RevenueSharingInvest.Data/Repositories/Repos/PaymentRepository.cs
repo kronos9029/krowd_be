@@ -47,7 +47,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @FromId, "
                     + "         @ToId, "
                     + "         @CreateDate, "
-                    + "         @CreateBy "
+                    + "         @CreateBy, "
                     + "         @Status )";
 
                 var parameters = new DynamicParameters();
