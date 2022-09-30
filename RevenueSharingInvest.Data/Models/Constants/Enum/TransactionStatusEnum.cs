@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Models.Constants.Enum
 {
-    public enum WalletTransactionTypeEnum
+    public enum TransactionStatusEnum
     {
-        INVESTMENT,
-        TRANSFER,
-        PAYMENT
+        WAITING,
+        SUCCESS,
+        FAILED,
+        CANCELED
     }
 }
