@@ -28,6 +28,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IUserRepository _userRepository;
         private readonly IPaymentRepository _paymentRepository;
         private readonly IWalletTypeRepository _walletTypeRepository;
+        private readonly IWalletTransactionRepository _walletTransactionRepository;
 
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
@@ -42,6 +43,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IUserRepository userRepository,
             IPaymentRepository paymentRepository,
             IWalletTypeRepository walletTypeRepository,
+            IWalletTransactionRepository walletTransactionRepository,
             IValidationService validationService, 
             IMapper mapper)
         {
@@ -54,6 +56,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _userRepository = userRepository;
             _paymentRepository = paymentRepository;
             _walletTypeRepository = walletTypeRepository;
+            _walletTransactionRepository = walletTransactionRepository;
 
             _validationService = validationService;
             _mapper = mapper;
@@ -146,6 +149,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         walletTransaction.FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString())).Id;
                         walletTransaction.ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString())).Id;
                         walletTransaction.Type = WalletTransactionTypeEnum.INVESTMENT.ToString();
+                        await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
                         //Add I3 balance
                         investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"));
@@ -167,11 +171,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         walletTransaction.FromWalletId = walletTransaction.InvestorWalletId;
                         walletTransaction.ToWalletId = walletTransaction.ProjectWalletId;
                         walletTransaction.Type = WalletTransactionTypeEnum.INVESTMENT.ToString();
+                        await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
-                        //Add I3 balance
-                        investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3"));
-                        investorWallet.Balance = payment.Amount;
-                        await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
+                        //Add P3 balance
+                        ProjectWallet projectWallet = new ProjectWallet();
+                        projectWallet.ProjectManagerId = projectManager.Id;
+                        projectWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3"));
+                        projectWallet.Balance = payment.Amount;
+                        projectWallet.UpdateBy = Guid.Parse(currentUser.userId);
+                        await _projectWalletRepository.UpdateProjectWalletBalance(projectWallet);
 
                         //Format Payment response
                         result = _mapper.Map<GetPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));

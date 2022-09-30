@@ -241,5 +241,38 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        //UPDATE BALANCE
+        public async Task<int> UpdateProjectWalletBalance(ProjectWallet projectWalletDTO)
+        {
+            try
+            {
+                var query = "UPDATE ProjectWallet "
+                    + "     SET "
+                    + "         Balance = Balance + @Balance, "
+                    + "         UpdateDate = @UpdateDate, "
+                    + "         UpdateBy = @UpdateBy"
+                    + "     WHERE "
+                    + "         ProjectManagerId = @ProjectManagerId"
+                    + "         AND WalletTypeId = @WalletTypeId";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Balance", projectWalletDTO.Balance, DbType.Double);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                parameters.Add("UpdateBy", projectWalletDTO.UpdateBy, DbType.Guid);
+                parameters.Add("ProjectManagerId", projectWalletDTO.ProjectManagerId, DbType.Guid);
+                parameters.Add("WalletTypeId", projectWalletDTO.WalletTypeId, DbType.Guid);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }
