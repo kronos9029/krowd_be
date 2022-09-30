@@ -226,6 +226,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             response.uid = uid;
             response.id = userObject.Id;
             response.image = userObject.Image ?? ImageUrl;
+            response.fullName = (userObject.FirstName + " " + userObject.LastName) ?? userRecord.DisplayName;
             response = await GenerateTokenAsync(response, RoleEnum.ADMIN.ToString());
 
 
