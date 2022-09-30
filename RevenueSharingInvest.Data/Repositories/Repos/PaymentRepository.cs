@@ -91,7 +91,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id=@Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
                 //parameters.Add("UpdateBy", paymentDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", paymentId, DbType.Guid);
 
@@ -219,22 +219,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
-            }
-        }
-
-        //CLEAR DATA
-        public async Task<int> ClearAllPaymentData()
-        {
-            try
-            {
-                var query = "DELETE FROM Payment";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
             }
         }
     }

@@ -211,5 +211,35 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+
+        //GET BY PROJECT OWNER ID AND TYPE
+        public async Task<ProjectWallet> GetProjectWalletByProjectOwnerIdAndType(Guid projectOwnerId, string walletType)
+        {
+            try
+            {
+                string query = "SELECT "
+                    + "             PW.Id, "
+                    + "             PW.ProjectManagerId, "
+                    + "             PW.Balance, "
+                    + "             PW.WalletTypeId "
+                    + "         FROM "
+                    + "             ProjectWallet PW "
+                    + "             JOIN WalletType WT ON PW.WalletTypeId = WT.Id "
+                    + "         WHERE "
+                    + "             WT.Type = @Type "
+                    + "             AND PW.ProjectManagerId = @ProjectManagerId "
+                    + "             AND PW.IsDeleted = 0";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectManagerId", projectOwnerId, DbType.Guid);
+                parameters.Add("Type", walletType, DbType.String);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<ProjectWallet>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

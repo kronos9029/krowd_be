@@ -102,7 +102,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     //investor top-up I1 Wallet
                     double realAmount = Convert.ToDouble(entity.Amount);
-                    InvestorWallet I1 = await _investorWalletRepository.GetInvestorWalletByTypeAndInvestorId(investor.Id, WalletTypeEnum.I1.ToString());
+                    InvestorWallet I1 = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(investor.Id, WalletTypeEnum.I1.ToString());
                     I1.Balance += realAmount;
                     I1.UpdateDate = DateTime.Now;
                     I1.UpdateBy = entity.FromUserId;
@@ -114,7 +114,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     }
 
                     //Money From I1 Wallet automaticly tranfer from I1 to I2
-                    InvestorWallet I2 = await _investorWalletRepository.GetInvestorWalletByTypeAndInvestorId(investor.Id, WalletTypeEnum.I2.ToString());
+                    InvestorWallet I2 = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(investor.Id, WalletTypeEnum.I2.ToString());
                     if (I2 == null)
                         throw new NotFoundException("I2 Wallet Not Found!!");
 

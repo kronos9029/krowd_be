@@ -20,7 +20,5 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> UpdatePayment(Payment paymentDTO, Guid paymentId);
 
         //DELETE
-        public Task<int> DeletePaymentById(Guid paymentId);
-        public Task<int> ClearAllPaymentData();
     }
 }

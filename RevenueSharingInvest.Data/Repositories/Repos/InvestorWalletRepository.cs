@@ -120,14 +120,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //GET BY ID
-        public async Task<InvestorWallet> GetInvestorWalletByTypeAndInvestorId(Guid investorId, string walletType)
+        //GET BY INVESTOR ID AND TYPE
+        public async Task<InvestorWallet> GetInvestorWalletByInvestorIdAndType(Guid investorId, string walletType)
         {
             try
             {
-                string query = "SELECT IW.Id, IW.InvestorId, IW.Balance, IW.WalletTypeId " +
-                    "FROM InvestorWallet IW JOIN WalletType WT ON IW.WalletTypeId = WT.Id " +
-                    "WHERE WT.Type = @Type AND IW.InvestorId = @InvestorId AND IW.IsDeleted = 0";
+                string query = "SELECT " 
+                    + "             IW.Id, " 
+                    + "             IW.InvestorId, " 
+                    + "             IW.Balance, " 
+                    + "             IW.WalletTypeId " 
+                    + "         FROM " 
+                    + "             InvestorWallet IW " 
+                    + "             JOIN WalletType WT ON IW.WalletTypeId = WT.Id " 
+                    + "         WHERE " 
+                    + "             WT.Type = @Type " 
+                    + "             AND IW.InvestorId = @InvestorId " 
+                    + "             AND IW.IsDeleted = 0";
                 var parameters = new DynamicParameters();
                 parameters.Add("InvestorId", investorId, DbType.Guid);
                 parameters.Add("Type", walletType, DbType.String);

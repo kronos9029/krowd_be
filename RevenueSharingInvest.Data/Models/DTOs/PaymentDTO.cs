@@ -22,4 +22,13 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string updateBy { get; set; }
         public bool isDeleted { get; set; }
     }
+
+    public class GetPaymentDTO : PaymentDTO
+    {
+        public string projectName { get; set; }
+        public string packageName { get; set; }
+        public int investedQuantity { get; set; }
+        public string fromWalletName { get; set; }
+        public string fee { get; set; }
+    }
 }

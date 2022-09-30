@@ -26,13 +26,7 @@ namespace RevenueSharingInvest.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreatePayment([FromBody] PaymentDTO paymentDTO)
-        {
-            var result = await _paymentService.CreatePayment(paymentDTO);
-            return Ok(result);
-        }
-
+        //GET ALL
         [HttpGet]
         public async Task<IActionResult> GetAllPayments(int pageIndex, int pageSize)
         {
@@ -41,6 +35,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //GET BY ID
         [HttpGet]
         [Route("{id}")]
         public async Task<IActionResult> GetPaymentById(Guid id)
@@ -48,22 +43,6 @@ namespace RevenueSharingInvest.API.Controllers
             PaymentDTO dto = new PaymentDTO();
             dto = await _paymentService.GetPaymentById(id);
             return Ok(dto);
-        }
-
-        [HttpPut]
-        [Route("{id}")]
-        public async Task<IActionResult> UpdatePayment([FromBody] PaymentDTO paymentDTO, Guid id)
-        {
-            var result = await _paymentService.UpdatePayment(paymentDTO, id);
-            return Ok(result);
-        }
-
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeletePayment(Guid id)
-        {
-            var result = await _paymentService.DeletePaymentById(id);
-            return Ok(result);
         }
     }
 }

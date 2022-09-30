@@ -122,7 +122,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             try
             {
-                InvestorWallet I1 = await _investorWalletRepository.GetInvestorWalletByTypeAndInvestorId(Guid.Parse(currentUser.investorId), WalletTypeEnum.I1.ToString());
+                InvestorWallet I1 = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I1.ToString());
 
                 if (I1 == null)
                     throw new NotFoundException("I1 Wallet not Found!!");
@@ -134,7 +134,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
                 else
                 {
-                    InvestorWallet I2 = await _investorWalletRepository.GetInvestorWalletByTypeAndInvestorId(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString());
+                    InvestorWallet I2 = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString());
                     if (I2 == null)
                         throw new NotFoundException("I2 Wallet Not Found!!");
 
