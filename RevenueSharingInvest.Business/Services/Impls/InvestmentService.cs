@@ -101,8 +101,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 investment.CreateBy = Guid.Parse(currentUser.userId);
                 investment.UpdateBy = Guid.Parse(currentUser.userId);
 
-                //investmentId = await _investmentRepository.CreateInvestment(investment);
-                if (investmentId.Equals(""))
+                investmentId = await _investmentRepository.CreateInvestment(investment);
+                if (!investmentId.Equals(""))
                 {
                     //Create Payment
                     Payment payment = new Payment();
