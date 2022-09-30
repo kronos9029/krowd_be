@@ -107,7 +107,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     //Create Payment
                     Payment payment = new Payment();
                     User projectManager = await _userRepository.GetProjectManagerByProjectId(package.ProjectId);
-                    payment.InvestmentId = Guid.Parse(investmentId);
+                    payment.InvestmentId = null;
                     payment.Amount = investment.TotalPrice;
                     payment.Description = "Đầu tư gói '" + package.Name + "' x" + investmentDTO.quantity;
                     payment.Type = TransactionTypeEnum.INVESTMENT.ToString();

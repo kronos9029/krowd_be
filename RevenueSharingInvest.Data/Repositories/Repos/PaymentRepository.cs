@@ -34,7 +34,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         FromId, "
                     + "         ToId, "
                     + "         CreateDate, "
-                    + "         CreateBy ) "
+                    + "         CreateBy, "
+                    + "         Status ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -46,7 +47,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @FromId, "
                     + "         @ToId, "
                     + "         @CreateDate, "
-                    + "         @CreateBy )";
+                    + "         @CreateBy "
+                    + "         @Status )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("InvestmentId", paymentDTO.InvestmentId, DbType.Guid);
@@ -58,6 +60,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("ToId", paymentDTO.ToId, DbType.Guid);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", paymentDTO.CreateBy, DbType.Guid);
+                parameters.Add("Status", paymentDTO.Status, DbType.String);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
@@ -94,7 +97,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         FromId, "
                     + "         ToId, "
                     + "         CreateDate, "
-                    + "         CreateBy "
+                    + "         CreateBy, "
+                    + "         Status "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
