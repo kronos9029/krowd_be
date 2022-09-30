@@ -11,7 +11,7 @@ namespace RevenueSharingInvest.Business.Services
     public interface IInvestmentService
     {
         //CREATE
-        public Task<PaymentDTO> CreateInvestment(CreateInvestmentDTO investmentDTO, ThisUserObj currentUser);
+        public Task<GetPaymentDTO> CreateInvestment(CreateInvestmentDTO investmentDTO, ThisUserObj currentUser);
 
         //READ
         public Task<List<GetInvestmentDTO>> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId, ThisUserObj currentUser);
