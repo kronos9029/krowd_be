@@ -108,6 +108,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     Payment payment = new Payment();
                     User projectManager = await _userRepository.GetProjectManagerByProjectId(package.ProjectId);
                     payment.InvestmentId = null;
+                    payment.PackageId = package.Id;
                     payment.Amount = investment.TotalPrice;
                     payment.Description = "Đầu tư gói '" + package.Name + "' x" + investmentDTO.quantity;
                     payment.Type = TransactionTypeEnum.INVESTMENT.ToString();
@@ -126,7 +127,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     result.packageId = package.Id.ToString();
                     result.packageName = package.Name;
                     result.investedQuantity = investmentDTO.quantity;
-                    result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")))).Name;
+                    result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")))).Name;
                     result.fee = "0%";
                 }
                 else
@@ -135,6 +136,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     Payment payment = new Payment();
                     User projectManager = await _userRepository.GetProjectManagerByProjectId(package.ProjectId);
                     payment.InvestmentId = Guid.Parse(investmentId);
+                    payment.PackageId = package.Id;
                     payment.Amount = investment.TotalPrice;
                     payment.Description = "Đầu tư gói '" + package.Name + "' x" + investmentDTO.quantity;
                     payment.Type = TransactionTypeEnum.INVESTMENT.ToString();
@@ -219,7 +221,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         result.packageId = package.Id.ToString();
                         result.packageName = package.Name;
                         result.investedQuantity = investmentDTO.quantity;
-                        result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")))).Name;
+                        result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")))).Name;
                         result.fee = walletTransaction.Fee + "%";
                     }
                     else
@@ -234,7 +236,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         result.packageId = package.Id.ToString();
                         result.packageName = package.Name;
                         result.investedQuantity = investmentDTO.quantity;
-                        result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")))).Name;
+                        result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")))).Name;
                         result.fee = "0%";
 
                         investment = new Investment();

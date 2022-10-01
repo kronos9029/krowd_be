@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
+using RevenueSharingInvest.Data.Models.Constants;
+using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -73,19 +75,54 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Payment>> GetAllPayments(int pageIndex, int pageSize)
+        public async Task<List<Payment>> GetAllPayments(int pageIndex, int pageSize, string type, Guid roleId, Guid userId)
         {
             try
             {
+                string whereCondition = "";
+                string typeCondition = "";
+                
+                var parameters = new DynamicParameters();
+
+                if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                {
+                    if (type.Equals(PaymentTypeEnum.INVESTMENT.ToString()))
+                    {
+                        whereCondition = whereCondition + " AND ToId = @ToId ";
+                        parameters.Add("ToId", userId, DbType.Guid);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + " AND FromId = @FromId ";
+                        parameters.Add("FromId", userId, DbType.Guid);
+                    }
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
+                }
+                else if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
+                {
+                    if (type.Equals(PaymentTypeEnum.INVESTMENT.ToString()))
+                    {
+                        whereCondition = whereCondition + " AND FromId = @FromId ";
+                        parameters.Add("ToId", userId, DbType.Guid);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + " AND ToId = @ToId ";
+                        parameters.Add("FromId", userId, DbType.Guid);
+                    }
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
+                }
+
                 if (pageIndex != 0 && pageSize != 0)
                 {
                     var query = "WITH X AS ( "
                     + "         SELECT "
                     + "             ROW_NUMBER() OVER ( "
                     + "                 ORDER BY "
-                    + "                     Type ASC ) AS Num, "
+                    + "                     CreateDate DESC ) AS Num, "
                     + "             * "
                     + "         FROM Payment "
+                    +           whereCondition
                     + "         ) "
                     + "     SELECT "
                     + "         Id, "
@@ -104,7 +141,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     WHERE "
                     + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
                     + "         AND @PageIndex * @PageSize";
-                    var parameters = new DynamicParameters();
                     parameters.Add("PageIndex", pageIndex, DbType.Int16);
                     parameters.Add("PageSize", pageSize, DbType.Int16);
                     using var connection = CreateConnection();
@@ -112,9 +148,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM Payment ORDER BY Type ASC";
+                    var query = "SELECT * FROM Payment " + whereCondition + " ORDER BY CreateDate DESC";
                     using var connection = CreateConnection();
-                    return (await connection.QueryAsync<Payment>(query)).ToList();
+                    return (await connection.QueryAsync<Payment>(query, parameters)).ToList();
                 }               
             }
             catch (Exception e)

@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<string> CreatePayment(Payment paymentDTO);
 
         //READ
-        public Task<List<Payment>> GetAllPayments(int pageIndex, int pageSize);
+        public Task<List<Payment>> GetAllPayments(int pageIndex, int pageSize, string type, Guid roleId, Guid userId);
         public Task<Payment> GetPaymentById(Guid paymentId);
 
         //UPDATE

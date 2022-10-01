@@ -37,7 +37,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string projectName { get; set; }
         public string stageId { get; set; }
         public string stageName { get; set; }
-        public int investedQuantity { get; set; }
         public string fromWalletName { get; set; }
         public string fee { get; set; }
     }
