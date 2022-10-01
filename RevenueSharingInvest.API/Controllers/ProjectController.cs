@@ -46,6 +46,7 @@ namespace RevenueSharingInvest.API.Controllers
             _investmentService = investmentService;
         }
 
+        //CREATE
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> CreateProject([FromForm] CreateProjectDTO projectDTO)
@@ -60,6 +61,7 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role BUSINESS_MANAGER can perform this action!!!");
         }
 
+        //GET ALL
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllProjects(
@@ -106,6 +108,7 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "You Don't Have Permission Perform This Action!!");
         }
 
+        //GET BY ID
         [HttpGet]
         [Route("{id}")]
         [AllowAnonymous]
@@ -238,6 +241,7 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
         }
 
+        //UPDATE
         [HttpPut]
         [Route("{id}")]
         [Authorize(Roles = "PROJECT_MANAGER")]
@@ -284,6 +288,7 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or PROJECT_MANAGER can perform this action!!!");
         }
 
+        //DELETE
         [HttpDelete]
         [Route("{id}")]
         [Authorize(Roles = "ADMIN, BUSINESS_MANAGER")]
