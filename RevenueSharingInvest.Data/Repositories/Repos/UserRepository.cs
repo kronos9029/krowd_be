@@ -823,6 +823,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         JOIN Investment INM ON INS.Id = INM.InvestorId "
                     + "     WHERE "
                     + "         INM.ProjectId = @ProjectId "
+                    + "         AND INM.Status = 'SUCCESS' "
                     + "     GROUP BY U.LastName, U.FirstName, U.Image";
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", projectId, DbType.Guid);
