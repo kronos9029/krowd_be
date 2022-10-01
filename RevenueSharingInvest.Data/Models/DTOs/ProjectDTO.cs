@@ -84,7 +84,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public bool isDeleted { get; set; }
     }
 
-    public class LandingPageProjectDTO : ProjectDTO
+    public class BasicProjectDTO : ProjectDTO
     {
         public string id { get; set; }
         public string managerId { get; set; }

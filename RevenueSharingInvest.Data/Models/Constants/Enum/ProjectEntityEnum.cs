@@ -18,6 +18,7 @@ namespace RevenueSharingInvest.Data.Models.Constants
         REVIEW,
         ABOUT,
         EXTENSION,
-        PRESS
+        PRESS, 
+        HOW_IT_WORKS
     }
 }
