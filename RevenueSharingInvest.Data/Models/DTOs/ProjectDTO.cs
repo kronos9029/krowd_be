@@ -84,7 +84,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public bool isDeleted { get; set; }
         public double investedAmount { get; set; }
         public double receivedAmount { get; set; }
-        public string lastedInvestedDate { get; set; }
+        public string lastestInvestmentDate { get; set; }
     }
 
     public class BasicProjectDTO : ProjectDTO

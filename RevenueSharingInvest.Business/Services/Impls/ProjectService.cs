@@ -33,6 +33,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IPeriodRevenueRepository _periodRevenueRepository;
         private readonly IPeriodRevenueHistoryRepository _periodRevenueHistoryRepository;
         private readonly IPackageRepository _packageRepository;       
+        private readonly IPaymentRepository _paymentRepository;       
 
         private readonly IValidationService _validationService;
         private readonly IProjectTagService _projectTagService;
@@ -51,6 +52,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IPeriodRevenueRepository periodRevenueRepository,
             IPeriodRevenueHistoryRepository periodRevenueHistoryRepository,
             IPackageRepository packageRepository,
+            IPaymentRepository paymentRepository, 
             IValidationService validationService,
             IProjectTagService projectTagService,
             IFileUploadService fileUploadService,
@@ -67,6 +69,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _periodRevenueRepository = periodRevenueRepository;
             _periodRevenueHistoryRepository = periodRevenueHistoryRepository;
             _packageRepository = packageRepository;
+            _paymentRepository = paymentRepository;
             
             _validationService = validationService;
             _projectTagService = projectTagService;
@@ -1145,7 +1148,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET INVESTED PROJECTS
-        public async Task<AllInvestedProjectDTO> GetInvestedProjects(int pageIndex, int pageSize, ThisUserObj thisUserObj)
+        public async Task<AllInvestedProjectDTO> GetInvestedProjects(int pageIndex, int pageSize, ThisUserObj currentUser)
         {
             AllInvestedProjectDTO result = new AllInvestedProjectDTO();
             result.listOfProject = new List<InvestedProjectDTO>();
@@ -1153,8 +1156,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             try
             {
-                result.numOfProject = await _projectRepository.CountInvestedProjects(Guid.Parse(thisUserObj.investorId));
-                listEntity = await _projectRepository.GetInvestedProjects(pageIndex, pageSize, Guid.Parse(thisUserObj.investorId));
+                result.numOfProject = await _projectRepository.CountInvestedProjects(Guid.Parse(currentUser.investorId));
+                listEntity = await _projectRepository.GetInvestedProjects(pageIndex, pageSize, Guid.Parse(currentUser.investorId));
 
                 List<InvestedProjectDTO> listDTO = _mapper.Map<List<InvestedProjectDTO>>(listEntity);
 
@@ -1168,6 +1171,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     }
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+
+                    item.investedAmount = await _paymentRepository.GetInvestedAmountForInvestorByProjectId(Guid.Parse(item.id), Guid.Parse(currentUser.userId));
+                    item.receivedAmount = await _paymentRepository.GetReceivedAmountForInvestorByProjectId(Guid.Parse(item.id), Guid.Parse(currentUser.userId));
+                    item.lastestInvestmentDate = await _validationService.FormatDateOutput(await _paymentRepository.GetLastestInvestmentDateForInvestorByProjectId(Guid.Parse(item.id), Guid.Parse(currentUser.userId)));
 
                     result.listOfProject.Add(item);
                 }

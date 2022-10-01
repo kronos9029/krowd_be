@@ -15,6 +15,9 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //READ
         public Task<List<Payment>> GetAllPayments(int pageIndex, int pageSize, string type, Guid roleId, Guid userId);
         public Task<Payment> GetPaymentById(Guid paymentId);
+        public Task<double> GetInvestedAmountForInvestorByProjectId(Guid projectId, Guid investorUserId);
+        public Task<double> GetReceivedAmountForInvestorByProjectId(Guid projectId, Guid investorUserId);
+        public Task<string> GetLastestInvestmentDateForInvestorByProjectId(Guid projectId, Guid investorUserId);
 
         //UPDATE
 

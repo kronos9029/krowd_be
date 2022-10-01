@@ -168,6 +168,63 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET INVESTED AMOUNT
+        public async Task<double> GetInvestedAmountForInvestorByProjectId(Guid projectId, Guid investorUserId)
+        {
+            try
+            {
+                string query = "SELECT " 
+                    + "             SUM(P.Amount) AS InvestedAmount "
+                    + "         FROM "
+                    + "             Payment P "
+                    + "             JOIN Package PK ON P.PackageId = PK.Id "
+                    + "         WHERE "
+                    + "             PK.ProjectId = @ProjectId "
+                    + "             AND P.Type = 'INVESTMENT' "
+                    + "             AND P.FromId = @FromId "
+                    + "             AND P.Status = 'SUCCESS'";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                parameters.Add("FromId", investorUserId, DbType.Guid);
+                using var connection = CreateConnection();
+                var result = connection.ExecuteScalar(query, parameters);
+                return (result != null) ? (double)result : 0;
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //GET LASTEST INVESTMENT DATE
+        public async Task<string> GetLastestInvestmentDateForInvestorByProjectId(Guid projectId, Guid investorUserId)
+        {
+            try
+            {
+                string query = "SELECT "
+                    + "             MAX(P.CreateDate) AS LastestInvestmentDate "
+                    + "         FROM "
+                    + "             Payment P "
+                    + "             JOIN Package PK ON P.PackageId = PK.Id "
+                    + "         WHERE "
+                    + "             PK.ProjectId = @ProjectId "
+                    + "             AND P.Type = 'INVESTMENT' "
+                    + "             AND P.FromId = @FromId "
+                    + "             AND P.Status = 'SUCCESS'";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                parameters.Add("FromId", investorUserId, DbType.Guid);
+                using var connection = CreateConnection();
+                return connection.ExecuteScalar(query, parameters).ToString();
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //GET BY ID
         public async Task<Payment> GetPaymentById(Guid paymentId)
         {
@@ -184,6 +241,35 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
             }
-        }        
+        }
+
+        //GET RECEIVED AMOUNT
+        public async Task<double> GetReceivedAmountForInvestorByProjectId(Guid projectId, Guid investorUserId)
+        {
+            try
+            {
+                string query = "SELECT "
+                    + "             SUM(P.Amount) AS ReceivedAmount "
+                    + "         FROM "
+                    + "             Payment P "
+                    + "             JOIN Stage S ON P.StageId = S.Id "
+                    + "         WHERE "
+                    + "             S.ProjectId = @ProjectId "
+                    + "             AND P.Type = 'PAYMENT' "
+                    + "             AND P.ToId = @ToId "
+                    + "             AND P.Status = 'SUCCESS'";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                parameters.Add("ToId", investorUserId, DbType.Guid);
+                using var connection = CreateConnection();
+                var result = connection.ExecuteScalar(query, parameters);
+                return (result != null) ? (double)result : 0;
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }
