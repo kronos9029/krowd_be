@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Business.Services.Impls;
@@ -23,7 +24,7 @@ namespace RevenueSharingInvest.API.Controllers
     public class AccountTransactionController : ControllerBase
     {
         private readonly IAccountTransactionService _accountTransactionService;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IAuthenticateService _authenticateService;
         private readonly IRoleService _roleService;
         private readonly IUserService _userService;
@@ -34,7 +35,7 @@ namespace RevenueSharingInvest.API.Controllers
             IUserService userService)
         {
             _accountTransactionService = accountTransactionService;
-            this.httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor;
             _authenticateService = authenticateService;
             _roleService = roleService;
             _userService = userService;
@@ -47,7 +48,7 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> GetAllAccountTransactions(int pageIndex, int pageSize, string fromDate, string toDate, string sort)
         {
 
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             if(fromDate == null || toDate == null || fromDate.Equals("") || toDate.Equals(""))
             {
                 var result = await _accountTransactionService.GetAllAccountTransactions(pageIndex, pageSize, sort, currentUser);
@@ -62,7 +63,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         }
 
-        private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
+/*        private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
         {
             ThisUserObj currentUser = new();
 
@@ -123,7 +124,7 @@ namespace RevenueSharingInvest.API.Controllers
             }
 
             return currentUser;
-        }
+        }*/
 
 
 

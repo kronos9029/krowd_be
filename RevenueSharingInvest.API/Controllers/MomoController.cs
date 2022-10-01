@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models;
@@ -119,7 +120,7 @@ namespace RevenueSharingInvest.API.Controllers
         {
             MomoPaymentRequest request = new();
             request.amount = amount;
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             if (currentUser.email == null 
                 || currentUser.email == "" 
                 || currentUser.userId == null 
@@ -139,7 +140,7 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("request-mobile")]
         public async Task<IActionResult> RequestLinkAndPay(MomoPaymentRequest request)
         {
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             request.partnerClientId = currentUser.userId;
             request.email = currentUser.email;
             var result = _momoService.RequestLinkAndPayment(request);
@@ -169,68 +170,6 @@ namespace RevenueSharingInvest.API.Controllers
         {
             var result = await _momoService.ConfirmMomoTransaction(request);
             return Ok(result);
-        }
-
-        private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
-        {
-            ThisUserObj currentUser = new();
-
-            var checkUser = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber);
-            if (checkUser == null)
-            {
-                currentUser.userId = "";
-                currentUser.email = "";
-                currentUser.investorId = "";
-            }else
-            {
-                currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
-                currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
-                currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
-            }
-
-            List<RoleDTO> roleList = await _roleService.GetAllRoles();
-            GetUserDTO? userDTO = await _userService.GetUserByEmail(currentUser.email);
-            if (userDTO == null)
-            {
-                currentUser.roleId = "";
-                currentUser.businessId = "";
-
-            }
-            else
-            {
-                currentUser.roleId = userDTO.role.id;
-                if (userDTO.business != null)
-                {
-                    currentUser.businessId = userDTO.business.id;
-                }
-                else
-                {
-                    currentUser.businessId = "";
-                }
-
-            }
-            foreach (RoleDTO role in roleList)
-            {
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(0)))
-                {
-                    currentUser.adminRoleId = role.id;
-                }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(3)))
-                {
-                    currentUser.investorRoleId = role.id;
-                }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(1)))
-                {
-                    currentUser.businessManagerRoleId = role.id;
-                }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(2)))
-                {
-                    currentUser.projectManagerRoleId = role.id;
-                }
-            }
-
-            return currentUser;
-
         }
 
     }

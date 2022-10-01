@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Data.Models.DTOs;
@@ -37,7 +38,7 @@ namespace RevenueSharingInvest.API.Controllers
         [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> CreateProjectEntity([FromBody] CreateProjectEntityDTO projectEntityDTO)
         {
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
             //PROJECT_MANAGER
             if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
@@ -54,7 +55,7 @@ namespace RevenueSharingInvest.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetProjectEntityByProjectIdAndType(Guid project_id, string type)
         {
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
             //ALL ROLES
             if (currentUser.roleId.Equals(currentUser.adminRoleId)
@@ -77,7 +78,7 @@ namespace RevenueSharingInvest.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetProjectEntityById(Guid id)
         {
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
             //ALL ROLES
             if (currentUser.roleId.Equals(currentUser.adminRoleId)
@@ -101,7 +102,7 @@ namespace RevenueSharingInvest.API.Controllers
         [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> UpdateProjectEntity([FromBody] UpdateProjectEntityDTO projectEntityDTO, Guid id)
         {
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
             //PROJECT_MANAGER
             if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
@@ -118,7 +119,7 @@ namespace RevenueSharingInvest.API.Controllers
         [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> UpdateProjectEntityPriority([FromBody] List<ProjectEntityUpdateDTO> idList)
         {
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
             //PROJECT_MANAGER
             if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
@@ -135,7 +136,7 @@ namespace RevenueSharingInvest.API.Controllers
         [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> DeleteProjectEntity(Guid id)
         {
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
             //PROJECT_MANAGER
             if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
@@ -144,69 +145,6 @@ namespace RevenueSharingInvest.API.Controllers
                 return Ok(result);
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER can perform this action!!!");
-        }
-
-        private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
-        {
-            ThisUserObj currentUser = new();
-
-            var checkUser = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber);
-            if (checkUser == null)
-            {
-                currentUser.userId = "";
-                currentUser.email = "";
-                currentUser.investorId = "";
-            }
-            else
-            {
-                currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
-                currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
-                currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
-            }
-
-            List<RoleDTO> roleList = await _roleService.GetAllRoles();
-            GetUserDTO? userDTO = await _userService.GetUserByEmail(currentUser.email);
-            if (userDTO == null)
-            {
-                currentUser.roleId = "";
-                currentUser.businessId = "";
-
-            }
-            else
-            {
-                if (userDTO.business != null)
-                {
-                    currentUser.roleId = userDTO.role.id;
-                    currentUser.businessId = userDTO.business.id;
-                }
-                else
-                {
-                    currentUser.roleId = userDTO.role.id;
-                    currentUser.businessId = "";
-                }
-            }
-
-            foreach (RoleDTO role in roleList)
-            {
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(0)))
-                {
-                    currentUser.adminRoleId = role.id;
-                }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(3)))
-                {
-                    currentUser.investorRoleId = role.id;
-                }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(1)))
-                {
-                    currentUser.businessManagerRoleId = role.id;
-                }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(2)))
-                {
-                    currentUser.projectManagerRoleId = role.id;
-                }
-            }
-
-            return currentUser;
         }
     }
 }

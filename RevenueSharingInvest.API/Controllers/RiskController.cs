@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Business.Services.Impls;
@@ -48,7 +49,7 @@ namespace RevenueSharingInvest.API.Controllers
         [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> GetAllRisks(int pageIndex, int pageSize)
         {
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
             var result = new List<RiskDTO>();
             result = await _riskService.GetAllRisksByBusinessId(pageIndex, pageSize, currentUser.businessId);
@@ -60,7 +61,7 @@ namespace RevenueSharingInvest.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetRiskById(Guid id)
         {
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
             RiskDTO dto = new RiskDTO();
             dto = await _riskService.GetRiskById(id, currentUser);
@@ -73,7 +74,7 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> UpdateRisk([FromBody] RiskDTO riskDTO, Guid id)
         {
 
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
             var result = await _riskService.UpdateRisk(riskDTO, id, currentUser);
             return Ok(result);
@@ -84,7 +85,7 @@ namespace RevenueSharingInvest.API.Controllers
         [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> DeleteRisk(Guid id)
         {
-            ThisUserObj currentUser = await GetThisUserInfo(HttpContext);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             var result = await _riskService.DeleteRiskById(id, currentUser);
             return Ok(result);
         }
@@ -94,72 +95,6 @@ namespace RevenueSharingInvest.API.Controllers
         {
             var result = await _riskService.ClearAllRiskData();
             return Ok(result);
-        }
-
-        private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
-        {
-            ThisUserObj currentUser = new();
-
-            var checkUser = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber);
-            if (checkUser == null)
-            {
-                currentUser.userId = "";
-                currentUser.email = "";
-                currentUser.investorId = "";
-            }
-            else
-            {
-                currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
-                currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
-                currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
-            }
-
-            List<RoleDTO> roleList = await _roleService.GetAllRoles();
-            GetUserDTO? userDTO = await _userService.GetUserByEmail(currentUser.email);
-            if (userDTO == null)
-            {
-                currentUser.roleId = "";
-                currentUser.businessId = "";
-
-            }
-            else
-            {
-                if (userDTO.business != null)
-                {
-                    currentUser.roleId = userDTO.role.id;
-                    currentUser.businessId = userDTO.business.id;
-                }
-                else
-                {
-                    currentUser.roleId = userDTO.role.id;
-                    currentUser.businessId = "";
-                }
-
-            }
-
-
-            foreach (RoleDTO role in roleList)
-            {
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(0)))
-                {
-                    currentUser.adminRoleId = role.id;
-                }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(3)))
-                {
-                    currentUser.investorRoleId = role.id;
-                }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(1)))
-                {
-                    currentUser.businessManagerRoleId = role.id;
-                }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(2)))
-                {
-                    currentUser.projectManagerRoleId = role.id;
-                }
-            }
-
-            return currentUser;
-
         }
     }
 }

@@ -10,7 +10,6 @@ using RevenueSharingInvest.Data.Repositories.IRepos;
 using RevenueSharingInvest.Data.Repositories.Repos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using RevenueSharingInvest.API.Helpers;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using RevenueSharingInvest.Business.Helpers;
