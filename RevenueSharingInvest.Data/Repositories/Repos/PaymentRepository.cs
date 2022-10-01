@@ -29,7 +29,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "INSERT INTO Payment ("
                     + "         InvestmentId, "
+                    + "         PackageId, "
                     + "         PeriodRevenueId, "
+                    + "         StageId, "
                     + "         Amount, "
                     + "         Description, "
                     + "         Type, "
@@ -42,7 +44,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @InvestmentId, "
+                    + "         @PackageId, "
                     + "         @PeriodRevenueId, "
+                    + "         @StageId, "
                     + "         @Amount, "
                     + "         @Description, "
                     + "         @Type, "
@@ -54,7 +58,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("InvestmentId", paymentDTO.InvestmentId, DbType.Guid);
+                parameters.Add("PackageId", paymentDTO.PackageId, DbType.Guid);
                 parameters.Add("PeriodRevenueId", paymentDTO.PeriodRevenueId, DbType.Guid);
+                parameters.Add("StageId", paymentDTO.StageId, DbType.Guid);
                 parameters.Add("Amount", paymentDTO.Amount, DbType.Double);
                 parameters.Add("Description", paymentDTO.Description, DbType.String);
                 parameters.Add("Type", paymentDTO.Type, DbType.String);
@@ -127,7 +133,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SELECT "
                     + "         Id, "
                     + "         InvestmentId, "
+                    + "         PackageId, "
                     + "         PeriodRevenueId, "
+                    + "         StageId, "
                     + "         Amount, "
                     + "         Description, "
                     + "         Type, "

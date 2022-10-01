@@ -9,6 +9,6 @@ namespace RevenueSharingInvest.Business.Services.Extensions
 {
     public interface IProjectTagService
     {
-        public Task<List<string>> GetProjectTagList(GetProjectDTO projectDTO);
+        public Task<List<string>> GetProjectTagList(BasicProjectDTO projectDTO);
     }
 }

@@ -563,7 +563,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         )
         {
             AllProjectDTO result = new AllProjectDTO();
-            result.listOfProject = new List<GetProjectDTO>();
+            result.listOfProject = new List<BasicProjectDTO>();
             List<Project> listEntity = new List<Project>();
 
             bool statusCheck = false;
@@ -745,59 +745,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     result.numOfProject = await _projectRepository.CountProject(null, thisUserObj.userId, areaId, fieldId, name, status, thisUserObj.roleId);
                     listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, null, thisUserObj.userId, areaId, fieldId, name, status, thisUserObj.roleId);
-                }
+                }               
 
-                //else if(thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
-                //{
-                //    int[] statusNum = { 3, 5, 6 ,7 };
+                List<BasicProjectDTO> listDTO = _mapper.Map<List<BasicProjectDTO>>(listEntity);
+                Data.Models.Entities.Business business = new Data.Models.Entities.Business();
+                Field field = new Field();
 
-                //    if (businessId != null)
-                //    {
-                //        if (!await _validationService.CheckUUIDFormat(businessId))
-                //            throw new InvalidFieldException("Invalid businessId!!!");
-
-                //        if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
-                //            throw new NotFoundException("This businessId is not existed!!!");
-                //    }
-
-                //    if (areaId != null)
-                //    {
-                //        if (!await _validationService.CheckUUIDFormat(areaId))
-                //            throw new InvalidFieldException("Invalid areaId!!!");
-
-                //        if (!await _validationService.CheckExistenceId("Area", Guid.Parse(areaId)))
-                //            throw new NotFoundException("This areaId is not existed!!!");
-                //    }
-
-                //    if (fieldId != null)
-                //    {
-                //        if (!await _validationService.CheckUUIDFormat(fieldId))
-                //            throw new InvalidFieldException("Invalid fieldId!!!");
-
-                //        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
-                //            throw new NotFoundException("This fieldId is not existed!!!");
-                //    }
-
-                //    if (status != null)
-                //    {
-                //        foreach (int item in statusNum)
-                //        {
-                //            if (status.Equals(Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item)))
-                //                statusCheck = true;
-                //            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item) + "' or";
-                //        }
-                //        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
-                //        if (!statusCheck)
-                //            throw new InvalidFieldException("INVESTOR can view Projects with status" + statusErrorMessage + " !!!");
-                //    }
-
-                //    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, name, status, thisUserObj.roleId);
-                //    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, name, status, thisUserObj.roleId);
-                //}                            
-
-                List<GetProjectDTO> listDTO = _mapper.Map<List<GetProjectDTO>>(listEntity);
-
-                foreach (GetProjectDTO item in listDTO)
+                foreach (BasicProjectDTO item in listDTO)
                 {
                     item.startDate = await _validationService.FormatDateOutput(item.startDate);
                     item.endDate = await _validationService.FormatDateOutput(item.endDate);
@@ -808,24 +762,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
 
-                    item.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByProjectId(Guid.Parse(item.id)));
-                    if (item.business != null)
-                    {
-                        item.business.manager = _mapper.Map<BusinessManagerUserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(item.business.id)));
-                        item.business.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(item.business.id)));
-                    }
-                    item.manager = _mapper.Map<ProjectManagerUserDTO>(await _userRepository.GetProjectManagerByProjectId(Guid.Parse(item.id)));
-                    item.field = _mapper.Map<FieldDTO>(await _fieldRepository.GetProjectFieldByProjectId(Guid.Parse(item.id)));
-                    item.area = _mapper.Map<AreaDTO>(await _areaRepository.GetAreaByProjectId(Guid.Parse(item.id)));
-                    item.projectEntity = new List<TypeProjectEntityDTO>();              
-                    for (int type = 0; type < Enum.GetNames(typeof(ProjectEntityEnum)).Length; type++)
-                    {
-                        TypeProjectEntityDTO typeProjectEntityDTO = new TypeProjectEntityDTO();
-                        typeProjectEntityDTO.type = Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(type);
-                        typeProjectEntityDTO.typeItemList = _mapper.Map<List<ProjectComponentProjectEntityDTO>>(await _projectEntityRepository.GetProjectEntityByProjectIdAndType(Guid.Parse(item.id), Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(type)));
-                        item.projectEntity.Add(typeProjectEntityDTO);
-                    }                    
-                    item.memberList = _mapper.Map<List<ProjectMemberUserDTO>>(await _userRepository.GetProjectMembers(Guid.Parse(item.id)));
+                    business = await _businessRepository.GetBusinessById(Guid.Parse(item.businessId));
+                    item.businessName = business.Name;
+                    item.businessImage = business.Image;
+
+                    field = await _fieldRepository.GetFieldById(Guid.Parse(item.fieldId));
+                    item.fieldName = field.Name;
+                    item.fieldDescription = field.Description;
+                    
                     item.tagList = await _projectTagService.GetProjectTagList(item);
 
                     result.listOfProject.Add(item);
@@ -876,7 +820,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     projectDTO.projectEntity.Add(typeProjectEntityDTO);
                 }
                 projectDTO.memberList = _mapper.Map<List<ProjectMemberUserDTO>>(await _userRepository.GetProjectMembers(Guid.Parse(projectDTO.id)));
-                projectDTO.tagList = await _projectTagService.GetProjectTagList(projectDTO);
+                projectDTO.tagList = await _projectTagService.GetProjectTagList(_mapper.Map<BasicProjectDTO>(projectDTO));
 
                 return projectDTO;
             }

@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions
             _mapper = mapper;
         }
 
-        public async Task<List<string>> GetProjectTagList(GetProjectDTO projectDTO)
+        public async Task<List<string>> GetProjectTagList(BasicProjectDTO projectDTO)
         {
             List<string> tagList = new List<string>();
             try
@@ -44,17 +44,17 @@ namespace RevenueSharingInvest.Business.Services.Extensions
             }
         }
 
-        private async Task<bool> NewTag(GetProjectDTO projectDTO)
+        private async Task<bool> NewTag(BasicProjectDTO projectDTO)
         {
             return true;
         }
 
-        private async Task<bool> HotTag(GetProjectDTO projectDTO)
+        private async Task<bool> HotTag(BasicProjectDTO projectDTO)
         {
             return true;
         }
 
-        private async Task<bool> RecommendedTag(GetProjectDTO projectDTO)
+        private async Task<bool> RecommendedTag(BasicProjectDTO projectDTO)
         {
             return true;
         }
