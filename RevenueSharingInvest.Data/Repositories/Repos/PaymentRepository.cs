@@ -90,7 +90,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 
                 var parameters = new DynamicParameters();
 
-                if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                if (roleId.Equals(Guid.Parse(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"))))
                 {
                     if (type.Equals(PaymentTypeEnum.INVESTMENT.ToString()))
                     {
@@ -104,17 +104,17 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     }
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
-                else if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
+                else if (roleId.Equals(Guid.Parse(RoleDictionary.role.GetValueOrDefault("INVESTOR"))))
                 {
                     if (type.Equals(PaymentTypeEnum.INVESTMENT.ToString()))
                     {
                         whereCondition = whereCondition + " AND FromId = @FromId ";
-                        parameters.Add("ToId", userId, DbType.Guid);
+                        parameters.Add("FromId", userId, DbType.Guid);
                     }
                     else
                     {
                         whereCondition = whereCondition + " AND ToId = @ToId ";
-                        parameters.Add("FromId", userId, DbType.Guid);
+                        parameters.Add("ToId", userId, DbType.Guid);
                     }
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }

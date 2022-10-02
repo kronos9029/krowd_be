@@ -68,7 +68,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (type.Equals(PaymentTypeEnum.INVESTMENT.ToString()))
                 {
                     List<InvestmentPaymentDTO> list = _mapper.Map<List<InvestmentPaymentDTO>>(paymentList);
-                    Investment investment = new Investment();
                     Package package = new Package();
                     foreach (InvestmentPaymentDTO item in list)
                     {                  
@@ -78,8 +77,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         item.projectId = project.Id.ToString();
                         item.projectName = project.Name;
                         item.packageId = package.Id.ToString();
-                        item.packageName = package.Name;
-                        item.investedQuantity = (int)investment.Quantity;
+                        item.packageName = package.Name;                   
+                        item.investedQuantity = (int)(item.amount / package.Price);
                         item.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")))).Name;
                     }
                     result = list;
