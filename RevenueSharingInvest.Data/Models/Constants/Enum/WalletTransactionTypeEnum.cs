@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Models.Constants.Enum
 {
-    public enum TransactionTypeEnum
+    public enum WalletTransactionTypeEnum
     {
-        INVESTMENT,
-        TRANSFER,
-        PAYMENT
+        CASH_IN,
+        CASH_OUT
     }
 }

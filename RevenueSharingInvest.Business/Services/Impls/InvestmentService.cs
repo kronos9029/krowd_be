@@ -111,7 +111,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     payment.PackageId = package.Id;
                     payment.Amount = investment.TotalPrice;
                     payment.Description = "Đầu tư gói '" + package.Name + "' x" + investmentDTO.quantity;
-                    payment.Type = TransactionTypeEnum.INVESTMENT.ToString();
+                    payment.Type = PaymentTypeEnum.INVESTMENT.ToString();
                     payment.FromId = Guid.Parse(currentUser.userId);
                     payment.ToId = projectManager.Id;
                     payment.CreateBy = Guid.Parse(currentUser.userId);
@@ -139,7 +139,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     payment.PackageId = package.Id;
                     payment.Amount = investment.TotalPrice;
                     payment.Description = "Đầu tư gói '" + package.Name + "' x" + investmentDTO.quantity;
-                    payment.Type = TransactionTypeEnum.INVESTMENT.ToString();
+                    payment.Type = PaymentTypeEnum.INVESTMENT.ToString();
                     payment.FromId = Guid.Parse(currentUser.userId);
                     payment.ToId = projectManager.Id;
                     payment.CreateBy = Guid.Parse(currentUser.userId);
@@ -169,7 +169,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
                         await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
 
-                        //Create WalletTransaction from I2 to I3
+                        //Create CASH_OUT WalletTransaction from I2 to I3
                         WalletTransaction walletTransaction = new WalletTransaction();
                         walletTransaction.PaymentId = Guid.Parse(paymentId);
                         walletTransaction.Amount = payment.Amount;
@@ -177,7 +177,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         walletTransaction.Description = "Transfer from I2 to I3 to invest";
                         walletTransaction.FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString())).Id;
                         walletTransaction.ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString())).Id;
-                        walletTransaction.Type = TransactionTypeEnum.INVESTMENT.ToString();
+                        walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
                         walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
@@ -186,31 +186,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         investorWallet.Balance = payment.Amount;
                         await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
 
-                        ////Subtract I3 balance
-                        //investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"));
-                        //investorWallet.Balance = -payment.Amount;
-                        //await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
-
-                        ////Create WalletTransaction from I3 to P3
-                        //walletTransaction.PaymentId = Guid.Parse(paymentId);
-                        //walletTransaction.InvestorWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString())).Id;
-                        //walletTransaction.ProjectWalletId = (await _projectWalletRepository.GetProjectWalletByProjectOwnerIdAndType(projectManager.Id, WalletTypeEnum.B3.ToString())).Id;
-                        //walletTransaction.Amount = payment.Amount;
-                        //walletTransaction.Fee = 0;
-                        //walletTransaction.Description = "Transfer from I3 to P3 to invest";
-                        //walletTransaction.FromWalletId = walletTransaction.InvestorWalletId;
-                        //walletTransaction.ToWalletId = walletTransaction.ProjectWalletId;
-                        //walletTransaction.Type = TransactionTypeEnum.INVESTMENT.ToString();
-                        //walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
-                        //await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
-
-                        ////Add P3 balance
-                        //ProjectWallet projectWallet = new ProjectWallet();
-                        //projectWallet.ProjectManagerId = projectManager.Id;
-                        //projectWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3"));
-                        //projectWallet.Balance = payment.Amount;
-                        //projectWallet.UpdateBy = Guid.Parse(currentUser.userId);
-                        //await _projectWalletRepository.UpdateProjectWalletBalance(projectWallet);
+                        //Create CASH_IN WalletTransaction from I2 to I3
+                        walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
+                        await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
                         //Format Payment response
                         result = _mapper.Map<InvestmentPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
