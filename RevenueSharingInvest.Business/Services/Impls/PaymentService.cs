@@ -111,18 +111,42 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET BY ID
-        public async Task<PaymentDTO> GetPaymentById(Guid paymentId, ThisUserObj currentUser)
+        public async Task<dynamic> GetPaymentById(Guid paymentId, ThisUserObj currentUser)
         {
-            PaymentDTO result;
+            dynamic result;
             try
             {
-                Payment dto = await _paymentRepository.GetPaymentById(paymentId);
-                result = _mapper.Map<PaymentDTO>(dto);
-                if (result == null)
-                    throw new NotFoundException("No Payment Object Found!");
+                Payment payment = await _paymentRepository.GetPaymentById(paymentId);
+                if (payment == null)
+                    throw new NotFoundException("No Payment Object Found!!!");
+                if (!currentUser.userId.Equals(payment.FromId.ToString()) && !currentUser.userId.Equals(payment.ToId.ToString()))
+                    throw new InvalidFieldException("This id is not belong to your payments!!!");
 
-                result.createDate = await _validationService.FormatDateOutput(result.createDate);
-
+                if (payment.Type.Equals(PaymentTypeEnum.INVESTMENT.ToString()))
+                {
+                    result = _mapper.Map<InvestmentPaymentDTO>(payment);
+                    Package package = await _packageRepository.GetPackageById(Guid.Parse(result.packageId));
+                    Project project = await _projectRepository.GetProjectById(package.ProjectId);
+                    result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                    result.projectId = project.Id.ToString();
+                    result.projectName = project.Name;
+                    result.packageId = package.Id.ToString();
+                    result.packageName = package.Name;
+                    result.investedQuantity = (int)(result.amount / package.Price);
+                    result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")))).Name;
+                }
+                else
+                {
+                    result = _mapper.Map<PeriodRevenuePaymentDTO>(payment);
+                    Stage stage = await _stageRepository.GetStageById(Guid.Parse(result.stageId));
+                    Project project = await _projectRepository.GetProjectById(stage.ProjectId);
+                    result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                    result.projectId = project.Id.ToString();
+                    result.projectName = project.Name;
+                    result.stageId = stage.Id.ToString();
+                    result.stageName = stage.Name;
+                    result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B1")))).Name;
+                }
                 return result;
             }
             catch (Exception e)

@@ -14,7 +14,7 @@ namespace RevenueSharingInvest.Business.Services
 
         //READ
         public Task<dynamic> GetAllPayments(int pageIndex, int pageSize, string type, ThisUserObj currentUser);
-        public Task<PaymentDTO> GetPaymentById(Guid paymentId, ThisUserObj currentUser);
+        public Task<dynamic> GetPaymentById(Guid paymentId, ThisUserObj currentUser);
 
         //UPDATE
 

@@ -62,10 +62,8 @@ namespace RevenueSharingInvest.API.Controllers
             if (currentUser.roleId.Equals(currentUser.projectManagerRoleId)
                 || (currentUser.roleId.Equals(currentUser.investorRoleId) && !currentUser.investorId.Equals("")))
             {
-                //GetPaymentDTO dto = new GetPaymentDTO();
-                //dto = await _paymentService.GetPaymentById(id, currentUser);
-                //return Ok(dto);
-                return Ok();
+                var result = await _paymentService.GetPaymentById(id, currentUser);
+                return Ok(result);
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_OWNER INVESTOR can perform this action!!!");
             
