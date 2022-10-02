@@ -36,13 +36,7 @@ namespace RevenueSharingInvest.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> CreateInvestorWallet([FromBody] InvestorWalletDTO investorWalletDTO)
-        //{
-        //    var result = await _investorWalletService.CreateInvestorWallet(investorWalletDTO);
-        //    return Ok(result);
-        //}
-
+        //GET ALL
         [HttpGet]
         public async Task<IActionResult> GetAllWallets()
         {
@@ -63,36 +57,26 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR or PROJECT_MANAGER can perform this action!!!");
         }
 
-        //[HttpGet]
-        //[Route("{id}")]
-        //public async Task<IActionResult> GetInvestorWalletById(Guid id)
-        //{
-        //    InvestorWalletDTO dto = new InvestorWalletDTO();
-        //    dto = await _investorWalletService.GetInvestorWalletById(id);
-        //    return Ok(dto);
-        //}
+        //GET BY ID
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetInvestorWalletById(Guid id)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
-        //[HttpPut]
-        //[Route("{id}")]
-        //public async Task<IActionResult> UpdateInvestorWallet([FromBody] InvestorWalletDTO investorWalletDTO, Guid id)
-        //{
-        //    var result = await _investorWalletService.UpdateInvestorWallet(investorWalletDTO, id);
-        //    return Ok(result);
-        //}
+            if (currentUser.roleId.Equals(currentUser.investorRoleId))
+            {
+                var result = await _investorWalletService.GetInvestorWalletById(id, currentUser);
+                return Ok(result);
+            }
 
-        //[HttpDelete]
-        //[Route("{id}")]
-        //public async Task<IActionResult> DeleteInvestorWallet(Guid id)
-        //{
-        //    var result = await _investorWalletService.DeleteInvestorWalletById(id);
-        //    return Ok(result);
-        //}
+            else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            {
+                var result = await _projectWalletService.GetAllProjectWalletById(id, currentUser);
+                return Ok(result);
+            }
 
-        //[HttpDelete]
-        //public async Task<IActionResult> ClearAllInvestorWalletData()
-        //{
-        //    var result = await _investorWalletService.ClearAllInvestorWalletData();
-        //    return Ok(result);
-        //}
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR or PROJECT_MANAGER can perform this action!!!");
+        }
     }
 }

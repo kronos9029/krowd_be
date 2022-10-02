@@ -16,6 +16,7 @@ namespace RevenueSharingInvest.Business.Services
 
         //READ
         public Task<UserWalletsDTO> GetAllInvestorWallets(ThisUserObj currentUser);
+        public Task<GetInvestorWalletDTO> GetInvestorWalletById(Guid id, ThisUserObj currentUser);
 
         //UPDATE
 

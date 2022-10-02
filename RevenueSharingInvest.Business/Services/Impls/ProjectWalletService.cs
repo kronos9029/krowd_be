@@ -64,26 +64,28 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET BY ID
-        //public async Task<ProjectWalletDTO> GetProjectWalletById(Guid projectWalletId)
-        //{
-        //    ProjectWalletDTO result;
-        //    try
-        //    {
+        public async Task<GetProjectWalletDTO> GetAllProjectWalletById(Guid id, ThisUserObj currentUser)
+        {
+            GetProjectWalletDTO result;
+            try
+            {
+                ProjectWallet projectWallet = await _projectWalletRepository.GetProjectWalletById(id);
+                if (projectWallet == null)
+                    throw new NotFoundException("No ProjectWallet Object Found!");
+                if (!currentUser.userId.Equals(projectWallet.ProjectManagerId.ToString()))
+                    throw new InvalidFieldException("This id is not belong to your wallets!!!");
 
-        //        ProjectWallet dto = await _projectWalletRepository.GetProjectWalletById(projectWalletId);
-        //        result = _mapper.Map<ProjectWalletDTO>(dto);
-        //        if (result == null)
-        //            throw new NotFoundException("No ProjectWallet Object Found!");
+                result = _mapper.Map<GetProjectWalletDTO>(projectWallet);
+                result.walletType = _mapper.Map<GetWalletTypeForWalletDTO>(await _walletTypeRepository.GetWalletTypeById((Guid)projectWallet.WalletTypeId));
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
 
-        //        result.createDate = await _validationService.FormatDateOutput(result.createDate);
-        //        result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
-
-        //        return result;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

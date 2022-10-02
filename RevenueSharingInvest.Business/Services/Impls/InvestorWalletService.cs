@@ -19,14 +19,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
     {
         private readonly IInvestorWalletRepository _investorWalletRepository;
         private readonly IWalletTypeRepository _walletTypeRepository;
+        private readonly IInvestorRepository _investorRepository;
+
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
 
-        public InvestorWalletService(IInvestorWalletRepository investorWalletRepository, IWalletTypeRepository walletTypeRepository, IValidationService validationService, IMapper mapper)
+        public InvestorWalletService(IInvestorWalletRepository investorWalletRepository, IWalletTypeRepository walletTypeRepository, IInvestorRepository investorRepository, IValidationService validationService, IMapper mapper)
         {
             _investorWalletRepository = investorWalletRepository;
             _walletTypeRepository = walletTypeRepository;
+            _investorRepository = investorRepository;
+
             _validationService = validationService;
             _mapper = mapper;
         }
@@ -60,28 +64,31 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
-        }        
+        }
 
         //GET BY ID
-        //public async Task<InvestorWalletDTO> GetInvestorWalletById(Guid investorWalletId)
-        //{
-        //    InvestorWalletDTO result;
-        //    try
-        //    {
-        //        InvestorWallet dto = await _investorWalletRepository.GetInvestorWalletById(investorWalletId);
-        //        result = _mapper.Map<InvestorWalletDTO>(dto);
-        //        if (result == null)
-        //            throw new NotFoundException("No InvestorWallet Object Found!");
+        public async Task<GetInvestorWalletDTO> GetInvestorWalletById(Guid id, ThisUserObj currentUser)
+        {
+            GetInvestorWalletDTO result;
+            try
+            {
+                InvestorWallet investorWallet = await _investorWalletRepository.GetInvestorWalletById(id);
+                if (investorWallet == null)
+                    throw new NotFoundException("No InvestorWallet Object Found!");
+                if (!currentUser.investorId.Equals(investorWallet.InvestorId.ToString()))
+                    throw new InvalidFieldException("This id is not belong to your wallets!!!");
 
-        //        result.createDate = await _validationService.FormatDateOutput(result.createDate);
-        //        result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
+                result = _mapper.Map<GetInvestorWalletDTO>(investorWallet);
+                result.walletType = _mapper.Map<GetWalletTypeForWalletDTO>(await _walletTypeRepository.GetWalletTypeById((Guid)investorWallet.WalletTypeId));
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
 
-        //        return result;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

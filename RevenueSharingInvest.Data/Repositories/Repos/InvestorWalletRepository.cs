@@ -92,21 +92,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = " SELECT IW.* FROM InvestorWallet IW JOIN WalletType WT ON IW.WalletTypeId = WT.Id "
-                    + " AND IW.InvestorId = @InvestorId "
-                    + " AND (IW.WalletTypeId = @I1 "
-                    + "     OR IW.WalletTypeId = @I2 "
-                    + "     OR IW.WalletTypeId = @I3 "
-                    + "     OR IW.WalletTypeId = @I4 "
-                    + "     OR IW.WalletTypeId = @I5 ) "
-                    + " ORDER BY WT.Type ASC ";
+                var query = "SELECT " 
+                    + "         IW.* "
+                    + "     FROM "
+                    + "         InvestorWallet IW "
+                    + "         JOIN WalletType WT ON IW.WalletTypeId = WT.Id "
+                    + "     WHERE "
+                    + "         IW.InvestorId = @InvestorId "
+                    + "     ORDER BY WT.Type ASC ";
                 var parameters = new DynamicParameters();
                 parameters.Add("InvestorId", investorId, DbType.Guid);
-                parameters.Add("I1", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I1")), DbType.Guid);
-                parameters.Add("I2", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")), DbType.Guid);
-                parameters.Add("I3", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3")), DbType.Guid);
-                parameters.Add("I4", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I4")), DbType.Guid);
-                parameters.Add("I5", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I5")), DbType.Guid);
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<InvestorWallet>(query, parameters)).ToList();               
             }
@@ -234,6 +229,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 {
                     return await connection.ExecuteAsync(query, parameters);
                 }
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<InvestorWallet> GetInvestorWalletById(Guid id)
+        {
+            try
+            {
+                string query = "SELECT * FROM InvestorWallet WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", id, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<InvestorWallet>(query, parameters);
             }
             catch (Exception e)
             {

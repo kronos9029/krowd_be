@@ -87,9 +87,11 @@ namespace RevenueSharingInvest.Business.Helpers
             CreateMap<WalletType, GetWalletTypeForWalletDTO>().ReverseMap();
 
             CreateMap<InvestorWallet, MappedInvestorWalletDTO>().ReverseMap();
+            CreateMap<InvestorWallet, GetInvestorWalletDTO>().ReverseMap();
             CreateMap<MappedInvestorWalletDTO, GetInvestorWalletDTO>().ReverseMap();
 
             CreateMap<ProjectWallet, MappedProjectWalletDTO>().ReverseMap();
+            CreateMap<ProjectWallet, GetProjectWalletDTO>().ReverseMap();
             CreateMap<MappedProjectWalletDTO, GetProjectWalletDTO>().ReverseMap();
 
             CreateMap<AccountTransaction, MomoPaymentResult>().ReverseMap();
