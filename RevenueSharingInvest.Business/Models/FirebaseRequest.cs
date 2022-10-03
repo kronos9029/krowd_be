@@ -20,4 +20,14 @@ namespace RevenueSharingInvest.Business.Models
         public List<IFormFile>? files { get; set; }
 
     }
+
+    public class FirebaseBusinessContract
+    {
+        public string businessName { get; set; }
+        public string projectOwnerName { get;set; }
+        public string businessId { get; set; }
+        public string projectOwnerId { get; set; }
+        public IFormFile file { get; set; }
+
+    }
 }

@@ -265,11 +265,38 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
                 }
             }
 
-
-
             await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.DeleteUserAsync(request.createBy);
 
             return urls;
+        }
+
+        public async Task<string> UploadBusinessContract(FirebaseBusinessContract request)
+        {
+            var tokenDescriptor = new Dictionary<string, object>()
+            {
+                {"permission", "allow" }
+            };
+
+            string storageToken = await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(request.businessId, tokenDescriptor);
+
+            var auth = new FirebaseAuthProvider(new FirebaseConfig(_firebaseSettings.ApiKey));
+
+            //var token = await auth.SignInWithEmailAndPasswordAsync(_firebaseSettings.Email, _firebaseSettings.Password);
+            var token = await auth.SignInWithCustomTokenAsync(storageToken);
+
+            var uploadTask = new FirebaseStorage(
+                                 _firebaseSettings.Bucket,
+                                 new FirebaseStorageOptions
+                                 {
+                                     AuthTokenAsyncFactory = () => Task.FromResult(token.FirebaseToken),
+                                     ThrowOnCancel = true,
+                                 });
+
+            string path = "Contract/"+request.businessId+"/"+request.projectOwnerId+"/"+request.businessName+request.projectOwnerName;
+
+            var url = await uploadTask.Child(path).PutAsync(request.file.OpenReadStream());
+            return url;
+            
         }
 
 /*        public async Task DeleteImagesFromFirebase(ProjectEntityDTO firebaseEntity)
