@@ -93,7 +93,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 AccountTransaction entity = _mapper.Map<AccountTransaction>(momoPaymentResult);
                 entity.PartnerClientId = Guid.Parse(momoPaymentResult.partnerClientId);
                 entity.FromUserId = entity.PartnerClientId;
-                entity.Type = "Top-up";
+                entity.Type = "TOP-UP";
                 newId.id = await _accountTransactionRepository.CreateAccountTransaction(entity);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create AccountTransaction Object!");
