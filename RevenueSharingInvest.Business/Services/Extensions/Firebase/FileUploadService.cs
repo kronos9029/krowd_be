@@ -130,7 +130,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
                     string url = await uploadTask.Child(path).PutAsync(file.OpenReadStream());
 
                     if(type[0].ToLower().Equals(CategoryEnum.Image.ToString().ToLower()))
-                        await _businessRepository.UpdateBusinessImage(url, Guid.Parse(request.businessId));
+                        await _businessRepository.UpdateBusinessImage(url, Guid.Parse(request.entityId));
 
                     urls.Add(url);
 
