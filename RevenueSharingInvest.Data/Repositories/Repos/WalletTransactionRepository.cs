@@ -89,7 +89,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             string userIdCondition = " AND U.Id = @UserId ";
             string dateCondition = " AND W.CreateDate BETWEEN @FromDate AND @ToDate ";
             string typeCondition = " AND W.Type = @Type ";
-            string walletIdCondition = " AND ((W.FromWalletId = @WalletId AND W.Type = 'CASH_OUT') OR (W.ToWalletId = @WalletId AND W.Type ='CASH_IN'))";
+            string walletIdCondition = " AND ((W.FromWalletId = @WalletId AND W.Type = 'CASH_OUT') " +
+                                       " OR (W.ToWalletId = @WalletId AND W.Type ='CASH_IN') " +
+                                       " OR (W.ToWalletId = @WalletId AND W.Type ='DEPOSIT') " +
+                                       " OR (W.FromWalletId = @WalletId AND W.Type ='WITHDRAW')) ";
 
             try
             {

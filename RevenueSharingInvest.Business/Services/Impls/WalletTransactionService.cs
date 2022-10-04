@@ -191,8 +191,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     toDate = toDate.Remove(toDate.Length - 8) + "23:59:59";
                 }
 
-                if (type != null && !type.Equals(WalletTransactionTypeEnum.CASH_IN.ToString()) && !type.Equals(WalletTransactionTypeEnum.CASH_OUT.ToString()))
-                    throw new InvalidFieldException("type must be CASH_IN or CASH_OUT!!!");
+                if (type != null && !type.Equals(WalletTransactionTypeEnum.CASH_IN.ToString()) 
+                    && !type.Equals(WalletTransactionTypeEnum.CASH_OUT.ToString())
+                    && !type.Equals(WalletTransactionTypeEnum.DEPOSIT.ToString()) 
+                    && !type.Equals(WalletTransactionTypeEnum.WITHDRAW.ToString()))
+                    throw new InvalidFieldException("type must be CASH_IN or CASH_OUT or DEPOSIT or WITHDRAW!!!");
 
                 if (order != null && !order.Equals(OrderEnum.ASC.ToString()) && !order.Equals(OrderEnum.DESC.ToString()))
                     throw new InvalidFieldException("order must be ASC or DESC!!!");
