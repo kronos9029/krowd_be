@@ -15,6 +15,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
 
     public class CreateUserDTO : UserDTO
     {
+        public string businessId { get; set; }
         public string email { get; set; }
         public string image { get; set; }
     }

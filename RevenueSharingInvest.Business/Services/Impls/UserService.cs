@@ -10,6 +10,7 @@ using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
+using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -84,7 +85,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             IdDTO newId = new IdDTO();
             try
-            {   
+            {
+                if (userDTO.businessId == null || !await _validationService.CheckUUIDFormat(userDTO.businessId))
+                    throw new InvalidFieldException("Invalid businessId " + userDTO.businessId + " !!!");
+
+                if (!await _validationService.CheckExistenceId("Business", Guid.Parse(userDTO.businessId)))
+                    throw new NotFoundException("This businessId " + userDTO.businessId + " is not existed!!!");
+
+                if (await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(userDTO.businessId)) != null)
+                    throw new InvalidFieldException("This Business has a BUSINESS_MANAGER already!!!");
+
                 if (!await _validationService.CheckText(userDTO.lastName))
                     throw new InvalidFieldException("Invalid lastName!!!");
 
@@ -104,7 +114,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
-                    entity.RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")); 
+                    Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(Guid.Parse(userDTO.businessId));
+                    entity.RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER"));
+                    entity.BusinessId = business.Id;
+                    entity.Description = "Business Manager of " + business.Name;
                 }
                 if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
@@ -124,11 +137,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
                     {
-                        //Tạo ví B1, B2, B3, B4
+                        //Tạo ví B1, B2, B3, B4 cho PROJECT_MANAGER
                         await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B1")), Guid.Parse(currentUser.userId));
                         await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B2")), Guid.Parse(currentUser.userId));
                         await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")), Guid.Parse(currentUser.userId));
                         await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B4")), Guid.Parse(currentUser.userId));
+                    }
+                    else if (currentUser.roleId.Equals(currentUser.adminRoleId))
+                    {
+                        //Cập nhật Status cho Business từ INACTIVE thành ACTIVE
+                        await _businessRepository.UpdateBusinessStatus(Guid.Parse(userDTO.businessId), BusinessStatusEnum.ACTIVE.ToString(), Guid.Parse(currentUser.userId));
                     }
                 }
                 return newId;

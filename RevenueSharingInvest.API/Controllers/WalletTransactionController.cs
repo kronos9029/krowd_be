@@ -59,7 +59,7 @@ namespace RevenueSharingInvest.API.Controllers
         */
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, string fromDate, string toDate, string type, string order)
+        public async Task<IActionResult> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, Guid? walletId, string fromDate, string toDate, string type, string order)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
@@ -67,7 +67,7 @@ namespace RevenueSharingInvest.API.Controllers
                 || currentUser.roleId.Equals(currentUser.projectManagerRoleId)
                 || currentUser.roleId.Equals(currentUser.investorRoleId))
             {
-                var result = await _walletTransactionService.GetAllWalletTransactions(pageIndex, pageSize, userId, fromDate, toDate, type, order, currentUser);
+                var result = await _walletTransactionService.GetAllWalletTransactions(pageIndex, pageSize, userId, walletId, fromDate, toDate, type, order, currentUser);
                 return Ok(result);
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or PROJECT_OWNER or INVESTOR can perform this action!!!");

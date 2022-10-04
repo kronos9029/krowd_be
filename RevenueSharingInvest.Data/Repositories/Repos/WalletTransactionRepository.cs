@@ -79,7 +79,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<WalletTransaction>> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, Guid? userRoleId, string fromDate, string toDate, string type, string order)
+        public async Task<List<WalletTransaction>> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, Guid? userRoleId, Guid? walletId, string fromDate, string toDate, string type, string order)
         {
             string selectColumns = " W.Id , W.PaymentId , W.SystemWalletId , W.ProjectWalletId , W.InvestorWalletId , W.Amount , W.Description , W.Type , W.FromWalletId , W.ToWalletId , W.Fee , W.CreateDate , W.CreateBy ";
             string whereClause = "";
@@ -89,6 +89,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             string userIdCondition = " AND U.Id = @UserId ";
             string dateCondition = " AND W.CreateDate BETWEEN @FromDate AND @ToDate ";
             string typeCondition = " AND W.Type = @Type ";
+            string walletIdCondition = " AND ((W.FromWalletId = @WalletId AND W.Type = 'CASH_OUT') OR (W.ToWalletId = @WalletId AND W.Type ='CASH_IN'))";
 
             try
             {
@@ -143,6 +144,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                     whereClause = whereClause + userIdCondition;
                     parameters.Add("UserId", userId, DbType.Guid);
+                }
+
+                if (walletId != null)
+                {
+                    whereClause = whereClause + walletIdCondition;
+                    parameters.Add("WalletId", walletId, DbType.Guid);
                 }
 
                 if (fromDate != null && toDate != null)

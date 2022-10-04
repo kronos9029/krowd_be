@@ -121,7 +121,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                         walletTransaction.Amount = realAmount;
                         walletTransaction.Fee = 0;
-                        walletTransaction.Description = "Investor deposit monney into I1 Wallet";
+                        walletTransaction.Description = "Deposit monney into I1 wallet";
                         walletTransaction.ToWalletId = I1.Id;
                         walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                         walletTransaction.CreateBy = entity.FromUserId;
@@ -144,7 +144,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     }
 
                     //Create CASH_OUT WalletTransaction from I1 to I2
-                    walletTransaction.Description = "Investor transfer money from I1 wallet to I2 wallet";
+                    walletTransaction.Description = "Transfer money from I1 wallet to I2 wallet";
                     walletTransaction.FromWalletId = I1.Id;
                     walletTransaction.ToWalletId = I2.Id;
                     walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
@@ -160,6 +160,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     }
 
                     //Create CASH_IN WalletTransaction from I1 to I2
+                    walletTransaction.Description = "Receive money from I1 wallet to I2 wallet";
                     walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                     walletTransaction.CreateBy = I2.UpdateBy;
 

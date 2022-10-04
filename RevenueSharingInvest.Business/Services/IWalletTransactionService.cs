@@ -14,7 +14,7 @@ namespace RevenueSharingInvest.Business.Services
         //CREATE
 
         //READ
-        public Task<List<WalletTransactionDTO>> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, string fromDate, string toDate, string type, string order, ThisUserObj currentUser);
+        public Task<List<WalletTransactionDTO>> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, Guid? walletId, string fromDate, string toDate, string type, string order, ThisUserObj currentUser);
         //public Task<WalletTransactionDTO> GetWalletTransactionById(Guid walletTransactionId);
 
         //UPDATE

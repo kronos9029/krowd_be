@@ -26,6 +26,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IInvestorWalletRepository _investorWalletRepository;
         private readonly IWalletTypeRepository _walletTypeRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IProjectWalletRepository _projectWalletRepository;
 
         private readonly IMapper _mapper;
 
@@ -35,6 +36,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IInvestorWalletRepository investorWalletRepository,
             IWalletTypeRepository walletTypeRepository,
             IUserRepository userRepository,
+            IProjectWalletRepository projectWalletRepository, 
 
             IValidationService validationService, 
             IMapper mapper
@@ -44,6 +46,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _investorWalletRepository = investorWalletRepository;
             _walletTypeRepository = walletTypeRepository;
             _userRepository = userRepository;
+            _projectWalletRepository = projectWalletRepository;
 
             _validationService = validationService;
             _mapper = mapper;           
@@ -114,7 +117,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<WalletTransactionDTO>> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, string fromDate, string toDate, string type, string order, ThisUserObj currentUser)
+        public async Task<List<WalletTransactionDTO>> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, Guid? walletId, string fromDate, string toDate, string type, string order, ThisUserObj currentUser)
         {
             //fromDate ??= "";
             //toDate ??= "";
@@ -150,6 +153,26 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("This userId is not your userId!!!");
                 }
 
+                if (walletId != null)
+                {
+                    if (!await _validationService.CheckExistenceId("ProjectWallet", (Guid)walletId) && !await _validationService.CheckExistenceId("InvestorWallet", (Guid)walletId))
+                        throw new NotFoundException("This walletId is not existed!!!");
+
+                    if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+                    {
+                        ProjectWallet projectWallet = await _projectWalletRepository.GetProjectWalletById((Guid)walletId);
+                        if (!projectWallet.ProjectManagerId.Equals(Guid.Parse(currentUser.userId)))
+                            throw new InvalidFieldException("This walletId is not your walletId!!!");
+                    }
+                    else if (currentUser.roleId.Equals(currentUser.investorRoleId))
+                    {
+                        InvestorWallet investorWallet = await _investorWalletRepository.GetInvestorWalletById((Guid)walletId);
+                        if (!investorWallet.InvestorId.Equals(Guid.Parse(currentUser.investorId)))
+                            throw new InvalidFieldException("This walletId is not your walletId!!!");
+                    }
+
+                }
+
                 if ((fromDate != null || toDate != null) && (fromDate == null || toDate == null))
                     throw new InvalidFieldException("fromDate and toDate must be used at the same time!!!");
 
@@ -177,7 +200,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 userId = ((currentUser.roleId.Equals(currentUser.projectManagerRoleId) || currentUser.roleId.Equals(currentUser.investorRoleId))) ? Guid.Parse(currentUser.userId) : userId;
                 userRoleId = userId == null ? null : (await _userRepository.GetUserById((Guid)userId)).RoleId;
 
-                List<WalletTransaction> walletTransactionsEntityList = await _walletTransactionRepository.GetAllWalletTransactions(pageIndex, pageSize, userId, userRoleId, fromDate, toDate, type, order);
+                List<WalletTransaction> walletTransactionsEntityList = await _walletTransactionRepository.GetAllWalletTransactions(pageIndex, pageSize, userId, userRoleId, walletId, fromDate, toDate, type, order);
                 List<WalletTransactionDTO> result = _mapper.Map<List<WalletTransactionDTO>>(walletTransactionsEntityList);
                 foreach (WalletTransactionDTO item in result)
                 {
