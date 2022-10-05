@@ -37,6 +37,7 @@ namespace RevenueSharingInvest.API.Controllers
             _userService = userService;
         }
 
+        //CREATE
         [HttpPost]
         [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> CreateRisk([FromBody] RiskDTO riskDTO)
@@ -45,6 +46,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //GET ALL
         [HttpGet]
         [Authorize(Roles = "PROJECT_MANAGER")]
         public async Task<IActionResult> GetAllRisks(int pageIndex, int pageSize)
@@ -56,6 +58,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //GET BY ID
         [HttpGet]
         [Route("{id}")]
         [AllowAnonymous]
@@ -68,6 +71,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(dto);
         }
 
+        //UPDATE
         [HttpPut]
         [Route("{id}")]
         [Authorize(Roles = "PROJECT_MANAGER")]
@@ -80,6 +84,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //DELETE
         [HttpDelete]
         [Route("{id}")]
         [Authorize(Roles = "PROJECT_MANAGER")]
@@ -87,13 +92,6 @@ namespace RevenueSharingInvest.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             var result = await _riskService.DeleteRiskById(id, currentUser);
-            return Ok(result);
-        }
-
-        [HttpDelete]
-        public async Task<IActionResult> ClearAllRiskData()
-        {
-            var result = await _riskService.ClearAllRiskData();
             return Ok(result);
         }
     }

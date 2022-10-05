@@ -20,22 +20,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
         }
 
-        //CLEAR DATA
-        public async Task<int> ClearAllWalletTypeData()
-        {
-            try
-            {
-                var query = "DELETE FROM WalletType";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
         //CREATE
         public async Task<string> CreateWalletType(WalletType walletTypeDTO)
         {
@@ -49,8 +33,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -61,8 +44,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", walletTypeDTO.Name, DbType.String);
@@ -84,39 +66,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //DELETE
-        public async Task<int> DeleteWalletTypeById(Guid walletTypeId)//thiếu para UpdateBy
-        {
-            try
-            {
-                var query = "UPDATE WalletType "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
-                using var connection = CreateConnection();
-                var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                //parameters.Add("UpdateBy", walletTypeDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", walletTypeId, DbType.Guid);
-
-                return await connection.ExecuteAsync(query, parameters);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
         //GET ALL
         public async Task<List<WalletType>> GetAllWalletTypes()
         {
             try
             {
-                string query = "SELECT * FROM WalletType WHERE IsDeleted = 0 ORDER BY Type ASC";
+                string query = "SELECT * FROM WalletType ORDER BY Type ASC";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<WalletType>(query)).ToList();
             }
@@ -175,8 +130,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Mode = @Mode, "
                     + "         Type = @Type, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         UpdateBy = @UpdateBy"
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -187,7 +141,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Type", walletTypeDTO.Type, DbType.String);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", walletTypeDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", walletTypeDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", walletTypeId, DbType.Guid);
 
                 using (var connection = CreateConnection())

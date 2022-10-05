@@ -48,21 +48,13 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(dto);
         }
 
-        [HttpPut]
-        [Route("{business_id},{field_id}")]
-        public async Task<IActionResult> UpdateBusinessField([FromBody] BusinessFieldDTO businessFieldDTO, Guid business_id, Guid field_id)
-        {
-            var result = await _businessFieldService.UpdateBusinessField(businessFieldDTO, business_id, field_id);
-            return Ok(result);
-        }
-
-        [HttpDelete]
-        [Route("{business_id},{field_id}")]
-        public async Task<IActionResult> DeleteBusinessField(Guid business_id, Guid field_id)
-        {
-            var result = await _businessFieldService.DeleteBusinessFieldById(business_id, field_id);
-            return Ok(result);
-        }
+        //[HttpDelete]
+        //[Route("{business_id},{field_id}")]
+        //public async Task<IActionResult> DeleteBusinessField(Guid business_id, Guid field_id)
+        //{
+        //    var result = await _businessFieldService.DeleteBusinessFieldById(business_id, field_id);
+        //    return Ok(result);
+        //}
 
         //[HttpDelete]
         //public async Task<IActionResult> ClearAllBusinessFieldData()

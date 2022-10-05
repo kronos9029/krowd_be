@@ -28,22 +28,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
-        //CLEAR DATA
-        public async Task<int> ClearAllRiskTypeData()
-        {
-            int result;
-            try
-            {
-                result = await _riskTypeRepository.ClearAllRiskTypeData();
-                return result;
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
         //CREATE
         public async Task<IdDTO> CreateRiskType(RiskTypeDTO riskTypeDTO)
         {

@@ -51,6 +51,5 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteProjectById(Guid projectId);
-        public Task<int> ClearAllProjectData();
     }
 }

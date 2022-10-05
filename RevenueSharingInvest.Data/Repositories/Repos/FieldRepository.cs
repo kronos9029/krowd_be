@@ -31,8 +31,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, " 
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -41,8 +40,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", fieldDTO.Name, DbType.String);
@@ -67,17 +65,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "UPDATE Field "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
+                var query = " DELETE FROM Field WHERE Id = @Id ";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                //parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", fieldId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
@@ -103,8 +93,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     Name ASC ) AS Num, "
                     + "             * "
                     + "         FROM Field "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "          ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         Name, "
@@ -112,8 +101,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -127,7 +115,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM Field WHERE IsDeleted = 0 ORDER BY Name ASC";
+                    var query = "SELECT * FROM Field ORDER BY Name ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<Field>(query)).ToList();
                 }             
@@ -139,11 +127,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //COUNT
         public int CountAllField()
         {
             try
             {
-                var query = "SELECT COUNT(*) FROM Field WHERE IsDeleted = 0";
+                var query = "SELECT COUNT(*) FROM Field";
                 using var connection = CreateConnection();
                 return (int)connection.ExecuteScalar(query);
 
@@ -173,6 +162,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET PROJECT BY FIELD ???
         public async Task<List<string>> GetProjectsByFieldId(Guid fieldId)
         {
             try
@@ -190,9 +180,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET BY BUSINESS ID
         public async Task<List<Field>> GetFieldsByBusinessId(Guid businessId)
         {
-            var query = "SELECT f.Id, f.Name, f.Description, f.CreateDate, f.CreateBy, f.UpdateDate, f.UpdateBy, f.IsDeleted " +
+            var query = "SELECT f.Id, f.Name, f.Description, f.CreateDate, f.CreateBy, f.UpdateDate, f.UpdateBy " +
                 "FROM BusinessField bf JOIN Field f ON bf.FieldId = f.Id " +
                 "WHERE bf.BusinessId = @Id";
             var parameters = new DynamicParameters();
@@ -212,8 +203,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Name = @Name, "
                     + "         Description = @Description, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         UpdateBy = @UpdateBy"
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -222,7 +212,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", fieldDTO.Description, DbType.String);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", fieldDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", fieldDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", fieldId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -237,21 +226,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public async Task<int> ClearAllFieldData()
-        {
-            try
-            {
-                var query = "DELETE FROM Field";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
+        //GET BY BUSINESS ID
         public async Task<List<Field>> GetCompanyFields(Guid businessId)
         {
             try
@@ -262,8 +237,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Field F " 
                     + "         JOIN BusinessField BF ON F.Id = BF.FieldId " 
                     + "     WHERE " 
-                    + "         F.IsDeleted = 0 " 
-                    + "         AND BF.BusinessId = @BusinessId "
+                    + "         BF.BusinessId = @BusinessId "
                     + "     ORDER BY F.Name ASC";
                 var parameters = new DynamicParameters();
                 parameters.Add("BusinessId", businessId, DbType.Guid);
@@ -277,6 +251,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET BY PROJECT ID
         public async Task<Field> GetProjectFieldByProjectId(Guid projectId)
         {
             try

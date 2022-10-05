@@ -64,22 +64,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
-        //CLEAR DATA
-        public async Task<int> ClearAllUserData()
-        {
-            int result;
-            try 
-            {
-                result = await _userRepository.ClearAllUserData();
-                return result;
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
         //CREATE
         public async Task<IdDTO> CreateUser(CreateUserDTO userDTO, ThisUserObj currentUser)
         {
@@ -159,22 +143,22 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //DELETE
-        public async Task<int> DeleteUserById(Guid userId)
-        {
-            int result;
-            try
-            {
-                result = await _userRepository.DeleteUserById(userId);
-                if (result == 0)
-                    throw new DeleteObjectException("Can not delete User Object!");
-                return result;
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
+        //public async Task<int> DeleteUserById(Guid userId)
+        //{
+        //    int result;
+        //    try
+        //    {
+        //        result = await _userRepository.DeleteUserById(userId);
+        //        if (result == 0)
+        //            throw new DeleteObjectException("Can not delete User Object!");
+        //        return result;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        LoggerService.Logger(e.ToString());
+        //        throw new Exception(e.Message);
+        //    }
+        //}
 
         //GET ALL
         public async Task<AllUserDTO> GetAllUsers(int pageIndex, int pageSize, string businessId, string role, string status, ThisUserObj currentUser)
@@ -537,6 +521,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             return OTP[0];
         }
 
+        //UPDATE STATUS
         public async Task<int> UpdateUserStatus(Guid userId, string status, ThisUserObj currentUser)
         {
             int result;
@@ -580,6 +565,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
+        //UPDATE EMAIL
         public async Task<int> UpdateUserEmail(Guid userId, string email, ThisUserObj currentUser)
         {
             int result;

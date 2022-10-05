@@ -34,6 +34,7 @@ namespace RevenueSharingInvest.API.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
+        //CREATE
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO userDTO)
@@ -51,6 +52,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         }
 
+        //GET ALL
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetAllUsers(int pageIndex, int pageSize, string businessId, string role, string status)
@@ -67,6 +69,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         }
 
+        //GET BY ID
         [HttpGet]
         [Route("{id}")]
         public async Task<IActionResult> GetUserById(Guid id)
@@ -127,6 +130,7 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
         }
 
+        //UPDATE
         [HttpPut]
         [Route("{id}")]
         [Authorize]
@@ -179,42 +183,27 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUSINESS_MANAGER can perform this action!!!!!");
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteUser(Guid id)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
-            GetUserDTO userDTO = await _userService.GetUserById(id);
-            if (userDTO != null)
-            {
-                throw new NotFoundException("No Such User With This Id!!");
-            }
-            if (userDTO.role.id.Equals(currentUser.adminRoleId))
-            {
-                if (userDTO.status.Equals(ObjectStatusEnum.INACTIVE.ToString()) || userDTO.status.Equals(ObjectStatusEnum.BLOCKED.ToString()))
-                {
-                    var result = await _userService.DeleteUserById(id);
-                    return Ok(result);
-                }
-            }
+        //DELETE
+        //[HttpDelete]
+        //[Route("{id}")]
+        //public async Task<IActionResult> DeleteUser(Guid id)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+        //    GetUserDTO userDTO = await _userService.GetUserById(id);
+        //    if (userDTO != null)
+        //    {
+        //        throw new NotFoundException("No Such User With This Id!!");
+        //    }
+        //    if (userDTO.role.id.Equals(currentUser.adminRoleId))
+        //    {
+        //        if (userDTO.status.Equals(ObjectStatusEnum.INACTIVE.ToString()) || userDTO.status.Equals(ObjectStatusEnum.BLOCKED.ToString()))
+        //        {
+        //            var result = await _userService.DeleteUserById(id);
+        //            return Ok(result);
+        //        }
+        //    }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Perfrom This Action!!");
-        }
-
-        [HttpDelete]
-        public async Task<IActionResult> ClearAllUserData()
-        {
-            var result = await _userService.ClearAllUserData();
-            return Ok(result);
-        }
+        //    return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Perfrom This Action!!");
+        //}
     }
 }
-
-        //[HttpPost]
-        //[AllowAnonymous]
-        //[Route("authenticate-mobile")]
-        //public async Task<IActionResult> AuthenticateMobile([FromQuery]string token)
-        //{
-        //    var result = await _userService.GetTokenInvestor(token);
-        //    return Ok(result);
-        //}

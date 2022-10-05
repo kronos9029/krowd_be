@@ -26,51 +26,23 @@ namespace RevenueSharingInvest.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> CreateWalletType([FromBody] WalletTypeDTO walletTypeDTO)
-        //{
-        //    var result = await _walletTypeService.CreateWalletType(walletTypeDTO);
-        //    return Ok(result);
-        //}
+        //GET ALL
+        [HttpGet]
+        public async Task<IActionResult> GetAllWalletTypes()
+        {
+            var result = new List<GetWalletTypeDTO>();
+            result = await _walletTypeService.GetAllWalletTypes();
+            return Ok(result);
+        }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllWalletTypes()
-        //{
-        //    var result = new List<WalletTypeDTO>();
-        //    result = await _walletTypeService.GetAllWalletTypes();
-        //    return Ok(result);
-        //}
-
-        //[HttpGet]
-        //[Route("{id}")]
-        //public async Task<IActionResult> GetWalletTypeById(Guid id)
-        //{
-        //    WalletTypeDTO dto = new WalletTypeDTO();
-        //    dto = await _walletTypeService.GetWalletTypeById(id);
-        //    return Ok(dto);
-        //}
-
-        //[HttpPut]
-        //[Route("{id}")]
-        //public async Task<IActionResult> UpdateWalletType([FromBody] WalletTypeDTO walletTypeDTO, Guid id)
-        //{
-        //    var result = await _walletTypeService.UpdateWalletType(walletTypeDTO, id);
-        //    return Ok(result);
-        //}
-
-        //[HttpDelete]
-        //[Route("{id}")]
-        //public async Task<IActionResult> DeleteWalletType(Guid id)
-        //{
-        //    var result = await _walletTypeService.DeleteWalletTypeById(id);
-        //    return Ok(result);
-        //}
-
-        //[HttpDelete]
-        //public async Task<IActionResult> ClearAllWalletTypeData()
-        //{
-        //    var result = await _walletTypeService.ClearAllWalletTypeData();
-        //    return Ok(result);
-        //}
+        //GET BY ID
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetWalletTypeById(Guid id)
+        {
+            GetWalletTypeDTO dto = new GetWalletTypeDTO();
+            dto = await _walletTypeService.GetWalletTypeById(id);
+            return Ok(dto);
+        }
     }
 }

@@ -33,8 +33,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -45,8 +44,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", periodRevenueHistoryDTO.Name, DbType.String);
@@ -111,8 +109,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     Name ASC ) AS Num, "
                     + "             * "
                     + "         FROM PeriodRevenueHistory "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "         ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         Name, "
@@ -122,8 +119,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -138,7 +134,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 else
                 {
-                    var query = "SELECT * FROM PeriodRevenueHistory WHERE IsDeleted = 0 ORDER BY PeriodRevenueId, Name ASC";
+                    var query = "SELECT * FROM PeriodRevenueHistory ORDER BY PeriodRevenueId, Name ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<PeriodRevenueHistory>(query)).ToList();
                 }              
@@ -180,8 +176,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Description = @Description, "
                     + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         UpdateBy = @UpdateBy"
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -192,7 +187,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Status", periodRevenueHistoryDTO.Status, DbType.String);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", periodRevenueHistoryDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", periodRevenueHistoryDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", periodRevenueHistoryId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -204,22 +198,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
-            }
-        }
-
-        //CLEAR DATA
-        public async Task<int> ClearAllPeriodRevenueHistoryData()
-        {
-            try
-            {
-                var query = "DELETE FROM PeriodRevenueHistory";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
             }
         }
     }

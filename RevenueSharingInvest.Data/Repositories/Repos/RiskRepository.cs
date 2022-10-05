@@ -33,8 +33,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -45,8 +44,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", riskDTO.Name, DbType.String);
@@ -73,13 +71,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "UPDATE Risk "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
+                var query = "DELETE FROM Risk WHERE Id = @Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
@@ -110,8 +102,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     Name ASC ) AS Num, "
                     + "             * "
                     + "         FROM Risk "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "         ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         Name, "
@@ -121,8 +112,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -136,7 +126,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM Risk WHERE IsDeleted = 0 ORDER BY RiskTypeId, Name ASC";
+                    var query = "SELECT * FROM Risk ORDER BY RiskTypeId, Name ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<Risk>(query)).ToList();
                 }                
@@ -148,6 +138,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }        
         
+        //GET BY BUSINESS ID
         public async Task<List<Risk>> GetAllRisksByBusinessId(int pageIndex, int pageSize, Guid businessId)
         {
             try
@@ -162,8 +153,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     Name ASC ) AS Num, "
                     + "             * "
                     + "         FROM Risk "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "         ) "
                     + "     SELECT "
                     + "         x.Id, "
                     + "         x.Name, "
@@ -173,8 +163,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         x.CreateDate, "
                     + "         x.CreateBy, "
                     + "         x.UpdateDate, "
-                    + "         x.UpdateBy, "
-                    + "         x.IsDeleted "
+                    + "         x.UpdateBy"
                     + "     FROM "
                     + "         X x JOIN Project p ON x.ProjectId = p.Id"
                     + "     WHERE "
@@ -198,10 +187,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         "r.CreateDate, " +
                         "r.CreateBy, " +
                         "r.UpdateDate, " +
-                        "r.UpdateBy, " +
-                        "r.IsDeleted " +
+                        "r.UpdateBy " +
                         "FROM Risk r JOIN Project p ON r.ProjectId = p.Id " +
-                        "WHERE r.IsDeleted = 0 AND p.BusinessId = @BusinessId " +
+                        "WHERE p.BusinessId = @BusinessId " +
                         "ORDER BY RiskTypeId, r.Name ASC";
                     var parameters = new DynamicParameters();
                     parameters.Add("BusinessId", businessId, DbType.Guid);
@@ -234,6 +222,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }        
 
+        //???
         public async Task<string> GetBusinessByRiskId(Guid riskId)
         {
             try
@@ -263,8 +252,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         RiskTypeId = @RiskTypeId, "
                     + "         Description = @Description, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         UpdateBy = @UpdateBy"
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -275,7 +263,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", riskDTO.Description, DbType.String);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", riskDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", riskDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", riskId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -287,22 +274,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
-            }
-        }
-
-        //CLEAR DATA
-        public async Task<int> ClearAllRiskData()
-        {
-            try
-            {
-                var query = "DELETE FROM Risk";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
             }
         }
     }

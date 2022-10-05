@@ -26,6 +26,7 @@ namespace RevenueSharingInvest.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
+        //CREATE
         [HttpPost]
         public async Task<IActionResult> CreateInvestorType([FromBody] InvestorTypeDTO investorTypeDTO)
         {
@@ -33,6 +34,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //GET ALL
         [HttpGet]
         public async Task<IActionResult> GetAllInvestorTypes(int pageIndex, int pageSize)
         {
@@ -41,6 +43,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //GET BY ID
         [HttpGet]
         [Route("{id}")]
         public async Task<IActionResult> GetInvestorTypeById(Guid id)
@@ -50,6 +53,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(dto);
         }
 
+        //UPDATE
         [HttpPut]
         [Route("{id}")]
         public async Task<IActionResult> UpdateInvestorType([FromBody] InvestorTypeDTO investorTypeDTO, Guid id)
@@ -58,18 +62,12 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //DELETE
         [HttpDelete]
         [Route("{id}")]
         public async Task<IActionResult> DeleteInvestorType(Guid id)
         {
             var result = await _investorTypeService.DeleteInvestorTypeById(id);
-            return Ok(result);
-        }
-
-        [HttpDelete]
-        public async Task<IActionResult> ClearAllInvestorTypeData()
-        {
-            var result = await _investorTypeService.ClearAllInvestorTypeData();
             return Ok(result);
         }
     }

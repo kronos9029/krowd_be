@@ -32,8 +32,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -42,8 +41,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", riskTypeDTO.Name, DbType.String);
@@ -64,21 +62,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteRiskTypeById(Guid riskTypeId)//thiếu para UpdateBy
+        public async Task<int> DeleteRiskTypeById(Guid riskTypeId)
         {
             try
             {
-                var query = "UPDATE RiskType "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
+                var query = "DELETE FROM RiskType WHERE Id = @Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                //parameters.Add("UpdateBy", riskTypeDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", riskTypeId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
@@ -104,8 +94,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     Name ASC ) AS Num, "
                     + "             * "
                     + "         FROM RiskType "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "         ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         Name, "
@@ -113,8 +102,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -128,7 +116,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM RiskType WHERE IsDeleted = 0 ORDER BY Name ASC";
+                    var query = "SELECT * FROM RiskType ORDER BY Name ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<RiskType>(query)).ToList();
                 }                
@@ -168,8 +156,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Name = @Name, "
                     + "         Description = @Description, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         UpdateBy = @UpdateBy "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -178,7 +165,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", riskTypeDTO.Description, DbType.String);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", riskTypeDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", riskTypeDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", riskTypeId, DbType.Guid);
 
                 using var connection = CreateConnection();
@@ -208,23 +194,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
 
-        }
-
-        //CLEAR DATA
-        public async Task<int> ClearAllRiskTypeData()
-        {
-            try
-            {
-                var query = "DELETE FROM RiskType";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
+        } 
     }
 
     public class RiskTypeObject

@@ -27,21 +27,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<int> ClearAllInvestorTypeData()
-        {
-            int result;
-            try
-            {
-                result = await _investorTypeRepository.ClearAllInvestorTypeData();
-                return result;
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
         //CREATE
         public async Task<IdDTO> CreateInvestorType(InvestorTypeDTO investorTypeDTO)
         {

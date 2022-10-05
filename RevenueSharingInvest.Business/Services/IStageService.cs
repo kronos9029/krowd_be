@@ -22,6 +22,5 @@ namespace RevenueSharingInvest.Business.Services
         public Task<int> UpdateStage(UpdateStageDTO stageDTO, Guid stageId, ThisUserObj currentUser);
 
         //DELETE
-        //public Task<int> DeleteStageById(Guid stageId);
     }
 }

@@ -27,22 +27,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
-        //CLEAR DATA
-        public async Task<int> ClearAllVoucherItemData()
-        {
-            int result;
-            try
-            {
-                result = await _voucherItemRepository.ClearAllVoucherItemData();
-                return result;
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
         //CREATE
         public async Task<IdDTO> CreateVoucherItem(VoucherItemDTO voucherItemDTO)
         {

@@ -17,10 +17,9 @@ namespace RevenueSharingInvest.Business.Services
         public Task<BusinessFieldDTO> GetBusinessFieldById(Guid businessId, Guid fieldId);
 
         //UPDATE
-        public Task<int> UpdateBusinessField(BusinessFieldDTO businessFieldDTO, Guid businessId, Guid fieldId);
 
         //DELETE
-        public Task<int> DeleteBusinessFieldById(Guid businessId, Guid fieldId);
-        public Task<int> ClearAllBusinessFieldData();
+        //public Task<int> DeleteBusinessFieldById(Guid businessId, Guid fieldId);
+        //public Task<int> ClearAllBusinessFieldData();
     }
 }

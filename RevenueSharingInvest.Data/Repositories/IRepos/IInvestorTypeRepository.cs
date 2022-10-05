@@ -22,6 +22,5 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteInvestorTypeById(Guid investorTypeId);
-        public Task<int> ClearAllInvestorTypeData();
     }
 }

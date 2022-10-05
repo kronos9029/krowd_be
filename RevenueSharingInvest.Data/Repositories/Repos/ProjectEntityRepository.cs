@@ -168,8 +168,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         //            + "                     Priority ASC ) AS Num, "
         //            + "             * "
         //            + "         FROM ProjectEntity "
-        //            + "         WHERE "
-        //            + "             IsDeleted = 0 ) "
+        //            + "         ) "
         //            + "     SELECT "
         //            + "         Id, "
         //            + "         ProjectId, "
@@ -182,8 +181,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         //            + "         CreateDate, "
         //            + "         CreateBy, "
         //            + "         UpdateDate, "
-        //            + "         UpdateBy, "
-        //            + "         IsDeleted "
+        //            + "         UpdateBy "
         //            + "     FROM "
         //            + "         X "
         //            + "     WHERE "
@@ -197,7 +195,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         //        }
         //        else
         //        {
-        //            var query = "SELECT * FROM ProjectEntity WHERE IsDeleted = 0 ORDER BY ProjectId ASC, Priority ASC";
+        //            var query = "SELECT * FROM ProjectEntity ORDER BY ProjectId ASC, Priority ASC";
         //            using var connection = CreateConnection();
         //            return (await connection.QueryAsync<ProjectEntity>(query)).ToList();
         //        }               

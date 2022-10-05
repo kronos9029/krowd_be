@@ -21,7 +21,5 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeletePeriodRevenueHistoryByProjectId(Guid projectIdId);
-
-        public Task<int> ClearAllPeriodRevenueHistoryData();
     }
 }

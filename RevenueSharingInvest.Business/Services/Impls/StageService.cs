@@ -37,35 +37,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
-
-        //DELETE
-        //public async Task<int> DeleteStageById(Guid stageId)
-        //{
-        //    int result;
-        //    try
-        //    {
-        //        if (!await _validationService.CheckUUIDFormat(stageId.ToString()))
-        //            throw new InvalidFieldException("Invalid stageId!!!");
-
-        //        Stage stage = await _stageRepository.GetStageById(stageId);
-        //        if (stage == null)
-        //            throw new NotFoundException("No Stage Object Found!");
-
-        //        result = await _stageRepository.DeleteStageById(stageId);
-        //        if (result == 0)
-        //            throw new DeleteObjectException("Can Not Delete Stage Object!");
-        //        else
-        //        {
-        //            await _periodRevenueRepository.DeletePeriodRevenueByStageId(stageId);
-        //        }
-        //        return result;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
-
         //GET ALL
         public async Task<AllStageDTO> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pageSize, ThisUserObj currentUser)
         {

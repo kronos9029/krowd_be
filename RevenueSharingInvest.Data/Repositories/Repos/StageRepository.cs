@@ -29,7 +29,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "INSERT INTO Stage ("
                     + "         Name, "
                     + "         ProjectId, "
-                    //+ "         Percents, "
                     + "         StartDate, "
                     + "         EndDate, "
                     + "         Status, "
@@ -42,7 +41,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     VALUES ( "
                     + "         @Name, "
                     + "         @ProjectId, "
-                    //+ "         @Percents, "
                     + "         @StartDate, "
                     + "         @EndDate, "
                     + "         @Status, "
@@ -54,7 +52,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", stageDTO.Name, DbType.String);
                 parameters.Add("ProjectId", stageDTO.ProjectId, DbType.Guid);
-                //parameters.Add("Percents", stageDTO.Percents, DbType.Double);
                 parameters.Add("StartDate", stageDTO.StartDate, DbType.DateTime);
                 parameters.Add("EndDate", stageDTO.EndDate, DbType.DateTime);
                 parameters.Add("Status", stageDTO.Status, DbType.String);
@@ -70,25 +67,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
-            }
-        }
-
-        //DELETE
-        public async Task<int> DeleteStageById(Guid stageId)
-        {
-            try
-            {
-                var query = "DELETE FROM Stage WHERE Id = @Id ";
-                using var connection = CreateConnection();
-                var parameters = new DynamicParameters();
-                parameters.Add("Id", stageId, DbType.Guid);
-
-                return await connection.ExecuteAsync(query, parameters);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
             }
         }
 
@@ -198,23 +176,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
-
-        //CLEAR DATA
-        public async Task<int> ClearAllStageData()
-        {
-            try
-            {
-                var query = "DELETE FROM Stage";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
 
         //DELETE ALL BY PROJECT ID
         public async Task<int> DeleteStageByProjectId(Guid projectId)

@@ -77,22 +77,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
-        //CLEAR DATA
-        public async Task<int> ClearAllProjectData()
-        {
-            int result;
-            try
-            {
-                result = await _projectRepository.ClearAllProjectData();
-                return result;
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
         //COUNT PROJECTS
         public async Task<ProjectCountDTO> CountProjects(string businessId, string areaId, string fieldId, string name, string status, ThisUserObj thisUserObj)
         {

@@ -31,7 +31,6 @@ namespace RevenueSharingInvest.Business.Services
         public Task<int> UpdateUserEmail(Guid userId, string email, ThisUserObj currentUser);
 
         //DELETE
-        public Task<int> DeleteUserById(Guid userId);
-        public Task<int> ClearAllUserData();
+        //public Task<int> DeleteUserById(Guid userId);
     }
 }

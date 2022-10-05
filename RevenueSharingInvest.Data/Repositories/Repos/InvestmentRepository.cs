@@ -82,8 +82,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         //        var query = "UPDATE Investment "
         //            + "     SET "
         //            + "         UpdateDate = @UpdateDate, "
-        //            //+ "         UpdateBy = @UpdateBy, "
-        //            + "         IsDeleted = 1 "
+        //            //+ "         UpdateBy = @UpdateBy "
         //            + "     WHERE "
         //            + "         Id=@Id";
         //        using var connection = CreateConnection();
@@ -248,8 +247,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         //            + "         Quantity = @Quantity, "
         //            + "         TotalPrice = @TotalPrice, "
         //            + "         UpdateDate = @UpdateDate, "
-        //            + "         UpdateBy = @UpdateBy, "
-        //            + "         IsDeleted = @IsDeleted"
+        //            + "         UpdateBy = @UpdateBy"
         //            + "     WHERE "
         //            + "         Id = @Id";
 
@@ -261,7 +259,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         //        parameters.Add("TotalPrice", investmentDTO.TotalPrice, DbType.Double);
         //        parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
         //        parameters.Add("UpdateBy", investmentDTO.UpdateBy, DbType.Guid);
-        //        parameters.Add("IsDeleted", investmentDTO.IsDeleted, DbType.Boolean);
         //        parameters.Add("Id", investmentId, DbType.Guid);
 
         //        using (var connection = CreateConnection())

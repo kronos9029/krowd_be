@@ -22,6 +22,5 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteFieldById(Guid fieldId);
-        public Task<int> ClearAllFieldData();
     }
 }

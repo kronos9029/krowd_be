@@ -33,8 +33,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -44,8 +43,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("UserId", investorDTO.UserId, DbType.Guid);
@@ -71,17 +69,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "UPDATE Investor "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
+                var query = "DELETE FROM Investor WHERE Id = @Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                //parameters.Add("UpdateBy", investorDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", investorId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
@@ -110,10 +100,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             var selectCondition = " * ";
             var fromCondition = " Investor ";
             var whereCondition = "";
-            var groupByCondition = " GROUP BY INS.Id, INS.UserId, INS.InvestorTypeId, INS.Status, INS.CreateDate, INS.CreateBy, INS.UpdateDate, INS.UpdateBy, INS.IsDeleted ";
+            var groupByCondition = " GROUP BY INS.Id, INS.UserId, INS.InvestorTypeId, INS.Status, INS.CreateDate, INS.CreateBy, INS.UpdateDate, INS.UpdateBy ";
             var orderByCondition = "ORDER BY CreateDate";
             var orderCondition = "";
-            var isDeletedCondition = " AND IsDeleted = 0 ";
 
             var statusCondition = " AND Status = @Status ";
             var nameCondition = " AND Name LIKE '%" + name + "%' ";
@@ -140,11 +129,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + nameCondition;
                     }
 
-                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4) + " " + isDeletedCondition;
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
                 else if (thisUserRoleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
-                    selectCondition = " INS.Id, INS.UserId, INS.InvestorTypeId, INS.Status, INS.CreateDate, INS.CreateBy, INS.UpdateDate, INS.UpdateBy, INS.IsDeleted ";
+                    selectCondition = " INS.Id, INS.UserId, INS.InvestorTypeId, INS.Status, INS.CreateDate, INS.CreateBy, INS.UpdateDate, INS.UpdateBy ";
                     fromCondition = " Investor INS JOIN Investment INM ON INS.Id = INM.InvestorId ";
                     whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE BusinessId = @BusinessId) ";
                     parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
@@ -163,7 +152,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + " AND (INS.Status = '"
                         + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR INS.Status = '"
                         + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR INS.Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') AND INS.IsDeleted = 0 "
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') "
                         + groupByCondition;
                     }
 
@@ -192,8 +181,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     InvestorTypeId ASC ) AS Num, "
                     + "             * "
                     + "         FROM Investor "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "         ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         UserId, "
@@ -202,8 +190,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -216,7 +203,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }                
                 else
                 {
-                    var query = "SELECT * FROM Investor WHERE IsDeleted = 0 ORDER BY InvestorTypeId ASC";
+                    var query = "SELECT * FROM Investor ORDER BY InvestorTypeId ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<Investor>(query)).ToList();
                 }
@@ -274,8 +261,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         InvestorTypeId = @InvestorTypeId, "
                     + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted "
+                    + "         UpdateBy = @UpdateBy "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -285,7 +271,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Status", investorDTO.Status, DbType.Int16);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", investorDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", investorDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", investorId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -300,22 +285,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //CLEAR DATA
-        public async Task<int> ClearAllInvestorData()
-        {
-            try
-            {
-                var query = "DELETE FROM Investor";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
+        //GET BY USER ID
         public async Task<Investor> GetInvestorByUserId(Guid userId)
         {
             try
@@ -364,63 +334,4 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
     }
-
-        //public async Task<int> CreateInvestor(Investor investor)
-        //{
-        //    try
-        //    {
-        //        var query = "INSERT INTO Investor (Id, UserId, CreateDate, InvestorTypeId) VALUES (@Id, @UserId, @CreateDate, @InvestorTypeId)";
-        //        var parameters = new DynamicParameters();
-        //        parameters.Add("Id", investor.Id, DbType.Guid);
-        //        parameters.Add("UserId", investor.UserId, DbType.Guid);
-        //        parameters.Add("CreateDate", investor.CreateDate, DbType.DateTime);
-        //        parameters.Add("InvestorTypeId", investor.InvestorTypeId, DbType.Guid);
-
-        //        using (var connection = CreateConnection())
-        //        {
-        //            return await connection.ExecuteAsync(query, parameters);
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message, e);
-        //    }
-        //}
-
-        //public async Task<int> CreateInvestorType(InvestorType investorType)
-        //{
-        //    try
-        //    {
-        //        var query = "INSERT INTO InvestorType (Name, Description, CreateDate, CreateBy) VALUES (@Name, @Description, @CreateDate, @CreateBy)";
-        //        var parameters = new DynamicParameters();
-        //        parameters.Add("Name", investorType.Name, DbType.String);
-        //        parameters.Add("Description", investorType.Description, DbType.String);
-        //        parameters.Add("CreateDate", investorType.CreateDate, DbType.DateTime);
-        //        parameters.Add("CreateBy", investorType.CreateBy, DbType.String);
-
-        //        using (var connection = CreateConnection())
-        //        {
-        //            return await connection.ExecuteAsync(query, parameters);
-        //        }
-        //    } catch(Exception e)
-        //    {
-        //        throw new Exception(e.Message, e);
-        //    }
-
-        //}
-
-        //public async Task<List<InvestorType>> GetAllInvestorType()
-        //{
-        //    try
-        //    {
-        //        string query = "SELECT * FROM InvestorType";
-        //        using var connection = CreateConnection();
-        //        return (await connection.QueryAsync<InvestorType>(query)).ToList();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message, e);
-        //    }
-        //}
-    //}
 }

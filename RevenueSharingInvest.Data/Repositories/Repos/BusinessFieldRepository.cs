@@ -31,16 +31,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     VALUES ( "
                     + "         @BusinessId, "
                     + "         @FieldId, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("BusinessId", businessId, DbType.Guid);
@@ -59,34 +57,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
-        
-        //DELETE
-        public async Task<int> DeleteBusinessFieldById(Guid businessId, Guid fieldId)
-        {
-            try
-            {
-                var query = "UPDATE BusinessField "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         BusinessId=@BusinessId "
-                    + "         AND FieldId=@FieldId";
-                using var connection = CreateConnection();
-                var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                //parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
-                parameters.Add("BusinessId", businessId, DbType.Guid);
-                parameters.Add("FieldId", fieldId, DbType.Guid);
-
-                return await connection.ExecuteAsync(query, parameters);
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
 
         //GET ALL
         public async Task<List<BusinessField>> GetAllBusinessFields(int pageIndex, int pageSize)
@@ -102,16 +72,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     FieldId ASC ) AS Num, "
                     + "             * "
                     + "         FROM BusinessField "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "          ) "
                     + "     SELECT "
                     + "         BusinessId, "
                     + "         FieldId, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -125,7 +93,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM BusinessField WHERE IsDeleted = 0 ORDER BY FieldId ASC";
+                    var query = "SELECT * FROM BusinessField ORDER BY FieldId ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<BusinessField>(query)).ToList();
                 }
@@ -164,8 +132,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         BusinessId = @BusinessId, "
                     + "         FieldId = @FieldId, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         UpdateBy = @UpdateBy"
                     + "     WHERE "
                     + "         BusinessId=@BId "
                     + "         AND FieldId=@FId";
@@ -175,7 +142,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("FieldId", businessFieldDTO.FieldId, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", businessFieldDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", businessFieldDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("BId", businessId, DbType.Guid);
                 parameters.Add("FId", fieldId, DbType.Guid);
 
@@ -190,20 +156,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public async Task<int> ClearAllBusinessFieldData()
-        {
-            try
-            {
-                var query = "DELETE FROM BusisnessField";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
-
+        //DELETE BY BUSINESS ID
         public async Task<int> DeleteBusinessFieldByBusinessId(Guid businessId)
         {
             try

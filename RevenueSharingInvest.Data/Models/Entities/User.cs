@@ -60,7 +60,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
-        public bool? IsDeleted { get; set; }
 
         [ForeignKey(nameof(BusinessId))]
         [InverseProperty("Users")]
