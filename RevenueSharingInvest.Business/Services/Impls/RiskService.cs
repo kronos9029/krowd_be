@@ -29,22 +29,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
-        //CLEAR DATA
-        public async Task<int> ClearAllRiskData()
-        {
-            int result;
-            try
-            {
-                result = await _riskRepository.ClearAllRiskData();
-                return result;
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
         //CREATE
         public async Task<IdDTO> CreateRisk(RiskDTO riskDTO)
         {
@@ -148,6 +132,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }        
         
+        //GET BY BUSINESS ID
         public async Task<List<RiskDTO>> GetAllRisksByBusinessId(int pageIndex, int pageSize, string businessId)
         {
             try

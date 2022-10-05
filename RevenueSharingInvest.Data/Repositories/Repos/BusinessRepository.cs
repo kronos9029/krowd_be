@@ -40,8 +40,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ("
@@ -57,8 +56,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0)";
+                    + "         @UpdateBy)";
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", businessDTO.Name, DbType.String);
                 parameters.Add("PhoneNum", businessDTO.PhoneNum, DbType.String);
@@ -114,11 +112,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var whereCondition = "";
                 var orderByCondition = "ORDER BY CreateDate";
                 var orderCondition = "";
-                var isDeletedCondition = "";
-                if (!roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
-                {
-                     isDeletedCondition= " AND IsDeleted = 0 ";
-                }
                 
                 var statusCondition = " AND Status = @Status ";
                 var nameCondition = " AND Name LIKE '%" + name + "%' ";
@@ -141,7 +134,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + nameCondition;
                     }
 
-                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4) + " " + isDeletedCondition;
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
                 
                 else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
@@ -164,7 +157,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + nameCondition;
                     }
 
-                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4) + " " + isDeletedCondition;
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
                 
                 else if(roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
@@ -185,7 +178,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + nameCondition;
                     }
 
-                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4) + " " + isDeletedCondition;
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
                 if (orderBy != null)
@@ -224,8 +217,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -356,6 +348,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //UPDATE IMAGE
         public async Task<int> UpdateBusinessImage(string url, Guid businessId)
         {
             try
@@ -409,6 +402,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //COUNT BUSINESS
         public async Task<int> CountBusiness(string status, string name,string roleId)
         {
             try
@@ -416,7 +410,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
 
                 var whereCondition = "";
-                var isDeletedCondition = " AND IsDeleted = 0 ";
 
                 var statusCondition = " AND Status = @Status ";
                 var nameCondition = " AND Name LIKE '%" + name + "%' ";
@@ -439,7 +432,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + nameCondition;
                     }
 
-                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4) + " " + isDeletedCondition;
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
                 else if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
@@ -462,7 +455,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + nameCondition;
                     }
 
-                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4) + " " + isDeletedCondition;
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
                 else if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
@@ -483,7 +476,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + nameCondition;
                     }
 
-                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4) + " " + isDeletedCondition;
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
                 var query = "SELECT COUNT(*) FROM Business " + whereCondition;
@@ -498,6 +491,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+
+        //GET BY USER ID
         public async Task<Models.Entities.Business> GetBusinessByUserId(Guid userId)
         {
             try
@@ -521,6 +516,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET BY PROJECT ID
         public async Task<Models.Entities.Business> GetBusinessByProjectId(Guid projectId)
         {
             try

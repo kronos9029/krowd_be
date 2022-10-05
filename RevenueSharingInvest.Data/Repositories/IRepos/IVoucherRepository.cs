@@ -21,6 +21,5 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteVoucherById(Guid voucherId);
-        public Task<int> ClearAllVoucherData();
     }
 }

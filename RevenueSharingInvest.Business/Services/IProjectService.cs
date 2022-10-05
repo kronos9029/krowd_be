@@ -45,6 +45,5 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteProjectById(Guid projectId);
-        public Task<int> ClearAllProjectData();
     }
 }

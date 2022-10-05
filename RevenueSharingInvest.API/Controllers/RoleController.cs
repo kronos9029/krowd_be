@@ -19,13 +19,14 @@ namespace RevenueSharingInvest.API.Controllers
     public class RoleController : ControllerBase
     {
         private readonly IRoleService _roleService;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         public RoleController(IRoleService roleService, IHttpContextAccessor httpContextAccessor)
         {
             _roleService = roleService;
-            this.httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor;
         }
 
+        //CREATE
         [HttpPost]
         public async Task<IActionResult> CreateRole([FromBody] RoleDTO roleDTO)
         {
@@ -33,6 +34,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //GET ALL
         [HttpGet]
         public async Task<IActionResult> GetAllRoles()
         {
@@ -41,6 +43,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //GET BY ID
         [HttpGet]
         [Route("{id}")]
         public async Task<IActionResult> GetRoleById(Guid id)
@@ -50,6 +53,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(dto);
         }
 
+        //UPDATE
         [HttpPut]
         [Route("{id}")]
         public async Task<IActionResult> UpdateRole([FromBody] RoleDTO roleDTO, Guid id)
@@ -58,6 +62,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //DELETE
         [HttpDelete]
         [Route("{id}")]
         public async Task<IActionResult> DeleteRole(Guid id)

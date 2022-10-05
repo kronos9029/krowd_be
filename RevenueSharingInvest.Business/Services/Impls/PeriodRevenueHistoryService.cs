@@ -26,22 +26,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _validationService = validationService;
             _mapper = mapper;
         }
-        //CLEAR DATA
-        public async Task<int> ClearAllPeriodRevenueHistoryData()
-        {
-            int result;
-            try
-            {
-                result = await _periodRevenueHistoryRepository.ClearAllPeriodRevenueHistoryData();
-                return result;
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
 
         //CREATE
         public async Task<IdDTO> CreatePeriodRevenueHistory(PeriodRevenueHistoryDTO periodRevenueHistoryDTO)

@@ -25,45 +25,5 @@ namespace RevenueSharingInvest.API.Controllers
             _periodRevenueService = periodRevenueService;
             this.httpContextAccessor = httpContextAccessor;
         }
-
-        //[HttpPost]
-        //public async Task<IActionResult> CreatePeriodRevenue([FromBody] PeriodRevenueDTO periodRevenueDTO)
-        //{
-        //    var result = await _periodRevenueService.CreatePeriodRevenue(periodRevenueDTO);
-        //    return Ok(result);
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllPeriodRevenues(int pageIndex, int pageSize)
-        //{
-        //    var result = new List<PeriodRevenueDTO>();
-        //    result = await _periodRevenueService.GetAllPeriodRevenues(pageIndex, pageSize);
-        //    return Ok(result);
-        //}
-
-        //[HttpGet]
-        //[Route("{id}")]
-        //public async Task<IActionResult> GetPeriodRevenueById(Guid id)
-        //{
-        //    PeriodRevenueDTO dto = new PeriodRevenueDTO();
-        //    dto = await _periodRevenueService.GetPeriodRevenueById(id);
-        //    return Ok(dto);
-        //}
-
-        //[HttpPut]
-        //[Route("{id}")]
-        //public async Task<IActionResult> UpdatePeriodRevenue([FromBody] PeriodRevenueDTO periodRevenueDTO, Guid id)
-        //{
-        //    var result = await _periodRevenueService.UpdatePeriodRevenue(periodRevenueDTO, id);
-        //    return Ok(result);
-        //}
-
-        //[HttpDelete]
-        //[Route("{id}")]
-        //public async Task<IActionResult> DeletePeriodRevenue(Guid id)
-        //{
-        //    var result = await _periodRevenueService.DeletePeriodRevenueById(id);
-        //    return Ok(result);
-        //}
     }
 }

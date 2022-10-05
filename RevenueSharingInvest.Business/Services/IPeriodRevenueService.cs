@@ -13,8 +13,8 @@ namespace RevenueSharingInvest.Business.Services
         //public Task<IdDTO> CreatePeriodRevenue(PeriodRevenueDTO periodRevenueDTO);
 
         //READ
-        public Task<List<GetPeriodRevenueDTO>> GetAllPeriodRevenues(int pageIndex, int pageSize);
-        public Task<GetPeriodRevenueDTO> GetPeriodRevenueById(Guid periodRevenueId);
+        //public Task<List<GetPeriodRevenueDTO>> GetAllPeriodRevenues(int pageIndex, int pageSize);
+        //public Task<GetPeriodRevenueDTO> GetPeriodRevenueById(Guid periodRevenueId);
 
         //UPDATE
         //public Task<int> UpdatePeriodRevenue(PeriodRevenueDTO periodRevenueDTO, Guid periodRevenueId);

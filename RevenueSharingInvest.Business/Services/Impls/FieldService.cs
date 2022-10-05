@@ -28,21 +28,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<int> ClearAllFieldData()
-        {
-            int result;
-            try
-            {
-                result = await _fieldRepository.ClearAllFieldData();
-                return result;
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
         //CREATE
         public async Task<IdDTO> CreateField(FieldDTO fieldDTO)
         {
@@ -161,6 +146,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
+        //GET BY BUSINESS ID
         public async Task<List<FieldDTO>> GetFieldsByBusinessId(Guid businessId)
         {
             

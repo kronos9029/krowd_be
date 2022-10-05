@@ -27,6 +27,7 @@ namespace RevenueSharingInvest.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
+        //CREATE
         [HttpPost]
         [Authorize(Roles="ADMIN")]
         public async Task<IActionResult> CreateRiskType([FromBody] RiskTypeDTO riskTypeDTO)
@@ -35,6 +36,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //GET ALL
         [HttpGet]
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> GetAllRiskTypes(int pageIndex, int pageSize)
@@ -44,6 +46,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //GET BY ID
         [HttpGet]
         [Route("{id}")]
         [Authorize(Roles = "ADMIN")]
@@ -54,6 +57,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(dto);
         }
 
+        //UPDATE
         [HttpPut]
         [Route("{id}")]
         [Authorize(Roles = "ADMIN")]
@@ -63,19 +67,13 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //DELETE
         [HttpDelete]
         [Route("{id}")]
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> DeleteRiskType(Guid id)
         {
             var result = await _riskTypeService.DeleteRiskTypeById(id);
-            return Ok(result);
-        }
-
-        [HttpDelete]
-        public async Task<IActionResult> ClearAllRiskTypeData()
-        {
-            var result = await _riskTypeService.ClearAllRiskTypeData();
             return Ok(result);
         }
     }

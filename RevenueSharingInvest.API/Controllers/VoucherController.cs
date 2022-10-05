@@ -26,6 +26,7 @@ namespace RevenueSharingInvest.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
+        //CREATE
         [HttpPost]
         public async Task<IActionResult> CreateVoucher([FromBody] VoucherDTO voucherDTO)
         {
@@ -33,6 +34,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //GET ALL
         [HttpGet]
         public async Task<IActionResult> GetAllVouchers(int pageIndex, int pageSize)
         {
@@ -41,6 +43,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //GET BY ID
         [HttpGet]
         [Route("{id}")]
         public async Task<IActionResult> GetVoucherById(Guid id)
@@ -50,6 +53,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(dto);
         }
 
+        //UPDATE
         [HttpPut]
         [Route("{id}")]
         public async Task<IActionResult> UpdateVoucher([FromBody] VoucherDTO voucherDTO, Guid id)
@@ -58,6 +62,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //DELETE
         [HttpDelete]
         [Route("{id}")]
         public async Task<IActionResult> DeleteVoucher(Guid id)

@@ -22,7 +22,7 @@ namespace RevenueSharingInvest.API.Controllers
     public class FieldController : ControllerBase
     {
         private readonly IFieldService _fieldService;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRoleService _roleService;
         private readonly IUserService _userService;
 
@@ -32,7 +32,7 @@ namespace RevenueSharingInvest.API.Controllers
             IUserService userService)
         {
             _fieldService = fieldService;
-            this.httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor;
             _roleService = roleService;
             _userService = userService;
         }
@@ -93,13 +93,6 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> DeleteField(Guid id)
         {
             var result = await _fieldService.DeleteFieldById(id);
-            return Ok(result);
-        }
-
-        [HttpDelete]
-        public async Task<IActionResult> ClearAllFieldData()
-        {
-            var result = await _fieldService.ClearAllFieldData();
             return Ok(result);
         }
     }

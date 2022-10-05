@@ -26,6 +26,7 @@ namespace RevenueSharingInvest.API.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
+        //CREATE
         [HttpPost]
         public async Task<IActionResult> CreatePackageVoucher([FromBody] PackageVoucherDTO packageVoucherDTO)
         {
@@ -33,6 +34,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //GET ALL
         [HttpGet]
         public async Task<IActionResult> GetAllPackageVouchers(int pageIndex, int pageSize)
         {
@@ -41,6 +43,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //GET BY ID
         [HttpGet]
         [Route("{package_id},{voucher_id}")]
         public async Task<IActionResult> GetPackageVoucherById(Guid package_id, Guid voucher_id)
@@ -50,6 +53,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(dto);
         }
 
+        //UPDATE
         [HttpPut]
         [Route("{package_id},{voucher_id}")]
         public async Task<IActionResult> UpdatePackageVoucher([FromBody] PackageVoucherDTO packageVoucherDTO, Guid package_id, Guid voucher_id)
@@ -58,6 +62,7 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
+        //DELETE
         [HttpDelete]
         [Route("{package_id},{voucher_id}")]
         public async Task<IActionResult> DeletePackageVoucher(Guid package_id, Guid voucher_id)

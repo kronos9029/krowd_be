@@ -21,6 +21,5 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteRiskTypeById(Guid riskTypeId);
-        public Task<int> ClearAllRiskTypeData();
     }
 }

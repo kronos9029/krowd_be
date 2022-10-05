@@ -23,6 +23,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string Name { get; set; }
         public Guid ProjectId { get; set; }
         public string Description { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime EndDate { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime StartDate { get; set; }
         [StringLength(20)]
         public string Status { get; set; }
         [Column(TypeName = "datetime")]
@@ -31,11 +35,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime EndDate { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime StartDate { get; set; }
-        public bool? IsPrivate { get; set; }
 
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("Stages")]

@@ -21,6 +21,5 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         //public Task<int> DeletePeriodRevenueHistoryById(Guid periodRevenueHistoryId);
-        public Task<int> ClearAllPeriodRevenueHistoryData();
     }
 }

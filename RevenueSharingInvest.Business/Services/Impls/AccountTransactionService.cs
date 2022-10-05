@@ -121,7 +121,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                         walletTransaction.Amount = realAmount;
                         walletTransaction.Fee = 0;
-                        walletTransaction.Description = "Deposit monney into I1 wallet";
+                        walletTransaction.Description = "Deposit money into I1 wallet";
                         walletTransaction.ToWalletId = I1.Id;
                         walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                         walletTransaction.CreateBy = entity.FromUserId;

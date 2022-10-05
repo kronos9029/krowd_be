@@ -27,7 +27,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
-        public bool? IsDeleted { get; set; }
 
         [InverseProperty(nameof(Risk.RiskType))]
         public virtual ICollection<Risk> Risks { get; set; }

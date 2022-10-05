@@ -32,8 +32,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> UpdateUserEmail(Guid userId, string email, Guid currentUserId);
 
         //DELETE
-        public Task<int> DeleteUserById(Guid userId);
+        //public Task<int> DeleteUserById(Guid userId);
         public Task<int> DeleteUserByBusinessId(Guid businessId);
-        public Task<int> ClearAllUserData();
     }
 }
