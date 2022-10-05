@@ -54,8 +54,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("Invalid updateBy!!!");
                 }
 
-                roleDTO.isDeleted = false;
-
                 Role dto = _mapper.Map<Role>(roleDTO);
                 newId.id = await _roleRepository.CreateRole(dto);
                 if (newId.id.Equals(""))

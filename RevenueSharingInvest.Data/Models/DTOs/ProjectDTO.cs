@@ -60,7 +60,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string createBy { get; set; }
         public string updateDate { get; set; }
         public string updateBy { get; set; }
-        public bool isDeleted { get; set; }
     }
 
     public class InvestedProjectDTO : ProjectDTO
@@ -81,7 +80,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string createBy { get; set; }
         public string updateDate { get; set; }
         public string updateBy { get; set; }
-        public bool isDeleted { get; set; }
         public double investedAmount { get; set; }
         public double receivedAmount { get; set; }
         public string lastestInvestmentDate { get; set; }
@@ -110,6 +108,5 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string createBy { get; set; }
         public string updateDate { get; set; }
         public string updateBy { get; set; }
-        public bool isDeleted { get; set; }
     }
 }

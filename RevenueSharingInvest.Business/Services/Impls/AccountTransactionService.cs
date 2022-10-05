@@ -88,7 +88,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 //        throw new InvalidFieldException("Invalid updateBy!!!");
                 //}
 
-                //accountTransactionDTO.isDeleted = false;
 
                 AccountTransaction entity = _mapper.Map<AccountTransaction>(momoPaymentResult);
                 entity.PartnerClientId = Guid.Parse(momoPaymentResult.partnerClientId);
