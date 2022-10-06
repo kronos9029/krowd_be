@@ -33,8 +33,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     VALUES ( "
                     + "         @PackageId, "
                     + "         @VoucherId, "
@@ -43,8 +42,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("PackageId", packageVoucherDTO.PackageId, DbType.Guid);
@@ -71,18 +69,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "UPDATE PackageVoucher "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         PackageId=@PackageId "
-                    + "         AND VoucherId=@VoucherId";
+                var query = "DELETE FROM PackageVoucher WHERE PackageId = @PackageId AND VoucherId = @VoucherId";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                //parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
                 parameters.Add("PackageId", packageId, DbType.Guid);
                 parameters.Add("VoucherId", voucherId, DbType.Guid);
 
@@ -109,8 +98,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     PackageId ASC ) AS Num, "
                     + "             * "
                     + "         FROM PackageVoucher "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "         ) "
                     + "     SELECT "
                     + "         PackageId, "
                     + "         VoucherId, "
@@ -119,8 +107,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -134,7 +121,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM PackageVoucher WHERE IsDeleted = 0 ORDER BY PackageId ASC";
+                    var query = "SELECT * FROM PackageVoucher ORDER BY PackageId ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<PackageVoucher>(query)).ToList();
                 }               
@@ -177,8 +164,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Quantity = @Quantity, "
                     + "         MaxQuantity = @MaxQuantity, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         UpdateBy = @UpdateBy "
                     + "     WHERE "
                     + "         PackageId=@PId "
                     + "         AND VoucherId=@VId";
@@ -190,7 +176,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("MaxQuantity", packageVoucherDTO.MaxQuantity, DbType.Int16);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", packageVoucherDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", packageVoucherDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("PId", packageId, DbType.Guid);
                 parameters.Add("VId", voucherId, DbType.Guid);
 
@@ -203,22 +188,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
-            }
-        }
-
-        //CLEAR DATA
-        public async Task<int> ClearAllPackageVoucherData()
-        {
-            try
-            {
-                var query = "DELETE FROM PackageVoucher";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
             }
         }
     }

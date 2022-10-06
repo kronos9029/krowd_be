@@ -26,6 +26,5 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteFieldById(Guid fieldId);
-        public Task<int> ClearAllFieldData();
     }
 }

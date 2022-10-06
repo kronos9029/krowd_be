@@ -20,7 +20,5 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> UpdateWalletType(WalletType walletTypeDTO, Guid walletTypeId);
 
         //DELETE
-        public Task<int> DeleteWalletTypeById(Guid walletTypeId);
-        public Task<int> ClearAllWalletTypeData();
     }
 }

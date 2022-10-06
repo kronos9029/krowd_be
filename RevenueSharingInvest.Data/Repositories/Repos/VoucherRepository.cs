@@ -38,8 +38,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -55,8 +54,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", voucherDTO.Name, DbType.String);
@@ -84,21 +82,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteVoucherById(Guid voucherId)//thiếu para UpdateBy
+        public async Task<int> DeleteVoucherById(Guid voucherId)
         {
             try
             {
-                var query = "UPDATE Voucher "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
+                var query = "DELETE FROM Voucher WHERE Id = @Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                //parameters.Add("UpdateBy", voucherDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", voucherId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
@@ -125,8 +115,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     Name ASC ) AS Num, "
                     + "             * "
                     + "         FROM Voucher "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "         ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         Name, "
@@ -141,8 +130,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -156,7 +144,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM Voucher WHERE IsDeleted = 0 ORDER BY ProjectId, Name ASC";
+                    var query = "SELECT * FROM Voucher ORDER BY ProjectId, Name ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<Voucher>(query)).ToList();
                 }               
@@ -203,8 +191,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         StartDate = @StartDate, "
                     + "         EndDate = @EndDate, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         UpdateBy = @UpdateBy"
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -220,7 +207,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("EndDate", voucherDTO.EndDate, DbType.DateTime);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", voucherDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", voucherDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", voucherId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -232,22 +218,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
-            }
-        }
-
-        //CLEAR DATA
-        public async Task<int> ClearAllVoucherData()
-        {
-            try
-            {
-                var query = "DELETE FROM Voucher";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
             }
         }
     }

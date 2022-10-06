@@ -26,176 +26,49 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
-        ////CLEAR DATA
-        //public async Task<int> ClearAllWalletTypeData()
-        //{
-        //    int result;
-        //    try
-        //    {
-        //        result = await _walletTypeRepository.ClearAllWalletTypeData();
-        //        return result;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
+        //GET ALL
+        public async Task<List<GetWalletTypeDTO>> GetAllWalletTypes()
+        {
+            try
+            {
+                List<WalletType> walletTypeList = await _walletTypeRepository.GetAllWalletTypes();
+                List<GetWalletTypeDTO> list = _mapper.Map<List<GetWalletTypeDTO>>(walletTypeList);
 
-        ////CREATE
-        //public async Task<IdDTO> CreateWalletType(WalletTypeDTO walletTypeDTO)
-        //{
-        //    IdDTO newId = new IdDTO();
-        //    try
-        //    {
-        //        if (!await _validationService.CheckText(walletTypeDTO.name))
-        //            throw new InvalidFieldException("Invalid name!!!");
+                foreach (GetWalletTypeDTO item in list)
+                {
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                }
 
-        //        if (walletTypeDTO.description != null && (walletTypeDTO.description.Equals("string") || walletTypeDTO.description.Length == 0))
-        //            walletTypeDTO.description = null;
+                return list;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
 
-        //        if(!await _validationService.CheckText(walletTypeDTO.mode) || (!walletTypeDTO.mode.Equals("INVESTOR") && !walletTypeDTO.mode.Equals("BUSINESS") && !walletTypeDTO.mode.Equals("SYSTEM")))
-        //            throw new InvalidFieldException("Mode must be 'INVESTOR' or 'BUSINESS' or 'SYSTEM'!!!");
+        //GET BY ID
+        public async Task<GetWalletTypeDTO> GetWalletTypeById(Guid walletTypeId)
+        {
+            GetWalletTypeDTO result;
+            try
+            {
 
-        //        if (!await _validationService.CheckText(walletTypeDTO.type))
-        //            throw new InvalidFieldException("Invalid type!!!");
+                WalletType dto = await _walletTypeRepository.GetWalletTypeById(walletTypeId);
+                result = _mapper.Map<GetWalletTypeDTO>(dto);
+                if (result == null)
+                    throw new NotFoundException("No WalletType Object Found!");
 
-        //        if (walletTypeDTO.createBy != null && walletTypeDTO.createBy.Length >= 0)
-        //        {
-        //            if (walletTypeDTO.createBy.Equals("string"))
-        //                walletTypeDTO.createBy = null;
-        //            else if (!await _validationService.CheckUUIDFormat(walletTypeDTO.createBy))
-        //                throw new InvalidFieldException("Invalid createBy!!!");
-        //        }
+                result.createDate = await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
 
-        //        if (walletTypeDTO.updateBy != null && walletTypeDTO.updateBy.Length >= 0)
-        //        {
-        //            if (walletTypeDTO.updateBy.Equals("string"))
-        //                walletTypeDTO.updateBy = null;
-        //            else if (!await _validationService.CheckUUIDFormat(walletTypeDTO.updateBy))
-        //                throw new InvalidFieldException("Invalid updateBy!!!");
-        //        }
-
-        //        walletTypeDTO.isDeleted = false;
-
-        //        WalletType dto = _mapper.Map<WalletType>(walletTypeDTO);
-        //        newId.id = await _walletTypeRepository.CreateWalletType(dto);
-        //        if (newId.id.Equals(""))
-        //            throw new CreateObjectException("Can not create WalletType Object!");
-        //        return newId;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
-
-        ////DELETE
-        //public async Task<int> DeleteWalletTypeById(Guid walletTypeId)
-        //{
-        //    int result;
-        //    try
-        //    {
-
-        //        result = await _walletTypeRepository.DeleteWalletTypeById(walletTypeId);
-        //        if (result == 0)
-        //            throw new DeleteObjectException("Can not delete WalletType Object!");
-        //        return result;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
-
-        ////GET ALL
-        //public async Task<List<WalletTypeDTO>> GetAllWalletTypes()
-        //{
-        //    try
-        //    {
-        //        List<WalletType> walletTypeList = await _walletTypeRepository.GetAllWalletTypes();
-        //        List<WalletTypeDTO> list = _mapper.Map<List<WalletTypeDTO>>(walletTypeList);
-
-        //        foreach (WalletTypeDTO item in list)
-        //        {
-        //            item.createDate = await _validationService.FormatDateOutput(item.createDate);
-        //            item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
-        //        }
-
-        //        return list;
-        //    }           
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
-
-        ////GET BY ID
-        //public async Task<WalletTypeDTO> GetWalletTypeById(Guid walletTypeId)
-        //{
-        //    WalletTypeDTO result;
-        //    try
-        //    {
-
-        //        WalletType dto = await _walletTypeRepository.GetWalletTypeById(walletTypeId);
-        //        result = _mapper.Map<WalletTypeDTO>(dto);
-        //        if (result == null)
-        //            throw new NotFoundException("No WalletType Object Found!");
-
-        //        result.createDate = await _validationService.FormatDateOutput(result.createDate);
-        //        result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
-
-        //        return result;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
-
-        ////UPDATE
-        //public async Task<int> UpdateWalletType(WalletTypeDTO walletTypeDTO, Guid walletTypeId)
-        //{
-        //    int result;
-        //    try
-        //    {
-        //        if (!await _validationService.CheckText(walletTypeDTO.name))
-        //            throw new InvalidFieldException("Invalid name!!!");
-
-        //        if (walletTypeDTO.description != null && (walletTypeDTO.description.Equals("string") || walletTypeDTO.description.Length == 0))
-        //            walletTypeDTO.description = null;
-
-        //        if (!await _validationService.CheckText(walletTypeDTO.mode) || (!walletTypeDTO.mode.Equals("INVESTOR") && !walletTypeDTO.mode.Equals("BUSINESS") && !walletTypeDTO.mode.Equals("SYSTEM")))
-        //            throw new InvalidFieldException("Mode must be 'INVESTOR' or 'BUSINESS' or 'SYSTEM'!!!");
-
-        //        if (!await _validationService.CheckText(walletTypeDTO.type))
-        //            throw new InvalidFieldException("Invalid type!!!");
-
-        //        if (walletTypeDTO.createBy != null && walletTypeDTO.createBy.Length >= 0)
-        //        {
-        //            if (walletTypeDTO.createBy.Equals("string"))
-        //                walletTypeDTO.createBy = null;
-        //            else if (!await _validationService.CheckUUIDFormat(walletTypeDTO.createBy))
-        //                throw new InvalidFieldException("Invalid createBy!!!");
-        //        }
-
-        //        if (walletTypeDTO.updateBy != null && walletTypeDTO.updateBy.Length >= 0)
-        //        {
-        //            if (walletTypeDTO.updateBy.Equals("string"))
-        //                walletTypeDTO.updateBy = null;
-        //            else if (!await _validationService.CheckUUIDFormat(walletTypeDTO.updateBy))
-        //                throw new InvalidFieldException("Invalid updateBy!!!");
-        //        }
-
-        //        WalletType dto = _mapper.Map<WalletType>(walletTypeDTO);
-        //        result = await _walletTypeRepository.UpdateWalletType(dto, walletTypeId);
-        //        if (result == 0)
-        //            throw new UpdateObjectException("Can not update WalletType Object!");
-        //        return result;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

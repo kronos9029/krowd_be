@@ -21,6 +21,5 @@ namespace RevenueSharingInvest.Business.Services
 
         //DELETE
         public Task<int> DeleteRiskById(Guid riskId, ThisUserObj currentUser);
-        public Task<int> ClearAllRiskData();
     }
 }

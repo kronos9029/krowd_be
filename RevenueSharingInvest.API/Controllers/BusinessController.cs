@@ -42,12 +42,12 @@ namespace RevenueSharingInvest.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
-            if(currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+            if(currentUser.roleId.Equals(currentUser.adminRoleId))
             {
                 var result = await _businessService.CreateBusiness(businessDTO, fieldIdList, currentUser);
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role BUSINESS_MANAGER can perform this action!!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN can perform this action!!!");
         }
 
         //GET ALL

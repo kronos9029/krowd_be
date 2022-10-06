@@ -93,7 +93,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 AccountTransaction entity = _mapper.Map<AccountTransaction>(momoPaymentResult);
                 entity.PartnerClientId = Guid.Parse(momoPaymentResult.partnerClientId);
                 entity.FromUserId = entity.PartnerClientId;
-                entity.Type = "Top-up";
+                entity.Type = "TOP-UP";
                 newId.id = await _accountTransactionRepository.CreateAccountTransaction(entity);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create AccountTransaction Object!");
@@ -121,9 +121,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                         walletTransaction.Amount = realAmount;
                         walletTransaction.Fee = 0;
-                        walletTransaction.Description = "Investor deposit monney into I1 Wallet";
+                        walletTransaction.Description = "Deposit money into I1 wallet";
                         walletTransaction.ToWalletId = I1.Id;
-                        walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
+                        walletTransaction.Type = WalletTransactionTypeEnum.DEPOSIT.ToString();
                         walletTransaction.CreateBy = entity.FromUserId;
 
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
@@ -144,11 +144,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     }
 
                     //Create CASH_OUT WalletTransaction from I1 to I2
-                    walletTransaction.Description = "Investor Transfer Money From I1 Wallet To I2 Wallet";
+                    walletTransaction.Description = "Transfer money from I1 wallet to I2 wallet";
                     walletTransaction.FromWalletId = I1.Id;
                     walletTransaction.ToWalletId = I2.Id;
                     walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
-                    walletTransaction.CreateBy = I2.UpdateBy;
 
                     await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
@@ -161,9 +160,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     }
 
                     //Create CASH_IN WalletTransaction from I1 to I2
-                    walletTransaction.Description = "Investor Transfer Money From I1 Wallet To I2 Wallet";
-                    walletTransaction.FromWalletId = I1.Id;
-                    walletTransaction.ToWalletId = I2.Id;
+                    walletTransaction.Description = "Receive money from I1 wallet to I2 wallet";
                     walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                     walletTransaction.CreateBy = I2.UpdateBy;
 

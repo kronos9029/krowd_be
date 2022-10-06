@@ -32,8 +32,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -43,8 +42,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", periodRevenueDTO.ProjectId, DbType.Guid);
@@ -99,8 +97,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     StageId ASC ) AS Num, "
                     + "             * "
                     + "         FROM PeriodRevenue "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "         ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         ProjectId, "
@@ -116,8 +113,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -131,7 +127,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM PeriodRevenue WHERE IsDeleted = 0 ORDER BY ProjectId, StageId ASC";
+                    var query = "SELECT * FROM PeriodRevenue ORDER BY ProjectId, StageId ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<PeriodRevenue>(query)).ToList();
                 }               
@@ -170,34 +166,18 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SET "
                     + "         ProjectId = @ProjectId, "
                     + "         StageId = @StageId, "
-                    //+ "         ActualAmount = @ActualAmount, "
-                    //+ "         PessimisticExpectedAmount = @PessimisticExpectedAmount, "
-                    //+ "         NormalExpectedAmount = @NormalExpectedAmount, "
-                    //+ "         OptimisticExpectedAmount = @OptimisticExpectedAmount, "
-                    //+ "         PessimisticExpectedRatio = @PessimisticExpectedRatio, "
-                    //+ "         NormalExpectedRatio = @NormalExpectedRatio, "
-                    //+ "         OptimisticExpectedRatio = @OptimisticExpectedRatio, "
                     + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted "
+                    + "         UpdateBy = @UpdateBy "
                     + "     WHERE "
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", periodRevenueDTO.ProjectId, DbType.Guid);
                 parameters.Add("StageId", periodRevenueDTO.StageId, DbType.Guid);
-                //parameters.Add("ActualAmount", periodRevenueDTO.ActualAmount, DbType.Double);
-                //parameters.Add("PessimisticExpectedAmount", periodRevenueDTO.PessimisticExpectedAmount, DbType.Double);
-                //parameters.Add("NormalExpectedAmount", periodRevenueDTO.NormalExpectedAmount, DbType.Double);
-                //parameters.Add("OptimisticExpectedAmount", periodRevenueDTO.OptimisticExpectedAmount, DbType.Double);
-                //parameters.Add("PessimisticExpectedRatio", periodRevenueDTO.PessimisticExpectedRatio, DbType.Double);
-                //parameters.Add("NormalExpectedRatio", periodRevenueDTO.NormalExpectedRatio, DbType.Double);
-                //parameters.Add("OptimisticExpectedRatio", periodRevenueDTO.OptimisticExpectedRatio, DbType.Double);
                 parameters.Add("Status", periodRevenueDTO.Status, DbType.String);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", periodRevenueDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", periodRevenueDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", periodRevenueId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -212,22 +192,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //CLEAR DATA
-        public async Task<int> ClearAllPeriodRevenueData()
-        {
-            try
-            {
-                var query = "DELETE FROM PeriodRevenue";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
+        //GET BY STAGE ID
         public async Task<PeriodRevenue> GetPeriodRevenueByStageId(Guid stageId)
         {
             try

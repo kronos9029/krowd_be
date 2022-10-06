@@ -38,8 +38,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -53,8 +52,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("RoleId", userDTO.RoleId, DbType.Guid);
@@ -79,33 +77,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //DELETE
-        public async Task<int> DeleteUserById(Guid userId)//thiếu para UpdateBy đợi Authen
-        {
-            try
-            {
-                var query = "UPDATE [User] "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
-                using var connection = CreateConnection();
-                var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                //parameters.Add("UpdateBy", userDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", userId, DbType.Guid);
-
-                return await connection.ExecuteAsync(query, parameters);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
         //GET ALL
         public async Task<List<User>> GetAllUsers(int pageIndex, int pageSize, string businessId, string projectManagerId, string roleId, string status, string thisUserRoleId)
         {
@@ -116,8 +87,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var selectCondition = " * ";
                 var fromCondition = " [User] ";
                 var whereCondition = "";
-                var groupByCondition = " GROUP BY U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted ";
-                var isDeletedCondition = " AND IsDeleted = 0 ";
+                var groupByCondition = " GROUP BY U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy";
 
                 var businessIdCondition = " AND BusinessId = @BusinessId ";
                 var roleIdCondition = " AND RoleId = @RoleId ";
@@ -149,7 +119,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         {
                             if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                             {
-                                selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted ";
+                                selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy ";
                                 fromCondition = " [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId ";
                                 whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE BusinessId = @BusinessId) " + roleIdCondition;
                                 parameters.Add("RoleId", Guid.Parse(roleId), DbType.Guid);
@@ -199,15 +169,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + " AND (Status = '"
                         + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR Status = '"
                         + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') "
-                        + isDeletedCondition;
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') ";
                     }
 
                     if (roleId != null)
                     {
                         if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                         {
-                            selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted ";
+                            selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy ";
                             fromCondition = " [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId ";
                             whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE BusinessId = @BusinessId) " + roleIdCondition;
                             parameters.Add("RoleId", Guid.Parse(roleId), DbType.Guid);
@@ -222,7 +191,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                                 whereCondition = whereCondition + " AND (U.Status = '"
                                 + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR U.Status = '"
                                 + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR U.Status = '"
-                                + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') AND U.IsDeleted = 0 "
+                                + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') "
                                 + groupByCondition;
                             }
                         }
@@ -247,15 +216,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + " AND (Status = '"
                         + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR Status = '"
                         + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') "
-                        + isDeletedCondition;
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') ";
                     }
 
                     if (roleId != null)
                     {
                         if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                         {
-                            selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted ";
+                            selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy ";
                             fromCondition = " [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId ";
                             whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE ManagerId = @ManagerId) " + roleIdCondition;
                             parameters.Add("ManagerId", Guid.Parse(projectManagerId), DbType.Guid);
@@ -271,7 +239,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                                 whereCondition = whereCondition + " AND (U.Status = '"
                                 + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR U.Status = '"
                                 + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR U.Status = '"
-                                + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') AND U.IsDeleted = 0 "
+                                + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') "
                                 + groupByCondition;
                             }
                         }
@@ -318,8 +286,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -363,6 +330,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }        
         
+        //GET BY EMAIL
         public async Task<User> GetUserByEmail(string email)
         {
             try
@@ -407,8 +375,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                             "            U.CreateDate, " +
                             "            U.CreateBy, " +
                             "            U.UpdateDate, " +
-                            "            U.UpdateBy, " +
-                            "            U.IsDeleted " +
+                            "            U.UpdateBy " +
                             "FROM[User] U " +
                             "    JOIN Investor INS ON U.Id = INS.UserId " +
                             "    JOIN Investment INM ON INS.Id = INM.InvestorId " +
@@ -437,8 +404,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                             "         U.CreateDate, " +
                             "         U.CreateBy, " +
                             "         U.UpdateDate, " +
-                            "         U.UpdateBy, " +
-                            "         U.IsDeleted " +
+                            "         U.UpdateBy " +
                             ") AS X " +
                             "WHERE Id = @Id";
 
@@ -461,14 +427,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             try
             {
                 var query = "SELECT * "+
-                            "FROM(SELECT U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted "+
+                            "FROM(SELECT U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy "+
                             "FROM[User] U "+
                             "    JOIN Investor INS ON U.Id = INS.UserId "+
                             "    JOIN Investment INM ON INS.Id = INM.InvestorId "+
                             "   WHERE INM.ProjectId IN(SELECT Id "+
                             "                        FROM Project "+
                             "                        WHERE ManagerId = @ManagerId) "+
-                            " GROUP BY U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted "+
+                            " GROUP BY U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy "+
                             " ) AS X "+
                             " WHERE Id = @Id";
                 var parameters = new DynamicParameters();
@@ -546,6 +512,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
         
+        //UPDATE IMAGE
         public async Task<int> UpdateUserImage(string url, Guid userId)
         {
             try
@@ -562,22 +529,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
-            }
-        }
-
-        //CLEAR DATA
-        public async Task<int> ClearAllUserData()
-        {
-            try
-            {
-                var query = "DELETE FROM [User]";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
             }
         }
 
@@ -599,6 +550,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //COUNT
         public async Task<int> CountUser(string businessId, string projectManagerId, string roleId, string status, string thisUserRoleId)
         {
             try
@@ -608,8 +560,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var selectCondition = " * ";
                 var fromCondition = " [User] ";
                 var whereCondition = "";
-                var groupByCondition = " GROUP BY U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted ";
-                var isDeletedCondition = " AND IsDeleted = 0 ";
+                var groupByCondition = " GROUP BY U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy ";
 
                 var businessIdCondition = " AND BusinessId = @BusinessId ";
                 var roleIdCondition = " AND RoleId = @RoleId ";
@@ -641,7 +592,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         {
                             if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                             {
-                                selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted ";
+                                selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy ";
                                 fromCondition = " [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId ";
                                 whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE BusinessId = @BusinessId) " + roleIdCondition;
                                 parameters.Add("RoleId", Guid.Parse(roleId), DbType.Guid);
@@ -691,15 +642,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + " AND (Status = '"
                         + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR Status = '"
                         + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') "
-                        + isDeletedCondition;
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') ";
                     }
 
                     if (roleId != null)
                     {
                         if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                         {
-                            selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted ";
+                            selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy ";
                             fromCondition = " [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId ";
                             whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE BusinessId = @BusinessId) " + roleIdCondition;
                             parameters.Add("RoleId", Guid.Parse(roleId), DbType.Guid);
@@ -714,7 +664,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                                 whereCondition = whereCondition + " AND (U.Status = '"
                                 + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR U.Status = '"
                                 + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR U.Status = '"
-                                + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') AND U.IsDeleted = 0 "
+                                + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') "
                                 + groupByCondition;
                             }
                         }
@@ -739,15 +689,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + " AND (Status = '"
                         + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR Status = '"
                         + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR Status = '"
-                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') "
-                        + isDeletedCondition;
+                        + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') ";
                     }
 
                     if (roleId != null)
                     {
                         if (roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                         {
-                            selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy, U.IsDeleted ";
+                            selectCondition = " U.Id, U.BusinessId, U.RoleId, U.Description, U.LastName, U.FirstName, U.PhoneNum, U.Image, U.IdCard, U.Email, U.Gender, U.DateOfBirth, U.TaxIdentificationNumber, U.City, U.District, U.Address, U.BankName, U.BankAccount, U.Status, U.CreateDate, U.CreateBy, U.UpdateDate, U.UpdateBy ";
                             fromCondition = " [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId ";
                             whereCondition = " AND INM.ProjectId IN (SELECT Id FROM Project WHERE ManagerId = @ManagerId) " + roleIdCondition;
                             parameters.Add("ManagerId", Guid.Parse(projectManagerId), DbType.Guid);
@@ -763,7 +712,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                                 whereCondition = whereCondition + " AND (U.Status = '"
                                 + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0) + "' OR U.Status = '"
                                 + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(1) + "' OR U.Status = '"
-                                + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') AND U.IsDeleted = 0 "
+                                + Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(2) + "') "
                                 + groupByCondition;
                             }
                         }
@@ -837,7 +786,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-
+        //GET BY BUSINESS ID
         public async Task<List<User>> GetUserByBusinessId(Guid businessId)
         {
             try
@@ -855,6 +804,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //UPDATE BUSINESS ID FOR BUSINESS MANAGER
         public async Task<int> UpdateBusinessIdForBuM(Guid? businessId, Guid businesManagerId)
         {
             try
@@ -873,6 +823,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //UPDATE STATUS
         public async Task<int> UpdateUserStatus(Guid userId, string status, Guid currentUserId)
         {
             try
@@ -903,6 +854,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //UPDATE EMAIL
         public async Task<int> UpdateUserEmail(Guid userId, string email, Guid currentUserId)
         {
             try
@@ -933,6 +885,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
         }
 
+        //DELETE BY BUSINESS
         public async Task<int> DeleteUserByBusinessId(Guid businessId)
         {
             try

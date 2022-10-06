@@ -23,6 +23,5 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //DELETE
         public Task<int> DeleteRiskById(Guid riskId);
-        public Task<int> ClearAllRiskData();
     }
 }

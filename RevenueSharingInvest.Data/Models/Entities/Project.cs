@@ -52,15 +52,15 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? ApprovedDate { get; set; }
         public Guid? ApprovedBy { get; set; }
+        [StringLength(50)]
+        public string Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
-        public bool? IsDeleted { get; set; }
-        [StringLength(50)]
-        public string Status { get; set; }
+        
 
         [ForeignKey(nameof(AreaId))]
         [InverseProperty("Projects")]

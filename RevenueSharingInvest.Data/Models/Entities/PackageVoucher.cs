@@ -21,7 +21,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
-        public bool? IsDeleted { get; set; }
         public Guid? UpdateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }

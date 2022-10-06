@@ -120,11 +120,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new CreateObjectException("Can not create Business Object!");
                 else
                 {
-                    if (await _userRepository.UpdateBusinessIdForBuM(Guid.Parse(newId.id), Guid.Parse(currentUser.userId)) == 0)
-                    {
-                        await _businessRepository.DeleteBusinessByBusinessId(Guid.Parse(newId.id));
-                        throw new UpdateObjectException("Can not update businessId for User(BUSINESS_MANAGER) Object!");
-                    }
+                    //if (await _userRepository.UpdateBusinessIdForBuM(Guid.Parse(newId.id), Guid.Parse(currentUser.userId)) == 0)
+                    //{
+                    //    await _businessRepository.DeleteBusinessByBusinessId(Guid.Parse(newId.id));
+                    //    throw new UpdateObjectException("Can not update businessId for User(BUSINESS_MANAGER) Object!");
+                    //}
                     foreach (string fieldId in fieldIdList)
                     {
                         if (await _businessFieldRepository.CreateBusinessField(Guid.Parse(newId.id), Guid.Parse(fieldId), Guid.Parse(currentUser.userId)) == 0)//ráp authen sửa createBy và updateBy

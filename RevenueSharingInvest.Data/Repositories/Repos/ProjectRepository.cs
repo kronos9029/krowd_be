@@ -48,8 +48,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, " //Id Business Manager
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -73,8 +72,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("ManagerId", projectDTO.ManagerId, DbType.Guid);
@@ -150,7 +148,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
 
                 var whereCondition = "";
-                var isDeletedCondition = " AND IsDeleted = 0 ";
 
                 var businessIdCondition = " AND BusinessId = @BusinessId ";
                 var managerIdCondition = " AND ManagerId = @ManagerId ";
@@ -189,8 +186,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     else
                     {
                         whereCondition = whereCondition + " AND (Status = '"
-                            + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "') "
-                            + isDeletedCondition;
+                            + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "') ";
                     }
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
@@ -399,8 +395,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -450,9 +445,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE Project "
                     + "     SET "
-                    //+ "         ManagerId = ISNULL(@ManagerId, ManagerId), "
-                    //+ "         FieldId = ISNULL(@FieldId, FieldId), "
-                    //+ "         AreaId = ISNULL(@AreaId, AreaId), "
                     + "         Name = ISNULL(@Name, Name), "
                     + "         Image = ISNULL(@Image, Image), "
                     + "         Description = ISNULL(@Description, Description), "
@@ -472,9 +464,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                //parameters.Add("ManagerId", projectDTO.ManagerId, DbType.Guid);
-                //parameters.Add("FieldId", projectDTO.FieldId, DbType.Guid);
-                //parameters.Add("AreaId", projectDTO.AreaId, DbType.Guid);
                 parameters.Add("Name", projectDTO.Name, DbType.String);
                 parameters.Add("Image", projectDTO.Image, DbType.String);
                 parameters.Add("Description", projectDTO.Description, DbType.String);
@@ -505,6 +494,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }        
         
+        //UPDATE IMAGE
         public async Task<int> UpdateProjectImage(string url, Guid projectId)
         {
             try
@@ -525,22 +515,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //CLEAR DATA***
-        public async Task<int> ClearAllProjectData()
-        {
-            try
-            {
-                var query = "DELETE FROM Project";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
-        }
-
+        //COUNT
         public async Task<int> CountProject
         (
             string businessId,
@@ -558,7 +533,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
 
                 var whereCondition = "";
-                var isDeletedCondition = " AND IsDeleted = 0 ";
 
                 var businessIdCondition = " AND BusinessId = @BusinessId ";
                 var managerIdCondition = " AND ManagerId = @ManagerId ";
@@ -597,8 +571,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     else
                     {
                         whereCondition = whereCondition + " AND (Status = '"
-                            + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "') "
-                            + isDeletedCondition;
+                            + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(3) + "') ";
                     }
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
@@ -801,6 +774,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //UPDATE STATUS
         public async Task<int> UpdateProjectStatus(Guid projectId, string status, Guid updaterId)
         {
             try
@@ -843,7 +817,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "') "
-                + " AND IsDeleted = 0 AND Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId) ";
+                + " AND Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId) ";
                 parameters.Add("InvestorId", investorId, DbType.Guid);
 
                 if (pageIndex != 0 && pageSize != 0)
@@ -884,8 +858,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -923,7 +896,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "') "
-                + " AND IsDeleted = 0 AND Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId) ";
+                + " AND Id IN (SELECT DISTINCT ProjectId FROM Investment WHERE InvestorId = @InvestorId) ";
                 parameters.Add("InvestorId", investorId, DbType.Guid);
 
                 var query = "SELECT COUNT(*) FROM Project " + whereCondition;

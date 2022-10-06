@@ -9,6 +9,8 @@ namespace RevenueSharingInvest.Data.Models.Constants.Enum
     public enum WalletTransactionTypeEnum
     {
         CASH_IN,
-        CASH_OUT
+        CASH_OUT,
+        DEPOSIT,
+        WITHDRAW
     }
 }

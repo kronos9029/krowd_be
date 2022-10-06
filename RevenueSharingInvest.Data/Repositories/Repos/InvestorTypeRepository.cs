@@ -31,8 +31,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted ) "
+                    + "         UpdateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -41,8 +40,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy, "
-                    + "         0 )";
+                    + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", investorTypeDTO.Name, DbType.String);
@@ -63,21 +61,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //DELETE
-        public async Task<int> DeleteInvestorTypeById(Guid investorTypeId)//thiếu para UpdateBy
+        public async Task<int> DeleteInvestorTypeById(Guid investorTypeId)
         {
             try
             {
-                var query = "UPDATE InvestorType "
-                    + "     SET "
-                    + "         UpdateDate = @UpdateDate, "
-                    //+ "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = 1 "
-                    + "     WHERE "
-                    + "         Id=@Id";
+                var query = "DELETE FROM InvestorType WHERE Id = @Id";
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                //parameters.Add("UpdateBy", investorTypeDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", investorTypeId, DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
@@ -103,8 +93,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     Name ASC ) AS Num, "
                     + "             * "
                     + "         FROM InvestorType "
-                    + "         WHERE "
-                    + "             IsDeleted = 0 ) "
+                    + "         ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         Name, "
@@ -112,8 +101,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy, "
-                    + "         IsDeleted "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -127,7 +115,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM InvestorType WHERE IsDeleted = 0 ORDER BY Name ASC";
+                    var query = "SELECT * FROM InvestorType ORDER BY Name ASC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<InvestorType>(query)).ToList();
                 }               
@@ -167,8 +155,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Name = @Name, "
                     + "         Description = @Description, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted "
+                    + "         UpdateBy = @UpdateBy "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -177,7 +164,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", investorTypeDTO.Description, DbType.String);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", investorTypeDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", investorTypeDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", investorTypeId, DbType.Guid);
 
                 using (var connection = CreateConnection())
@@ -189,22 +175,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
-            }
-        }
-
-        //CLEAR DATA
-        public async Task<int> ClearAllInvestorTypeData()
-        {
-            try
-            {
-                var query = "DELETE FROM InvestorType";
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
             }
         }
 

@@ -111,8 +111,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         var query = "UPDATE AccountTransaction "
                             + "     SET "
                             + "         UpdateDate = @UpdateDate, "
-                            //+ "         UpdateBy = @UpdateBy, "
-                            + "         IsDeleted = 1 "
+                            //+ "         UpdateBy = @UpdateBy "
                             + "     WHERE "
                             + "         Id=@Id";
                         using var connection = CreateConnection();
@@ -314,8 +313,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Description = @Description, "
                     + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy, "
-                    + "         IsDeleted = @IsDeleted"
+                    + "         UpdateBy = @UpdateBy"
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -326,7 +324,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Status", accountTransactionDTO.Status, DbType.String);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", accountTransactionDTO.UpdateBy, DbType.Guid);
-                parameters.Add("IsDeleted", accountTransactionDTO.IsDeleted, DbType.Boolean);
                 parameters.Add("Id", accountTransactionId, DbType.Guid);
 
                 using (var connection = CreateConnection())
