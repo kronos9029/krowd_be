@@ -36,7 +36,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         //GET ALL
         [HttpGet]
-        public async Task<IActionResult> GetBills(string projectId)
+        public async Task<IActionResult> GetBillsDate(string projectId)
         {
             var result = await _firestoreProvider.GetDatesOfProject(projectId);
             return Ok(result);
@@ -46,7 +46,7 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("test")]
         public async Task<IActionResult> GetTest(string projectId, string date)
         {
-            var result = await _firestoreProvider.GetInvoiceDetail(projectId, date);
+            var result = await _firestoreProvider.GetInvoiceDetailByDate(projectId, date);
             return Ok(result);
         }
 

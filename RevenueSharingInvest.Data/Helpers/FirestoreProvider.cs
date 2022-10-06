@@ -35,6 +35,19 @@ namespace RevenueSharingInvest.Data.Helpers
             }
         }
 
+        public async Task<dynamic> UpdateBills(BillEntity bill, string date)
+        {
+            try
+            {
+                DocumentReference billPath = _fireStoreDb.Collection("Bills").Document(bill.ProjectId).Collection(date).Document(bill.InvoiceId);
+                return await billPath.SetAsync(bill);
+            } catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
 
 
         public async Task<List<string>> GetDatesOfProject(string projectId)
@@ -82,7 +95,7 @@ namespace RevenueSharingInvest.Data.Helpers
             }
         }
 
-        public async Task<List<BillEntity>> GetInvoiceDetail(string projectId, string date)
+        public async Task<List<BillEntity>> GetInvoiceDetailByDate(string projectId, string date)
         {
             try
             {
