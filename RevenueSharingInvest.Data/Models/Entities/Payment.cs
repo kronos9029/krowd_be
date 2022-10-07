@@ -21,9 +21,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
         public Guid? PeriodRevenueId { get; set; }
-        public Guid? StageId { get; set; }
         public Guid? InvestmentId { get; set; }
-        public Guid? PackageId { get; set; }
         public double? Amount { get; set; }
         public string Description { get; set; }
         [StringLength(20)]
@@ -34,6 +32,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
         public string Status { get; set; }
+        public Guid? PackageId { get; set; }
+        public Guid? StageId { get; set; }
 
         [ForeignKey(nameof(InvestmentId))]
         [InverseProperty("Payments")]

@@ -82,7 +82,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Package entity = _mapper.Map<Package>(packageDTO);
 
                 entity.RemainingQuantity = entity.Quantity;
-                entity.Status = Enum.GetNames(typeof(PackageStatusEnum)).ElementAt(0); //IN_STOCK
+                entity.Status = PackageStatusEnum.INACTIVE.ToString(); //INACTIVE
                 entity.CreateBy = Guid.Parse(currentUser.userId);
                 entity.UpdateBy = Guid.Parse(currentUser.userId);
 

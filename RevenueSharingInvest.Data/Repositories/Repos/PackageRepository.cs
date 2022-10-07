@@ -33,7 +33,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Quantity, "
                     + "         RemainingQuantity, "
                     + "         Description, "
-                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -48,7 +47,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @Quantity, "
                     + "         @RemainingQuantity, "
                     + "         @Description, "
-                    + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -62,7 +60,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Quantity", packageDTO.Quantity, DbType.Int16);
                 parameters.Add("RemainingQuantity", packageDTO.RemainingQuantity, DbType.Int16);
                 parameters.Add("Description", packageDTO.Description, DbType.String);
-                parameters.Add("Status", packageDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", packageDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);

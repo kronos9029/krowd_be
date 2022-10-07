@@ -1,12 +1,11 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Models.Entities;
 
 #nullable disable
 
-namespace RevenueSharingInvest.Data.Models.Entities
+namespace RevenueSharingInvest.Data.Helpers
 {
     public partial class KrowdContext : DbContext
     {
@@ -21,7 +20,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
 
         public virtual DbSet<AccountTransaction> AccountTransactions { get; set; }
         public virtual DbSet<Area> Areas { get; set; }
-        public virtual DbSet<Business> Businesses { get; set; }
+        public virtual DbSet<Models.Entities.Business> Businesses { get; set; }
         public virtual DbSet<BusinessField> BusinessFields { get; set; }
         public virtual DbSet<Field> Fields { get; set; }
         public virtual DbSet<Investment> Investments { get; set; }
@@ -52,7 +51,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                //optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;Trusted_Connection = True");
+                optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;User ID=sa;Password=123");
                 //optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
             }
         }
@@ -64,6 +63,14 @@ namespace RevenueSharingInvest.Data.Models.Entities
             modelBuilder.Entity<AccountTransaction>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.Amount).HasDefaultValueSql("(CONVERT([bigint],(0)))");
+
+                entity.Property(e => e.CreateDate).HasDefaultValueSql("('0001-01-01T00:00:00.000')");
+
+                entity.Property(e => e.ResponseTime).HasDefaultValueSql("(CONVERT([bigint],(0)))");
+
+                entity.Property(e => e.TransId).HasDefaultValueSql("(CONVERT([bigint],(0)))");
 
                 entity.HasOne(d => d.FromUser)
                     .WithMany(p => p.AccountTransactionFromUsers)
@@ -81,7 +88,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
 
-            modelBuilder.Entity<Business>(entity =>
+            modelBuilder.Entity<Models.Entities.Business>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
@@ -111,21 +118,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
             modelBuilder.Entity<Investment>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
-
-                //entity.HasOne(d => d.Investor)
-                //    .WithMany(p => p.Investments)
-                //    .HasForeignKey(d => d.InvestorId)
-                //    .HasConstraintName("FK_Investment_Investor");
-
-                //entity.HasOne(d => d.Package)
-                //    .WithMany(p => p.Investments)
-                //    .HasForeignKey(d => d.PackageId)
-                //    .HasConstraintName("FK_Investment_Package");
-
-                //entity.HasOne(d => d.Project)
-                //    .WithMany(p => p.Investments)
-                //    .HasForeignKey(d => d.ProjectId)
-                //    .HasConstraintName("FK_Investment_Project");
             });
 
             modelBuilder.Entity<Investor>(entity =>
@@ -156,6 +148,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
             modelBuilder.Entity<Package>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.Status)
+                    .IsUnicode(false)
+                    .HasComputedColumnSql("(case when [dbo].[Change_Package_Status]([ProjectId])<>'CALLING_FOR_INVESTMENT' then 'INACTIVE' when [dbo].[Change_Package_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]>(0) then 'IN_STOCK' when [dbo].[Change_Package_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]=(0) then 'OUT_OF_STOCK' else 'INACTIVE' end)", false);
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Packages)
@@ -202,7 +198,13 @@ namespace RevenueSharingInvest.Data.Models.Entities
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.PeriodRevenues)
                     .HasForeignKey(d => d.ProjectId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_PeriodRevenue_Project");
+
+                entity.HasOne(d => d.Stage)
+                    .WithMany(p => p.PeriodRevenues)
+                    .HasForeignKey(d => d.StageId)
+                    .OnDelete(DeleteBehavior.ClientSetNull);
             });
 
             modelBuilder.Entity<PeriodRevenueHistory>(entity =>
@@ -227,6 +229,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
                 entity.HasOne(d => d.Business)
                     .WithMany(p => p.Projects)
                     .HasForeignKey(d => d.BusinessId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Project_Business");
 
                 entity.HasOne(d => d.Manager)
@@ -292,6 +295,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Stages)
                     .HasForeignKey(d => d.ProjectId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Stage_Project");
             });
 
@@ -364,8 +368,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
-
-            //modelBuilder.Seed();
 
             OnModelCreatingPartial(modelBuilder);
         }

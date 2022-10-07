@@ -14,7 +14,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
     {
         public Package()
         {
-            //Investments = new HashSet<Investment>();
             PackageVouchers = new HashSet<PackageVoucher>();
         }
 
@@ -33,14 +32,14 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
-        public string Status { get; set; }
         public int RemainingQuantity { get; set; }
+        [Required]
+        [StringLength(12)]
+        public string Status { get; set; }
 
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("Packages")]
         public virtual Project Project { get; set; }
-        //[InverseProperty(nameof(Investment.Package))]
-        //public virtual ICollection<Investment> Investments { get; set; }
         [InverseProperty(nameof(PackageVoucher.Package))]
         public virtual ICollection<PackageVoucher> PackageVouchers { get; set; }
     }

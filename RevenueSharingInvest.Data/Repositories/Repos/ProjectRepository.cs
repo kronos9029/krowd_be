@@ -44,7 +44,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         StartDate, "
                     + "         EndDate, "
                     + "         BusinessLicense, "
-                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, " //Id Business Manager
                     + "         UpdateDate, "
@@ -68,7 +67,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @StartDate, "
                     + "         @EndDate, "
                     + "         @BusinessLicense, "
-                    + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -91,7 +89,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("StartDate", Convert.ToDateTime(projectDTO.StartDate), DbType.DateTime);
                 parameters.Add("EndDate", Convert.ToDateTime(projectDTO.EndDate), DbType.DateTime);
                 parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
-                parameters.Add("Status", projectDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", projectDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
