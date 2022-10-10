@@ -15,7 +15,7 @@ namespace RevenueSharingInvest.Business.Helpers
         public String ServiceAccountId { get; set; }
     }
 
-    public class firestoreSettings
+    public class FirestoreSettings
     {
         [JsonPropertyName("type")]
         public string Type { get; set; }

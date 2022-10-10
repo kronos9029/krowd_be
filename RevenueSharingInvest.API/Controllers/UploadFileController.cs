@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using ExcelDataReader;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,16 +11,21 @@ using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Data.Models.DTOs;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
     [Route("api/v1.0/upload-files")]
     [EnableCors]
-    [Authorize]
+    //[Authorize]
     public class UploadFileController : ControllerBase
     {
         private readonly IFileUploadService _fileUploadService;
@@ -49,7 +55,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPost]
         [Route("contract")]
-        public async Task<IActionResult> UploadContractToFirebase([FromForm] IFormFile file)
+        public async Task<IActionResult> UploadContractToFirebase(IFormFile file)
         {
             ThisUserObj userInfo = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             FirebaseBusinessContract firebaseBusinessContract = new();
@@ -57,17 +63,49 @@ namespace RevenueSharingInvest.API.Controllers
             firebaseBusinessContract.businessName = await _businessService.GetBusinessNameById(userInfo.businessId);
             firebaseBusinessContract.projectOwnerId = userInfo.userId;
             firebaseBusinessContract.projectOwnerEmail = userInfo.email;
-            var result = _fileUploadService.UploadBusinessContract(firebaseBusinessContract);
+            var result = await _fileUploadService.UploadBusinessContract(firebaseBusinessContract);
             return Ok(result);
         }
 
-        [HttpPost]
+/*        [HttpPost]
         [Route("excel")]
-        public async Task<IActionResult> UploadExcel([FromForm] FirebaseRequest firebaseRequest)
+        public async Task<IActionResult> UploadExcel([FromForm] IFormFile excelFile)
         {
             ThisUserObj userInfo = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            string ok = await _fileUploadService.ExcelFileReader(excelFile);
             return Ok(0);
 
+
+        }*/
+
+        [HttpPost]
+        [Route("excel")]
+        public async Task<IActionResult> UploadExcel(IFormFile excelFile)
+        {
+            try
+            {
+                DataSet dsexcelRecords = new DataSet();
+                IExcelDataReader reader = null;
+                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+                Stream FileStream = excelFile.OpenReadStream();
+
+                if (excelFile != null && FileStream != null)
+                {
+                    if (excelFile.FileName.EndsWith(".xls"))
+                        reader = ExcelReaderFactory.CreateBinaryReader(FileStream);
+                    else if (excelFile.FileName.EndsWith(".xlsx"))
+                        reader = ExcelReaderFactory.CreateOpenXmlReader(FileStream);
+
+                    dsexcelRecords = reader.AsDataSet();
+                    reader.Close();
+                }
+
+                return Ok(dsexcelRecords);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
 
         }
         /*        [HttpDelete]
@@ -75,5 +113,10 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     return Ok(_fileUploadService.DeleteImagesFromFirebase(firebaseEntity));
                 }*/
+    }
+
+    public class Test
+    {
+        public string ok { get; set; }
     }
 }

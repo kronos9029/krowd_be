@@ -192,8 +192,8 @@ namespace RevenueSharingInvest.API.Extensions
         public static void AddFirestoreDatabasecontext(this IServiceCollection services, IConfiguration configuration)
         {
             var firestoreSettingSection = configuration.GetSection("FirestoreSettings");
-            services.Configure<firestoreSettings>(firestoreSettingSection);
-            var firestoreSettings = firestoreSettingSection.Get<firestoreSettings>();
+            services.Configure<FirestoreSettings>(firestoreSettingSection);
+            var firestoreSettings = firestoreSettingSection.Get<FirestoreSettings>();
             var firestoreJson = JsonSerializer.Serialize(firestoreSettings);
             services.AddSingleton(_ => new FirestoreProvider(
                 new FirestoreDbBuilder
