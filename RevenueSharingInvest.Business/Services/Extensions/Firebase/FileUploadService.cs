@@ -292,7 +292,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
                                      ThrowOnCancel = true,
                                  });
 
-            string path = "Contract/"+request.businessId+"/"+request.projectOwnerId+"/"+request.businessName+request.projectOwnerName;
+            string path = "Contract/"+request.businessId+"/"+request.projectOwnerId+"/"+request.businessName+request.projectOwnerEmail;
 
             var url = await uploadTask.Child(path).PutAsync(request.file.OpenReadStream());
             return url;

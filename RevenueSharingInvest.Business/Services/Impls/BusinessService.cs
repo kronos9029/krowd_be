@@ -466,5 +466,23 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 throw new Exception(e.Message);
             }
         }
+
+        //GET BUSINESS NAME BY ID
+        public async Task<string> GetBusinessNameById(string businessId)
+        {
+            try
+            {
+                string businessName = await _businessRepository.GetBusinessNameById(Guid.Parse(businessId));
+
+                return businessName;
+
+            }catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
+
     }
 }

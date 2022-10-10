@@ -17,6 +17,7 @@ namespace RevenueSharingInvest.Business.Services
         public Task<AllBusinessDTO> GetAllBusiness(int pageIndex, int pageSize, string status, string name, string orderBy, string order, ThisUserObj currentUser);
         public Task<GetBusinessDTO> GetBusinessById(Guid businessId);
         public Task<Data.Models.Entities.Business> GetBusinessByProjectId(Guid projectId);
+        public Task<string> GetBusinessNameById(string businessId);
 
         //UPDATE
         public Task<int> UpdateBusiness(UpdateBusinessDTO businessDTO, Guid businessId, ThisUserObj currentUser);

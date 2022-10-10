@@ -540,6 +540,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET BUSINESS NAME BY ID
+        public async Task<string> GetBusinessNameById(Guid businessId)
+        {
+            try
+            {
+                var query = "SELECT Name FROM Business WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", businessId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<string>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //UPDATE NUM OF PROJECT
         public async Task<int> UpdateBusinessNumOfProject(Guid businessId)
         {
@@ -557,5 +575,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+
     }
 }

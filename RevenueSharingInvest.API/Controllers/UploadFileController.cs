@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Models;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
@@ -24,18 +25,21 @@ namespace RevenueSharingInvest.API.Controllers
         private readonly IFileUploadService _fileUploadService;
         private readonly IRoleService _roleService;
         private readonly IUserService _userService;
+        private readonly IBusinessService _businessService;
 
-        public UploadFileController(IFileUploadService fileUploadService, IRoleService roleService, IUserService userService)
+        public UploadFileController(IFileUploadService fileUploadService, IRoleService roleService, IUserService userService, IBusinessService businessService)
         {
             _fileUploadService = fileUploadService;
             _roleService = roleService;
             _userService = userService;
+            _businessService = businessService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadImageToFirebase([FromForm] FirebaseRequest firebaseRequest)
+        [Route("firebase")]
+        public async Task<IActionResult> UploadFileToFirebase([FromForm] FirebaseRequest firebaseRequest)
         {
-            ThisUserObj userInfo = await GetThisUserInfo(HttpContext);
+            ThisUserObj userInfo = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             firebaseRequest.createBy = userInfo.userId;
             firebaseRequest.businessId = userInfo.businessId;
 
@@ -43,71 +47,28 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
-        private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
+        [HttpPost]
+        [Route("contract")]
+        public async Task<IActionResult> UploadContractToFirebase([FromForm] IFormFile file)
         {
-            ThisUserObj currentUser = new();
-
-            var checkUser = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber);
-            if (checkUser == null)
-            {
-                currentUser.userId = "";
-                currentUser.email = "";
-                currentUser.investorId = "";
-            }
-            else
-            {
-                currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
-                currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
-                currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
-            }
-
-            List<RoleDTO> roleList = await _roleService.GetAllRoles();
-            GetUserDTO? userDTO = await _userService.GetUserByEmail(currentUser.email);
-            if (userDTO == null)
-            {
-                currentUser.roleId = "";
-                currentUser.businessId = "";
-
-            }
-            else
-            {
-                if (userDTO.business != null)
-                {
-                    currentUser.roleId = userDTO.role.id;
-                    currentUser.businessId = userDTO.business.id;
-                }
-                else
-                {
-                    currentUser.roleId = "";
-                    currentUser.businessId = "";
-                }
-
-            }
-
-
-            foreach (RoleDTO role in roleList)
-            {
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(0)))
-                {
-                    currentUser.adminRoleId = role.id;
-                }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(3)))
-                {
-                    currentUser.investorRoleId = role.id;
-                }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(1)))
-                {
-                    currentUser.businessManagerRoleId = role.id;
-                }
-                if (role.name.Equals(Enum.GetNames(typeof(RoleEnum)).ElementAt(2)))
-                {
-                    currentUser.projectManagerRoleId = role.id;
-                }
-            }
-
-            return currentUser;
-
+            ThisUserObj userInfo = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            FirebaseBusinessContract firebaseBusinessContract = new();
+            firebaseBusinessContract.businessId = userInfo.businessId.ToString();
+            firebaseBusinessContract.businessName = await _businessService.GetBusinessNameById(userInfo.businessId);
+            firebaseBusinessContract.projectOwnerId = userInfo.userId;
+            firebaseBusinessContract.projectOwnerEmail = userInfo.email;
+            var result = _fileUploadService.UploadBusinessContract(firebaseBusinessContract);
+            return Ok(result);
         }
+        
+        [HttpPost]
+        [Route("excel")]
+        public async Task<IActionResult> UploadExcel([FromForm] FirebaseRequest firebaseRequest)
+        {
+            ThisUserObj userInfo = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            return Ok(0);
+        
+
 
         /*        [HttpDelete]
                 public async Task<IActionResult> DeleteImagesFromFirebase(FirebaseEntity firebaseEntity)
