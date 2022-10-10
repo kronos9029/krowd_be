@@ -60,16 +60,16 @@ namespace RevenueSharingInvest.API.Controllers
             var result = _fileUploadService.UploadBusinessContract(firebaseBusinessContract);
             return Ok(result);
         }
-        
+
         [HttpPost]
         [Route("excel")]
         public async Task<IActionResult> UploadExcel([FromForm] FirebaseRequest firebaseRequest)
         {
             ThisUserObj userInfo = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             return Ok(0);
-        
 
 
+        }
         /*        [HttpDelete]
                 public async Task<IActionResult> DeleteImagesFromFirebase(FirebaseEntity firebaseEntity)
                 {
