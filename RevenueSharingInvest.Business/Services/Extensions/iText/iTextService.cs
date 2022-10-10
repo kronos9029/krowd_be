@@ -59,8 +59,9 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
                 if(investor.FirstName != null)
                     fullName = investor.FirstName +" "+investor.LastName;
                 else
-                    fullName = investor.LastName;
+                    fullName = investor.LastName; 
                 
+                 
                 
 
                 //Initialize PDF writer
