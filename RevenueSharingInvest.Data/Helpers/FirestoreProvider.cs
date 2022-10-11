@@ -21,13 +21,17 @@ namespace RevenueSharingInvest.Data.Helpers
             _fireStoreDb = fireStoreDb;
         }
 
-        public async Task<dynamic> CreateBills(BillEntity bill)
+        public async Task<List<BillEntity>> CreateBills(List<BillEntity> billList, string projectId)
         {
             try
             {
-                DocumentReference billPath = _fireStoreDb.Collection("Bills").Document(bill.ProjectId).Collection(DateTimePicker.GetDateTimeByTimeZone().ToString("dd-MM-yyyy")).Document(bill.InvoiceId);
-                bill.Descriprion = "tetst";
-                return await billPath.SetAsync(bill);
+                foreach(BillEntity bill in billList)
+                {
+                    DocumentReference billPath = _fireStoreDb.Collection("Bills").Document(projectId).Collection(DateTimePicker.GetDateTimeByTimeZone().ToString("dd-MM-yyyy")).Document(bill.InvoiceId);
+                    await billPath.SetAsync(bill);
+                }
+
+                return billList;
             } catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());

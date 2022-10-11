@@ -9,6 +9,7 @@ using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using static RevenueSharingInvest.Data.Helpers.FirestoreProvider;
 
@@ -21,17 +22,31 @@ namespace RevenueSharingInvest.API.Controllers
     {
 
         private readonly FirestoreProvider _firestoreProvider;
+        private readonly IUserService _userService;
+        private readonly IRoleService _roleService;
 
-        public POSController(FirestoreProvider firestoreProvider)
+        public POSController(FirestoreProvider firestoreProvider, IUserService userService, IRoleService roleService)
         {
             _firestoreProvider = firestoreProvider;
+            _userService = userService;
+            _roleService = roleService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> ReciveBill(BillEntity billEntity)
+        [Route("Krowd-upload")]
+        public async Task<IActionResult> UploadBillsFromKrowd(List<BillEntity> billEntity)
         {
-            await _firestoreProvider.CreateBills(billEntity);
-            return Ok(0);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            await _firestoreProvider.CreateBills(billEntity, currentUser.projectId);
+            return Ok();
+        }
+        
+        [HttpPost]
+        [Route("Client-upload")]
+        public async Task<IActionResult> UploadBillsFromPOS(List<BillEntity> billEntity, string projectId)
+        {
+            var result =  _firestoreProvider.CreateBills(billEntity, projectId);
+            return Ok(result);
         }
 
         //GET ALL

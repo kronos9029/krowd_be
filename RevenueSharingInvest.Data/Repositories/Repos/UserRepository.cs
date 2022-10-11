@@ -905,5 +905,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+
+
+        public async Task<Guid> GetProjectIdByManagerEmail(string email)
+        {
+            try
+            {
+                var query = "SELECT p.Id FROM [User] u JOIN Project p ON u.Id = p.ManagerId WHERE u.Email = @Email";
+                var parameters = new DynamicParameters();
+                parameters.Add("Email", email, DbType.String);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Guid>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }
