@@ -1,4 +1,5 @@
-﻿using Firebase.Auth;
+﻿using ExcelDataReader;
+using Firebase.Auth;
 using Firebase.Storage;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -12,6 +13,8 @@ using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
@@ -72,9 +75,6 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
             {
                 entity.Priority = 0;
             }
-
-            
-            
 
             return entity;
         }
@@ -299,46 +299,88 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
             
         }
 
-/*        public async Task<string> ExcelFileReader(IFormFile file)
+        public async Task<List<Revenue>> ExcelFileReader(IFormFile excelFile)
         {
-
-        }*/
-
-
-
-/*        public async Task DeleteImagesFromFirebase(ProjectEntityDTO firebaseEntity)
-        {
-            var tokenDescriptor = new Dictionary<string, object>()
+            try
             {
-                {"permission", "allow" }
-            };
+                DataSet dsexcelRecords = new DataSet();
+                IExcelDataReader reader = null;
+                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+                Stream FileStream = excelFile.OpenReadStream();
+                List<Revenue> revenueList = new();
+                if (excelFile != null && FileStream != null)
+                {
+                    if (excelFile.FileName.EndsWith(".xls"))
+                        reader = ExcelReaderFactory.CreateBinaryReader(FileStream);
+                    else if (excelFile.FileName.EndsWith(".xlsx"))
+                        reader = ExcelReaderFactory.CreateOpenXmlReader(FileStream);
 
-            string storageToken = await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(firebaseEntity.createBy, tokenDescriptor);
+                    dsexcelRecords = reader.AsDataSet();
+                    reader.Close();
 
-            var auth = new FirebaseAuthProvider(new FirebaseConfig(_firebaseSettings.ApiKey));
+                    if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
+                    {
+                        DataTable monthyRefvenueTable = dsexcelRecords.Tables[0];
+                        for (int i = 2; i < monthyRefvenueTable.Rows.Count; i++)
+                        {
+                            Revenue revenue = new();
+                            revenue.Day = monthyRefvenueTable.Rows[i][0].ToString();
+                            if (!monthyRefvenueTable.Rows[i][4].ToString().Equals(""))
+                                revenue.DailyRevenue = Convert.ToDecimal(monthyRefvenueTable.Rows[i][4]);
+                            else
+                                revenue.DailyRevenue = 0;
+                            if (!revenue.Day.Equals(""))
+                            {
+                                revenueList.Add(revenue);
+                            }
+                        }
+                    }
 
-            //var token = await auth.SignInWithEmailAndPasswordAsync(_firebaseSettings.Email, _firebaseSettings.Password);
-            var token = await auth.SignInWithCustomTokenAsync(storageToken);
+                }
 
-            var uploadTask = new FirebaseStorage(
-                                 _firebaseSettings.Bucket,
-                                 new FirebaseStorageOptions
-                                 {
-                                     AuthTokenAsyncFactory = () => Task.FromResult(token.FirebaseToken),
-                                     ThrowOnCancel = true,
-                                 });
-
-            string fileName = firebaseEntity.id + ".jpg";
-
-            string newGuid = Guid.NewGuid().ToString();
-            await uploadTask.Child(firebaseEntity.type)
-                            .Child(firebaseEntity.path)
-                            .Child(firebaseEntity.projectId)
-                            .Child(fileName)
-                            .DeleteAsync();
+                return revenueList;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
 
 
-        }*/
+
+        /*        public async Task DeleteImagesFromFirebase(ProjectEntityDTO firebaseEntity)
+                {
+                    var tokenDescriptor = new Dictionary<string, object>()
+                    {
+                        {"permission", "allow" }
+                    };
+
+                    string storageToken = await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(firebaseEntity.createBy, tokenDescriptor);
+
+                    var auth = new FirebaseAuthProvider(new FirebaseConfig(_firebaseSettings.ApiKey));
+
+                    //var token = await auth.SignInWithEmailAndPasswordAsync(_firebaseSettings.Email, _firebaseSettings.Password);
+                    var token = await auth.SignInWithCustomTokenAsync(storageToken);
+
+                    var uploadTask = new FirebaseStorage(
+                                         _firebaseSettings.Bucket,
+                                         new FirebaseStorageOptions
+                                         {
+                                             AuthTokenAsyncFactory = () => Task.FromResult(token.FirebaseToken),
+                                             ThrowOnCancel = true,
+                                         });
+
+                    string fileName = firebaseEntity.id + ".jpg";
+
+                    string newGuid = Guid.NewGuid().ToString();
+                    await uploadTask.Child(firebaseEntity.type)
+                                    .Child(firebaseEntity.path)
+                                    .Child(firebaseEntity.projectId)
+                                    .Child(fileName)
+                                    .DeleteAsync();
+
+
+                }*/
 
         public async Task<string> UploadImageToFirebaseBusiness(IFormFile file, string uid)
         {
@@ -510,5 +552,11 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
             return downloadUrl.ToString();
 
         }
+    }
+
+    public class Revenue
+    {
+        public string Day { get; set; }
+        public decimal DailyRevenue { get; set; }
     }
 }

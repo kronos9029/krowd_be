@@ -19,6 +19,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Forms;
+using Org.BouncyCastle.Utilities;
 
 namespace RevenueSharingInvest.API.Controllers
 {
@@ -82,31 +83,8 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("excel")]
         public async Task<IActionResult> UploadExcel(IFormFile excelFile)
         {
-            try
-            {
-                DataSet dsexcelRecords = new DataSet();
-                IExcelDataReader reader = null;
-                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-                Stream FileStream = excelFile.OpenReadStream();
-
-                if (excelFile != null && FileStream != null)
-                {
-                    if (excelFile.FileName.EndsWith(".xls"))
-                        reader = ExcelReaderFactory.CreateBinaryReader(FileStream);
-                    else if (excelFile.FileName.EndsWith(".xlsx"))
-                        reader = ExcelReaderFactory.CreateOpenXmlReader(FileStream);
-
-                    dsexcelRecords = reader.AsDataSet();
-                    reader.Close();
-                }
-
-                return Ok(dsexcelRecords);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
+            var result = await _fileUploadService.ExcelFileReader(excelFile);
+            return Ok(result);
         }
         /*        [HttpDelete]
                 public async Task<IActionResult> DeleteImagesFromFirebase(FirebaseEntity firebaseEntity)
@@ -115,8 +93,4 @@ namespace RevenueSharingInvest.API.Controllers
                 }*/
     }
 
-    public class Test
-    {
-        public string ok { get; set; }
-    }
 }
