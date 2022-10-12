@@ -288,6 +288,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         public async Task<IdDTO> CreateProject(CreateProjectDTO projectDTO, ThisUserObj currentUser)
         {
             IdDTO newId = new IdDTO();
+           
             try
             {
                 if (projectDTO.managerId == null || !await _validationService.CheckUUIDFormat(projectDTO.managerId))
@@ -484,9 +485,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(entity.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
 
                     //ACTIVE to CLOSED
+                    _backgroundJobClient.Schedule<ProjectService>(
+                        projectService => projectService
+                        .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(stage.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
                 }
-
-
                 return newId;
             }
             catch (Exception e)
@@ -839,6 +841,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
         public async Task<int> UpdateProject(UpdateProjectDTO projectDTO, Guid projectId, ThisUserObj currentUser)
         {
             int result;
+            bool reScheduleCheck = false;
+            DateTime projectClosedDate;
             try
             {
                 GetProjectDTO getProject = _mapper.Map<GetProjectDTO>(await _projectRepository.GetProjectById(projectId));
@@ -936,43 +940,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 //Update [Stage] and [PeriodRevenue]
                 if (projectDTO.duration != 0 || projectDTO.numOfStage != 0 || (projectDTO.startDate != null && projectDTO.endDate != null))
                 {
+                    reScheduleCheck = true;
+
                     if (projectDTO.duration == 0)
                         projectDTO.duration = getProject.duration;
 
                     if (projectDTO.numOfStage == 0)
                         projectDTO.numOfStage = getProject.numOfStage;
-
-                    //if (projectDTO.startDate != null && projectDTO.endDate != null)
-                    //{
-                    //    if ((DateAndTime.DateDiff(DateInterval.Day, DateTime.ParseExact(projectDTO.startDate, "dd/MM/yyyy HH:mm:ss", null), DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null))) < 0)
-                    //        throw new InvalidFieldException("startDate can not bigger than endDate!!!");
-                    //}
-
-                    //if (projectDTO.startDate != null)
-                    //{
-                    //    if (!await _validationService.CheckDate((projectDTO.startDate)))
-                    //        throw new InvalidFieldException("Invalid startDate!!!");
-
-                    //    projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
-                    //}
-                    //else
-                    //{
-                    //    projectDTO.startDate = await _validationService.FormatDateOutput(getProject.startDate);
-                    //    projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
-                    //}
-
-                    //if (projectDTO.endDate != null)
-                    //{
-                    //    if (!await _validationService.CheckDate((projectDTO.endDate)))
-                    //        throw new InvalidFieldException("Invalid endDate!!!");
-
-                    //    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
-                    //}
-                    //else
-                    //{
-                    //    projectDTO.endDate = await _validationService.FormatDateOutput(getProject.endDate);
-                    //    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
-                    //}
 
                     if (projectDTO.startDate == null && projectDTO.endDate == null)
                     {
@@ -1023,6 +997,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     }
                     stage.Name = " Kỳ " + projectDTO.numOfStage;
                     stage.EndDate = stage.EndDate.AddDays(modDays);
+                    projectClosedDate = stage.EndDate;
                     newStageId = await _stageRepository.CreateStage(stage);
                     periodRevenue.StageId = Guid.Parse(newStageId);
                     newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);                   
@@ -1034,6 +1009,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     projectDTO.startDate = getProject.startDate;
                     projectDTO.endDate = getProject.endDate;
                     project = _mapper.Map<Project>(projectDTO);
+
+                    //
+                    projectClosedDate = DateTimePicker.GetDateTimeByTimeZone();
                 }                
 
                 if (projectDTO.image != null)
@@ -1046,6 +1024,56 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = await _projectRepository.UpdateProject(project, projectId);
                 if (result == 0)
                     throw new UpdateObjectException("Can not update Project Object!");
+                else
+                {
+                    if (reScheduleCheck)
+                    {
+                        //Tạo lại Schedule
+                        //WAITING_FOR_APPROVAL to DENIED
+                        _backgroundJobClient.Schedule<ProjectService>(
+                            projectService => projectService
+                            .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.StartDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                        //WAITING_TO_PUBLISH to CALLING_FOR_INVESTMENT
+                        _backgroundJobClient.Schedule<ProjectService>(
+                            projectService => projectService
+                            .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.StartDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                        //CALLING_FOR_INVESTMENT to CALLING_TIME_IS_OVER
+                        _backgroundJobClient.Schedule<ProjectService>(
+                            projectService => projectService
+                            .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                        //CALLING_FOR_INVESTMENT to WAITING_TO_ACTIVATE
+                        _backgroundJobClient.Schedule<ProjectService>(
+                            projectService => projectService
+                            .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                        //ACTIVE to CLOSED
+                        _backgroundJobClient.Schedule<ProjectService>(
+                            projectService => projectService
+                            .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(projectClosedDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                        //Update EXTENSION ProjectEntity
+                        List<ProjectEntity> extensionList = await _projectEntityRepository.GetProjectEntityByProjectIdAndType(projectId, ProjectEntityEnum.EXTENSION.ToString());
+                        ProjectEntity projectEntity = new ProjectEntity();
+                        foreach (ProjectEntity item in extensionList)
+                        {
+                            if (item.Title.ToString().Equals("Ngày kết thúc gọi vốn"))
+                            {
+                                projectEntity.Content = (await _validationService.FormatDateOutput(projectDTO.endDate)).Remove(projectDTO.endDate.Length - 8);
+                                projectEntity.UpdateBy = Guid.Parse(currentUser.userId);
+                                await _projectEntityRepository.UpdateProjectEntity(projectEntity, item.Id);
+                            }
+                            else if (item.Title.ToString().Equals("Ngày dự đoán đóng dự án"))
+                            {
+                                projectEntity.Content = (await _validationService.FormatDateOutput(projectClosedDate.ToString())).Remove(projectDTO.endDate.Length - 8);
+                                projectEntity.UpdateBy = Guid.Parse(currentUser.userId);
+                                await _projectEntityRepository.UpdateProjectEntity(projectEntity, item.Id);
+                            }
+                        }
+                    }
+                }
                 return result;
             }
             catch (Exception e)

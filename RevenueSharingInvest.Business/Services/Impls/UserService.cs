@@ -34,6 +34,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IRoleRepository _roleRepository;
         private readonly IFieldRepository _fieldRepository;
         private readonly IProjectWalletRepository _projectWalletRepository;
+        private readonly IProjectEntityRepository _projectEntityRepository;
 
         private readonly IValidationService _validationService;
         private readonly IFileUploadService _fileUploadService;
@@ -47,6 +48,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IRoleRepository roleRepository,
             IFieldRepository fieldRepository,
             IProjectWalletRepository projectWalletRepository,
+            IProjectEntityRepository projectEntityRepository,
             IValidationService validationService,
             IFileUploadService fileUploadService,
             IMapper mapper)
@@ -59,6 +61,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _roleRepository = roleRepository;
             _fieldRepository = fieldRepository;
             _projectWalletRepository = projectWalletRepository;
+            _projectEntityRepository = projectEntityRepository;
+
             _validationService = validationService;
             _fileUploadService = fileUploadService;
             _mapper = mapper;
@@ -475,6 +479,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                User user = await _userRepository.GetUserById(userId);
+                if (user == null)
+                    throw new InvalidFieldException("This userId is not existed!!!");
+
                 if (!userId.ToString().Equals(currentUser.userId))
                     throw new InvalidFieldException("id is not match with this Updater's Id!!!");
 
@@ -505,6 +513,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = await _userRepository.UpdateUser(entity, userId);
                 if (result == 0)
                     throw new UpdateObjectException("Can not update User Object!");
+                else
+                {
+                    if (currentUser.roleId.Equals(currentUser.projectManagerRoleId) && userDTO.phoneNum != null && !userDTO.phoneNum.Equals(user.PhoneNum.ToString()))
+                    {
+                        await _projectEntityRepository.UpdateProjectManagerContactExtension(Guid.Parse(currentUser.userId), userDTO.phoneNum);
+                    }
+                }
                 return result;
             }
             catch (Exception e)

@@ -77,7 +77,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 List<string> projectWithFieldId = await _fieldRepository.GetProjectsByFieldId(fieldId);
 
-                if (projectWithFieldId != null)
+                if (projectWithFieldId.Count != 0)
                 {
                     throw new InUseException("There Are Projects Using This Field");
                 }

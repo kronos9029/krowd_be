@@ -463,5 +463,75 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+
+        //UPDATE PROJECT MANAGER CONTACT EXTENSION
+        public async Task<int> UpdateProjectManagerContactExtension(Guid managerId, string phoneNum)
+        {
+            try
+            {
+                var query = "UPDATE PE "
+                    + "     SET "
+                    + "         PE.Description = @Description, "
+                    + "         UpdateDate = @UpdateDate, "
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
+                    + "     FROM " 
+                    + "         ProjectEntity PE " 
+                    + "         JOIN Project P ON PE.ProjectId = P.Id "
+                    + "     WHERE "
+                    + "         P.ManagerId = @ManagerId "
+                    + "         AND PE.Title = @Title";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Description", "Liên hệ: " + phoneNum, DbType.String);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                parameters.Add("UpdateBy", managerId, DbType.Guid);
+                parameters.Add("ManagerId", managerId , DbType.Guid);
+                parameters.Add("Title", "Chủ dự án", DbType.String);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //UPDATE BUSINESS EMAIL EXTENSION
+        public async Task<int> UpdateBusinessEmailExtension(Guid businessId, string email)
+        {
+            try
+            {
+                var query = "UPDATE PE "
+                    + "     SET "
+                    + "         PE.Description = @Description, "
+                    + "         UpdateDate = @UpdateDate "
+                    + "     FROM "
+                    + "         ProjectEntity PE "
+                    + "         JOIN Project P ON PE.ProjectId = P.Id "
+                    + "     WHERE "
+                    + "         P.BusinessId = @BusinessId "
+                    + "         AND PE.Title = @Title";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Description", "Email: " + email, DbType.String);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                parameters.Add("BusinessId", businessId, DbType.Guid);
+                parameters.Add("Title", "Doanh nghiệp", DbType.String);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }
