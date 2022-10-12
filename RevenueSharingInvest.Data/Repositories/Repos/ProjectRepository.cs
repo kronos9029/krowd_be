@@ -167,7 +167,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + areaIdCondition;
                         parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
                     }
-                    if (listFieldId != null || listFieldId.Count == 0)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
                         foreach (string fieldId in listFieldId)
                         {
@@ -205,7 +205,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + areaIdCondition;
                         parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
                     }
-                    if (listFieldId != null || listFieldId.Count == 0)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
                         foreach (string fieldId in listFieldId)
                         {
@@ -249,7 +249,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + areaIdCondition;
                         parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
                     }
-                    if (listFieldId != null || listFieldId.Count == 0)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
                         foreach (string fieldId in listFieldId)
                         {
@@ -294,7 +294,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + areaIdCondition;
                         parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
                     }
-                    if (listFieldId != null || listFieldId.Count == 0)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
                         foreach (string fieldId in listFieldId)
                         {
@@ -524,7 +524,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + areaIdCondition;
                         parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
                     }
-                    if (listFieldId != null || listFieldId.Count == 0)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
                         foreach (string fieldId in listFieldId)
                         {
@@ -562,7 +562,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + areaIdCondition;
                         parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
                     }
-                    if (listFieldId != null || listFieldId.Count == 0)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
                         foreach (string fieldId in listFieldId)
                         {
@@ -606,7 +606,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + areaIdCondition;
                         parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
                     }
-                    if (listFieldId != null || listFieldId.Count == 0)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
                         foreach (string fieldId in listFieldId)
                         {
@@ -651,7 +651,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         whereCondition = whereCondition + areaIdCondition;
                         parameters.Add("AreaId", Guid.Parse(areaId), DbType.Guid);
                     }
-                    if (listFieldId != null || listFieldId.Count == 0)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
                         foreach (string fieldId in listFieldId)
                         {
