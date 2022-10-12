@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RevenueSharingInvest.API.Extensions;
+using RevenueSharingInvest.API.Hangfire;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using System.Linq;
@@ -96,7 +97,10 @@ namespace RevenueSharingInvest.API
                 endpoints.MapHangfireDashboard();
             });
 
-            app.UseHangfireDashboard();
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new HangfireAuthorizationFilter() }
+            });
         }
     }
 }
