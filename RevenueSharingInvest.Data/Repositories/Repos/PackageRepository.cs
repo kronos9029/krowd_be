@@ -241,7 +241,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("RemainingQuantity", remainingQuantity, DbType.Int16);
-                parameters.Add("UpdateDate", DateTime.Now, DbType.DateTime);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", updateBy, DbType.Guid);
                 parameters.Add("Id", packageId, DbType.Guid);
 
