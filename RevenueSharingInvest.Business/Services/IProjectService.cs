@@ -38,6 +38,7 @@ namespace RevenueSharingInvest.Business.Services
             ThisUserObj thisUserObj
         );
         public Task<List<BusinessProjectDTO>> GetBusinessProjectsToAuthor(Guid businessId);
+        public Task<IntegrateInfo> GetIntegrateInfoByUserEmail(string projectId);
 
         //UPDATE
         public Task<int> UpdateProject(UpdateProjectDTO projectDTO, Guid projectId, ThisUserObj thisUserObj);

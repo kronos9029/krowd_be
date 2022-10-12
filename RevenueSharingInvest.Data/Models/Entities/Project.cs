@@ -60,7 +60,9 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
-        
+        [StringLength(16)]
+        public string AccessKey { get; set; }
+
 
         [ForeignKey(nameof(AreaId))]
         [InverseProperty("Projects")]
