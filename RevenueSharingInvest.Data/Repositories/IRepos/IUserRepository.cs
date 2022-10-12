@@ -1,4 +1,5 @@
-﻿using RevenueSharingInvest.Data.Models.Entities;
+﻿using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<User> BusinessManagerGetUserById(Guid businessId, Guid userid);
         public Task<User> ProjectManagerGetUserbyId(Guid managerId, Guid id);
         public Task<Guid> GetProjectIdByManagerEmail(string email);
+        public Task<IntegrateInfo> GetIntegrateInfoByEmailAndProjectId(string email, Guid projectId);
 
         //UPDATE
         public Task<int> UpdateUser(User userDTO, Guid userId);

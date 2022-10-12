@@ -4,6 +4,7 @@ using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
+using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -38,7 +39,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
-                    + "         UpdateBy ) "
+                    + "         UpdateBy," 
+                    + "         SecretKey ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -52,7 +54,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy )";
+                    + "         @UpdateBy," 
+                    + "         @SecretKey )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("RoleId", userDTO.RoleId, DbType.Guid);
@@ -66,6 +69,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("CreateBy", userDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", userDTO.CreateBy, DbType.Guid);
+                parameters.Add("SecretKey", userDTO.SecretKey??="", DbType.String);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
@@ -906,6 +910,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        public async Task<IntegrateInfo> GetIntegrateInfoByEmailAndProjectId(string email, Guid projectId)
+        {
+            try
+            {
+                var query = "SELECT p.Id AS ProjectId, u.Id AS UserId , u.SecretKey, p.AccessKey FROM Project p JOIN [User] u ON p.ManagerId = u.Id WHERE u.Email = @Email and p.Id = @Id";
+                using var connection = CreateConnection();
+                var parameters = new DynamicParameters();
+                parameters.Add("Email", email, DbType.String);
+                parameters.Add("Id", email, DbType.Guid);
+                return await connection.QueryFirstOrDefaultAsync<IntegrateInfo>(query, parameters);
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
 
         public async Task<Guid> GetProjectIdByManagerEmail(string email)
         {

@@ -50,7 +50,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateDate, "
                     + "         CreateBy, " //Id Business Manager
                     + "         UpdateDate, "
-                    + "         UpdateBy ) "
+                    + "         UpdateBy," 
+                    + "         AccessKey ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -74,7 +75,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
-                    + "         @UpdateBy )";
+                    + "         @UpdateBy," 
+                    + "         @AccessKey )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("ManagerId", projectDTO.ManagerId, DbType.Guid);
@@ -98,6 +100,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("CreateBy", projectDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", projectDTO.CreateBy, DbType.Guid);
+                parameters.Add("AccessKey", projectDTO.AccessKey, DbType.String);
+
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
@@ -924,7 +928,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public async Task<IntegrateInfo> GetIntegrateInfoByUserEmail(Guid projectId)
+        public async Task<IntegrateInfo> GetIntegrateInfoByProjectId(Guid projectId)
         {
             try
             {

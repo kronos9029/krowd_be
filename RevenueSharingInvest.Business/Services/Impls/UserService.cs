@@ -8,6 +8,7 @@ using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
+using RevenueSharingInvest.Business.Services.Extensions.Security;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
@@ -113,6 +114,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     entity.RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"));
                     entity.BusinessId = Guid.Parse(currentUser.businessId);
                     entity.Description = "Project Manager of " + business.Name;
+                    entity.SecretKey = GenerateSecurityKey.GenerateSecretKey();
                 }
                 entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
                 entity.CreateBy = Guid.Parse(currentUser.userId);
@@ -382,6 +384,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 throw new Exception(e.Message);
             }
         } 
+
+        public async Task<IntegrateInfo> GetIntegrateInfoByEmailAndProjectId(string email, string projectId)
+        {
+            try
+            { 
+                IntegrateInfo info = await _userRepository.GetIntegrateInfoByEmailAndProjectId(email, Guid.Parse(projectId));
+
+                return info;
+            }catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
         
 
         public async Task<GetUserDTO> BusinessManagerGetUserById(String businesId, Guid userId)

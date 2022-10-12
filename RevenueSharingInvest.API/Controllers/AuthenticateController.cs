@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
+using RevenueSharingInvest.Business.Services.Impls;
 using System;
 using System.Threading.Tasks;
 
@@ -18,12 +20,23 @@ namespace RevenueSharingInvest.API.Controllers
         private readonly IAuthenticateService _authenticateService;
         private readonly IFileUploadService _fileUploadService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IProjectService _projectService;
+        private readonly IUserService _userService;
+        private readonly IRoleService _roleService;
 
-        public AuthenticateController(IAuthenticateService authenticateService, IFileUploadService fileUploadService, IHttpContextAccessor httpContextAccessor)
+        public AuthenticateController(IAuthenticateService authenticateService, 
+            IFileUploadService fileUploadService, 
+            IHttpContextAccessor httpContextAccessor, 
+            IProjectService projectService,
+            IRoleService roleService,
+            IUserService userService)
         {
             _authenticateService = authenticateService;
             _fileUploadService = fileUploadService;
             _httpContextAccessor = httpContextAccessor;
+            _projectService = projectService;
+            _roleService = roleService;
+            _userService = userService;
         }
 
         [HttpPost]
@@ -49,6 +62,16 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> GetTokenAdmin([FromQuery] string token)
         {
             var result = await _authenticateService.GetTokenAdmin(token);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("integrate-info")]
+        [Authorize]
+        public async Task<IActionResult> GetIntegrateInfo([FromQuery] string projectId)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            var result = await _userService.GetIntegrateInfoByEmailAndProjectId(currentUser.email, projectId);
             return Ok(result);
         }
 

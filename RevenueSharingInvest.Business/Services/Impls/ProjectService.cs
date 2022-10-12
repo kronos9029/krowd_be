@@ -6,6 +6,7 @@ using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
+using RevenueSharingInvest.Business.Services.Extensions.Security;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
@@ -373,6 +374,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 entity.Status = Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(0);
                 entity.BusinessId = Guid.Parse(currentUser.businessId);
                 entity.CreateBy = Guid.Parse(currentUser.userId);
+                entity.AccessKey = GenerateSecurityKey.GenerateAccessKey();
 
                 newId.id = await _projectRepository.CreateProject(entity);
                 if (newId.id.Equals(""))
@@ -1189,7 +1191,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             try
             {
-                IntegrateInfo info = await _projectRepository.GetIntegrateInfoByUserEmail(Guid.Parse(projectId));
+                IntegrateInfo info = await _projectRepository.GetIntegrateInfoByProjectId(Guid.Parse(projectId));
 
                 return info;
             } catch(Exception e)
