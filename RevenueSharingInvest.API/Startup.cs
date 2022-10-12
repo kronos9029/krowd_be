@@ -93,6 +93,7 @@ namespace RevenueSharingInvest.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHangfireDashboard();
             });
 
             app.UseHangfireDashboard();

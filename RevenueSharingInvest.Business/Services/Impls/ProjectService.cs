@@ -486,10 +486,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         projectService => projectService
                         .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(entity.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
 
-                    //ACTIVE to CLOSED
-                    _backgroundJobClient.Schedule<ProjectService>(
-                        projectService => projectService
-                        .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(stage.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+                    ////ACTIVE to CLOSED
+                    //_backgroundJobClient.Schedule<ProjectService>(
+                    //    projectService => projectService
+                    //    .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(stage.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
                 }
                 return newId;
             }
@@ -1051,10 +1051,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             projectService => projectService
                             .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
 
-                        //ACTIVE to CLOSED
-                        _backgroundJobClient.Schedule<ProjectService>(
-                            projectService => projectService
-                            .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(projectClosedDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+                        ////ACTIVE to CLOSED
+                        //_backgroundJobClient.Schedule<ProjectService>(
+                        //    projectService => projectService
+                        //    .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(projectClosedDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
 
                         //Update EXTENSION ProjectEntity
                         List<ProjectEntity> extensionList = await _projectEntityRepository.GetProjectEntityByProjectIdAndType(projectId, ProjectEntityEnum.EXTENSION.ToString());
@@ -1112,8 +1112,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         if (!status.Equals(ProjectStatusEnum.ACTIVE.ToString()))
                             throw new InvalidFieldException("ADMIN can update Project's status from WAITING_TO_ACTIVATE to ACTIVE!!!");
                     }
+                    else if (project.Status.Equals(ProjectStatusEnum.ACTIVE.ToString()))
+                    {
+                        if (!status.Equals(ProjectStatusEnum.CLOSED.ToString()))
+                            throw new InvalidFieldException("ADMIN can update Project's status from ACTIVE to CLOSED!!!");
+                    }
                     else
-                        throw new InvalidFieldException("ADMIN can update if Project's status is WAITING_FOR_APPROVAL or CALLING_TIME_IS_OVER or WAITING_TO_ACTIVATE!!!");
+                        throw new InvalidFieldException("ADMIN can update if Project's status is WAITING_FOR_APPROVAL or CALLING_TIME_IS_OVER or WAITING_TO_ACTIVATE or ACTIVE!!!");
                 }
                 else if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
                 {
@@ -1225,10 +1230,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     else if (project.EndDate <= DateTimePicker.GetDateTimeByTimeZone() && project.InvestedCapital == project.InvestmentTargetCapital)
                         return await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString(), Guid.Parse(currentUser.userId));
-                }
-                else if (project.Status.Equals(ProjectStatusEnum.ACTIVE.ToString()))
-                {
-
                 }
                 return 0;
             }
