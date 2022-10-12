@@ -47,6 +47,8 @@ namespace RevenueSharingInvest.API
 
             services.AddFirebaseAuthentication(Configuration);
 
+            services.AddFirestoreDatabasecontext(Configuration);
+
             services.AddControllers();
 
             services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);

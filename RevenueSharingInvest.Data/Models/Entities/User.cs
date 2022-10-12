@@ -53,6 +53,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string BankName { get; set; }
         [StringLength(20)]
         public string BankAccount { get; set; }
+        [StringLength(32)]
+        public string SecretKey { get; set; }
         public string Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }

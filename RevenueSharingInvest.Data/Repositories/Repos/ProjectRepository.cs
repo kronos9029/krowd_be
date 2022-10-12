@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Data.Extensions;
@@ -13,6 +14,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Project = RevenueSharingInvest.Data.Models.Entities.Project;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
 {
@@ -921,6 +923,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        public async Task<IntegrateInfo> GetIntegrateInfoByUserEmail(Guid projectId)
+        {
+            try
+            {
+                var query = "SELECT u.Id AS UserId, p.Id AS ProjectId, u.SecretKey, p.AccessKey FROM Project p JOIN [User] u ON p.ManagerId = u.Id WHERE p.Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<IntegrateInfo>(query, parameters);
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
     }
 
     public enum RoleEnum

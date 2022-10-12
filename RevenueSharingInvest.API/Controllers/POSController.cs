@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Helpers;
+using RevenueSharingInvest.Business.Models;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.DTOs;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,16 +18,18 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    [Route("api/public/v1.0/POS")]
+    [EnableCors]
+    public class POSController : ControllerBase
     {
+
         private readonly FirestoreProvider _firestoreProvider;
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
         private readonly IProjectService _projectService;
         private readonly AppSettings _appSettings;
 
-        public WeatherForecastController(FirestoreProvider firestoreProvider,
+        public POSController(FirestoreProvider firestoreProvider,
             IUserService userService,
             IRoleService roleService,
             IOptions<AppSettings> appSettings,
@@ -40,23 +43,47 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Getokok(ClientUploadRevenueRequest request)
+        [Route("Krowd-upload")]
+        public async Task<IActionResult> UploadBillsFromKrowd(List<BillEntity> billEntity)
         {
-            string accessKey = GenerateAccessKey();
-            string secretKey = GenerateSecretKey();
-                
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            await _firestoreProvider.CreateBills(billEntity, currentUser.projectId);
+            return Ok();
+        }
 
+        [HttpPost]
+        [Route("Client-upload")]
+        public async Task<IActionResult> UploadBillsFromPOS(ClientUploadRevenueRequest request)
+        {
             IntegrateInfo info = await _projectService.GetIntegrateInfoByUserEmail(request.projectId);
 
-            string userMessage = "projectId=" + request.projectId + "&accessKey=" + request.accessKey;
-            string systemMessage = "projectId=" + info.ProjectId + "&accessKey=" + info.AccessKey;
-
-            string userSignature = CreateSignature(userMessage, info.SecretKey);
+            string systemMessage = "projectId="+info.ProjectId+"&accessKey="+info.AccessKey;
+            
             string systemSignature = CreateSignature(systemMessage, info.SecretKey);
 
-            bool check = userSignature.Equals(systemMessage);
+            if (systemSignature.Equals(request.signature))
+            {
+                var result = await _firestoreProvider.CreateBills(request.billEntities, request.projectId);
+                return Ok(result);
+            }
 
-            return Ok(check);
+            return StatusCode((int)HttpStatusCode.BadRequest, "You Don't Have Permission Perform This Action!!");
+        }
+
+        //GET ALL
+        [HttpGet]
+        public async Task<IActionResult> GetBillsDate(string projectId)
+        {
+            var result = await _firestoreProvider.GetDatesOfProject(projectId);
+            return Ok(result);
+        }
+        //GET ALL
+        [HttpGet]
+        [Route("test")]
+        public async Task<IActionResult> GetTest(string projectId, string date)
+        {
+            var result = await _firestoreProvider.GetInvoiceDetailByDate(projectId, date);
+            return Ok(result);
         }
 
         private string CreateSignature(string message, string key)
@@ -71,7 +98,7 @@ namespace RevenueSharingInvest.API.Controllers
                 hex = hex.Replace("-", "").ToLower();
                 return hex;
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
@@ -79,35 +106,12 @@ namespace RevenueSharingInvest.API.Controllers
 
         }
 
-        private string GenerateAccessKey()
-        {
-            var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            var Charsarr = new char[16];
-            var random = new Random();
+    }
 
-            for (int i = 0; i < Charsarr.Length; i++)
-            {
-                Charsarr[i] = characters[random.Next(characters.Length)];
-            }
-
-            var resultString = new String(Charsarr);
-            return resultString;
-        }
-
-        private string GenerateSecretKey()
-        {
-            var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            var Charsarr = new char[32];
-            var random = new Random();
-
-            for (int i = 0; i < Charsarr.Length; i++)
-            {
-                Charsarr[i] = characters[random.Next(characters.Length)];
-            }
-
-            var resultString = new String(Charsarr);
-            return resultString;
-        }
-
+    public class ClientUploadRevenueRequest
+    {
+        public string projectId { get; set; }
+        public string signature { get; set; }
+        public List<BillEntity> billEntities { get; set; }
     }
 }

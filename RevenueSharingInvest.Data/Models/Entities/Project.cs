@@ -57,6 +57,9 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
+        [StringLength(16)]
+        public string AccessKey { get; set; }
+
         [StringLength(50)]
         public string Status { get; set; }
 

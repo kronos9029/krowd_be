@@ -1185,6 +1185,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
+        public async Task<IntegrateInfo> GetIntegrateInfoByUserEmail(string projectId)
+        {
+            try
+            {
+                IntegrateInfo info = await _projectRepository.GetIntegrateInfoByUserEmail(Guid.Parse(projectId));
+
+                return info;
+            } catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
+
         //UPDATE STATUS BY HANGFIRE
         public async Task<int> UpdateProjectStatusByHangfire(Guid projectId, ThisUserObj currentUser)
         {

@@ -617,5 +617,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 throw new Exception(e.Message);
             }
         }
+
+        public async Task<string> GetProjectIdByManagerEmail(string email)
+        {
+            try
+            {
+                string projectId = Convert.ToString(await _userRepository.GetProjectIdByManagerEmail(email));
+                return projectId;
+            }catch(Exception e)
+            {
+                LoggerService.Logger(e.Message);
+                throw new Exception(e.Message);
+            }
+        }
+
+
     }
 }

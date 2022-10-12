@@ -20,6 +20,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Linq;
+using Google.Cloud.Firestore;
+using RevenueSharingInvest.Data.Helpers;
+using System.Text.Json;
 
 namespace RevenueSharingInvest.API.Extensions
 {
@@ -184,6 +187,21 @@ namespace RevenueSharingInvest.API.Extensions
                 ProjectId = firebaseSettings.ProjectId,
                 ServiceAccountId = firebaseSettings.ServiceAccountId
             });
+        }
+
+        public static void AddFirestoreDatabasecontext(this IServiceCollection services, IConfiguration configuration)
+        {
+            var firestoreSettingSection = configuration.GetSection("FirestoreSettings");
+            services.Configure<firestoreSettings>(firestoreSettingSection);
+            var firestoreSettings = firestoreSettingSection.Get<firestoreSettings>();
+            var firestoreJson = JsonSerializer.Serialize(firestoreSettings);
+            services.AddSingleton(_ => new FirestoreProvider(
+                new FirestoreDbBuilder
+                {
+                    ProjectId = firestoreSettings.ProjectId,
+                    JsonCredentials = firestoreJson // <-- service account json file
+                }.Build()
+            ));
         }
 
         public static void AddSettingObjects(this IServiceCollection services, IConfiguration configuration)
