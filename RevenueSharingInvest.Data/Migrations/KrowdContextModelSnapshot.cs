@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RevenueSharingInvest.Data.Models.Entities;
+using RevenueSharingInvest.Data.Helpers;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
@@ -28,13 +28,17 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasDefaultValueSql("(newid())");
 
                     b.Property<long>("Amount")
-                        .HasColumnType("bigint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValueSql("(CONVERT([bigint],(0)))");
 
                     b.Property<string>("CallbackToken")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("('0001-01-01T00:00:00.000')");
 
                     b.Property<string>("ExtraData")
                         .HasColumnType("nvarchar(max)");
@@ -70,7 +74,9 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("ResponseTime")
-                        .HasColumnType("bigint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValueSql("(CONVERT([bigint],(0)))");
 
                     b.Property<int>("ResultCode")
                         .HasColumnType("int");
@@ -82,7 +88,9 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<long>("TransId")
-                        .HasColumnType("bigint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValueSql("(CONVERT([bigint],(0)))");
 
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
@@ -427,7 +435,12 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasMaxLength(12)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(12)")
+                        .HasComputedColumnSql("(case when [dbo].[Change_Package_Status]([ProjectId])<>'CALLING_FOR_INVESTMENT' then 'INACTIVE' when [dbo].[Change_Package_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]>(0) then 'IN_STOCK' when [dbo].[Change_Package_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]=(0) then 'OUT_OF_STOCK' else 'INACTIVE' end)", false);
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -1400,13 +1413,11 @@ namespace RevenueSharingInvest.Data.Migrations
                         .WithMany("PeriodRevenues")
                         .HasForeignKey("ProjectId")
                         .HasConstraintName("FK_PeriodRevenue_Project")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Stage", "Stage")
                         .WithMany("PeriodRevenues")
                         .HasForeignKey("StageId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -1437,7 +1448,6 @@ namespace RevenueSharingInvest.Data.Migrations
                         .WithMany("Projects")
                         .HasForeignKey("BusinessId")
                         .HasConstraintName("FK_Project_Business")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "Manager")
@@ -1506,7 +1516,6 @@ namespace RevenueSharingInvest.Data.Migrations
                         .WithMany("Stages")
                         .HasForeignKey("ProjectId")
                         .HasConstraintName("FK_Stage_Project")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Project");

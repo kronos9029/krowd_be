@@ -31,7 +31,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         ProjectId, "
                     + "         StartDate, "
                     + "         EndDate, "
-                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -43,7 +42,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @ProjectId, "
                     + "         @StartDate, "
                     + "         @EndDate, "
-                    + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -54,7 +52,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("ProjectId", stageDTO.ProjectId, DbType.Guid);
                 parameters.Add("StartDate", stageDTO.StartDate, DbType.DateTime);
                 parameters.Add("EndDate", stageDTO.EndDate, DbType.DateTime);
-                parameters.Add("Status", stageDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", stageDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);

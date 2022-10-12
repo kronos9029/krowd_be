@@ -67,8 +67,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("Invalid updateBy!!!");
                 }
 
-                packageVoucherDTO.isDeleted = false;
-
                 PackageVoucher dto = _mapper.Map<PackageVoucher>(packageVoucherDTO);
                 result = await _packageVoucherRepository.CreatePackageVoucher(dto);
                 if (result == 0)

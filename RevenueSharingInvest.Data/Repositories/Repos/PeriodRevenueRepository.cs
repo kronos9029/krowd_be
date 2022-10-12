@@ -28,7 +28,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "INSERT INTO PeriodRevenue ("
                     + "         ProjectId, "
                     + "         StageId, "
-                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -38,7 +37,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     VALUES ( "
                     + "         @ProjectId, "
                     + "         @StageId, "
-                    + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -47,7 +45,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", periodRevenueDTO.ProjectId, DbType.Guid);
                 parameters.Add("StageId", periodRevenueDTO.StageId, DbType.Guid);
-                parameters.Add("Status", periodRevenueDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", periodRevenueDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
@@ -166,7 +163,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SET "
                     + "         ProjectId = @ProjectId, "
                     + "         StageId = @StageId, "
-                    + "         Status = @Status, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy "
                     + "     WHERE "
@@ -175,7 +171,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", periodRevenueDTO.ProjectId, DbType.Guid);
                 parameters.Add("StageId", periodRevenueDTO.StageId, DbType.Guid);
-                parameters.Add("Status", periodRevenueDTO.Status, DbType.String);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", periodRevenueDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", periodRevenueId, DbType.Guid);

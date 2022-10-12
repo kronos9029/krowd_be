@@ -21,7 +21,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
             string businessId, 
             string managerId, 
             string areaId, 
-            string fieldId, 
+            List<string> listFieldId, 
             //string investorId, 
             string name, 
             string status, 
@@ -33,7 +33,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
             string businessId,
             string managerId,
             string areaId,
-            string fieldId,
+            List<string> listFieldId,
             //string investorId,
             string name,
             string status,
@@ -48,6 +48,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> UpdateProjectImage(string url, Guid projectId);
         public Task<int> UpdateProjectStatus(Guid projectId, string status, Guid updaterId);
         public Task<int> UpdateProjectInvestedCapitalAndRemainAmount(Guid projectId, double investedAmount, Guid updateBy);
+        public Task<int> ApproveProject(Guid projectId, Guid updateBy);
 
         //DELETE
         public Task<int> DeleteProjectById(Guid projectId);

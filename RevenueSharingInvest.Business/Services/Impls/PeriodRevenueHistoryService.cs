@@ -64,8 +64,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("Invalid updateBy!!!");
                 }
 
-                periodRevenueHistoryDTO.isDeleted = false;
-
                 PeriodRevenueHistory dto = _mapper.Map<PeriodRevenueHistory>(periodRevenueHistoryDTO);
                 newId.id = await _periodRevenueHistoryRepository.CreatePeriodRevenueHistory(dto);
                 if (newId.id.Equals(""))

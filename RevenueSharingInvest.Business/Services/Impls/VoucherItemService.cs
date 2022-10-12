@@ -82,8 +82,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("Invalid updateBy!!!");
                 }
 
-                voucherItemDTO.isDeleted = false;
-
                 VoucherItem dto = _mapper.Map<VoucherItem>(voucherItemDTO);
                 newId.id = await _voucherItemRepository.CreateVoucherItem(dto);
                 if (newId.id.Equals(""))
