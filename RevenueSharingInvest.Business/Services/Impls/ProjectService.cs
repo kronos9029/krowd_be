@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using Hangfire;
 using Microsoft.VisualBasic;
 using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
+using RevenueSharingInvest.Business.Services.Extensions.Security;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
@@ -38,6 +41,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IValidationService _validationService;
         private readonly IProjectTagService _projectTagService;
         private readonly IFileUploadService _fileUploadService;
+        private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IMapper _mapper;
 
         public ProjectService(
@@ -56,6 +60,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IValidationService validationService,
             IProjectTagService projectTagService,
             IFileUploadService fileUploadService,
+            IBackgroundJobClient backgroundJobClient,
             IMapper mapper)
         {
             _projectRepository = projectRepository;
@@ -74,11 +79,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _validationService = validationService;
             _projectTagService = projectTagService;
             _fileUploadService = fileUploadService;
+            _backgroundJobClient = backgroundJobClient;
             _mapper = mapper;
         }
 
         //COUNT PROJECTS
-        public async Task<ProjectCountDTO> CountProjects(string businessId, string areaId, string fieldId, string name, string status, ThisUserObj thisUserObj)
+        public async Task<ProjectCountDTO> CountProjects(string businessId, string areaId, List<string> listFieldId, string name, string status, ThisUserObj thisUserObj)
         {
             ProjectCountDTO result = new ProjectCountDTO();
 
@@ -88,7 +94,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 if (thisUserObj.roleId.Equals("") || thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                 {
-                    int[] statusNum = { 3 };
+                    int[] statusNum = { 4 };
                     if (businessId != null)
                     {
                         if (!await _validationService.CheckUUIDFormat(businessId))
@@ -107,13 +113,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new NotFoundException("This areaId is not existed!!!");
                     }
 
-                    if (fieldId != null)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
-                        if (!await _validationService.CheckUUIDFormat(fieldId))
-                            throw new InvalidFieldException("Invalid fieldId!!!");
+                        foreach (string fieldId in listFieldId)
+                        {
+                            if (!await _validationService.CheckUUIDFormat(fieldId))
+                                throw new InvalidFieldException("Invalid fieldId " + fieldId + "!!!");
 
-                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
-                            throw new NotFoundException("This fieldId is not existed!!!");
+                            if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                                throw new NotFoundException("This fieldId " + fieldId + " is not existed!!!");
+                        }
                     }
 
                     if (status != null)
@@ -129,12 +138,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("GUEST can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, name, status, thisUserObj.investorRoleId);
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, name, status, thisUserObj.investorRoleId);
                 }
 
                 else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
-                    int[] statusNum = { 1, 2, 3, 4, 5, 6, 7 };
+                    int[] statusNum = { 1, 2, 3, 4, 5, 6, 7, 8 };
 
                     if (businessId != null)
                     {
@@ -154,13 +163,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new NotFoundException("This areaId is not existed!!!");
                     }
 
-                    if (fieldId != null)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
-                        if (!await _validationService.CheckUUIDFormat(fieldId))
-                            throw new InvalidFieldException("Invalid fieldId!!!");
+                        foreach (string fieldId in listFieldId)
+                        {
+                            if (!await _validationService.CheckUUIDFormat(fieldId))
+                                throw new InvalidFieldException("Invalid fieldId " + fieldId + "!!!");
 
-                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
-                            throw new NotFoundException("This fieldId is not existed!!!");
+                            if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                                throw new NotFoundException("This fieldId " + fieldId + " is not existed!!!");
+                        }
                     }
 
                     if (status != null)
@@ -176,12 +188,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("ADMIN can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, name, status, thisUserObj.roleId);                 
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, name, status, thisUserObj.roleId);                 
                 }
 
                 else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
-                    int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7 };
+                    int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
                     if (businessId != null && !businessId.Equals(thisUserObj.businessId))
                         throw new InvalidFieldException("businessId is not match with this BUSINESS_MANAGER's businessId!!!");
                     businessId = thisUserObj.businessId;
@@ -195,13 +207,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new NotFoundException("This areaId is not existed!!!");
                     }
 
-                    if (fieldId != null)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
-                        if (!await _validationService.CheckUUIDFormat(fieldId))
-                            throw new InvalidFieldException("Invalid fieldId!!!");
+                        foreach (string fieldId in listFieldId)
+                        {
+                            if (!await _validationService.CheckUUIDFormat(fieldId))
+                                throw new InvalidFieldException("Invalid fieldId " + fieldId + "!!!");
 
-                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
-                            throw new NotFoundException("This fieldId is not existed!!!");
+                            if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                                throw new NotFoundException("This fieldId " + fieldId + " is not existed!!!");
+                        }
                     }
 
                     if (status != null)
@@ -217,12 +232,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("BUSINESS_MANAGER can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, name, status, thisUserObj.roleId);
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, name, status, thisUserObj.roleId);
                 }
 
                 else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
                 {
-                    int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7 };
+                    int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
 
                     if (areaId != null)
                     {
@@ -233,13 +248,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new NotFoundException("This areaId is not existed!!!");
                     }
 
-                    if (fieldId != null)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
-                        if (!await _validationService.CheckUUIDFormat(fieldId))
-                            throw new InvalidFieldException("Invalid fieldId!!!");
+                        foreach (string fieldId in listFieldId)
+                        {
+                            if (!await _validationService.CheckUUIDFormat(fieldId))
+                                throw new InvalidFieldException("Invalid fieldId " + fieldId + "!!!");
 
-                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
-                            throw new NotFoundException("This fieldId is not existed!!!");
+                            if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                                throw new NotFoundException("This fieldId " + fieldId + " is not existed!!!");
+                        }
                     }
 
                     if (status != null)
@@ -255,55 +273,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("PROJECT_MANAGER can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(null, thisUserObj.userId, areaId, fieldId, name, status, thisUserObj.roleId);
+                    result.numOfProject = await _projectRepository.CountProject(null, thisUserObj.userId, areaId, listFieldId, name, status, thisUserObj.roleId);
                 }
-
-                //else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
-                //{
-                //    int[] statusNum = { 3, 5, 6, 7 };
-
-                //    if (businessId != null)
-                //    {
-                //        if (!await _validationService.CheckUUIDFormat(businessId))
-                //            throw new InvalidFieldException("Invalid businessId!!!");
-
-                //        if (!await _validationService.CheckExistenceId("Business", Guid.Parse(businessId)))
-                //            throw new NotFoundException("This businessId is not existed!!!");
-                //    }
-
-                //    if (areaId != null)
-                //    {
-                //        if (!await _validationService.CheckUUIDFormat(areaId))
-                //            throw new InvalidFieldException("Invalid areaId!!!");
-
-                //        if (!await _validationService.CheckExistenceId("Area", Guid.Parse(areaId)))
-                //            throw new NotFoundException("This areaId is not existed!!!");
-                //    }
-
-                //    if (fieldId != null)
-                //    {
-                //        if (!await _validationService.CheckUUIDFormat(fieldId))
-                //            throw new InvalidFieldException("Invalid fieldId!!!");
-
-                //        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
-                //            throw new NotFoundException("This fieldId is not existed!!!");
-                //    }
-
-                //    if (status != null)
-                //    {
-                //        foreach (int item in statusNum)
-                //        {
-                //            if (status.Equals(Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item)))
-                //                statusCheck = true;
-                //            statusErrorMessage = statusErrorMessage + " '" + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(item) + "' or";
-                //        }
-                //        statusErrorMessage = statusErrorMessage.Remove(statusErrorMessage.Length - 3);
-                //        if (!statusCheck)
-                //            throw new InvalidFieldException("INVESTOR can view Projects with status" + statusErrorMessage + " !!!");
-                //    }
-
-                //    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, name, status, thisUserObj.roleId);
-                //}
 
                 return result;
             }
@@ -318,6 +289,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         public async Task<IdDTO> CreateProject(CreateProjectDTO projectDTO, ThisUserObj currentUser)
         {
             IdDTO newId = new IdDTO();
+           
             try
             {
                 if (projectDTO.managerId == null || !await _validationService.CheckUUIDFormat(projectDTO.managerId))
@@ -332,8 +304,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!(await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId))).Status.Equals(ObjectStatusEnum.ACTIVE.ToString()))
                     throw new InvalidFieldException("This PROJECT_MANAGER's status must be ACTIVE!!!");
 
-                if ((await _projectRepository.GetAllProjects(0, 0, null, projectDTO.managerId, null, null, null, null, RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"))).Count() != 0)
-                    throw new InvalidFieldException("This PROJECT_MANAGER has a project already!!!");
+                //if ((await _projectRepository.GetAllProjects(0, 0, null, projectDTO.managerId, null, null, null, null, RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"))).Count() != 0)
+                //    throw new InvalidFieldException("This PROJECT_MANAGER has a project already!!!");
 
                 if (projectDTO.fieldId == null || !await _validationService.CheckUUIDFormat(projectDTO.fieldId))
                     throw new InvalidFieldException("Invalid fieldId!!!");
@@ -402,6 +374,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 entity.Status = Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(0);
                 entity.BusinessId = Guid.Parse(currentUser.businessId);
                 entity.CreateBy = Guid.Parse(currentUser.userId);
+                entity.AccessKey = GenerateSecurityKey.GenerateAccessKey();
 
                 newId.id = await _projectRepository.CreateProject(entity);
                 if (newId.id.Equals(""))
@@ -415,14 +388,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     string newPeriodRevenueId;
 
                     stage.ProjectId = Guid.Parse(newId.id);
-                    stage.Status = StageStatusEnum.UNDUE.ToString();
                     stage.CreateBy = Guid.Parse(currentUser.userId);
                     //stage.StartDate = entity.EndDate.AddDays(1);
                     stage.StartDate = DateTime.ParseExact(DateTime.Parse(entity.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(entity.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:00:00", "dd/MM/yyyy HH:mm:ss", null).AddDays(1);
                     stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "23:59:59", "dd/MM/yyyy HH:mm:ss", null);
 
                     periodRevenue.ProjectId = Guid.Parse(newId.id);
-                    periodRevenue.Status = StageStatusEnum.UNDUE.ToString();
                     periodRevenue.CreateBy = Guid.Parse(currentUser.userId);
 
                     for (int i = 1; i <= projectDTO.numOfStage - 1; i++)
@@ -493,9 +464,33 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     //Update NumOfProject
                     await _businessRepository.UpdateBusinessNumOfProject(Guid.Parse(currentUser.businessId));
-                }    
-                
 
+                    //Tạo Schedule
+                    //WAITING_FOR_APPROVAL to DENIED
+                    _backgroundJobClient.Schedule<ProjectService>(
+                        projectService => projectService
+                        .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(entity.StartDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                    //WAITING_TO_PUBLISH to CALLING_FOR_INVESTMENT
+                    _backgroundJobClient.Schedule<ProjectService>(
+                        projectService => projectService
+                        .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(entity.StartDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                    //CALLING_FOR_INVESTMENT to CALLING_TIME_IS_OVER
+                    _backgroundJobClient.Schedule<ProjectService>(
+                        projectService => projectService
+                        .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(entity.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                    //CALLING_FOR_INVESTMENT to WAITING_TO_ACTIVATE
+                    _backgroundJobClient.Schedule<ProjectService>(
+                        projectService => projectService
+                        .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(entity.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                    ////ACTIVE to CLOSED
+                    //_backgroundJobClient.Schedule<ProjectService>(
+                    //    projectService => projectService
+                    //    .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(stage.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+                }
                 return newId;
             }
             catch (Exception e)
@@ -543,7 +538,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int pageSize, 
             string businessId, 
             string areaId, 
-            string fieldId, 
+            List<string> listFieldId, 
             string name, 
             string status, 
             ThisUserObj thisUserObj
@@ -560,7 +555,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 if (thisUserObj.roleId.Equals("") || thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("INVESTOR")))
                 {
-                    int[] statusNum = { 3 };
+                    int[] statusNum = { 4 };
                     if (businessId != null)
                     {
                         if (!await _validationService.CheckUUIDFormat(businessId))
@@ -579,13 +574,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new NotFoundException("This areaId is not existed!!!");
                     }
 
-                    if (fieldId != null)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
-                        if (!await _validationService.CheckUUIDFormat(fieldId))
-                            throw new InvalidFieldException("Invalid fieldId!!!");
+                        foreach (string fieldId in listFieldId)
+                        {
+                            if (!await _validationService.CheckUUIDFormat(fieldId))
+                                throw new InvalidFieldException("Invalid fieldId " + fieldId + "!!!");
 
-                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
-                            throw new NotFoundException("This fieldId is not existed!!!");
+                            if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                                throw new NotFoundException("This fieldId " + fieldId + " is not existed!!!");
+                        }                       
                     }
 
                     if (status != null)
@@ -601,13 +599,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("GUEST can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, name, status, thisUserObj.investorRoleId);
-                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, name, status, thisUserObj.investorRoleId);
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, name, status, thisUserObj.investorRoleId);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, listFieldId, name, status, thisUserObj.investorRoleId);
                 }
 
                 else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
-                    int[] statusNum = { 1, 2, 3, 4, 5, 6, 7 };
+                    int[] statusNum = { 1, 2, 3, 4, 5, 6, 7, 8 };
 
                     if (businessId != null)
                     {
@@ -627,13 +625,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new NotFoundException("This areaId is not existed!!!");
                     }
 
-                    if (fieldId != null)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
-                        if (!await _validationService.CheckUUIDFormat(fieldId))
-                            throw new InvalidFieldException("Invalid fieldId!!!");
+                        foreach (string fieldId in listFieldId)
+                        {
+                            if (!await _validationService.CheckUUIDFormat(fieldId))
+                                throw new InvalidFieldException("Invalid fieldId " + fieldId + "!!!");
 
-                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
-                            throw new NotFoundException("This fieldId is not existed!!!");
+                            if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                                throw new NotFoundException("This fieldId " + fieldId + " is not existed!!!");
+                        }
                     }
 
                     if (status != null)
@@ -649,13 +650,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("ADMIN can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, name, status, thisUserObj.roleId);
-                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, name, status, thisUserObj.roleId);
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, name, status, thisUserObj.roleId);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, listFieldId, name, status, thisUserObj.roleId);
                 }
 
                 else if(thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
                 {
-                    int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7 };
+                    int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
                     if (businessId != null && !businessId.Equals(thisUserObj.businessId))
                         throw new InvalidFieldException("businessId is not match with this BUSINESS_MANAGER's businessId!!!");
                     businessId = thisUserObj.businessId;
@@ -669,13 +670,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new NotFoundException("This areaId is not existed!!!");
                     }
 
-                    if (fieldId != null)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
-                        if (!await _validationService.CheckUUIDFormat(fieldId))
-                            throw new InvalidFieldException("Invalid fieldId!!!");
+                        foreach (string fieldId in listFieldId)
+                        {
+                            if (!await _validationService.CheckUUIDFormat(fieldId))
+                                throw new InvalidFieldException("Invalid fieldId " + fieldId + "!!!");
 
-                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
-                            throw new NotFoundException("This fieldId is not existed!!!");
+                            if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                                throw new NotFoundException("This fieldId " + fieldId + " is not existed!!!");
+                        }
                     }
 
                     if (status != null)
@@ -691,13 +695,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("BUSINESS_MANAGER can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, fieldId, name, status, thisUserObj.roleId);
-                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, fieldId, name, status, thisUserObj.roleId);
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, name, status, thisUserObj.roleId);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, listFieldId, name, status, thisUserObj.roleId);
                 }
 
                 else if(thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
                 {
-                    int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7 };                   
+                    int[] statusNum = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };                   
 
                     if (areaId != null)
                     {
@@ -708,13 +712,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new NotFoundException("This areaId is not existed!!!");
                     }
 
-                    if (fieldId != null)
+                    if (listFieldId != null && listFieldId.Count != 0)
                     {
-                        if (!await _validationService.CheckUUIDFormat(fieldId))
-                            throw new InvalidFieldException("Invalid fieldId!!!");
+                        foreach (string fieldId in listFieldId)
+                        {
+                            if (!await _validationService.CheckUUIDFormat(fieldId))
+                                throw new InvalidFieldException("Invalid fieldId " + fieldId + "!!!");
 
-                        if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
-                            throw new NotFoundException("This fieldId is not existed!!!");
+                            if (!await _validationService.CheckExistenceId("Field", Guid.Parse(fieldId)))
+                                throw new NotFoundException("This fieldId " + fieldId + " is not existed!!!");
+                        }
                     }
 
                     if (status != null)
@@ -730,8 +737,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("PROJECT_MANAGER can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(null, thisUserObj.userId, areaId, fieldId, name, status, thisUserObj.roleId);
-                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, null, thisUserObj.userId, areaId, fieldId, name, status, thisUserObj.roleId);
+                    result.numOfProject = await _projectRepository.CountProject(null, thisUserObj.userId, areaId, listFieldId, name, status, thisUserObj.roleId);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, null, thisUserObj.userId, areaId, listFieldId, name, status, thisUserObj.roleId);
                 }               
 
                 List<BasicProjectDTO> listDTO = _mapper.Map<List<BasicProjectDTO>>(listEntity);
@@ -818,6 +825,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
+        //
         public async Task<List<BusinessProjectDTO>> GetBusinessProjectsToAuthor(Guid businessId)
         {
             try
@@ -835,6 +843,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
         public async Task<int> UpdateProject(UpdateProjectDTO projectDTO, Guid projectId, ThisUserObj currentUser)
         {
             int result;
+            bool reScheduleCheck = false;
+            DateTime projectClosedDate;
             try
             {
                 GetProjectDTO getProject = _mapper.Map<GetProjectDTO>(await _projectRepository.GetProjectById(projectId));
@@ -932,43 +942,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 //Update [Stage] and [PeriodRevenue]
                 if (projectDTO.duration != 0 || projectDTO.numOfStage != 0 || (projectDTO.startDate != null && projectDTO.endDate != null))
                 {
+                    reScheduleCheck = true;
+
                     if (projectDTO.duration == 0)
                         projectDTO.duration = getProject.duration;
 
                     if (projectDTO.numOfStage == 0)
                         projectDTO.numOfStage = getProject.numOfStage;
-
-                    //if (projectDTO.startDate != null && projectDTO.endDate != null)
-                    //{
-                    //    if ((DateAndTime.DateDiff(DateInterval.Day, DateTime.ParseExact(projectDTO.startDate, "dd/MM/yyyy HH:mm:ss", null), DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null))) < 0)
-                    //        throw new InvalidFieldException("startDate can not bigger than endDate!!!");
-                    //}
-
-                    //if (projectDTO.startDate != null)
-                    //{
-                    //    if (!await _validationService.CheckDate((projectDTO.startDate)))
-                    //        throw new InvalidFieldException("Invalid startDate!!!");
-
-                    //    projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
-                    //}
-                    //else
-                    //{
-                    //    projectDTO.startDate = await _validationService.FormatDateOutput(getProject.startDate);
-                    //    projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
-                    //}
-
-                    //if (projectDTO.endDate != null)
-                    //{
-                    //    if (!await _validationService.CheckDate((projectDTO.endDate)))
-                    //        throw new InvalidFieldException("Invalid endDate!!!");
-
-                    //    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
-                    //}
-                    //else
-                    //{
-                    //    projectDTO.endDate = await _validationService.FormatDateOutput(getProject.endDate);
-                    //    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
-                    //}
 
                     if (projectDTO.startDate == null && projectDTO.endDate == null)
                     {
@@ -1000,13 +980,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     string newPeriodRevenueId;
 
                     stage.ProjectId = projectId;
-                    stage.Status = StageStatusEnum.UNDUE.ToString();
                     stage.CreateBy = Guid.Parse(currentUser.userId);
                     stage.StartDate = DateTime.ParseExact(DateTime.Parse(project.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(project.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:00:00", "dd/MM/yyyy HH:mm:ss", null).AddDays(1);
                     stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "23:59:59", "dd/MM/yyyy HH:mm:ss", null);
 
                     periodRevenue.ProjectId = projectId;
-                    periodRevenue.Status = StageStatusEnum.UNDUE.ToString();
                     periodRevenue.CreateBy = Guid.Parse(currentUser.userId);
 
                     for (int i = 1; i <= projectDTO.numOfStage - 1; i++)
@@ -1021,6 +999,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     }
                     stage.Name = " Kỳ " + projectDTO.numOfStage;
                     stage.EndDate = stage.EndDate.AddDays(modDays);
+                    projectClosedDate = stage.EndDate;
                     newStageId = await _stageRepository.CreateStage(stage);
                     periodRevenue.StageId = Guid.Parse(newStageId);
                     newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);                   
@@ -1032,6 +1011,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     projectDTO.startDate = getProject.startDate;
                     projectDTO.endDate = getProject.endDate;
                     project = _mapper.Map<Project>(projectDTO);
+
+                    //
+                    projectClosedDate = DateTimePicker.GetDateTimeByTimeZone();
                 }                
 
                 if (projectDTO.image != null)
@@ -1044,6 +1026,56 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = await _projectRepository.UpdateProject(project, projectId);
                 if (result == 0)
                     throw new UpdateObjectException("Can not update Project Object!");
+                else
+                {
+                    if (reScheduleCheck)
+                    {
+                        //Tạo lại Schedule
+                        //WAITING_FOR_APPROVAL to DENIED
+                        _backgroundJobClient.Schedule<ProjectService>(
+                            projectService => projectService
+                            .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.StartDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                        //WAITING_TO_PUBLISH to CALLING_FOR_INVESTMENT
+                        _backgroundJobClient.Schedule<ProjectService>(
+                            projectService => projectService
+                            .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.StartDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                        //CALLING_FOR_INVESTMENT to CALLING_TIME_IS_OVER
+                        _backgroundJobClient.Schedule<ProjectService>(
+                            projectService => projectService
+                            .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                        //CALLING_FOR_INVESTMENT to WAITING_TO_ACTIVATE
+                        _backgroundJobClient.Schedule<ProjectService>(
+                            projectService => projectService
+                            .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                        ////ACTIVE to CLOSED
+                        //_backgroundJobClient.Schedule<ProjectService>(
+                        //    projectService => projectService
+                        //    .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(projectClosedDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                        //Update EXTENSION ProjectEntity
+                        List<ProjectEntity> extensionList = await _projectEntityRepository.GetProjectEntityByProjectIdAndType(projectId, ProjectEntityEnum.EXTENSION.ToString());
+                        ProjectEntity projectEntity = new ProjectEntity();
+                        foreach (ProjectEntity item in extensionList)
+                        {
+                            if (item.Title.ToString().Equals("Ngày kết thúc gọi vốn"))
+                            {
+                                projectEntity.Content = (await _validationService.FormatDateOutput(projectDTO.endDate)).Remove(projectDTO.endDate.Length - 8);
+                                projectEntity.UpdateBy = Guid.Parse(currentUser.userId);
+                                await _projectEntityRepository.UpdateProjectEntity(projectEntity, item.Id);
+                            }
+                            else if (item.Title.ToString().Equals("Ngày dự đoán đóng dự án"))
+                            {
+                                projectEntity.Content = (await _validationService.FormatDateOutput(projectClosedDate.ToString())).Remove(projectDTO.endDate.Length - 8);
+                                projectEntity.UpdateBy = Guid.Parse(currentUser.userId);
+                                await _projectEntityRepository.UpdateProjectEntity(projectEntity, item.Id);
+                            }
+                        }
+                    }
+                }
                 return result;
             }
             catch (Exception e)
@@ -1053,6 +1085,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
+        //UPDATE STATUS
         public async Task<int> UpdateProjectStatus(Guid projectId, string status, ThisUserObj currentUser)
         {
             int result;
@@ -1064,25 +1097,49 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
                 {
-                    if (!project.Status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
-                        throw new InvalidFieldException("ADMIN can update Project's status from WAITING_FOR_APPROVAL to DENIED or CALLING_FOR_INVESTMENT!!!");
-
-                    if (!status.Equals(ProjectStatusEnum.DENIED.ToString()) && !status.Equals(ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString()))
-                        throw new InvalidFieldException("Status must be DENIED or CALLING_FOR_INVESTMENT!!!");
+                    if (project.Status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
+                    {
+                        if (!status.Equals(ProjectStatusEnum.DENIED.ToString()) && !status.Equals(ProjectStatusEnum.WAITING_TO_PUBLISH.ToString()))
+                            throw new InvalidFieldException("ADMIN can update Project's status from WAITING_FOR_APPROVAL to DENIED or WAITING_TO_PUBLISH!!!");
+                    }
+                    else if (project.Status.Equals(ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString()))
+                    {
+                        if (!status.Equals(ProjectStatusEnum.CLOSED.ToString()))
+                            throw new InvalidFieldException("ADMIN can update Project's status from CALLING_TIME_IS_OVER to CLOSED!!!");
+                    }
+                    else if (project.Status.Equals(ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString()))
+                    {
+                        if (!status.Equals(ProjectStatusEnum.ACTIVE.ToString()))
+                            throw new InvalidFieldException("ADMIN can update Project's status from WAITING_TO_ACTIVATE to ACTIVE!!!");
+                    }
+                    else if (project.Status.Equals(ProjectStatusEnum.ACTIVE.ToString()))
+                    {
+                        if (!status.Equals(ProjectStatusEnum.CLOSED.ToString()))
+                            throw new InvalidFieldException("ADMIN can update Project's status from ACTIVE to CLOSED!!!");
+                    }
+                    else
+                        throw new InvalidFieldException("ADMIN can update if Project's status is WAITING_FOR_APPROVAL or CALLING_TIME_IS_OVER or WAITING_TO_ACTIVATE or ACTIVE!!!");
                 }
                 else if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
                 {
-                    if (!project.BusinessId.ToString().Equals(currentUser.businessId))
-                        throw new InvalidFieldException("The Project with this businessId is not match with this PROJECT_MANAGER's businessId!!!");
-
-                    if (!project.Status.Equals(ProjectStatusEnum.DRAFT.ToString()))
-                        throw new InvalidFieldException("PROJECT_MANAGER can update Project's status from DRAFT to WAITING_FOR_APPROVAL!!!");
-
-                    if (!status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
-                        throw new InvalidFieldException("Status must be WAITING_FOR_APPROVAL!!!");
+                    if (project.Status.Equals(ProjectStatusEnum.DRAFT.ToString()))
+                    {
+                        if (!status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
+                            throw new InvalidFieldException("PROJECT_MANAGER can update Project's status from DRAFT to WAITING_FOR_APPROVAL!!!");
+                    }
+                    else if (project.Status.Equals(ProjectStatusEnum.DENIED.ToString()))
+                    {
+                        if (!status.Equals(ProjectStatusEnum.DRAFT.ToString()))
+                            throw new InvalidFieldException("PROJECT_MANAGER can update Project's status from DENIED to DRAFT!!!");
+                    }
+                    else
+                        throw new InvalidFieldException("PROJECT_MANAGER can update if Project's status is DRAFT or DENIED!!!");
                 }
 
-                result = await _projectRepository.UpdateProjectStatus(projectId, status, Guid.Parse(currentUser.userId));
+                if (status.Equals(ProjectStatusEnum.WAITING_TO_PUBLISH.ToString()))
+                    result = await _projectRepository.ApproveProject(projectId, Guid.Parse(currentUser.userId));
+                else
+                    result = await _projectRepository.UpdateProjectStatus(projectId, status, Guid.Parse(currentUser.userId));
 
                 if (result == 0)
                     throw new UpdateObjectException("Can not update Project status!");
@@ -1127,6 +1184,54 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     result.listOfProject.Add(item);
                 }
                 return result;
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<IntegrateInfo> GetIntegrateInfoByUserEmail(string projectId)
+        {
+            try
+            {
+                IntegrateInfo info = await _projectRepository.GetIntegrateInfoByProjectId(Guid.Parse(projectId));
+
+                return info;
+            } catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
+
+        //UPDATE STATUS BY HANGFIRE
+        public async Task<int> UpdateProjectStatusByHangfire(Guid projectId, ThisUserObj currentUser)
+        {
+            try
+            {
+                Project project = await _projectRepository.GetProjectById(projectId);
+                if (project.Status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
+                {
+                    if (project.StartDate <= DateTimePicker.GetDateTimeByTimeZone() && project.ApprovedBy == null && project.ApprovedDate == null)
+                        return await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.DENIED.ToString(), Guid.Parse(currentUser.userId));
+                }
+                else if (project.Status.Equals(ProjectStatusEnum.WAITING_TO_PUBLISH.ToString()))
+                {
+                    if (project.StartDate <= DateTimePicker.GetDateTimeByTimeZone())
+                        return await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), Guid.Parse(currentUser.userId));
+                }
+                else if (project.Status.Equals(ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString()))
+                {
+                    if (project.EndDate <= DateTimePicker.GetDateTimeByTimeZone() && project.InvestedCapital < project.InvestmentTargetCapital)
+                        return await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString(), Guid.Parse(currentUser.userId));
+
+                    else if (project.EndDate <= DateTimePicker.GetDateTimeByTimeZone() && project.InvestedCapital == project.InvestmentTargetCapital)
+                        return await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString(), Guid.Parse(currentUser.userId));
+                }
+                return 0;
             }
             catch (Exception e)
             {

@@ -6,6 +6,7 @@ using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
@@ -88,7 +89,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 //        throw new InvalidFieldException("Invalid updateBy!!!");
                 //}
 
-                //accountTransactionDTO.isDeleted = false;
 
                 AccountTransaction entity = _mapper.Map<AccountTransaction>(momoPaymentResult);
                 entity.PartnerClientId = Guid.Parse(momoPaymentResult.partnerClientId);
@@ -105,7 +105,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     double realAmount = Convert.ToDouble(entity.Amount);
                     InvestorWallet I1 = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(investor.Id, WalletTypeEnum.I1.ToString());
                     I1.Balance += realAmount;
-                    I1.UpdateDate = DateTime.Now;
+                    I1.UpdateDate = DateTimePicker.GetDateTimeByTimeZone();
                     I1.UpdateBy = entity.FromUserId;
                     
                     int checkTopUp = await _investorWalletRepository.UpdateWalletBalance(I1);
@@ -134,7 +134,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     if (I2 == null)
                         throw new NotFoundException("I2 Wallet Not Found!!");
 
-                    I1.UpdateDate = DateTime.Now;
+                    I1.UpdateDate = DateTimePicker.GetDateTimeByTimeZone();
                     I1.Balance -= realAmount;
                     I1.UpdateBy = entity.FromUserId;
                     int checkSuccess = await _investorWalletRepository.UpdateWalletBalance(I1);

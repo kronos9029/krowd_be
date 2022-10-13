@@ -42,7 +42,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string createBy { get; set; }
         public string updateDate { get; set; }
         public string updateBy { get; set; }
-        public bool isDeleted { get; set; }
         public double pessimisticExpectedAmount { get; set; }
         public double normalExpectedAmount { get; set; }
         public double optimisticExpectedAmount { get; set; }

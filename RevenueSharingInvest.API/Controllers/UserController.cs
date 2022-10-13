@@ -127,7 +127,7 @@ namespace RevenueSharingInvest.API.Controllers
 
             }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This User!!");
         }
 
         //UPDATE

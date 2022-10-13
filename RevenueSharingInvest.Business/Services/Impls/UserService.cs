@@ -8,6 +8,7 @@ using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
+using RevenueSharingInvest.Business.Services.Extensions.Security;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
@@ -34,6 +35,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IRoleRepository _roleRepository;
         private readonly IFieldRepository _fieldRepository;
         private readonly IProjectWalletRepository _projectWalletRepository;
+        private readonly IProjectEntityRepository _projectEntityRepository;
 
         private readonly IValidationService _validationService;
         private readonly IFileUploadService _fileUploadService;
@@ -47,6 +49,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IRoleRepository roleRepository,
             IFieldRepository fieldRepository,
             IProjectWalletRepository projectWalletRepository,
+            IProjectEntityRepository projectEntityRepository,
             IValidationService validationService,
             IFileUploadService fileUploadService,
             IMapper mapper)
@@ -59,6 +62,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _roleRepository = roleRepository;
             _fieldRepository = fieldRepository;
             _projectWalletRepository = projectWalletRepository;
+            _projectEntityRepository = projectEntityRepository;
+
             _validationService = validationService;
             _fileUploadService = fileUploadService;
             _mapper = mapper;
@@ -109,6 +114,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     entity.RoleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"));
                     entity.BusinessId = Guid.Parse(currentUser.businessId);
                     entity.Description = "Project Manager of " + business.Name;
+                    entity.SecretKey = GenerateSecurityKey.GenerateSecretKey();
                 }
                 entity.Status = Enum.GetNames(typeof(ObjectStatusEnum)).ElementAt(0);
                 entity.CreateBy = Guid.Parse(currentUser.userId);
@@ -378,6 +384,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 throw new Exception(e.Message);
             }
         } 
+
+        public async Task<IntegrateInfo> GetIntegrateInfoByEmailAndProjectId(string email, string projectId)
+        {
+            try
+            { 
+                IntegrateInfo info = await _userRepository.GetIntegrateInfoByEmailAndProjectId(email, Guid.Parse(projectId));
+
+                return info;
+            }catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
         
 
         public async Task<GetUserDTO> BusinessManagerGetUserById(String businesId, Guid userId)
@@ -475,6 +495,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
+                User user = await _userRepository.GetUserById(userId);
+                if (user == null)
+                    throw new InvalidFieldException("This userId is not existed!!!");
+
                 if (!userId.ToString().Equals(currentUser.userId))
                     throw new InvalidFieldException("id is not match with this Updater's Id!!!");
 
@@ -505,6 +529,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = await _userRepository.UpdateUser(entity, userId);
                 if (result == 0)
                     throw new UpdateObjectException("Can not update User Object!");
+                else
+                {
+                    if (currentUser.roleId.Equals(currentUser.projectManagerRoleId) && userDTO.phoneNum != null && !userDTO.phoneNum.Equals(user.PhoneNum.ToString()))
+                    {
+                        await _projectEntityRepository.UpdateProjectManagerContactExtension(Guid.Parse(currentUser.userId), userDTO.phoneNum);
+                    }
+                }
                 return result;
             }
             catch (Exception e)
@@ -602,5 +633,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 throw new Exception(e.Message);
             }
         }
+
+        public async Task<string> GetProjectIdByManagerEmail(string email)
+        {
+            try
+            {
+                string projectId = Convert.ToString(await _userRepository.GetProjectIdByManagerEmail(email));
+                return projectId;
+            }catch(Exception e)
+            {
+                LoggerService.Logger(e.Message);
+                throw new Exception(e.Message);
+            }
+        }
+
+
     }
 }

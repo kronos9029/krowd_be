@@ -8,6 +8,7 @@ namespace RevenueSharingInvest.Data.Models.Constants
 {
     public enum PackageStatusEnum
     {
+        INACTIVE,
         IN_STOCK,
         OUT_OF_STOCK
     }

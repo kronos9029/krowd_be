@@ -69,8 +69,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("Invalid updateBy!!!");
                 }
 
-                riskDTO.isDeleted = false;
-
                 Risk dto = _mapper.Map<Risk>(riskDTO);
                 newId.id = await _riskRepository.CreateRisk(dto);
                 if (newId.id.Equals(""))

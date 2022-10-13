@@ -22,6 +22,8 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //UPDATE
         public Task<int> UpdateProjectEntity(ProjectEntity projectEntityDTO, Guid projectEntityId);
         public Task<int> UpdateProjectEntityPriority(Guid projectEntityId, int priority, Guid? updaterId);
+        public Task<int> UpdateProjectManagerContactExtension(Guid managerId, string phoneNum);
+        public Task<int> UpdateBusinessEmailExtension(Guid businessId, string email);
 
         //DELETE
         public Task<int> DeleteProjectEntityById(Guid projectId);

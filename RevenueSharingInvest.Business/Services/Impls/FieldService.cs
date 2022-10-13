@@ -56,8 +56,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("Invalid updateBy!!!");
                 }
 
-                fieldDTO.isDeleted = false;
-
                 Field dto = _mapper.Map<Field>(fieldDTO);
                 newId.id = await _fieldRepository.CreateField(dto);
                 if (newId.id.Equals(""))
@@ -79,7 +77,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 List<string> projectWithFieldId = await _fieldRepository.GetProjectsByFieldId(fieldId);
 
-                if (projectWithFieldId != null)
+                if (projectWithFieldId.Count != 0)
                 {
                     throw new InUseException("There Are Projects Using This Field");
                 }

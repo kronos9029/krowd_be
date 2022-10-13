@@ -21,7 +21,7 @@ namespace RevenueSharingInvest.Business.Services
             int pageSize, 
             string businessId, 
             string areaId, 
-            string fieldId, 
+            List<string> listFieldId, 
             string name,
             string status,
             ThisUserObj thisUserObj
@@ -31,17 +31,19 @@ namespace RevenueSharingInvest.Business.Services
         public Task<ProjectCountDTO> CountProjects
         (
             string businessId, 
-            string areaId, 
-            string fieldId, 
+            string areaId,
+            List<string> listFieldId,
             string name,
             string status,
             ThisUserObj thisUserObj
         );
         public Task<List<BusinessProjectDTO>> GetBusinessProjectsToAuthor(Guid businessId);
+        public Task<IntegrateInfo> GetIntegrateInfoByUserEmail(string projectId);
 
         //UPDATE
         public Task<int> UpdateProject(UpdateProjectDTO projectDTO, Guid projectId, ThisUserObj thisUserObj);
         public Task<int> UpdateProjectStatus(Guid projectId, string status, ThisUserObj currentUser);
+        public Task<int> UpdateProjectStatusByHangfire(Guid projectId, ThisUserObj currentUser);
 
         //DELETE
         public Task<int> DeleteProjectById(Guid projectId);

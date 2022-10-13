@@ -1,13 +1,8 @@
 ﻿using Google.Cloud.Firestore;
-using Google.Type;
-using iText.StyledXmlParser.Jsoup.Helper;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Helpers
@@ -21,14 +16,19 @@ namespace RevenueSharingInvest.Data.Helpers
             _fireStoreDb = fireStoreDb;
         }
 
-        public async Task<dynamic> CreateBills(BillEntity bill)
+        public async Task<List<BillEntity>> CreateBills(List<BillEntity> billList, string projectId)
         {
             try
             {
-                DocumentReference billPath = _fireStoreDb.Collection("Bills").Document(bill.ProjectId).Collection(DateTimePicker.GetDateTimeByTimeZone().ToString("dd-MM-yyyy")).Document(bill.InvoiceId);
-                bill.Descriprion = "tetst";
-                return await billPath.SetAsync(bill);
-            } catch(Exception e)
+                foreach (BillEntity bill in billList)
+                {
+                    DocumentReference billPath = _fireStoreDb.Collection("Bills").Document(projectId).Collection(DateTimePicker.GetDateTimeByTimeZone().ToString("dd-MM-yyyy")).Document(bill.InvoiceId);
+                    await billPath.SetAsync(bill);
+                }
+
+                return billList;
+            }
+            catch (Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
@@ -41,7 +41,8 @@ namespace RevenueSharingInvest.Data.Helpers
             {
                 DocumentReference billPath = _fireStoreDb.Collection("Bills").Document(bill.ProjectId).Collection(date).Document(bill.InvoiceId);
                 return await billPath.SetAsync(bill);
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
@@ -68,7 +69,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
                 return dateList;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
@@ -88,7 +89,7 @@ namespace RevenueSharingInvest.Data.Helpers
                 }
                 return invoiceList;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
@@ -111,36 +112,32 @@ namespace RevenueSharingInvest.Data.Helpers
                 }
                 return bills;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
+    }
 
-
-
-
-
-        [FirestoreData]
-        public class BillEntity
-        {
-            [FirestoreProperty]
-            public string BillId { get; set; }
-            [FirestoreProperty]
-            public string InvoiceId { get; set; }
-            [FirestoreProperty]
-            public string Descriprion { get; set; }
-            [FirestoreProperty]
-            public string Createdate { get; set; }
-            [FirestoreProperty]
-            public string Createby { get; set; }
-            [FirestoreProperty]
-            public string Preference { get; set; }
-            [FirestoreProperty]
-            public string Amount { get; set; }
-            [FirestoreProperty]
-            public string ProjectId { get; set; }
-        }
+    [FirestoreData]
+    public class BillEntity
+    {
+        [FirestoreProperty]
+        public string BillId { get; set; }
+        [FirestoreProperty]
+        public string InvoiceId { get; set; }
+        [FirestoreProperty]
+        public string Descriprion { get; set; }
+        [FirestoreProperty]
+        public string Createdate { get; set; }
+        [FirestoreProperty]
+        public string Createby { get; set; }
+        [FirestoreProperty]
+        public string Preference { get; set; }
+        [FirestoreProperty]
+        public string Amount { get; set; }
+        [FirestoreProperty]
+        public string ProjectId { get; set; }
     }
 }

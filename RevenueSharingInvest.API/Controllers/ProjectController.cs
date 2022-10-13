@@ -71,7 +71,7 @@ namespace RevenueSharingInvest.API.Controllers
             int pageSize,
             string businessId,
             string areaId,
-            string fieldId,
+            [FromQuery] List<string> listFieldId,
             string name,
             string status
             )
@@ -83,11 +83,11 @@ namespace RevenueSharingInvest.API.Controllers
                 if(!currentUser.roleId.Equals(""))
                 {
                     RoleDTO roleDTO = await _roleService.GetRoleById(Guid.Parse(currentUser.roleId));
-                    countResult = await _projectService.CountProjects(businessId, areaId, fieldId, name, status, currentUser);
+                    countResult = await _projectService.CountProjects(businessId, areaId, listFieldId, name, status, currentUser);
                     return Ok(countResult);
                 } else
                 {
-                    countResult = await _projectService.CountProjects(businessId, areaId, fieldId, name, status, currentUser);
+                    countResult = await _projectService.CountProjects(businessId, areaId, listFieldId, name, status, currentUser);
                     return Ok(countResult);
                 }
             }
@@ -98,11 +98,11 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     RoleDTO roleDTO = await _roleService.GetRoleById(Guid.Parse(currentUser.roleId));
 
-                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, fieldId, name, status, currentUser);
+                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, listFieldId, name, status, currentUser);
                     return Ok(resultProjectList);
                 } else
                 {
-                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, fieldId, name, status, currentUser);
+                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, listFieldId, name, status, currentUser);
                     return Ok(resultProjectList);
                 }
             }           

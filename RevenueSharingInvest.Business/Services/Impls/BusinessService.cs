@@ -25,6 +25,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IUserRepository _userRepository;
         private readonly IProjectRepository _projectRepository;
         private readonly IProjectWalletRepository _projectWalletRepository;
+        private readonly IProjectEntityRepository _projectEntityRepository;
 
         private readonly IValidationService _validationService;
         private readonly IFileUploadService _fileUploadService;
@@ -38,6 +39,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IFieldRepository fieldRepository,
             IProjectRepository projectRepository,
             IProjectWalletRepository projectWalletRepository,
+            IProjectEntityRepository projectEntityRepository,
             IFileUploadService fileUploadService,
             IProjectService projectService,
             IMapper mapper)
@@ -48,6 +50,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _userRepository = userRepository;
             _projectRepository = projectRepository;
             _projectWalletRepository = projectWalletRepository;
+            _projectEntityRepository = projectEntityRepository;
 
             _validationService = validationService;
             _fileUploadService = fileUploadService;
@@ -361,6 +364,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             try
             {
                 Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(Guid.Parse(currentUser.businessId));
+                if (business == null)
+                    throw new InvalidFieldException("This businessId is not existed!!!");
 
                 if (business.Status.Equals(BusinessStatusEnum.BLOCKED))
                 {
@@ -414,6 +419,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = await _businessRepository.UpdateBusiness(entity, businessId);
                 if (result == 0)
                     throw new UpdateObjectException("Can not update Business Object!");
+                else
+                {
+                    if (businessDTO.email != null && !businessDTO.email.Equals(business.Email.ToString()))
+                    {
+                        await _projectEntityRepository.UpdateBusinessEmailExtension(businessId, businessDTO.email);
+                    }
+                }
                 return result;
             }
             catch (Exception e)
@@ -466,5 +478,23 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 throw new Exception(e.Message);
             }
         }
+
+        //GET BUSINESS NAME BY ID
+        public async Task<string> GetBusinessNameById(string businessId)
+        {
+            try
+            {
+                string businessName = await _businessRepository.GetBusinessNameById(Guid.Parse(businessId));
+
+                return businessName;
+
+            }catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
+
     }
 }
