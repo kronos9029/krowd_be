@@ -86,7 +86,9 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
-        private string CreateSignature(string message, string key)
+        [HttpPost]
+        [Route("generate-sig")]
+        public string CreateSignature(string message, string key)
         {
             try
             {

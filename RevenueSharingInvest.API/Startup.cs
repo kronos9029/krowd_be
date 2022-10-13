@@ -52,6 +52,10 @@ namespace RevenueSharingInvest.API
 
             services.AddFirestoreDatabasecontext(Configuration);
 
+            services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("HangfireDatabase")));
+
+            services.AddHangfireServer();
+
             services.AddControllers();
 
             services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
@@ -64,9 +68,7 @@ namespace RevenueSharingInvest.API
                 .AddJsonOptions(options =>
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-            services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("HangfireDatabase")));
 
-            services.AddHangfireServer();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -77,6 +79,11 @@ namespace RevenueSharingInvest.API
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "RevenueSharingInvest.API v1"));
+                app.UseHangfireDashboard("/hangfire", options: new DashboardOptions
+                {
+                    Authorization = new List<IDashboardAuthorizationFilter>() { new HangfireAuthorizationFilter() },
+                    IsReadOnlyFunc = context => false // according to your needs
+                });
             }
 
             app.UseMiddleware(typeof(ExceptionHandlingMiddleware));
@@ -103,12 +110,6 @@ namespace RevenueSharingInvest.API
             {
                 Authorization = new[] { new HangfireAuthorizationFilter() }
             });*/
-
-            app.UseHangfireDashboard("/hangfire", options: new DashboardOptions
-            {
-                Authorization = new List<IDashboardAuthorizationFilter>() { new HangfireAuthorizationFilter() },
-                IsReadOnlyFunc = context => false // according to your needs
-            });
         }
     }
 }
