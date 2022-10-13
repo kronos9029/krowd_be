@@ -1,6 +1,7 @@
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Hangfire;
+using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,6 +14,7 @@ using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.API.Hangfire;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -97,9 +99,15 @@ namespace RevenueSharingInvest.API
                 endpoints.MapHangfireDashboard();
             });
 
-            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+/*            app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
                 Authorization = new[] { new HangfireAuthorizationFilter() }
+            });*/
+
+            app.UseHangfireDashboard("/hangfire", options: new DashboardOptions
+            {
+                Authorization = new List<IDashboardAuthorizationFilter>() { new HangfireAuthorizationFilter() },
+                IsReadOnlyFunc = context => false // according to your needs
             });
         }
     }
