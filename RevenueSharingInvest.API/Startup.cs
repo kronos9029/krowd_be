@@ -82,7 +82,7 @@ namespace RevenueSharingInvest.API
                 app.UseHangfireDashboard("/hangfire", options: new DashboardOptions
                 {
                     Authorization = new List<IDashboardAuthorizationFilter>() { new HangfireAuthorizationFilter() },
-                    IsReadOnlyFunc = context => false // according to your needs
+                    IsReadOnlyFunc = context => true // according to your needs
                 });
             }
 
