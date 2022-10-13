@@ -918,7 +918,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("Email", email, DbType.String);
-                parameters.Add("Id", email, DbType.Guid);
+                parameters.Add("Id", projectId, DbType.Guid);
                 return await connection.QueryFirstOrDefaultAsync<IntegrateInfo>(query, parameters);
             }
             catch(Exception e)
