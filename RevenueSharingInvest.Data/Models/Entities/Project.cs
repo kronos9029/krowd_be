@@ -35,13 +35,14 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string Image { get; set; }
         public string Description { get; set; }
         public string Address { get; set; }
-        public double InvestmentTargetCapital { get; set; }
-        public double InvestedCapital { get; set; }
-        public double SharedRevenue { get; set; }
-        public double Multiplier { get; set; }
-        public int Duration { get; set; }
-        public int NumOfStage { get; set; }
-        public double RemainAmount { get; set; }
+        public double InvestmentTargetCapital { get; set; } //Số tiền kêu gọi
+        public double InvestedCapital { get; set; } //Số tiền đã được đầu tư
+        public double SharedRevenue { get; set; } //Phần trăm doanh thu chia sẻ mỗi kì
+        public double Multiplier { get; set; } //Hệ số nhân
+        public int Duration { get; set; } 
+        public int NumOfStage { get; set; } //Số kì thanh toán
+        public double RemainingPayableAmount { get; set; } //Số tiền phải trả tối thiểu
+        public double RemainingMaximumPayableAmount { get; set; } //Số tiền phải trả tối đa
         [Column(TypeName = "datetime")]
         public DateTime StartDate { get; set; }
         [Column(TypeName = "datetime")]

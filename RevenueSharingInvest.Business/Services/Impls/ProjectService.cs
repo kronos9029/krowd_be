@@ -334,11 +334,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (projectDTO.investmentTargetCapital <= 0)
                     throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
 
-                if (projectDTO.sharedRevenue <= 0)
-                    throw new InvalidFieldException("sharedRevenue must be greater than 0!!!");
+                if (projectDTO.sharedRevenue <= 0 || projectDTO.sharedRevenue > 100)
+                    throw new InvalidFieldException("sharedRevenue must be greater than 0 and less than 100!!!");
 
-                if (projectDTO.multiplier <= 0)
-                    throw new InvalidFieldException("multiplier must be greater than 0!!!");
+                if (projectDTO.multiplier <= 0 || projectDTO.multiplier > 100)
+                    throw new InvalidFieldException("multiplier must be greater than 0 and less than 100!!!");
 
                 if (projectDTO.duration <= 0)
                     throw new InvalidFieldException("duration must be greater than 0!!!");
@@ -881,16 +881,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (projectDTO.sharedRevenue != 0)
                 {
-                    if (projectDTO.sharedRevenue <= 0)
-                        throw new InvalidFieldException("sharedRevenue must be greater than 0!!!");
+                    if (projectDTO.sharedRevenue <= 0 || projectDTO.sharedRevenue > 100)
+                        throw new InvalidFieldException("sharedRevenue must be greater than 0 and less than 100!!!");
                 }
                 else
                     projectDTO.sharedRevenue = getProject.sharedRevenue;
 
                 if (projectDTO.multiplier != 0)
                 {
-                    if (projectDTO.multiplier <= 0)
-                        throw new InvalidFieldException("multiplier must be greater than 0!!!");
+                    if (projectDTO.multiplier <= 0 || projectDTO.multiplier > 100)
+                        throw new InvalidFieldException("multiplier must be greater than 0 and less than 100!!!");
                 }
                 else
                     projectDTO.multiplier = getProject.multiplier;
@@ -1020,7 +1020,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     project.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, RoleDictionary.role.GetValueOrDefault("ADMIN"));
                 }
-                project.RemainAmount = project.InvestmentTargetCapital;
+                project.RemainingPayableAmount = project.InvestmentTargetCapital;
+                project.RemainingMaximumPayableAmount = (double)(project.InvestmentTargetCapital * project.Multiplier);
                 project.UpdateBy = Guid.Parse(currentUser.userId);
 
                 result = await _projectRepository.UpdateProject(project, projectId);
