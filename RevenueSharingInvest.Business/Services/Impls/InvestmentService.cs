@@ -159,7 +159,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         await _packageRepository.UpdatePackageRemainingQuantity(package.Id, package.RemainingQuantity - investmentDTO.quantity, Guid.Parse(currentUser.userId));
 
                         //Update Project Amount
-                        await _projectRepository.UpdateProjectInvestedCapitalAndRemainAmount(package.ProjectId, (double)payment.Amount, Guid.Parse(currentUser.userId));
+                        await _projectRepository.UpdateProjectInvestedCapital(package.ProjectId, (double)payment.Amount, Guid.Parse(currentUser.userId));
 
                         //Subtract I2 balance
                         InvestorWallet investorWallet = new InvestorWallet();

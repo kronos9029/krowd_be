@@ -42,7 +42,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Multiplier, "
                     + "         Duration, "
                     + "         NumOfStage, "
-                    + "         RemainAmount, "
+                    + "         RemainingPayableAmount, "
+                    + "         RemainingMaximumPayableAmount, "
                     + "         StartDate, "
                     + "         EndDate, "
                     + "         BusinessLicense, "
@@ -63,11 +64,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @Description, "
                     + "         @Address, "
                     + "         @InvestmentTargetCapital, "
-                    + "         @SharedRevenue, "
-                    + "         @Multiplier, "
+                    + "         ROUND(@SharedRevenue, 1), "
+                    + "         ROUND(@Multiplier, 1), "
                     + "         @Duration, "
                     + "         @NumOfStage, "
-                    + "         @RemainAmount, "
+                    + "         @RemainingPayableAmount, "
+                    + "         @RemainingMaximumPayableAmount, "
                     + "         @StartDate, "
                     + "         @EndDate, "
                     + "         @BusinessLicense, "
@@ -91,7 +93,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Multiplier", projectDTO.Multiplier, DbType.Double);
                 parameters.Add("Duration", projectDTO.Duration, DbType.Int16);
                 parameters.Add("NumOfStage", projectDTO.NumOfStage, DbType.Int16);
-                parameters.Add("RemainAmount", projectDTO.InvestmentTargetCapital, DbType.Double);
+                parameters.Add("RemainingPayableAmount", projectDTO.InvestmentTargetCapital, DbType.Double);
+                parameters.Add("RemainingMaximumPayableAmount", (double)(projectDTO.InvestmentTargetCapital * projectDTO.Multiplier), DbType.Double);
                 parameters.Add("StartDate", Convert.ToDateTime(projectDTO.StartDate), DbType.DateTime);
                 parameters.Add("EndDate", Convert.ToDateTime(projectDTO.EndDate), DbType.DateTime);
                 parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
@@ -363,7 +366,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Multiplier, "
                     + "         Duration, "
                     + "         NumOfStage, "
-                    + "         RemainAmount, "
+                    + "         RemainingPayableAmount, "
+                    + "         RemainingMaximumPayableAmount, "
                     + "         StartDate, "
                     + "         EndDate, "
                     + "         BusinessLicense, "
@@ -428,9 +432,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Description = ISNULL(@Description, Description), "
                     + "         Address = ISNULL(@Address, Address), "
                     + "         InvestmentTargetCapital = ISNULL(@InvestmentTargetCapital, InvestmentTargetCapital), "
-                    + "         RemainAmount = ISNULL(@RemainAmount, RemainAmount), "
-                    + "         SharedRevenue = ISNULL(@SharedRevenue, SharedRevenue), "
-                    + "         Multiplier = ISNULL(@Multiplier, Multiplier), "
+                    + "         RemainingPayableAmount = ISNULL(@RemainingPayableAmount, RemainingPayableAmount), "
+                    + "         RemainingMaximumPayableAmount = ISNULL(@RemainingMaximumPayableAmount, RemainingMaximumPayableAmount), "
+                    + "         SharedRevenue = ISNULL(ROUND(@SharedRevenue, 1), SharedRevenue), "
+                    + "         Multiplier = ISNULL(ROUND(@Multiplier, 1), Multiplier), "
                     + "         Duration = ISNULL(@Duration, Duration), "
                     + "         NumOfStage = ISNULL(@NumOfStage, NumOfStage), "
                     + "         StartDate = ISNULL(@StartDate, StartDate), "
@@ -447,7 +452,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Description", projectDTO.Description, DbType.String);
                 parameters.Add("Address", projectDTO.Address, DbType.String);
                 parameters.Add("InvestmentTargetCapital", projectDTO.InvestmentTargetCapital, DbType.Double);
-                parameters.Add("RemainAmount", projectDTO.RemainAmount, DbType.Double);
+                parameters.Add("RemainingPayableAmount", projectDTO.RemainingPayableAmount, DbType.Double);
+                parameters.Add("RemainingMaximumPayableAmount", projectDTO.RemainingMaximumPayableAmount, DbType.Double);
                 parameters.Add("InvestedCapital", projectDTO.InvestedCapital, DbType.Double);
                 parameters.Add("SharedRevenue", projectDTO.SharedRevenue, DbType.Double);
                 parameters.Add("Multiplier", projectDTO.Multiplier, DbType.Double);
@@ -798,7 +804,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Multiplier, "
                     + "         Duration, "
                     + "         NumOfStage, "
-                    + "         RemainAmount, "
+                    + "         RemainingPayableAmount, "
+                    + "         RemainingMaximumPayableAmount, "
                     + "         StartDate, "
                     + "         EndDate, "
                     + "         BusinessLicense, "
@@ -861,14 +868,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //UPDATE INVESTED CAPITAL AND REMAIN AMOUNT
-        public async Task<int> UpdateProjectInvestedCapitalAndRemainAmount(Guid projectId, double investedAmount, Guid updateBy)
+        //UPDATE INVESTED CAPITAL
+        public async Task<int> UpdateProjectInvestedCapital(Guid projectId, double investedAmount, Guid updateBy)
         {
             try
             {
                 var query = "UPDATE Project "
                     + "     SET "
-                    + "         RemainAmount = ISNULL(RemainAmount - @InvestedAmount, RemainAmount), "
                     + "         InvestedCapital = ISNULL(InvestedCapital + @InvestedAmount, InvestedCapital), "
                     + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
                     + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
