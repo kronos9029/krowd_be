@@ -52,8 +52,8 @@ namespace RevenueSharingInvest.Data.Helpers
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com,1433;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
                 //optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;User ID=sa;Password=123");
-                //optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
             }
         }
 
@@ -63,11 +63,19 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<AccountTransaction>(entity =>
             {
+                entity.ToTable("AccountTransaction");
+
+                entity.HasIndex(e => e.FromUserId, "IX_AccountTransaction_FromUserId");
+
+                entity.HasIndex(e => e.ToUserId, "IX_AccountTransaction_ToUserId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.Amount).HasDefaultValueSql("(CONVERT([bigint],(0)))");
 
-                entity.Property(e => e.CreateDate).HasDefaultValueSql("('0001-01-01T00:00:00.000')");
+                entity.Property(e => e.CreateDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("('0001-01-01T00:00:00.000')");
 
                 entity.Property(e => e.ResponseTime).HasDefaultValueSql("(CONVERT([bigint],(0)))");
 
@@ -86,7 +94,17 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Area>(entity =>
             {
+                entity.ToTable("Area");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.City).HasMaxLength(50);
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.District).HasMaxLength(50);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<Bill>(entity =>
@@ -102,12 +120,53 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Data.Models.Entities.Business>(entity =>
             {
+                entity.ToTable("Bill");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateBy).HasMaxLength(50);
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.InvoiceId)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.HasOne(d => d.Project)
+                    .WithMany(p => p.Bills)
+                    .HasForeignKey(d => d.ProjectId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Project_Bill");
+            });
+
+            modelBuilder.Entity<RevenueSharingInvest.Data.Models.Entities.Business>(entity =>
+            {
+                entity.ToTable("Business");
+
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Email).HasMaxLength(50);
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.PhoneNum).HasMaxLength(10);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<BusinessField>(entity =>
             {
                 entity.HasKey(e => new { e.BusinessId, e.FieldId });
+
+                entity.ToTable("BusinessField");
+
+                entity.HasIndex(e => e.FieldId, "IX_BusinessField_FieldId");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Business)
                     .WithMany(p => p.BusinessFields)
@@ -124,27 +183,71 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Field>(entity =>
             {
+                entity.ToTable("Field");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<Investment>(entity =>
             {
+                entity.ToTable("Investment");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<Investor>(entity =>
             {
+                entity.ToTable("Investor");
+
+                entity.HasIndex(e => e.UserId, "IX_Investor_UserId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Investors)
+                    .HasForeignKey(d => d.UserId);
             });
 
             modelBuilder.Entity<InvestorType>(entity =>
             {
+                entity.ToTable("InvestorType");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<InvestorWallet>(entity =>
             {
+                entity.ToTable("InvestorWallet");
+
+                entity.HasIndex(e => e.InvestorId, "IX_InvestorWallet_InvestorId");
+
+                entity.HasIndex(e => e.WalletTypeId, "IX_InvestorWallet_WalletTypeId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Investor)
                     .WithMany(p => p.InvestorWallets)
@@ -159,9 +262,19 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Package>(entity =>
             {
+                entity.ToTable("Package");
+
+                entity.HasIndex(e => e.ProjectId, "IX_Package_ProjectId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
                 entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(12)
                     .IsUnicode(false)
                     .HasComputedColumnSql("(case when [dbo].[Get_Project_Status]([ProjectId])<>'CALLING_FOR_INVESTMENT' then 'INACTIVE' when [dbo].[Get_Project_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]>(0) then 'IN_STOCK' when [dbo].[Get_Project_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]=(0) then 'OUT_OF_STOCK' else 'INACTIVE' end)", false);
 
@@ -174,6 +287,14 @@ namespace RevenueSharingInvest.Data.Helpers
             modelBuilder.Entity<PackageVoucher>(entity =>
             {
                 entity.HasKey(e => new { e.PackageId, e.VoucherId });
+
+                entity.ToTable("PackageVoucher");
+
+                entity.HasIndex(e => e.VoucherId, "IX_PackageVoucher_VoucherId");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Package)
                     .WithMany(p => p.PackageVouchers)
@@ -190,7 +311,17 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Payment>(entity =>
             {
+                entity.ToTable("Payment");
+
+                entity.HasIndex(e => e.InvestmentId, "IX_Payment_InvestmentId");
+
+                entity.HasIndex(e => e.PeriodRevenueId, "IX_Payment_PeriodRevenueId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Type).HasMaxLength(20);
 
                 entity.HasOne(d => d.Investment)
                     .WithMany(p => p.Payments)
@@ -205,7 +336,19 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<PeriodRevenue>(entity =>
             {
+                entity.ToTable("PeriodRevenue");
+
+                entity.HasIndex(e => e.ProjectId, "IX_PeriodRevenue_ProjectId");
+
+                entity.HasIndex(e => e.StageId, "IX_PeriodRevenue_StageId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Status).HasMaxLength(20);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.PeriodRevenues)
@@ -221,7 +364,19 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<PeriodRevenueHistory>(entity =>
             {
+                entity.ToTable("PeriodRevenueHistory");
+
+                entity.HasIndex(e => e.PeriodRevenueId, "IX_PeriodRevenueHistory_PeriodRevenueId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.Status).HasMaxLength(20);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.PeriodRevenue)
                     .WithMany(p => p.PeriodRevenueHistories)
@@ -231,7 +386,33 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Project>(entity =>
             {
+                entity.ToTable("Project");
+
+                entity.HasIndex(e => e.AreaId, "IX_Project_AreaId");
+
+                entity.HasIndex(e => e.BusinessId, "IX_Project_BusinessId");
+
+                entity.HasIndex(e => e.ManagerId, "IX_Project_ManagerId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.AccessKey).HasMaxLength(16);
+
+                entity.Property(e => e.ApprovedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.BusinessLicense).HasMaxLength(13);
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.EndDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.StartDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Status).HasMaxLength(50);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Area)
                     .WithMany(p => p.Projects)
@@ -252,7 +433,17 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<ProjectEntity>(entity =>
             {
+                entity.ToTable("ProjectEntity");
+
+                entity.HasIndex(e => e.ProjectId, "IX_ProjectEntity_ProjectId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Title).HasMaxLength(255);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.ProjectEntities)
@@ -262,7 +453,17 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<ProjectWallet>(entity =>
             {
+                entity.ToTable("ProjectWallet");
+
+                entity.HasIndex(e => e.ProjectManagerId, "IX_ProjectWallet_ProjectId");
+
+                entity.HasIndex(e => e.WalletTypeId, "IX_ProjectWallet_WalletTypeId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.ProjectManager)
                     .WithMany(p => p.ProjectWallets)
@@ -277,7 +478,19 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<Risk>(entity =>
             {
+                entity.ToTable("Risk");
+
+                entity.HasIndex(e => e.ProjectId, "IX_Risk_ProjectId");
+
+                entity.HasIndex(e => e.RiskTypeId, "IX_Risk_RiskTypeId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Risks)
@@ -292,16 +505,36 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<RiskType>(entity =>
             {
+                entity.ToTable("RiskType");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<Role>(entity =>
             {
+                entity.ToTable("Role");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<Stage>(entity =>
             {
+                entity.ToTable("Stage");
+
+                entity.HasIndex(e => e.ProjectId, "IX_Stage_ProjectId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.IsOverDue)
@@ -321,7 +554,15 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<SystemWallet>(entity =>
             {
+                entity.ToTable("SystemWallet");
+
+                entity.HasIndex(e => e.WalletTypeId, "IX_SystemWallet_WalletTypeId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.WalletType)
                     .WithMany(p => p.SystemWallets)
@@ -331,17 +572,75 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<User>(entity =>
             {
+                entity.ToTable("User");
+
+                entity.HasIndex(e => e.BusinessId, "IX_User_BusinessId");
+
+                entity.HasIndex(e => e.RoleId, "IX_User_RoleId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.BankAccount).HasMaxLength(20);
+
+                entity.Property(e => e.BankName).HasMaxLength(50);
+
+                entity.Property(e => e.City).HasMaxLength(255);
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DateOfBirth).HasMaxLength(20);
+
+                entity.Property(e => e.District).HasMaxLength(255);
+
+                entity.Property(e => e.Email).HasMaxLength(50);
+
+                entity.Property(e => e.FirstName).HasMaxLength(255);
+
+                entity.Property(e => e.Gender).HasMaxLength(10);
+
+                entity.Property(e => e.IdCard).HasMaxLength(20);
+
+                entity.Property(e => e.LastName).HasMaxLength(255);
+
+                entity.Property(e => e.PhoneNum).HasMaxLength(10);
+
+                entity.Property(e => e.SecretKey).HasMaxLength(32);
+
+                entity.Property(e => e.TaxIdentificationNumber).HasMaxLength(20);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Business)
                     .WithMany(p => p.Users)
                     .HasForeignKey(d => d.BusinessId)
                     .HasConstraintName("FK_User_Business");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.Users)
+                    .HasForeignKey(d => d.RoleId);
             });
 
             modelBuilder.Entity<Voucher>(entity =>
             {
+                entity.ToTable("Voucher");
+
+                entity.HasIndex(e => e.ProjectId, "IX_Voucher_ProjectId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.Code).HasMaxLength(10);
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.EndDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.StartDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Status).HasMaxLength(20);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Vouchers)
@@ -351,7 +650,29 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<VoucherItem>(entity =>
             {
+                entity.ToTable("VoucherItem");
+
+                entity.HasIndex(e => e.InvestmentId, "IX_VoucherItem_InvestmentId");
+
+                entity.HasIndex(e => e.VoucherId, "IX_VoucherItem_VoucherId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.AvailableDate).HasColumnType("datetime");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ExpireDate).HasColumnType("datetime");
+
+                entity.Property(e => e.IssuedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.RedeemDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Investment)
+                    .WithMany(p => p.VoucherItems)
+                    .HasForeignKey(d => d.InvestmentId);
 
                 entity.HasOne(d => d.Voucher)
                     .WithMany(p => p.VoucherItems)
@@ -361,7 +682,21 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<WalletTransaction>(entity =>
             {
+                entity.ToTable("WalletTransaction");
+
+                entity.HasIndex(e => e.InvestorWalletId, "IX_WalletTransaction_InvestorWalletId");
+
+                entity.HasIndex(e => e.PaymentId, "IX_WalletTransaction_PaymentId");
+
+                entity.HasIndex(e => e.ProjectWalletId, "IX_WalletTransaction_ProjectWalletId");
+
+                entity.HasIndex(e => e.SystemWalletId, "IX_WalletTransaction_SystemWalletId");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Type).HasMaxLength(20);
 
                 entity.HasOne(d => d.InvestorWallet)
                     .WithMany(p => p.WalletTransactions)
@@ -386,7 +721,19 @@ namespace RevenueSharingInvest.Data.Helpers
 
             modelBuilder.Entity<WalletType>(entity =>
             {
+                entity.ToTable("WalletType");
+
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Mode).HasMaxLength(10);
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.Type).HasMaxLength(10);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             });
 
             OnModelCreatingPartial(modelBuilder);
