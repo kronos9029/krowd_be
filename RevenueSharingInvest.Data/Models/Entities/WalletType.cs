@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
 namespace RevenueSharingInvest.Data.Models.Entities
 {
-    [Table("WalletType")]
     public partial class WalletType
     {
         public WalletType()
@@ -18,27 +14,18 @@ namespace RevenueSharingInvest.Data.Models.Entities
             SystemWallets = new HashSet<SystemWallet>();
         }
 
-        [Key]
         public Guid Id { get; set; }
-        [StringLength(50)]
         public string Name { get; set; }
         public string Description { get; set; }
-        [StringLength(10)]
         public string Mode { get; set; }
-        [StringLength(10)]
         public string Type { get; set; }
         public Guid? CreateBy { get; set; }
-        [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? UpdateBy { get; set; }
-        [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
 
-        [InverseProperty(nameof(InvestorWallet.WalletType))]
         public virtual ICollection<InvestorWallet> InvestorWallets { get; set; }
-        [InverseProperty(nameof(ProjectWallet.WalletType))]
         public virtual ICollection<ProjectWallet> ProjectWallets { get; set; }
-        [InverseProperty(nameof(SystemWallet.WalletType))]
         public virtual ICollection<SystemWallet> SystemWallets { get; set; }
     }
 }
