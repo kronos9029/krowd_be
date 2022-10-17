@@ -106,10 +106,7 @@ namespace RevenueSharingInvest.API
                 endpoints.MapHangfireDashboard();
             });
 
-/*            app.UseHangfireDashboard("/hangfire", new DashboardOptions
-            {
-                Authorization = new[] { new HangfireAuthorizationFilter() }
-            });*/
+
         }
     }
 }
