@@ -10,7 +10,7 @@ using RevenueSharingInvest.Data.Helpers;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
-    [DbContext(typeof(KrowdContext))]
+    [DbContext(typeof(Helpers.KrowdContext))]
     [Migration("20220913120752_Krowd_v1.0.4")]
     partial class Krowd_v104
     {

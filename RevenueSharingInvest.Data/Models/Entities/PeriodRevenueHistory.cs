@@ -26,6 +26,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
+        public double? Amount { get; set; }
+        public double? StageTotalAmount { get; set; }
 
         [ForeignKey(nameof(PeriodRevenueId))]
         [InverseProperty("PeriodRevenueHistories")]

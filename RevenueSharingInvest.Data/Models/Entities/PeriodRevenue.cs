@@ -38,6 +38,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
+        public double? SharedAmount { get; set; }
 
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("PeriodRevenues")]

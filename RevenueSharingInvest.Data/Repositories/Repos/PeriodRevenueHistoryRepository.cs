@@ -28,6 +28,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "INSERT INTO PeriodRevenueHistory ("
                     + "         Name, "
                     + "         PeriodRevenueId, "
+                    + "         Amount, "
+                    + "         StageTotalAmount, "
                     + "         Description, "
                     + "         Status, "
                     + "         CreateDate, "
@@ -39,6 +41,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     VALUES ( "
                     + "         @Name, "
                     + "         @PeriodRevenueId, "
+                    + "         @Amount, "
+                    + "         @StageTotalAmount, "
                     + "         @Description, "
                     + "         @Status, "
                     + "         @CreateDate, "
@@ -49,6 +53,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", periodRevenueHistoryDTO.Name, DbType.String);
                 parameters.Add("PeriodRevenueId", periodRevenueHistoryDTO.PeriodRevenueId, DbType.Guid);
+                parameters.Add("Amount", periodRevenueHistoryDTO.Amount, DbType.Double);
+                parameters.Add("StageTotalAmount", periodRevenueHistoryDTO.StageTotalAmount, DbType.Double);
                 parameters.Add("Description", periodRevenueHistoryDTO.Description, DbType.String);
                 parameters.Add("Status", periodRevenueHistoryDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
@@ -114,6 +120,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Id, "
                     + "         Name, "
                     + "         PeriodRevenueId, "
+                    + "         Amount, "
+                    + "         StageTotalAmount, "
                     + "         Description, "
                     + "         Status, "
                     + "         CreateDate, "

@@ -136,6 +136,41 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.ToTable("Area");
                 });
 
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Bill", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("(newid())");
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<string>("CreateBy")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InvoiceId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Bill");
+                });
+
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Business", b =>
                 {
                     b.Property<Guid>("Id")
@@ -440,7 +475,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasMaxLength(12)
                         .IsUnicode(false)
                         .HasColumnType("varchar(12)")
-                        .HasComputedColumnSql("(case when [dbo].[Change_Package_Status]([ProjectId])<>'CALLING_FOR_INVESTMENT' then 'INACTIVE' when [dbo].[Change_Package_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]>(0) then 'IN_STOCK' when [dbo].[Change_Package_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]=(0) then 'OUT_OF_STOCK' else 'INACTIVE' end)", false);
+                        .HasComputedColumnSql("(case when [dbo].[Get_Project_Status]([ProjectId])<>'CALLING_FOR_INVESTMENT' then 'INACTIVE' when [dbo].[Get_Project_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]>(0) then 'IN_STOCK' when [dbo].[Get_Project_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]=(0) then 'OUT_OF_STOCK' else 'INACTIVE' end)", false);
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -578,6 +613,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<double?>("SharedAmount")
+                        .HasColumnType("float");
+
                     b.Property<Guid>("StageId")
                         .HasColumnType("uniqueidentifier");
 
@@ -607,6 +645,9 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("(newid())");
 
+                    b.Property<double?>("Amount")
+                        .HasColumnType("float");
+
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -622,6 +663,9 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.Property<Guid?>("PeriodRevenueId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<double?>("StageTotalAmount")
+                        .HasColumnType("float");
 
                     b.Property<string>("Status")
                         .HasMaxLength(20)
@@ -950,6 +994,13 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime");
 
+                    b.Property<string>("IsOverDue")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasMaxLength(5)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(5)")
+                        .HasComputedColumnSql("(case when [dbo].[Get_Period_Revenue_History]([Id])<>(0) AND (dateadd(hour,(7),getdate())>=[EndDate] AND dateadd(hour,(7),getdate())<=dateadd(day,(3),[EndDate])) then 'FALSE' when [dbo].[Get_Period_Revenue_History]([Id])=(0) AND dateadd(hour,(7),getdate())>dateadd(day,(3),[EndDate]) then 'TRUE' when dateadd(hour,(7),getdate())<[EndDate] then NULL  end)", false);
+
                     b.Property<string>("Name")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -961,8 +1012,12 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("Status")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasMaxLength(8)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(8)")
+                        .HasComputedColumnSql("(case when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())<[StartDate] then 'UNDUE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND (dateadd(hour,(7),getdate())>=[StartDate] AND dateadd(hour,(7),getdate())<=[EndDate]) then 'DUE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())>[EndDate] AND [dbo].[Get_Period_Revenue_Actual_Amount]([Id])<>NULL then 'PAID' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())>[EndDate] AND [dbo].[Get_Period_Revenue_Actual_Amount]([Id]) IS NULL then 'OVERDUE' else 'INACTIVE' end)", false);
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -1325,6 +1380,17 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("ToUser");
                 });
 
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Bill", b =>
+                {
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Project", "Project")
+                        .WithMany("Bills")
+                        .HasForeignKey("ProjectId")
+                        .HasConstraintName("FK_Project_Bill")
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.BusinessField", b =>
                 {
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Business", "Business")
@@ -1670,6 +1736,8 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Project", b =>
                 {
+                    b.Navigation("Bills");
+
                     b.Navigation("Packages");
 
                     b.Navigation("PeriodRevenues");

@@ -20,7 +20,8 @@ namespace RevenueSharingInvest.Data.Helpers
 
         public virtual DbSet<AccountTransaction> AccountTransactions { get; set; }
         public virtual DbSet<Area> Areas { get; set; }
-        public virtual DbSet<Models.Entities.Business> Businesses { get; set; }
+        public virtual DbSet<Bill> Bills { get; set; }
+        public virtual DbSet<Data.Models.Entities.Business> Businesses { get; set; }
         public virtual DbSet<BusinessField> BusinessFields { get; set; }
         public virtual DbSet<Field> Fields { get; set; }
         public virtual DbSet<Investment> Investments { get; set; }
@@ -88,7 +89,18 @@ namespace RevenueSharingInvest.Data.Helpers
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
 
-            modelBuilder.Entity<Models.Entities.Business>(entity =>
+            modelBuilder.Entity<Bill>(entity =>
+            {
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.HasOne(d => d.Project)
+                    .WithMany(p => p.Bills)
+                    .HasForeignKey(d => d.ProjectId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Project_Bill");
+            });
+
+            modelBuilder.Entity<Data.Models.Entities.Business>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             });
@@ -151,7 +163,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
                 entity.Property(e => e.Status)
                     .IsUnicode(false)
-                    .HasComputedColumnSql("(case when [dbo].[Change_Package_Status]([ProjectId])<>'CALLING_FOR_INVESTMENT' then 'INACTIVE' when [dbo].[Change_Package_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]>(0) then 'IN_STOCK' when [dbo].[Change_Package_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]=(0) then 'OUT_OF_STOCK' else 'INACTIVE' end)", false);
+                    .HasComputedColumnSql("(case when [dbo].[Get_Project_Status]([ProjectId])<>'CALLING_FOR_INVESTMENT' then 'INACTIVE' when [dbo].[Get_Project_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]>(0) then 'IN_STOCK' when [dbo].[Get_Project_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]=(0) then 'OUT_OF_STOCK' else 'INACTIVE' end)", false);
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Packages)
@@ -291,6 +303,14 @@ namespace RevenueSharingInvest.Data.Helpers
             modelBuilder.Entity<Stage>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.IsOverDue)
+                    .IsUnicode(false)
+                    .HasComputedColumnSql("(case when [dbo].[Get_Period_Revenue_History]([Id])<>(0) AND (dateadd(hour,(7),getdate())>=[EndDate] AND dateadd(hour,(7),getdate())<=dateadd(day,(3),[EndDate])) then 'FALSE' when [dbo].[Get_Period_Revenue_History]([Id])=(0) AND dateadd(hour,(7),getdate())>dateadd(day,(3),[EndDate]) then 'TRUE' when dateadd(hour,(7),getdate())<[EndDate] then NULL  end)", false);
+
+                entity.Property(e => e.Status)
+                    .IsUnicode(false)
+                    .HasComputedColumnSql("(case when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())<[StartDate] then 'UNDUE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND (dateadd(hour,(7),getdate())>=[StartDate] AND dateadd(hour,(7),getdate())<=[EndDate]) then 'DUE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())>[EndDate] AND [dbo].[Get_Period_Revenue_Actual_Amount]([Id])<>NULL then 'PAID' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())>[EndDate] AND [dbo].[Get_Period_Revenue_Actual_Amount]([Id]) IS NULL then 'OVERDUE' else 'INACTIVE' end)", false);
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Stages)
