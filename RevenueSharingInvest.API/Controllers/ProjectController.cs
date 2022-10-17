@@ -72,6 +72,7 @@ namespace RevenueSharingInvest.API.Controllers
             string businessId,
             string areaId,
             [FromQuery] List<string> listFieldId,
+            double investmentTargetCapital,
             string name,
             string status
             )
@@ -83,11 +84,11 @@ namespace RevenueSharingInvest.API.Controllers
                 if(!currentUser.roleId.Equals(""))
                 {
                     RoleDTO roleDTO = await _roleService.GetRoleById(Guid.Parse(currentUser.roleId));
-                    countResult = await _projectService.CountProjects(businessId, areaId, listFieldId, name, status, currentUser);
+                    countResult = await _projectService.CountProjects(businessId, areaId, listFieldId, investmentTargetCapital, name, status, currentUser);
                     return Ok(countResult);
                 } else
                 {
-                    countResult = await _projectService.CountProjects(businessId, areaId, listFieldId, name, status, currentUser);
+                    countResult = await _projectService.CountProjects(businessId, areaId, listFieldId, investmentTargetCapital, name, status, currentUser);
                     return Ok(countResult);
                 }
             }
@@ -98,11 +99,11 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     RoleDTO roleDTO = await _roleService.GetRoleById(Guid.Parse(currentUser.roleId));
 
-                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, listFieldId, name, status, currentUser);
+                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, listFieldId, investmentTargetCapital, name, status, currentUser);
                     return Ok(resultProjectList);
                 } else
                 {
-                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, listFieldId, name, status, currentUser);
+                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, listFieldId, investmentTargetCapital, name, status, currentUser);
                     return Ok(resultProjectList);
                 }
             }           

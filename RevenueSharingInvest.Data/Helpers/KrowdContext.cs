@@ -118,7 +118,7 @@ namespace RevenueSharingInvest.Data.Helpers
                     .HasConstraintName("FK_Project_Bill");
             });
 
-            modelBuilder.Entity<Data.Models.Entities.Business>(entity =>
+            modelBuilder.Entity<Bill>(entity =>
             {
                 entity.ToTable("Bill");
 
@@ -139,7 +139,7 @@ namespace RevenueSharingInvest.Data.Helpers
                     .HasConstraintName("FK_Project_Bill");
             });
 
-            modelBuilder.Entity<RevenueSharingInvest.Data.Models.Entities.Business>(entity =>
+            modelBuilder.Entity<Models.Entities.Business>(entity =>
             {
                 entity.ToTable("Business");
 

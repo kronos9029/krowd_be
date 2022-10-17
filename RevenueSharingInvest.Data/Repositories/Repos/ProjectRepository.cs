@@ -146,6 +146,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             string managerId,
             string areaId,
             List<string> listFieldId,
+            double investmentTargetCapital,
             string name,
             string status,
             string roleId
@@ -161,6 +162,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var managerIdCondition = " AND ManagerId = @ManagerId ";
                 var areaIdCondition = " AND AreaId = @AreaId ";
                 var fieldIdCondition = "";
+                var investmentTargetCapitalCondition = " AND InvestmentTargetCapital >= @InvestmentTargetCapital ";
                 var nameCondition = " AND Name LIKE '%" + name + "%' ";
                 var statusCondition = " AND Status = @Status ";
 
@@ -184,6 +186,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         }
                         fieldIdCondition = "AND ( " + fieldIdCondition.Substring(3, fieldIdCondition.Length - 3) + " ) ";
                         whereCondition = whereCondition + fieldIdCondition;
+                    }
+                    if (investmentTargetCapital != 0)
+                    {
+                        whereCondition = whereCondition + investmentTargetCapitalCondition;
+                        parameters.Add("InvestmentTargetCapital", investmentTargetCapital, DbType.Double);
                     }
                     if (name != null)
                     {
@@ -222,6 +229,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         }
                         fieldIdCondition = "AND ( " + fieldIdCondition.Substring(3, fieldIdCondition.Length - 3) + " ) ";
                         whereCondition = whereCondition + fieldIdCondition;
+                    }
+                    if (investmentTargetCapital != 0)
+                    {
+                        whereCondition = whereCondition + investmentTargetCapitalCondition;
+                        parameters.Add("InvestmentTargetCapital", investmentTargetCapital, DbType.Double);
                     }
                     if (name != null)
                     {
@@ -267,6 +279,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         fieldIdCondition = "AND ( " + fieldIdCondition.Substring(3, fieldIdCondition.Length - 3) + " ) ";
                         whereCondition = whereCondition + fieldIdCondition;
                     }
+                    if (investmentTargetCapital != 0)
+                    {
+                        whereCondition = whereCondition + investmentTargetCapitalCondition;
+                        parameters.Add("InvestmentTargetCapital", investmentTargetCapital, DbType.Double);
+                    }
                     if (name != null)
                     {
                         whereCondition = whereCondition + nameCondition;
@@ -311,6 +328,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         }
                         fieldIdCondition = "AND ( " + fieldIdCondition.Substring(3, fieldIdCondition.Length - 3) + " ) ";
                         whereCondition = whereCondition + fieldIdCondition;
+                    }
+                    if (investmentTargetCapital != 0)
+                    {
+                        whereCondition = whereCondition + investmentTargetCapitalCondition;
+                        parameters.Add("InvestmentTargetCapital", investmentTargetCapital, DbType.Double);
                     }
                     if (name != null)
                     {
@@ -506,6 +528,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             string managerId,
             string areaId,
             List<string> listFieldId,
+            double investmentTargetCapital,
             string name,
             string status,
             string roleId
@@ -521,6 +544,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var managerIdCondition = " AND ManagerId = @ManagerId ";
                 var areaIdCondition = " AND AreaId = @AreaId ";
                 var fieldIdCondition = "";
+                var investmentTargetCapitalCondition = " AND InvestmentTargetCapital >= @InvestmentTargetCapital ";
                 var nameCondition = " AND Name LIKE '%" + name + "%' ";
                 var statusCondition = " AND Status = @Status ";
 
@@ -544,6 +568,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         }
                         fieldIdCondition = "AND ( " + fieldIdCondition.Substring(3, fieldIdCondition.Length - 3) + " ) ";
                         whereCondition = whereCondition + fieldIdCondition;
+                    }
+                    if (investmentTargetCapital != 0)
+                    {
+                        whereCondition = whereCondition + investmentTargetCapitalCondition;
+                        parameters.Add("InvestmentTargetCapital", investmentTargetCapital, DbType.Double);
                     }
                     if (name != null)
                     {
@@ -582,6 +611,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         }
                         fieldIdCondition = "AND ( " + fieldIdCondition.Substring(3, fieldIdCondition.Length - 3) + " ) ";
                         whereCondition = whereCondition + fieldIdCondition;
+                    }
+                    if (investmentTargetCapital != 0)
+                    {
+                        whereCondition = whereCondition + investmentTargetCapitalCondition;
+                        parameters.Add("InvestmentTargetCapital", investmentTargetCapital, DbType.Double);
                     }
                     if (name != null)
                     {
@@ -627,6 +661,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         fieldIdCondition = "AND ( " + fieldIdCondition.Substring(3, fieldIdCondition.Length - 3) + " ) ";
                         whereCondition = whereCondition + fieldIdCondition;
                     }
+                    if (investmentTargetCapital != 0)
+                    {
+                        whereCondition = whereCondition + investmentTargetCapitalCondition;
+                        parameters.Add("InvestmentTargetCapital", investmentTargetCapital, DbType.Double);
+                    }
                     if (name != null)
                     {
                         whereCondition = whereCondition + nameCondition;
@@ -671,6 +710,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                         }
                         fieldIdCondition = "AND ( " + fieldIdCondition.Substring(3, fieldIdCondition.Length - 3) + " ) ";
                         whereCondition = whereCondition + fieldIdCondition;
+                    }
+                    if (investmentTargetCapital != 0)
+                    {
+                        whereCondition = whereCondition + investmentTargetCapitalCondition;
+                        parameters.Add("InvestmentTargetCapital", investmentTargetCapital, DbType.Double);
                     }
                     if (name != null)
                     {

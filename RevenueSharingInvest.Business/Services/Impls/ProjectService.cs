@@ -84,7 +84,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //COUNT PROJECTS
-        public async Task<ProjectCountDTO> CountProjects(string businessId, string areaId, List<string> listFieldId, string name, string status, ThisUserObj thisUserObj)
+        public async Task<ProjectCountDTO> CountProjects(string businessId, string areaId, List<string> listFieldId, double investmentTargetCapital, string name, string status, ThisUserObj thisUserObj)
         {
             ProjectCountDTO result = new ProjectCountDTO();
 
@@ -125,6 +125,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         }
                     }
 
+                    if (investmentTargetCapital != 0)
+                    {
+                        if (investmentTargetCapital < 0)
+                            throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+                    }
+
                     if (status != null)
                     {
                         foreach (int item in statusNum)
@@ -138,7 +144,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("GUEST can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, name, status, thisUserObj.investorRoleId);
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, investmentTargetCapital, name, status, thisUserObj.investorRoleId);
                 }
 
                 else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
@@ -175,6 +181,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         }
                     }
 
+                    if (investmentTargetCapital != 0)
+                    {
+                        if (investmentTargetCapital < 0)
+                            throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+                    }
+
                     if (status != null)
                     {
                         foreach (int item in statusNum)
@@ -188,7 +200,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("ADMIN can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, name, status, thisUserObj.roleId);                 
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, investmentTargetCapital, name, status, thisUserObj.roleId);                 
                 }
 
                 else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
@@ -219,6 +231,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         }
                     }
 
+                    if (investmentTargetCapital != 0)
+                    {
+                        if (investmentTargetCapital < 0)
+                            throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+                    }
+
                     if (status != null)
                     {
                         foreach (int item in statusNum)
@@ -232,7 +250,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("BUSINESS_MANAGER can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, name, status, thisUserObj.roleId);
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, investmentTargetCapital, name, status, thisUserObj.roleId);
                 }
 
                 else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
@@ -260,6 +278,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         }
                     }
 
+                    if (investmentTargetCapital != 0)
+                    {
+                        if (investmentTargetCapital < 0)
+                            throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+                    }
+
                     if (status != null)
                     {
                         foreach (int item in statusNum)
@@ -273,7 +297,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("PROJECT_MANAGER can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(null, thisUserObj.userId, areaId, listFieldId, name, status, thisUserObj.roleId);
+                    result.numOfProject = await _projectRepository.CountProject(null, thisUserObj.userId, areaId, listFieldId, investmentTargetCapital, name, status, thisUserObj.roleId);
                 }
 
                 return result;
@@ -538,7 +562,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int pageSize, 
             string businessId, 
             string areaId, 
-            List<string> listFieldId, 
+            List<string> listFieldId,
+            double investmentTargetCapital,
             string name, 
             string status, 
             ThisUserObj thisUserObj
@@ -586,6 +611,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         }                       
                     }
 
+                    if (investmentTargetCapital != 0)
+                    {
+                        if (investmentTargetCapital < 0)
+                            throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+                    }
+
                     if (status != null)
                     {
                         foreach (int item in statusNum)
@@ -599,8 +630,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("GUEST can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, name, status, thisUserObj.investorRoleId);
-                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, listFieldId, name, status, thisUserObj.investorRoleId);
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, investmentTargetCapital, name, status, thisUserObj.investorRoleId);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, listFieldId, investmentTargetCapital, name, status, thisUserObj.investorRoleId);
                 }
 
                 else if (thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
@@ -637,6 +668,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         }
                     }
 
+                    if (investmentTargetCapital != 0)
+                    {
+                        if (investmentTargetCapital < 0)
+                            throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+                    }
+
                     if (status != null)
                     {
                         foreach (int item in statusNum)
@@ -650,8 +687,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("ADMIN can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, name, status, thisUserObj.roleId);
-                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, listFieldId, name, status, thisUserObj.roleId);
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, investmentTargetCapital, name, status, thisUserObj.roleId);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, listFieldId, investmentTargetCapital, name, status, thisUserObj.roleId);
                 }
 
                 else if(thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")))
@@ -682,6 +719,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         }
                     }
 
+                    if (investmentTargetCapital != 0)
+                    {
+                        if (investmentTargetCapital < 0)
+                            throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+                    }
+
                     if (status != null)
                     {
                         foreach (int item in statusNum)
@@ -695,8 +738,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("BUSINESS_MANAGER can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, name, status, thisUserObj.roleId);
-                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, listFieldId, name, status, thisUserObj.roleId);
+                    result.numOfProject = await _projectRepository.CountProject(businessId, null, areaId, listFieldId, investmentTargetCapital, name, status, thisUserObj.roleId);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, businessId, null, areaId, listFieldId, investmentTargetCapital, name, status, thisUserObj.roleId);
                 }
 
                 else if(thisUserObj.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
@@ -724,6 +767,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         }
                     }
 
+                    if (investmentTargetCapital != 0)
+                    {
+                        if (investmentTargetCapital < 0)
+                            throw new InvalidFieldException("investmentTargetCapital must be greater than 0!!!");
+                    }
+
                     if (status != null)
                     {
                         foreach (int item in statusNum)
@@ -737,8 +786,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             throw new InvalidFieldException("PROJECT_MANAGER can view Projects with status" + statusErrorMessage + " !!!");
                     }
 
-                    result.numOfProject = await _projectRepository.CountProject(null, thisUserObj.userId, areaId, listFieldId, name, status, thisUserObj.roleId);
-                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, null, thisUserObj.userId, areaId, listFieldId, name, status, thisUserObj.roleId);
+                    result.numOfProject = await _projectRepository.CountProject(null, thisUserObj.userId, areaId, listFieldId, investmentTargetCapital, name, status, thisUserObj.roleId);
+                    listEntity = await _projectRepository.GetAllProjects(pageIndex, pageSize, null, thisUserObj.userId, areaId, listFieldId, investmentTargetCapital, name, status, thisUserObj.roleId);
                 }               
 
                 List<BasicProjectDTO> listDTO = _mapper.Map<List<BasicProjectDTO>>(listEntity);

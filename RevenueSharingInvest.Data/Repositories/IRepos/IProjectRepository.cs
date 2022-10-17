@@ -21,8 +21,8 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
             string businessId, 
             string managerId, 
             string areaId, 
-            List<string> listFieldId, 
-            //string investorId, 
+            List<string> listFieldId,
+            double investmentTargetCapital,
             string name, 
             string status, 
             string roleId
@@ -34,7 +34,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
             string managerId,
             string areaId,
             List<string> listFieldId,
-            //string investorId,
+            double investmentTargetCapital,
             string name,
             string status,
             string roleId
