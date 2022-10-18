@@ -18,21 +18,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
         }
 
-        public Task<int> BulkInsertInvoice(InsertBillDTO request)
+        public async Task<int> BulkInsertInvoice(InsertBillDTO request)
         {
             var query = "INSERT INTO Bill (InvoiceId, Amount, Description, CreateBy,  CreateDate, ProjectId) VALUES ";
 
             for(int i = 0; i < request.Bills.Count; i++)
             {
                 if(i == request.Bills.Count - 1)
-                    query += "(" + request.Bills[i].InvoiceId + "," + request.Bills[i].Amount + "," + request.Bills[i].Description + "," + request.Bills[i].CreateBy + "," + request.Bills[i].CreateDate + "," + request.Bills[i].ProjectId + ")";
+                    query += "(" +"'"+request.Bills[i].InvoiceId +"'"+ "," + "'" + request.Bills[i].Amount + "'" + "," +"'"+ (request.Bills[i].Description ??= "") +"'" + "," + "'" + request.Bills[i].CreateBy + "'" + "," + "'" + request.Bills[i].CreateDate + "'" + "," + "'" + request.Bills[i].ProjectId + "'" + ")";
                 else
-                    query += "(" + request.Bills[i].InvoiceId + "," + request.Bills[i].Amount + "," + request.Bills[i].Description + "," + request.Bills[i].CreateBy + "," + request.Bills[i].CreateDate + "," + request.Bills[i].ProjectId + "),";
+                    query += "(" +"'"+request.Bills[i].InvoiceId +"'"+ "," + "'" + request.Bills[i].Amount + "'" + "," +"'"+ (request.Bills[i].Description ??= "") +"'" + "," + "'" + request.Bills[i].CreateBy + "'" + "," + "'" + request.Bills[i].CreateDate + "'" + "," + "'" + request.Bills[i].ProjectId + "'" + "),";
 
             }
 
             using var connection = CreateConnection();
-            return connection.ExecuteAsync(query);
+            return await connection.ExecuteAsync(query);
         }
     }
 }

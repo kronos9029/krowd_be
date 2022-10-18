@@ -16,7 +16,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             _billRepository = billRepository;
         }
-        public Task<int> BulkInsertBills(InsertBillDTO bills, string projectId)
+        public async Task<int> BulkInsertBills(InsertBillDTO bills, string projectId)
         {
             try
             {
@@ -27,7 +27,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     bills.Bills[i].ProjectId = currentProjectId;
                 }
 
-                var result = _billRepository.BulkInsertInvoice(bills);
+                var result = await _billRepository.BulkInsertInvoice(bills);
                 return result;
             }
             catch(Exception e)
