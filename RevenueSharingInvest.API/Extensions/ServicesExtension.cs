@@ -144,6 +144,10 @@ namespace RevenueSharingInvest.API.Extensions
             services.AddScoped<IWalletTypeRepository, WalletTypeRepository>();
             services.AddScoped<IWalletTypeService, WalletTypeService>();
 
+            // BILL
+            services.AddScoped<IBillRepository, BillRepository>();
+            services.AddScoped<IBillService, BillService>();
+
             //MOMO
             services.AddScoped<IMomoService, MomoService>();
 

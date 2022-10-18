@@ -8,6 +8,7 @@ using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -22,33 +23,35 @@ namespace RevenueSharingInvest.API.Controllers
     [EnableCors]
     public class POSController : ControllerBase
     {
-
-        private readonly FirestoreProvider _firestoreProvider;
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
         private readonly IProjectService _projectService;
         private readonly AppSettings _appSettings;
+        private readonly IBillService _billService;
 
-        public POSController(FirestoreProvider firestoreProvider,
-            IUserService userService,
+        public POSController(IUserService userService,
             IRoleService roleService,
             IOptions<AppSettings> appSettings,
-            IProjectService projectService)
+            IProjectService projectService,
+            IBillService billService)
         {
-            _firestoreProvider = firestoreProvider;
             _userService = userService;
             _roleService = roleService;
             _appSettings = appSettings.Value;
             _projectService = projectService;
+            _billService = billService;
         }
 
         [HttpPost]
         [Route("Krowd-upload")]
-        public async Task<IActionResult> UploadBillsFromKrowd(List<BillEntity> billEntity)
+        public async Task<IActionResult> UploadBillsFromKrowd(List<BillDTO> bills)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
-            await _firestoreProvider.CreateBills(billEntity, currentUser.projectId);
-            return Ok();
+            InsertBillDTO billDTO = new();
+            billDTO.ProjectId = currentUser.projectId;
+            billDTO.Bills = bills;
+            var result = await _billService.BulkInsertBills(billDTO);
+            return Ok(result);
         }
 
         [HttpPost]
@@ -63,13 +66,16 @@ namespace RevenueSharingInvest.API.Controllers
 
             if (systemSignature.Equals(request.signature))
             {
-                var result = await _firestoreProvider.CreateBills(request.billEntities, request.projectId);
+                InsertBillDTO billDTO = new();
+                billDTO.ProjectId = info.ProjectId.ToString();
+                billDTO.Bills = request.bills;
+                var result = await _billService.BulkInsertBills(billDTO, info.ProjectId.ToString());
                 return Ok(result);
             }
 
             return StatusCode((int)HttpStatusCode.BadRequest, "You Don't Have Permission Perform This Action!!");
         }
-
+/*
         //GET ALL
         [HttpGet]
         public async Task<IActionResult> GetBillsDate(string projectId)
@@ -84,7 +90,7 @@ namespace RevenueSharingInvest.API.Controllers
         {
             var result = await _firestoreProvider.GetInvoiceDetailByDate(projectId, date);
             return Ok(result);
-        }
+        }*/
 
         [HttpPost]
         [Route("generate-sig")]
@@ -114,6 +120,6 @@ namespace RevenueSharingInvest.API.Controllers
     {
         public string projectId { get; set; }
         public string signature { get; set; }
-        public List<BillEntity> billEntities { get; set; }
+        public List<BillDTO> bills { get; set; }
     }
 }
