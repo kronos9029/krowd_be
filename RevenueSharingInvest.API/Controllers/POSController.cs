@@ -50,7 +50,7 @@ namespace RevenueSharingInvest.API.Controllers
             InsertBillDTO billDTO = new();
             billDTO.ProjectId = currentUser.projectId;
             billDTO.Bills = bills;
-            var result = await _billService.BulkInsertBills(billDTO);
+            var result = await _billService.BulkInsertBills(billDTO, billDTO.ProjectId);
             return Ok(result);
         }
 
@@ -69,7 +69,7 @@ namespace RevenueSharingInvest.API.Controllers
                 InsertBillDTO billDTO = new();
                 billDTO.ProjectId = info.ProjectId.ToString();
                 billDTO.Bills = request.bills;
-                var result = await _billService.BulkInsertBills(billDTO, info.ProjectId.ToString());
+                var result = await _billService.BulkInsertBills(billDTO, billDTO.ProjectId);
                 return Ok(result);
             }
 
