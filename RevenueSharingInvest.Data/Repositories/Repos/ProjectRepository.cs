@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Data.Extensions;
@@ -13,8 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using Project = RevenueSharingInvest.Data.Models.Entities.Project;
 
 namespace RevenueSharingInvest.Data.Repositories.Repos
 {
