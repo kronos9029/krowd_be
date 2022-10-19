@@ -13,19 +13,14 @@ namespace RevenueSharingInvest.Data.Models.Entities
     {
         [Key]
         public Guid Id { get; set; }
-        [Required]
         [StringLength(50)]
         public string InvoiceId { get; set; }
+        public Guid DailyReportId { get; set; }
         public double Amount { get; set; }
         public string Description { get; set; }
         [StringLength(50)]
         public string CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
-        public Guid ProjectId { get; set; }
-
-        [ForeignKey(nameof(ProjectId))]
-        [InverseProperty("Bills")]
-        public virtual Project Project { get; set; }
     }
 }
