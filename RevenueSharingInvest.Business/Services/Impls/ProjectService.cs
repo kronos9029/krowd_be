@@ -384,7 +384,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckDate((projectDTO.endDate)))
                     throw new InvalidFieldException("Invalid endDate!!!");
 
-                projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "00:15:00";               
+                projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";               
 
                 long totalDay = DateAndTime.DateDiff(DateInterval.Day, (DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null)).AddDays(1), (DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null)).AddMonths(projectDTO.duration)) + 1;
                 int daysPerStage = ((int)totalDay) / projectDTO.numOfStage;
@@ -415,7 +415,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     stage.CreateBy = Guid.Parse(currentUser.userId);
                     //stage.StartDate = entity.EndDate.AddDays(1);
                     stage.StartDate = DateTime.ParseExact(DateTime.Parse(entity.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(entity.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:00:00", "dd/MM/yyyy HH:mm:ss", null).AddDays(1);
-                    stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:15:00", "dd/MM/yyyy HH:mm:ss", null);
+                    stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "23:59:59", "dd/MM/yyyy HH:mm:ss", null);
 
                     periodRevenue.ProjectId = Guid.Parse(newId.id);
                     periodRevenue.CreateBy = Guid.Parse(currentUser.userId);
@@ -949,7 +949,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("startDate can not bigger than endDate!!!");
 
                     projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
-                    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "00:15:00";
+                    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
 
                     if (DateAndTime.DateDiff(DateInterval.Day,
                         DateTime.ParseExact(projectDTO.startDate, "dd/MM/yyyy HH:mm:ss", null),
@@ -978,7 +978,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         projectDTO.startDate = await _validationService.FormatDateOutput(getProject.startDate);
                         projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
                         projectDTO.endDate = await _validationService.FormatDateOutput(getProject.endDate);
-                        projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "00:15:00";
+                        projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
                     }
 
                     //Xóa [Stage] và [PeriodRevenue] cũ
@@ -1005,7 +1005,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     stage.ProjectId = projectId;
                     stage.CreateBy = Guid.Parse(currentUser.userId);
                     stage.StartDate = DateTime.ParseExact(DateTime.Parse(project.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(project.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:00:00", "dd/MM/yyyy HH:mm:ss", null).AddDays(1);
-                    stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:15:00", "dd/MM/yyyy HH:mm:ss", null);
+                    stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "23:59:59", "dd/MM/yyyy HH:mm:ss", null);
 
                     periodRevenue.ProjectId = projectId;
                     periodRevenue.CreateBy = Guid.Parse(currentUser.userId);
