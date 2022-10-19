@@ -1,7 +1,9 @@
-﻿using iText.Kernel.Geom;
+﻿using iText.Kernel.Font;
+using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
+using iText.Layout.Properties;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
@@ -61,7 +63,6 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
                     fullName = investor.FirstName +" "+investor.LastName;
                 else
                     fullName = investor.LastName;
-
                 path += "\\" + fullName + "(" + investor.Id + ")" + "\\";
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
@@ -69,11 +70,12 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
                 //Initialize PDF writer
                 PdfWriter writer = new PdfWriter(path+projectId+".pdf");
                 //Initialize PDF document
-                PdfDocument pdf = new PdfDocument(writer);
-                // Initialize document
-                Document document = new Document(pdf);
+                PdfDocument pdfDoc = new PdfDocument(writer);
+
+                //Initialize document
+                Document document = new Document(pdfDoc);
                 //Add paragraph to the document
-                document.Add(new Paragraph("Hello World!"));
+                document.Add(new Paragraph("Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam").SetFontSize(20).SetTextAlignment(TextAlignment.CENTER));
                 //Close document
                 document.Close();
                 writer.Close();
