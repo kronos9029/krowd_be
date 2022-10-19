@@ -18,12 +18,12 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Services.Extensions.iText
 {
-    public class iTextService
+    public class ITextService : IITextService
     {
 
         private readonly IInvestorRepository _investorService;
         private readonly IProjectRepository _projectService;
-        public iTextService(IInvestorRepository investorRepository, IProjectRepository projectRepository)
+        public ITextService(IInvestorRepository investorRepository, IProjectRepository projectRepository)
         {
             _investorService = investorRepository;
             _projectService = projectRepository;
@@ -39,6 +39,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
+
                 }
             }
 
@@ -50,7 +51,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
             try
             {
                 InvestorName investor = await _investorService.GetInvestorNameByEmail(currentUser.email);
-                string path = GetPath();  
+                string path = GetPath();
                 if (investor == null)
                 {
                     throw new NotFoundException("No Investor Found!!");
@@ -59,13 +60,14 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
                 if(investor.FirstName != null)
                     fullName = investor.FirstName +" "+investor.LastName;
                 else
-                    fullName = investor.LastName; 
-                
-                 
-                
+                    fullName = investor.LastName;
+
+                path += "\\" + fullName + "(" + investor.Id + ")" + "\\";
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
 
                 //Initialize PDF writer
-                PdfWriter writer = new PdfWriter(path);
+                PdfWriter writer = new PdfWriter(path+projectId+".pdf");
                 //Initialize PDF document
                 PdfDocument pdf = new PdfDocument(writer);
                 // Initialize document

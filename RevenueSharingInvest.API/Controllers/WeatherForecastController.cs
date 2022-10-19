@@ -1,8 +1,11 @@
-﻿/*using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Business.Services.Extensions.iText;
+using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.DTOs;
@@ -21,43 +24,23 @@ namespace RevenueSharingInvest.API.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private readonly FirestoreProvider _firestoreProvider;
-        private readonly IUserService _userService;
+        private readonly IITextService _iTextService;
         private readonly IRoleService _roleService;
-        private readonly IProjectService _projectService;
-        private readonly AppSettings _appSettings;
+        private readonly IUserService _userService;
 
-        public WeatherForecastController(FirestoreProvider firestoreProvider,
-            IUserService userService,
-            IRoleService roleService,
-            IOptions<AppSettings> appSettings,
-            IProjectService projectService)
+        public WeatherForecastController(IITextService iTextService, IRoleService roleService, IUserService userService)
         {
-            _firestoreProvider = firestoreProvider;
-            _userService = userService;
+            _iTextService = iTextService;
             _roleService = roleService;
-            _appSettings = appSettings.Value;
-            _projectService = projectService;
+            _userService = userService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Getokok(ClientUploadRevenueRequest request)
+        public async Task<IActionResult> Getokok(string projectId)
         {
-            string accessKey = GenerateAccessKey();
-            string secretKey = GenerateSecretKey();
-                
-
-            IntegrateInfo info = await _projectService.GetIntegrateInfoByUserEmail(request.projectId);
-
-            string userMessage = "projectId=" + request.projectId + "&accessKey=" + request.accessKey;
-            string systemMessage = "projectId=" + info.ProjectId + "&accessKey=" + info.AccessKey;
-
-            string userSignature = CreateSignature(userMessage, info.SecretKey);
-            string systemSignature = CreateSignature(systemMessage, info.SecretKey);
-
-            bool check = userSignature.Equals(systemMessage);
-
-            return Ok(check);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            _iTextService.GenerateProjectContract(currentUser, projectId);
+            return Ok(0);
         }
 
         private string CreateSignature(string message, string key)
@@ -112,4 +95,3 @@ namespace RevenueSharingInvest.API.Controllers
 
     }
 }
-*/
