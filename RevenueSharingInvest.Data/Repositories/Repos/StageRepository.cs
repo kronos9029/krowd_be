@@ -90,6 +90,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         ProjectId, "
                     + "         Description, "
                     + "         Status, "
+                    + "         IsOverDue, "
                     + "         StartDate, "
                     + "         EndDate, "
                     + "         CreateDate, "

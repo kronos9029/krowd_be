@@ -16,6 +16,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
     {
         public Project()
         {
+            Bills = new HashSet<Bill>();
             Packages = new HashSet<Package>();
             PeriodRevenues = new HashSet<PeriodRevenue>();
             ProjectEntities = new HashSet<ProjectEntity>();
@@ -41,7 +42,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public double Multiplier { get; set; }
         public int Duration { get; set; }
         public int NumOfStage { get; set; }
-        public double RemainAmount { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime StartDate { get; set; }
         [Column(TypeName = "datetime")]
@@ -57,11 +57,12 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
-        [StringLength(16)]
-        public string AccessKey { get; set; }
-
         [StringLength(50)]
         public string Status { get; set; }
+        [StringLength(16)]
+        public string AccessKey { get; set; }
+        public double RemainingMaximumPayableAmount { get; set; }
+        public double RemainingPayableAmount { get; set; }
 
         [ForeignKey(nameof(AreaId))]
         [InverseProperty("Projects")]
@@ -72,6 +73,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [ForeignKey(nameof(ManagerId))]
         [InverseProperty(nameof(User.Projects))]
         public virtual User Manager { get; set; }
+        [InverseProperty(nameof(Bill.Project))]
+        public virtual ICollection<Bill> Bills { get; set; }
         [InverseProperty(nameof(Package.Project))]
         public virtual ICollection<Package> Packages { get; set; }
         [InverseProperty(nameof(PeriodRevenue.Project))]

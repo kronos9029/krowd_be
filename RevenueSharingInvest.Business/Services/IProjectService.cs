@@ -21,7 +21,8 @@ namespace RevenueSharingInvest.Business.Services
             int pageSize, 
             string businessId, 
             string areaId, 
-            List<string> listFieldId, 
+            List<string> listFieldId,
+            double investmentTargetCapital,
             string name,
             string status,
             ThisUserObj thisUserObj
@@ -33,6 +34,7 @@ namespace RevenueSharingInvest.Business.Services
             string businessId, 
             string areaId,
             List<string> listFieldId,
+            double investmentTargetCapital,
             string name,
             string status,
             ThisUserObj thisUserObj

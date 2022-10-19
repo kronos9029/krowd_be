@@ -20,7 +20,7 @@ namespace RevenueSharingInvest.API.Extensions
             services.AddTransient<IDbConnection>((sp) => new SqlConnection(dbConnectionString));
 
             //Register DBcontext for migration
-            services.AddDbContext<KrowdContext>(options => options.UseSqlServer(dbConnectionString));
+            services.AddDbContext<Data.Helpers.KrowdContext>(options => options.UseSqlServer(dbConnectionString));
         }
 
     }

@@ -23,8 +23,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string Name { get; set; }
         public Guid ProjectId { get; set; }
         public string Description { get; set; }
-        [StringLength(20)]
-        public string Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
@@ -35,6 +33,11 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public DateTime EndDate { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime StartDate { get; set; }
+        [Required]
+        [StringLength(8)]
+        public string Status { get; set; }
+        [StringLength(5)]
+        public string IsOverDue { get; set; }
 
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("Stages")]

@@ -163,7 +163,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     if (business.Status.Equals(BusinessStatusEnum.INACTIVE.ToString()))
                     {
-                        List<Project> projectList = await _projectRepository.GetAllProjects(0, 0, businessId.ToString(), null, null , null, null, null, currentUser.roleId);
+                        List<Project> projectList = await _projectRepository.GetAllProjects(0, 0, businessId.ToString(), null, null , null, 0, null, null, currentUser.roleId);
                         foreach (Project item in projectList)
                         {
                             await _projectService.DeleteProjectById(item.Id);                           

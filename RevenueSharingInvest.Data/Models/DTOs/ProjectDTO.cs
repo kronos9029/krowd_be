@@ -31,9 +31,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class UpdateProjectDTO : ProjectDTO
     {
         public IFormFile image { get; set; }
-        //public string managerId { get; set; }
-        //public string fieldId { get; set; }
-        //public string areaId { get; set; }
         public int numOfStage { get; set; }
         public string businessLicense { get; set; }
     }
@@ -50,7 +47,8 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public List<ProjectMemberUserDTO> memberList { get; set; }
         public double investedCapital { get; set; }
         public int numOfStage { get; set; }
-        public double remainAmount { get; set; }
+        public double remainingPayableAmount { get; set; }
+        public double remainingMaximumPayableAmount { get; set; }
         public string businessLicense { get; set; }
         public string approvedDate { get; set; }
         public string approvedBy { get; set; }
@@ -71,7 +69,8 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string image { get; set; }
         public double investedCapital { get; set; }
         public int numOfStage { get; set; }
-        public double remainAmount { get; set; }
+        public double remainingPayableAmount { get; set; }
+        public double remainingMaximumPayableAmount { get; set; }
         public string businessLicense { get; set; }
         public string approvedDate { get; set; }
         public string approvedBy { get; set; }
@@ -99,7 +98,8 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string image { get; set; }
         public double investedCapital { get; set; }
         public int numOfStage { get; set; }
-        public double remainAmount { get; set; }
+        public double remainingPayableAmount { get; set; }
+        public double remainingMaximumPayableAmount { get; set; }
         public string approvedDate { get; set; }
         public string approvedBy { get; set; }
         public string status { get; set; }

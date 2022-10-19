@@ -38,6 +38,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string startDate { get; set; }
         public string endDate { get; set; }
         public string status { get; set; }
+        public string isOverDue { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
         public string updateDate { get; set; }
