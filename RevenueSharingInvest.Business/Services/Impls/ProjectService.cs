@@ -384,7 +384,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckDate((projectDTO.endDate)))
                     throw new InvalidFieldException("Invalid endDate!!!");
 
-                projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";               
+                projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "00:15:00";               
 
                 long totalDay = DateAndTime.DateDiff(DateInterval.Day, (DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null)).AddDays(1), (DateTime.ParseExact(projectDTO.endDate, "dd/MM/yyyy HH:mm:ss", null)).AddMonths(projectDTO.duration)) + 1;
                 int daysPerStage = ((int)totalDay) / projectDTO.numOfStage;
@@ -415,7 +415,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     stage.CreateBy = Guid.Parse(currentUser.userId);
                     //stage.StartDate = entity.EndDate.AddDays(1);
                     stage.StartDate = DateTime.ParseExact(DateTime.Parse(entity.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(entity.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:00:00", "dd/MM/yyyy HH:mm:ss", null).AddDays(1);
-                    stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "23:59:59", "dd/MM/yyyy HH:mm:ss", null);
+                    stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:15:00", "dd/MM/yyyy HH:mm:ss", null);
 
                     periodRevenue.ProjectId = Guid.Parse(newId.id);
                     periodRevenue.CreateBy = Guid.Parse(currentUser.userId);
@@ -488,32 +488,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     //Update NumOfProject
                     await _businessRepository.UpdateBusinessNumOfProject(Guid.Parse(currentUser.businessId));
-
-                    //Tạo Schedule
-                    //WAITING_FOR_APPROVAL to DENIED
-                    _backgroundJobClient.Schedule<ProjectService>(
-                        projectService => projectService
-                        .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(entity.StartDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
-
-                    //WAITING_TO_PUBLISH to CALLING_FOR_INVESTMENT
-                    _backgroundJobClient.Schedule<ProjectService>(
-                        projectService => projectService
-                        .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(entity.StartDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
-
-                    //CALLING_FOR_INVESTMENT to CALLING_TIME_IS_OVER
-                    _backgroundJobClient.Schedule<ProjectService>(
-                        projectService => projectService
-                        .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(entity.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
-
-                    //CALLING_FOR_INVESTMENT to WAITING_TO_ACTIVATE
-                    _backgroundJobClient.Schedule<ProjectService>(
-                        projectService => projectService
-                        .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(entity.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
-
-                    ////ACTIVE to CLOSED
-                    //_backgroundJobClient.Schedule<ProjectService>(
-                    //    projectService => projectService
-                    //    .UpdateProjectStatusByHangfire(Guid.Parse(newId.id), currentUser), TimeSpan.FromTicks(stage.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
                 }
                 return newId;
             }
@@ -892,7 +866,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         public async Task<int> UpdateProject(UpdateProjectDTO projectDTO, Guid projectId, ThisUserObj currentUser)
         {
             int result;
-            bool reScheduleCheck = false;
+            bool dateChangedCheck = false;
             DateTime projectClosedDate;
             try
             {
@@ -975,7 +949,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("startDate can not bigger than endDate!!!");
 
                     projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
-                    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
+                    projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "00:15:00";
 
                     if (DateAndTime.DateDiff(DateInterval.Day,
                         DateTime.ParseExact(projectDTO.startDate, "dd/MM/yyyy HH:mm:ss", null),
@@ -991,7 +965,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 //Update [Stage] and [PeriodRevenue]
                 if (projectDTO.duration != 0 || projectDTO.numOfStage != 0 || (projectDTO.startDate != null && projectDTO.endDate != null))
                 {
-                    reScheduleCheck = true;
+                    dateChangedCheck = true;
 
                     if (projectDTO.duration == 0)
                         projectDTO.duration = getProject.duration;
@@ -1004,7 +978,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         projectDTO.startDate = await _validationService.FormatDateOutput(getProject.startDate);
                         projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
                         projectDTO.endDate = await _validationService.FormatDateOutput(getProject.endDate);
-                        projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
+                        projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "00:15:00";
                     }
 
                     //Xóa [Stage] và [PeriodRevenue] cũ
@@ -1031,7 +1005,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     stage.ProjectId = projectId;
                     stage.CreateBy = Guid.Parse(currentUser.userId);
                     stage.StartDate = DateTime.ParseExact(DateTime.Parse(project.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(project.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:00:00", "dd/MM/yyyy HH:mm:ss", null).AddDays(1);
-                    stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "23:59:59", "dd/MM/yyyy HH:mm:ss", null);
+                    stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:15:00", "dd/MM/yyyy HH:mm:ss", null);
 
                     periodRevenue.ProjectId = projectId;
                     periodRevenue.CreateBy = Guid.Parse(currentUser.userId);
@@ -1078,34 +1052,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new UpdateObjectException("Can not update Project Object!");
                 else
                 {
-                    if (reScheduleCheck)
+                    if (dateChangedCheck)
                     {
-                        //Tạo lại Schedule
-                        //WAITING_FOR_APPROVAL to DENIED
-                        _backgroundJobClient.Schedule<ProjectService>(
-                            projectService => projectService
-                            .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.StartDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
-
-                        //WAITING_TO_PUBLISH to CALLING_FOR_INVESTMENT
-                        _backgroundJobClient.Schedule<ProjectService>(
-                            projectService => projectService
-                            .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.StartDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
-
-                        //CALLING_FOR_INVESTMENT to CALLING_TIME_IS_OVER
-                        _backgroundJobClient.Schedule<ProjectService>(
-                            projectService => projectService
-                            .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
-
-                        //CALLING_FOR_INVESTMENT to WAITING_TO_ACTIVATE
-                        _backgroundJobClient.Schedule<ProjectService>(
-                            projectService => projectService
-                            .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
-
-                        ////ACTIVE to CLOSED
-                        //_backgroundJobClient.Schedule<ProjectService>(
-                        //    projectService => projectService
-                        //    .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(projectClosedDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
-
                         //Update EXTENSION ProjectEntity
                         List<ProjectEntity> extensionList = await _projectEntityRepository.GetProjectEntityByProjectIdAndType(projectId, ProjectEntityEnum.EXTENSION.ToString());
                         ProjectEntity projectEntity = new ProjectEntity();
@@ -1186,13 +1134,51 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("PROJECT_MANAGER can update if Project's status is DRAFT or DENIED!!!");
                 }
 
-                if (status.Equals(ProjectStatusEnum.WAITING_TO_PUBLISH.ToString()))
-                    result = await _projectRepository.ApproveProject(projectId, Guid.Parse(currentUser.userId));
-                else
-                    result = await _projectRepository.UpdateProjectStatus(projectId, status, Guid.Parse(currentUser.userId));
+                //if (status.Equals(ProjectStatusEnum.WAITING_TO_PUBLISH.ToString()))
+                //    result = await _projectRepository.ApproveProject(projectId, Guid.Parse(currentUser.userId));
+                //else
+                //    result = await _projectRepository.UpdateProjectStatus(projectId, status, Guid.Parse(currentUser.userId));
+
+                result = status.Equals(ProjectStatusEnum.WAITING_TO_PUBLISH.ToString()) 
+                    ? await _projectRepository.ApproveProject(projectId, Guid.Parse(currentUser.userId)) 
+                    : await _projectRepository.UpdateProjectStatus(projectId, status, Guid.Parse(currentUser.userId));
 
                 if (result == 0)
                     throw new UpdateObjectException("Can not update Project status!");
+                else
+                {
+                    if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("ADMIN")))
+                    {
+                        if (status.Equals(ProjectStatusEnum.WAITING_TO_PUBLISH.ToString()))
+                        {
+                            //Tạo Schedule chuyển status WAITING_TO_PUBLISH to CALLING_FOR_INVESTMENT
+                            _backgroundJobClient.Schedule<ProjectService>(
+                                projectService => projectService
+                                .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.StartDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                            //Tạo Schedule chuyển status CALLING_FOR_INVESTMENT to CALLING_TIME_IS_OVER
+                            _backgroundJobClient.Schedule<ProjectService>(
+                                projectService => projectService
+                                .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+                            //Tạo Schedule chuyển status CALLING_FOR_INVESTMENT to WAITING_TO_ACTIVATE
+                            _backgroundJobClient.Schedule<ProjectService>(
+                                projectService => projectService
+                                .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+                        }
+
+                    }
+                    else if (currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
+                    {
+                        if (status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
+                        {
+                            //Tạo Schedule chuyển status WAITING_FOR_APPROVAL to DENIED
+                            _backgroundJobClient.Schedule<ProjectService>(
+                                projectService => projectService
+                                .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.StartDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+                        }
+                    }
+                }
                 return result;
             }
             catch (Exception e)
