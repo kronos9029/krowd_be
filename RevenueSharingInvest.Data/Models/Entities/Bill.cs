@@ -22,5 +22,9 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
+
+        [ForeignKey(nameof(DailyReportId))]
+        [InverseProperty("Bills")]
+        public virtual DailyReport DailyReport { get; set; }
     }
 }

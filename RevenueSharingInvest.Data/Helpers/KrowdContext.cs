@@ -54,8 +54,7 @@ namespace RevenueSharingInvest.Data.Helpers
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
                 //optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;User ID=sa;Password=123");
-                optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
-
+                //optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
             }
         }
 
@@ -94,6 +93,12 @@ namespace RevenueSharingInvest.Data.Helpers
             modelBuilder.Entity<Bill>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.HasOne(d => d.DailyReport)
+                    .WithMany(p => p.Bills)
+                    .HasForeignKey(d => d.DailyReportId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Bill_DailyReport");
             });
 
             modelBuilder.Entity<Models.Entities.Business>(entity =>
@@ -122,14 +127,10 @@ namespace RevenueSharingInvest.Data.Helpers
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
-                entity.HasOne(d => d.IdNavigation)
-                    .WithMany()
-                    .HasForeignKey(d => d.Id)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_DailyReport_Bill");
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.HasOne(d => d.Stage)
-                    .WithMany()
+                    .WithMany(p => p.DailyReports)
                     .HasForeignKey(d => d.StageId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_DailyReport_Stage");
@@ -280,11 +281,13 @@ namespace RevenueSharingInvest.Data.Helpers
                 entity.HasOne(d => d.ProjectManager)
                     .WithMany(p => p.ProjectWallets)
                     .HasForeignKey(d => d.ProjectManagerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ProjectWallet_User");
 
                 entity.HasOne(d => d.WalletType)
                     .WithMany(p => p.ProjectWallets)
                     .HasForeignKey(d => d.WalletTypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_BusinessWallet_WalletType");
             });
 

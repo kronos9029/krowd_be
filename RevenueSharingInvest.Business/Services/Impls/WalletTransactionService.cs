@@ -147,7 +147,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     User user = await _userRepository.GetUserById((Guid)userId);
                     if (!user.RoleId.Equals(Guid.Parse(currentUser.projectManagerRoleId)) && !user.RoleId.Equals(Guid.Parse(currentUser.investorRoleId)))
-                        throw new InvalidFieldException("You can view WalletTransaction of PROJECT_OWNER or INVESTOR only!!!");
+                        throw new InvalidFieldException("You can view WalletTransaction of PROJECT_MANAGER or INVESTOR only!!!");
 
                     if ((currentUser.roleId.Equals(currentUser.projectManagerRoleId) || currentUser.roleId.Equals(currentUser.investorRoleId)) && !userId.Equals(Guid.Parse(currentUser.userId)))
                         throw new InvalidFieldException("This userId is not your userId!!!");

@@ -1070,9 +1070,9 @@ namespace RevenueSharingInvest.Data.Migrations
                         {
                             Id = new Guid("2d80393a-3a3d-495d-8dd7-f9261f85cc8f"),
                             CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
-                            Description = "Project owner",
+                            Description = "Project manager",
                             IsDeleted = false,
-                            Name = "PROJECT_OWNER"
+                            Name = "PROJECT_MANAGER"
                         },
                         new
                         {

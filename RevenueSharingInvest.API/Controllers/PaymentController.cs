@@ -49,7 +49,7 @@ namespace RevenueSharingInvest.API.Controllers
                 var result = await _paymentService.GetAllPayments(pageIndex, pageSize, type.ToString(), currentUser);
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_OWNER INVESTOR can perform this action!!!");            
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER or INVESTOR can perform this action!!!");            
         }
 
         //GET BY ID
@@ -65,7 +65,7 @@ namespace RevenueSharingInvest.API.Controllers
                 var result = await _paymentService.GetPaymentById(id, currentUser);
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_OWNER INVESTOR can perform this action!!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER or INVESTOR can perform this action!!!");
             
         }
     }

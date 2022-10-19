@@ -97,7 +97,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         item.projectName = project.Name;
                         item.stageId = stage.Id.ToString();
                         item.stageName = stage.Name;
-                        item.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B1")))).Name;
+                        item.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2")))).Name;
                     }
                     result = list;
                 }
@@ -145,7 +145,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     result.projectName = project.Name;
                     result.stageId = stage.Id.ToString();
                     result.stageName = stage.Name;
-                    result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B1")))).Name;
+                    result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2")))).Name;
                 }
                 return result;
             }

@@ -41,7 +41,7 @@ namespace RevenueSharingInvest.Data.Migrations
                 {
                     { new Guid("015ae3c5-eee9-4f5c-befb-57d41a43d9df"), null, new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185), "Business manager", false, "BUSINESS_MANAGER", null, null },
                     { new Guid("ad5f37da-ca48-4dc5-9f4b-963d94b535e6"), null, new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185), "Investor", false, "INVESTOR", null, null },
-                    { new Guid("2d80393a-3a3d-495d-8dd7-f9261f85cc8f"), null, new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185), "Project owner", false, "PROJECT_OWNER", null, null },
+                    { new Guid("2d80393a-3a3d-495d-8dd7-f9261f85cc8f"), null, new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185), "Project manager", false, "PROJECT_MANAGER", null, null },
                     { new Guid("ff54acc6-c4e9-4b73-a158-fd640b4b6940"), null, new DateTime(2022, 9, 8, 13, 35, 0, 889, DateTimeKind.Local).AddTicks(3185), "Krowd's admin", false, "ADMIN", null, null }
                 });
 

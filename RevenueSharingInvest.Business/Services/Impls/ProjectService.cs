@@ -437,8 +437,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
 
                     ////Tạo ví B2, B3
-                    //await _projectWalletRepository.CreateProjectWallet(Guid.Parse(currentUser.userId), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B2")), Guid.Parse(currentUser.userId));
-                    //await _projectWalletRepository.CreateProjectWallet(Guid.Parse(currentUser.userId), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")), Guid.Parse(currentUser.userId));
+                    //await _projectWalletRepository.CreateProjectWallet(Guid.Parse(currentUser.userId), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P3")), Guid.Parse(currentUser.userId));
+                    //await _projectWalletRepository.CreateProjectWallet(Guid.Parse(currentUser.userId), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P4")), Guid.Parse(currentUser.userId));
 
                     //Tạo EXTENSION ProjectEntity
                     User user = await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId));

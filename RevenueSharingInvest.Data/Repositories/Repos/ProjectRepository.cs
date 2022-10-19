@@ -1001,6 +1001,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         ADMIN,
         INVESTOR,
         BUSINESS_MANAGER,
-        PROJECT_OWNER
+        PROJECT_MANAGER
     }
 }

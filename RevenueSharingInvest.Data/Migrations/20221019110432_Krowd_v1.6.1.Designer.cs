@@ -5,14 +5,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Helpers;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
-    [DbContext(typeof(Helpers.KrowdContext))]
-    [Migration("20220908114145_Krowd_v1.0.1")]
-    partial class Krowd_v101
+    [DbContext(typeof(KrowdContext))]
+    [Migration("20221019110432_Krowd_v1.6.1")]
+    partial class Krowd_v161
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -30,33 +29,73 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("(newid())");
 
-                    b.Property<Guid?>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("Amount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValueSql("(CONVERT([bigint],(0)))");
+
+                    b.Property<string>("CallbackToken")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("('0001-01-01T00:00:00.000')");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("ExtraData")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("FromUserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Status")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                    b.Property<string>("OrderId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrderInfo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrderType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("PartnerClientId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PartnerCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PartnerUserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PayType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("ResponseTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValueSql("(CONVERT([bigint],(0)))");
+
+                    b.Property<int>("ResultCode")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Signature")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("ToUserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UpdateBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long>("TransId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValueSql("(CONVERT([bigint],(0)))");
 
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime");
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -88,9 +127,6 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -100,6 +136,40 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Area");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Bill", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("(newid())");
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<string>("CreateBy")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<Guid>("DailyReportId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InvoiceId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DailyReportId");
+
+                    b.ToTable("Bill");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Business", b =>
@@ -127,9 +197,6 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
@@ -179,9 +246,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -193,6 +257,44 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasIndex(new[] { "FieldId" }, "IX_BusinessField_FieldId");
 
                     b.ToTable("BusinessField");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.DailyReport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("(newid())");
+
+                    b.Property<double?>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("ReportDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<Guid>("StageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<Guid?>("UpdateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StageId");
+
+                    b.ToTable("DailyReport");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Field", b =>
@@ -211,9 +313,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -227,80 +326,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Field");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("180c2784-e700-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "School, Tutor, Learning tools",
-                            IsDeleted = false,
-                            Name = "Education"
-                        },
-                        new
-                        {
-                            Id = new Guid("15f8f9bc-e701-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Spa, Cosmetic, Hair salon",
-                            IsDeleted = false,
-                            Name = "Beauty"
-                        },
-                        new
-                        {
-                            Id = new Guid("fc24cff0-e6fd-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Restaurant, Food Court, Culinary",
-                            IsDeleted = false,
-                            Name = "Food"
-                        },
-                        new
-                        {
-                            Id = new Guid("6e39f240-e6ff-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Functional foods, Clean food",
-                            IsDeleted = false,
-                            Name = "Health"
-                        },
-                        new
-                        {
-                            Id = new Guid("d1a18b54-e6ff-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Gym, Sportwear, Exercise machines",
-                            IsDeleted = false,
-                            Name = "Fitness"
-                        },
-                        new
-                        {
-                            Id = new Guid("29e3709e-e6ff-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Restaurant, Drink Court, Culinary, Cafe",
-                            IsDeleted = false,
-                            Name = "Drink"
-                        },
-                        new
-                        {
-                            Id = new Guid("4f492fa4-e6ff-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Clothes, Shoes, Bags",
-                            IsDeleted = false,
-                            Name = "Fashion"
-                        },
-                        new
-                        {
-                            Id = new Guid("b289b3a4-e6ff-11ec-8fea-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Drug, Medical devices",
-                            IsDeleted = false,
-                            Name = "Medical"
-                        },
-                        new
-                        {
-                            Id = new Guid("98d579ca-0685-11ed-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Food, Drink, Personal belongings",
-                            IsDeleted = false,
-                            Name = "Grocery"
-                        });
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investment", b =>
@@ -316,23 +341,20 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("InvestorId")
+                    b.Property<Guid>("InvestorId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastPayment")
-                        .HasColumnType("datetime");
-
-                    b.Property<Guid?>("PackageId")
+                    b.Property<Guid>("PackageId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ProjectId")
+                    b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double?>("TotalPrice")
                         .HasColumnType("float");
@@ -344,12 +366,6 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("datetime");
 
                     b.HasKey("Id");
-
-                    b.HasIndex(new[] { "InvestorId" }, "IX_Investment_InvestorId");
-
-                    b.HasIndex(new[] { "PackageId" }, "IX_Investment_PackageId");
-
-                    b.HasIndex(new[] { "ProjectId" }, "IX_Investment_ProjectId");
 
                     b.ToTable("Investment");
                 });
@@ -369,9 +385,6 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.Property<Guid>("InvestorTypeId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
@@ -408,9 +421,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -424,40 +434,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("InvestorType");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("ec92ef2a-f794-11ec-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Mua và nắm giữ dài hạn, thường là các HOLDER, họ có niềm tin vào tiền điện tử cũng như công nghệ Blockchain.",
-                            IsDeleted = false,
-                            Name = "LONG_INVESTOR"
-                        },
-                        new
-                        {
-                            Id = new Guid("07c55f72-f794-11ec-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Những người trẻ tuổi, quan tâm đến những thứ mới lạ có thể mang lại sự thay đổi cho tương lai và đặc biệt thích về các công nghệ.",
-                            IsDeleted = false,
-                            Name = "HOBBYIST_INVESTOR"
-                        },
-                        new
-                        {
-                            Id = new Guid("ca4e68cc-f794-11ec-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Những người đầu tư ngắn hạn, thường là Day Trader, họ tìm kiếm lợi nhuận từ những biến động của thị trường trong thời gian ngắn, thường sử dụng margin để gia tăng lợi nhuận.",
-                            IsDeleted = false,
-                            Name = "SHORT_INVESTOR"
-                        },
-                        new
-                        {
-                            Id = new Guid("175389b8-f795-11ec-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Họ thường là những người trẻ tuổi, có kiến thức tốt và thấu hiểu bản thân, nhìn thì trường bằng con mắt đa chiều và cũng rất thông minh.",
-                            IsDeleted = false,
-                            Name = "STRATEGIC_INVESTOR"
-                        });
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.InvestorWallet", b =>
@@ -478,9 +454,6 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.Property<Guid?>("InvestorId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -523,7 +496,7 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<double?>("Price")
+                    b.Property<double>("Price")
                         .HasColumnType("float");
 
                     b.Property<Guid>("ProjectId")
@@ -536,7 +509,12 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasMaxLength(12)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(12)")
+                        .HasComputedColumnSql("(case when [dbo].[Get_Project_Status]([ProjectId])<>'CALLING_FOR_INVESTMENT' then 'INACTIVE' when [dbo].[Get_Project_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]>(0) then 'IN_STOCK' when [dbo].[Get_Project_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND [RemainingQuantity]=(0) then 'OUT_OF_STOCK' else 'INACTIVE' end)", false);
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -564,9 +542,6 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<int>("MaxQuantity")
                         .HasColumnType("int");
@@ -612,11 +587,17 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<Guid?>("InvestmentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<Guid?>("PackageId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("PeriodRevenueId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("StageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("ToId")
                         .HasColumnType("uniqueidentifier");
@@ -624,12 +605,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Type")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<Guid?>("UpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -656,9 +631,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<double?>("NormalExpectedAmount")
                         .HasColumnType("float");
 
@@ -677,10 +649,13 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<double?>("PessimisticExpectedRatio")
                         .HasColumnType("float");
 
-                    b.Property<Guid?>("ProjectId")
+                    b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("StageId")
+                    b.Property<double?>("SharedAmount")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("StageId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
@@ -709,6 +684,9 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("(newid())");
 
+                    b.Property<double?>("Amount")
+                        .HasColumnType("float");
+
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -718,15 +696,15 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<Guid?>("PeriodRevenueId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<double?>("StageTotalAmount")
+                        .HasColumnType("float");
 
                     b.Property<string>("Status")
                         .HasMaxLength(20)
@@ -752,6 +730,10 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("(newid())");
 
+                    b.Property<string>("AccessKey")
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
@@ -761,10 +743,10 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("AreaId")
+                    b.Property<Guid>("AreaId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("BusinessId")
+                    b.Property<Guid>("BusinessId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BusinessLicense")
@@ -780,31 +762,28 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Duration")
+                    b.Property<int>("Duration")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("FieldId")
+                    b.Property<Guid>("FieldId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double?>("InvestedCapital")
+                    b.Property<double>("InvestedCapital")
                         .HasColumnType("float");
 
-                    b.Property<double?>("InvestmentTargetCapital")
+                    b.Property<double>("InvestmentTargetCapital")
                         .HasColumnType("float");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("ManagerId")
+                    b.Property<Guid>("ManagerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double?>("Multiplier")
+                    b.Property<double>("Multiplier")
                         .HasColumnType("float");
 
                     b.Property<string>("Name")
@@ -814,10 +793,13 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<int>("NumOfStage")
                         .HasColumnType("int");
 
-                    b.Property<double?>("RemainAmount")
+                    b.Property<double>("RemainingMaximumPayableAmount")
                         .HasColumnType("float");
 
-                    b.Property<double?>("SharedRevenue")
+                    b.Property<double>("RemainingPayableAmount")
+                        .HasColumnType("float");
+
+                    b.Property<double>("SharedRevenue")
                         .HasColumnType("float");
 
                     b.Property<DateTime>("StartDate")
@@ -863,9 +845,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Link")
                         .HasColumnType("nvarchar(max)");
 
@@ -876,8 +855,8 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Title")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
@@ -911,10 +890,10 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ProjectManagerId")
+                    b.Property<Guid>("ProjectManagerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("UpdateBy")
@@ -923,7 +902,7 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("WalletTypeId")
+                    b.Property<Guid>("WalletTypeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -950,9 +929,6 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
@@ -995,9 +971,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -1029,9 +1002,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -1045,40 +1015,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Role");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("015ae3c5-eee9-4f5c-befb-57d41a43d9df"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Business manager",
-                            IsDeleted = false,
-                            Name = "BUSINESS_MANAGER"
-                        },
-                        new
-                        {
-                            Id = new Guid("ad5f37da-ca48-4dc5-9f4b-963d94b535e6"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Investor",
-                            IsDeleted = false,
-                            Name = "INVESTOR"
-                        },
-                        new
-                        {
-                            Id = new Guid("2d80393a-3a3d-495d-8dd7-f9261f85cc8f"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Project manager",
-                            IsDeleted = false,
-                            Name = "PROJECT_MANAGER"
-                        },
-                        new
-                        {
-                            Id = new Guid("ff54acc6-c4e9-4b73-a158-fd640b4b6940"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Krowd's admin",
-                            IsDeleted = false,
-                            Name = "ADMIN"
-                        });
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Stage", b =>
@@ -1100,25 +1036,30 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsPrivate")
-                        .HasColumnType("bit");
+                    b.Property<string>("IsOverDue")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasMaxLength(5)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(5)")
+                        .HasComputedColumnSql("(case when [dbo].[Get_Period_Revenue_History]([Id])<>(0) AND (dateadd(hour,(7),getdate())>=[EndDate] AND dateadd(hour,(7),getdate())<=dateadd(day,(3),[EndDate])) then 'FALSE' when [dbo].[Get_Period_Revenue_History]([Id])=(0) AND dateadd(hour,(7),getdate())>dateadd(day,(3),[EndDate]) then 'TRUE' when dateadd(hour,(7),getdate())<[EndDate] then NULL  end)", false);
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<Guid?>("ProjectId")
+                    b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime");
 
                     b.Property<string>("Status")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasMaxLength(8)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(8)")
+                        .HasComputedColumnSql("(case when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())<[StartDate] then 'UNDUE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND (dateadd(hour,(7),getdate())>=[StartDate] AND dateadd(hour,(7),getdate())<=[EndDate]) then 'DUE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())>[EndDate] AND [dbo].[Get_Period_Revenue_Actual_Amount]([Id])<>NULL then 'PAID' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())>[EndDate] AND [dbo].[Get_Period_Revenue_Actual_Amount]([Id]) IS NULL then 'OVERDUE' else 'INACTIVE' end)", false);
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -1190,8 +1131,8 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("City")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
@@ -1207,16 +1148,16 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("District")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("FirstName")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Gender")
                         .HasMaxLength(10)
@@ -1229,12 +1170,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("LastName")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("PhoneNum")
                         .HasMaxLength(10)
@@ -1242,6 +1180,10 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.Property<Guid?>("RoleId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SecretKey")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
@@ -1263,22 +1205,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasIndex(new[] { "RoleId" }, "IX_User_RoleId");
 
                     b.ToTable("User");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("21d77b9a-f792-11ec-b939-0242ac120002"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Admin 1",
-                            Email = "krowd.dev.2022@gmail.com",
-                            FirstName = "Krowd's",
-                            Gender = "LGBT",
-                            Image = "https://firebasestorage.googleapis.com/v0/b/revenuesharinginvest-44354.appspot.com/o/User%2Favt%20Kh%C3%A1nh.jpg?alt=media&token=0940aab1-edaf-443b-ad83-1d14cb8dff1f",
-                            IsDeleted = false,
-                            LastName = "Admin",
-                            RoleId = new Guid("ff54acc6-c4e9-4b73-a158-fd640b4b6940"),
-                            Status = "ACTIVE"
-                        });
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Voucher", b =>
@@ -1306,9 +1232,6 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
@@ -1362,9 +1285,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<Guid?>("InvestmentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime?>("IssuedDate")
                         .HasColumnType("datetime");
 
@@ -1417,9 +1337,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<Guid?>("InvestorWalletId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<Guid?>("PaymentId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1435,12 +1352,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Type")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<Guid?>("UpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -1471,12 +1382,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Mode")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
@@ -1495,98 +1403,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("WalletType");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("a036a7d2-980b-41b2-8ec2-06bff8782b66"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Ví đầu tư dự án của Business",
-                            IsDeleted = false,
-                            Mode = "BUSINESS",
-                            Name = "PROJECT_INVESTMENT_WALLET",
-                            Type = "B3"
-                        },
-                        new
-                        {
-                            Id = new Guid("0568667c-1e13-440b-8d4a-077288aa9919"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Ví thanh toán chung của Business",
-                            IsDeleted = false,
-                            Mode = "BUSINESS",
-                            Name = "UNIVERSAL_PAYMENT_WALLET",
-                            Type = "B1"
-                        },
-                        new
-                        {
-                            Id = new Guid("67453687-e268-4f32-8fb8-0e7c77de2c71"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Ví tạm thời của Investor",
-                            IsDeleted = false,
-                            Mode = "INVESTOR",
-                            Name = "TEMPORARY_WALLET",
-                            Type = "I1"
-                        },
-                        new
-                        {
-                            Id = new Guid("e3b41a08-135b-4fb3-bf1f-4d3675d39f96"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Ví đầu tư chung của Investors",
-                            IsDeleted = false,
-                            Mode = "INVESTOR",
-                            Name = "GENERAL_INVESTMENT_WALLET",
-                            Type = "I2"
-                        },
-                        new
-                        {
-                            Id = new Guid("c485dc8b-b61d-4de9-8939-4e765a3f9e7d"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Ví thu tiền của Investor",
-                            IsDeleted = false,
-                            Mode = "INVESTOR",
-                            Name = "INVESTOR_COLLECTING_WALLET",
-                            Type = "I5"
-                        },
-                        new
-                        {
-                            Id = new Guid("ba9baf2f-b063-41a2-808b-a452afa3e57f"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Ví tạm ứng của Investor",
-                            IsDeleted = false,
-                            Mode = "INVESTOR",
-                            Name = "ADVANCE_WALLET",
-                            Type = "I3"
-                        },
-                        new
-                        {
-                            Id = new Guid("4e24a3d5-9aed-4db2-87f5-bd69c55899b7"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Ví thanh toán dự án của Investor",
-                            IsDeleted = false,
-                            Mode = "INVESTOR",
-                            Name = "PROJECT_PAYMENT_WALLET",
-                            Type = "I4"
-                        },
-                        new
-                        {
-                            Id = new Guid("05d47eb3-06a5-4718-a46a-d62494dee371"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Ví thanh toán doanh nghiệp của Business",
-                            IsDeleted = false,
-                            Mode = "BUSINESS",
-                            Name = "BUSINESS_PAYMENT_WALLET",
-                            Type = "B2"
-                        },
-                        new
-                        {
-                            Id = new Guid("d7ed0979-285f-4ec0-9f6b-ae95fcfa9207"),
-                            CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Ví thu tiền của Business",
-                            IsDeleted = false,
-                            Mode = "BUSINESS",
-                            Name = "BUSINESS_COLLECTING_WALLET",
-                            Type = "B4"
-                        });
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.AccountTransaction", b =>
@@ -1604,6 +1420,17 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("FromUser");
 
                     b.Navigation("ToUser");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Bill", b =>
+                {
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.DailyReport", "DailyReport")
+                        .WithMany("Bills")
+                        .HasForeignKey("DailyReportId")
+                        .HasConstraintName("FK_Bill_DailyReport")
+                        .IsRequired();
+
+                    b.Navigation("DailyReport");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.BusinessField", b =>
@@ -1625,28 +1452,15 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("Field");
                 });
 
-            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investment", b =>
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.DailyReport", b =>
                 {
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Investor", "Investor")
-                        .WithMany("Investments")
-                        .HasForeignKey("InvestorId")
-                        .HasConstraintName("FK_Investment_Investor");
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Stage", "Stage")
+                        .WithMany("DailyReports")
+                        .HasForeignKey("StageId")
+                        .HasConstraintName("FK_DailyReport_Stage")
+                        .IsRequired();
 
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Package", "Package")
-                        .WithMany("Investments")
-                        .HasForeignKey("PackageId")
-                        .HasConstraintName("FK_Investment_Package");
-
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Project", "Project")
-                        .WithMany("Investments")
-                        .HasForeignKey("ProjectId")
-                        .HasConstraintName("FK_Investment_Project");
-
-                    b.Navigation("Investor");
-
-                    b.Navigation("Package");
-
-                    b.Navigation("Project");
+                    b.Navigation("Stage");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investor", b =>
@@ -1728,11 +1542,13 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Project", "Project")
                         .WithMany("PeriodRevenues")
                         .HasForeignKey("ProjectId")
-                        .HasConstraintName("FK_PeriodRevenue_Project");
+                        .HasConstraintName("FK_PeriodRevenue_Project")
+                        .IsRequired();
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Stage", "Stage")
                         .WithMany("PeriodRevenues")
-                        .HasForeignKey("StageId");
+                        .HasForeignKey("StageId")
+                        .IsRequired();
 
                     b.Navigation("Project");
 
@@ -1754,17 +1570,22 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Area", "Area")
                         .WithMany("Projects")
                         .HasForeignKey("AreaId")
-                        .HasConstraintName("FK_Project_Area");
+                        .HasConstraintName("FK_Project_Area")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Business", "Business")
                         .WithMany("Projects")
                         .HasForeignKey("BusinessId")
-                        .HasConstraintName("FK_Project_Business");
+                        .HasConstraintName("FK_Project_Business")
+                        .IsRequired();
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "Manager")
                         .WithMany("Projects")
                         .HasForeignKey("ManagerId")
-                        .HasConstraintName("FK_Project_User");
+                        .HasConstraintName("FK_Project_User")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Area");
 
@@ -1790,12 +1611,14 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "ProjectManager")
                         .WithMany("ProjectWallets")
                         .HasForeignKey("ProjectManagerId")
-                        .HasConstraintName("FK_ProjectWallet_User");
+                        .HasConstraintName("FK_ProjectWallet_User")
+                        .IsRequired();
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.WalletType", "WalletType")
                         .WithMany("ProjectWallets")
                         .HasForeignKey("WalletTypeId")
-                        .HasConstraintName("FK_BusinessWallet_WalletType");
+                        .HasConstraintName("FK_BusinessWallet_WalletType")
+                        .IsRequired();
 
                     b.Navigation("ProjectManager");
 
@@ -1824,7 +1647,8 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Project", "Project")
                         .WithMany("Stages")
                         .HasForeignKey("ProjectId")
-                        .HasConstraintName("FK_Stage_Project");
+                        .HasConstraintName("FK_Stage_Project")
+                        .IsRequired();
 
                     b.Navigation("Project");
                 });
@@ -1926,6 +1750,11 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.DailyReport", b =>
+                {
+                    b.Navigation("Bills");
+                });
+
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Field", b =>
                 {
                     b.Navigation("BusinessFields");
@@ -1940,8 +1769,6 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investor", b =>
                 {
-                    b.Navigation("Investments");
-
                     b.Navigation("InvestorWallets");
                 });
 
@@ -1952,8 +1779,6 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Package", b =>
                 {
-                    b.Navigation("Investments");
-
                     b.Navigation("PackageVouchers");
                 });
 
@@ -1971,8 +1796,6 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Project", b =>
                 {
-                    b.Navigation("Investments");
-
                     b.Navigation("Packages");
 
                     b.Navigation("PeriodRevenues");
@@ -2003,6 +1826,8 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Stage", b =>
                 {
+                    b.Navigation("DailyReports");
+
                     b.Navigation("PeriodRevenues");
                 });
 

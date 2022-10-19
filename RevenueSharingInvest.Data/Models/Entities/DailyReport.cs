@@ -8,10 +8,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace RevenueSharingInvest.Data.Models.Entities
 {
-    [Keyless]
     [Table("DailyReport")]
     public partial class DailyReport
     {
+        public DailyReport()
+        {
+            Bills = new HashSet<Bill>();
+        }
+
+        [Key]
         public Guid Id { get; set; }
         public Guid StageId { get; set; }
         public double? Amount { get; set; }
@@ -26,9 +31,10 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [StringLength(20)]
         public string Status { get; set; }
 
-        [ForeignKey(nameof(Id))]
-        public virtual Bill IdNavigation { get; set; }
         [ForeignKey(nameof(StageId))]
+        [InverseProperty("DailyReports")]
         public virtual Stage Stage { get; set; }
+        [InverseProperty(nameof(Bill.DailyReport))]
+        public virtual ICollection<Bill> Bills { get; set; }
     }
 }

@@ -14,6 +14,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
     {
         public Stage()
         {
+            DailyReports = new HashSet<DailyReport>();
             PeriodRevenues = new HashSet<PeriodRevenue>();
         }
 
@@ -42,6 +43,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("Stages")]
         public virtual Project Project { get; set; }
+        [InverseProperty(nameof(DailyReport.Stage))]
+        public virtual ICollection<DailyReport> DailyReports { get; set; }
         [InverseProperty(nameof(PeriodRevenue.Stage))]
         public virtual ICollection<PeriodRevenue> PeriodRevenues { get; set; }
     }

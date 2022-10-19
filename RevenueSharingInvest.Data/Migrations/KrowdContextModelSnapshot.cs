@@ -165,6 +165,8 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DailyReportId");
+
                     b.ToTable("Bill");
                 });
 
@@ -257,6 +259,10 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.DailyReport", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("(newid())");
+
                     b.Property<double?>("Amount")
                         .HasColumnType("float");
 
@@ -265,11 +271,6 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
-
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("(newid())");
 
                     b.Property<DateTime?>("ReportDate")
                         .HasColumnType("datetime");
@@ -287,7 +288,7 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
-                    b.HasIndex("Id");
+                    b.HasKey("Id");
 
                     b.HasIndex("StageId");
 
@@ -887,7 +888,10 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("ProjectManagerId")
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProjectManagerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("UpdateBy")
@@ -896,7 +900,7 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("WalletTypeId")
+                    b.Property<Guid>("WalletTypeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -1416,6 +1420,17 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("ToUser");
                 });
 
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Bill", b =>
+                {
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.DailyReport", "DailyReport")
+                        .WithMany("Bills")
+                        .HasForeignKey("DailyReportId")
+                        .HasConstraintName("FK_Bill_DailyReport")
+                        .IsRequired();
+
+                    b.Navigation("DailyReport");
+                });
+
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.BusinessField", b =>
                 {
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Business", "Business")
@@ -1437,19 +1452,11 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.DailyReport", b =>
                 {
-                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Bill", "IdNavigation")
-                        .WithMany()
-                        .HasForeignKey("Id")
-                        .HasConstraintName("FK_DailyReport_Bill")
-                        .IsRequired();
-
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Stage", "Stage")
-                        .WithMany()
+                        .WithMany("DailyReports")
                         .HasForeignKey("StageId")
                         .HasConstraintName("FK_DailyReport_Stage")
                         .IsRequired();
-
-                    b.Navigation("IdNavigation");
 
                     b.Navigation("Stage");
                 });
@@ -1602,12 +1609,14 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "ProjectManager")
                         .WithMany("ProjectWallets")
                         .HasForeignKey("ProjectManagerId")
-                        .HasConstraintName("FK_ProjectWallet_User");
+                        .HasConstraintName("FK_ProjectWallet_User")
+                        .IsRequired();
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.WalletType", "WalletType")
                         .WithMany("ProjectWallets")
                         .HasForeignKey("WalletTypeId")
-                        .HasConstraintName("FK_BusinessWallet_WalletType");
+                        .HasConstraintName("FK_BusinessWallet_WalletType")
+                        .IsRequired();
 
                     b.Navigation("ProjectManager");
 
@@ -1739,6 +1748,11 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.DailyReport", b =>
+                {
+                    b.Navigation("Bills");
+                });
+
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Field", b =>
                 {
                     b.Navigation("BusinessFields");
@@ -1810,6 +1824,8 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Stage", b =>
                 {
+                    b.Navigation("DailyReports");
+
                     b.Navigation("PeriodRevenues");
                 });
 

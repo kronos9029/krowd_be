@@ -19,7 +19,7 @@ namespace RevenueSharingInvest.Data.Helpers
             modelBuilder.Entity<Role>().HasData( 
                 new Role { Id = Guid.Parse("015AE3C5-EEE9-4F5C-BEFB-57D41A43D9DF"), Name = RoleEnum.BUSINESS_MANAGER.ToString(), Description = "Business manager", CreateDate = localDate },
                 new Role { Id = Guid.Parse("AD5F37DA-CA48-4DC5-9F4B-963D94B535E6"), Name = RoleEnum.INVESTOR.ToString(), Description = "Investor", CreateDate = localDate },
-                new Role { Id = Guid.Parse("2D80393A-3A3D-495D-8DD7-F9261F85CC8F"), Name = RoleEnum.PROJECT_OWNER.ToString(), Description = "Project owner", CreateDate = localDate },
+                new Role { Id = Guid.Parse("2D80393A-3A3D-495D-8DD7-F9261F85CC8F"), Name = RoleEnum.PROJECT_MANAGER.ToString(), Description = "Project manager", CreateDate = localDate },
                 new Role { Id = Guid.Parse("FF54ACC6-C4E9-4B73-A158-FD640B4B6940"), Name = RoleEnum.ADMIN.ToString(), Description = "Krowd's admin", CreateDate = localDate }
                 );            
             
