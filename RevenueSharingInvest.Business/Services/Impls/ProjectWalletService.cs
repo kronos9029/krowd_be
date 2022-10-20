@@ -20,14 +20,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
     {
         private readonly IProjectWalletRepository _projectWalletRepository;
         private readonly IWalletTypeRepository _walletTypeRepository;
+        private readonly IProjectRepository _projectRepository;
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
 
-        public ProjectWalletService(IProjectWalletRepository projectWalletRepository, IWalletTypeRepository walletTypeRepository, IValidationService validationService, IMapper mapper)
+        public ProjectWalletService(IProjectWalletRepository projectWalletRepository, IWalletTypeRepository walletTypeRepository, IProjectRepository projectRepository, IValidationService validationService, IMapper mapper)
         {
             _projectWalletRepository = projectWalletRepository;
             _walletTypeRepository = walletTypeRepository;
+            _projectRepository = projectRepository;
             _validationService = validationService;
             _mapper = mapper;
         }
@@ -44,6 +46,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 List<ProjectWallet> projectWalletList = await _projectWalletRepository.GetProjectWalletsByProjectManagerId(Guid.Parse(currentUser.userId));
                 List<MappedProjectWalletDTO> list = _mapper.Map<List<MappedProjectWalletDTO>>(projectWalletList);
                 GetProjectWalletDTO dto = new GetProjectWalletDTO();
+                Project project = new Project();
 
                 foreach (MappedProjectWalletDTO item in list)
                 {
@@ -53,16 +56,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     dto = _mapper.Map<GetProjectWalletDTO>(item);
                     dto.walletType = _mapper.Map<GetWalletTypeForWalletDTO>(await _walletTypeRepository.GetWalletTypeById(Guid.Parse(item.walletTypeId)));
 
+                    project = dto.projectId == null ? null : await _projectRepository.GetProjectById(Guid.Parse(dto.projectId));
+                    dto.projectName = project == null ? null : project.Name;
+                    dto.projectImage = project == null ? null : project.Image;
+
                     result.totalAsset += (float)item.balance;
 
                     if (Guid.Parse(item.walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P1"))))
                         result.listOfProjectWallet.p1 = dto;
                     else if (Guid.Parse(item.walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2"))))
                         result.listOfProjectWallet.p2 = dto;
-                    else if (Guid.Parse(item.walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P3"))))
-                        result.listOfProjectWallet.p3List.Add(dto);
+                    else if (Guid.Parse(item.walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P3"))))                  
+                        result.listOfProjectWallet.p3List.Add(dto);                     
                     else if (Guid.Parse(item.walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P4"))))
-                        result.listOfProjectWallet.p4List.Add(dto);
+                        result.listOfProjectWallet.p4List.Add(dto);                     
                     else if (Guid.Parse(item.walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P5"))))
                         result.listOfProjectWallet.p5 = dto;
                 }
@@ -81,6 +88,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             GetProjectWalletDTO result;
             try
             {
+                Project project = new Project();
                 ProjectWallet projectWallet = await _projectWalletRepository.GetProjectWalletById(id);
                 if (projectWallet == null)
                     throw new NotFoundException("No ProjectWallet Object Found!");
@@ -89,6 +97,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 result = _mapper.Map<GetProjectWalletDTO>(projectWallet);
                 result.walletType = _mapper.Map<GetWalletTypeForWalletDTO>(await _walletTypeRepository.GetWalletTypeById((Guid)projectWallet.WalletTypeId));
+
+                project = result.projectId == null ? null : await _projectRepository.GetProjectById(Guid.Parse(result.projectId));
+                result.projectName = project == null ? null : project.Name;
+                result.projectImage = project == null ? null : project.Image;
+
                 result.createDate = await _validationService.FormatDateOutput(result.createDate);
                 result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
 
@@ -96,6 +109,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
             catch (Exception e)
             {
+                LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
         }
