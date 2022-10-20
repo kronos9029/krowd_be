@@ -78,7 +78,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         JOIN WalletType WT ON PW.WalletTypeId = WT.Id "
                     + "     WHERE " 
                     + "         PW.ProjectManagerId = @ProjectManagerId "
-                    + "     ORDER BY WT.Type ASC ";
+                    + "     ORDER BY WT.Type ASC, PW.CreateDate DESC ";
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectManagerId", projectManagerId, DbType.Guid);
                 using var connection = CreateConnection();
