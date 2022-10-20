@@ -10,6 +10,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs.CommonDTOs
     {
         public float totalAsset { get; set; }
         public List<GetInvestorWalletDTO> listOfInvestorWallet { get; set; }
-        public List<GetProjectWalletDTO> listOfProjectWallet { get; set; }
+        public AllProjectManagerWalletDTO listOfProjectWallet { get; set; }
     }
 }

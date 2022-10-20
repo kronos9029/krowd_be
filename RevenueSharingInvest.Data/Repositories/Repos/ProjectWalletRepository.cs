@@ -22,7 +22,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<string> CreateProjectWallet(Guid projectManagerId, Guid walletTypeId, Guid currentUserId)
+        public async Task<string> CreateProjectWallet(ProjectWallet projectWalletDTO)
         {
             try
             {
@@ -30,6 +30,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         ProjectManagerId, "
                     + "         Balance, "
                     + "         WalletTypeId, "
+                    + "         ProjectId, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -40,18 +41,20 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @ProjectManagerId, "
                     + "         0, "
                     + "         @WalletTypeId, "
+                    + "         @ProjectId, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
                     + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("ProjectManagerId", projectManagerId, DbType.Guid);
-                parameters.Add("WalletTypeId", walletTypeId, DbType.Guid);
+                parameters.Add("ProjectManagerId", projectWalletDTO.ProjectManagerId, DbType.Guid);
+                parameters.Add("WalletTypeId", projectWalletDTO.WalletTypeId, DbType.Guid);
+                parameters.Add("ProjectId", projectWalletDTO.ProjectId, DbType.Guid);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                parameters.Add("CreateBy", currentUserId, DbType.Guid);
+                parameters.Add("CreateBy", projectWalletDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                parameters.Add("UpdateBy", currentUserId, DbType.Guid);
+                parameters.Add("UpdateBy", projectWalletDTO.CreateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();

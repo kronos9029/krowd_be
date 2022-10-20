@@ -3,6 +3,7 @@ using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -37,7 +38,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
             try
             {
                 UserWalletsDTO result = new UserWalletsDTO();
-                result.listOfProjectWallet = new List<GetProjectWalletDTO>();
+                result.listOfProjectWallet = new AllProjectManagerWalletDTO();
+                result.listOfProjectWallet.p3List = new List<GetProjectWalletDTO>();
+                result.listOfProjectWallet.p4List = new List<GetProjectWalletDTO>();
                 List<ProjectWallet> projectWalletList = await _projectWalletRepository.GetProjectWalletsByProjectManagerId(Guid.Parse(currentUser.userId));
                 List<MappedProjectWalletDTO> list = _mapper.Map<List<MappedProjectWalletDTO>>(projectWalletList);
                 GetProjectWalletDTO dto = new GetProjectWalletDTO();
@@ -51,9 +54,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     dto.walletType = _mapper.Map<GetWalletTypeForWalletDTO>(await _walletTypeRepository.GetWalletTypeById(Guid.Parse(item.walletTypeId)));
 
                     result.totalAsset += (float)item.balance;
-                    result.listOfProjectWallet.Add(dto);
-                }
 
+                    if (Guid.Parse(item.walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P1"))))
+                        result.listOfProjectWallet.p1 = dto;
+                    else if (Guid.Parse(item.walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2"))))
+                        result.listOfProjectWallet.p2 = dto;
+                    else if (Guid.Parse(item.walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P3"))))
+                        result.listOfProjectWallet.p3List.Add(dto);
+                    else if (Guid.Parse(item.walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P4"))))
+                        result.listOfProjectWallet.p4List.Add(dto);
+                    else if (Guid.Parse(item.walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P5"))))
+                        result.listOfProjectWallet.p5 = dto;
+                }
                 return result;
             }
             catch (Exception e)

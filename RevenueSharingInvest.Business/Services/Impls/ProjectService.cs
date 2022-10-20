@@ -36,7 +36,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IPeriodRevenueRepository _periodRevenueRepository;
         private readonly IPeriodRevenueHistoryRepository _periodRevenueHistoryRepository;
         private readonly IPackageRepository _packageRepository;       
-        private readonly IPaymentRepository _paymentRepository;       
+        private readonly IPaymentRepository _paymentRepository;
+        private readonly IProjectWalletRepository _projectWalletRepository;
 
         private readonly IValidationService _validationService;
         private readonly IProjectTagService _projectTagService;
@@ -55,6 +56,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IStageRepository stageRepository,
             IPeriodRevenueRepository periodRevenueRepository,
             IPeriodRevenueHistoryRepository periodRevenueHistoryRepository,
+            IProjectWalletRepository projectWalletRepository,
             IPackageRepository packageRepository,
             IPaymentRepository paymentRepository, 
             IValidationService validationService,
@@ -75,7 +77,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _periodRevenueHistoryRepository = periodRevenueHistoryRepository;
             _packageRepository = packageRepository;
             _paymentRepository = paymentRepository;
-            
+            _projectWalletRepository = projectWalletRepository;
+
             _validationService = validationService;
             _projectTagService = projectTagService;
             _fileUploadService = fileUploadService;
@@ -436,9 +439,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     periodRevenue.StageId = Guid.Parse(newStageId);
                     newPeriodRevenueId = await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
 
-                    ////Tạo ví B2, B3
-                    //await _projectWalletRepository.CreateProjectWallet(Guid.Parse(currentUser.userId), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P3")), Guid.Parse(currentUser.userId));
-                    //await _projectWalletRepository.CreateProjectWallet(Guid.Parse(currentUser.userId), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P4")), Guid.Parse(currentUser.userId));
+                    //Tạo ví P3, P4 cho PROJECT_MANAGER
+                    ProjectWallet projectWallet = new ProjectWallet();
+                    projectWallet.ProjectManagerId = Guid.Parse(currentUser.userId);
+                    projectWallet.ProjectId = Guid.Parse(newId.id);
+                    projectWallet.CreateBy = Guid.Parse(currentUser.userId);
+
+                    projectWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P3"));
+                    await _projectWalletRepository.CreateProjectWallet(projectWallet);
+                    projectWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P4"));
+                    await _projectWalletRepository.CreateProjectWallet(projectWallet);
 
                     //Tạo EXTENSION ProjectEntity
                     User user = await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId));

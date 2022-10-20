@@ -127,10 +127,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
                     {
-                        //Tạo ví P1, P2, B5 cho PROJECT_MANAGER
-                        await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P1")), Guid.Parse(currentUser.userId));
-                        await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2")), Guid.Parse(currentUser.userId));
-                        await _projectWalletRepository.CreateProjectWallet(Guid.Parse(newId.id), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P5")), Guid.Parse(currentUser.userId));
+                        //Tạo ví P1, P2, P5 cho PROJECT_MANAGER
+                        ProjectWallet projectWallet = new ProjectWallet();
+                        projectWallet.ProjectManagerId = Guid.Parse(newId.id);
+                        projectWallet.CreateBy = Guid.Parse(currentUser.userId);
+
+                        projectWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P1"));
+                        await _projectWalletRepository.CreateProjectWallet(projectWallet);
+                        projectWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2"));
+                        await _projectWalletRepository.CreateProjectWallet(projectWallet);
+                        projectWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P5"));
+                        await _projectWalletRepository.CreateProjectWallet(projectWallet);
                     }
                     else if (currentUser.roleId.Equals(currentUser.adminRoleId))
                     {

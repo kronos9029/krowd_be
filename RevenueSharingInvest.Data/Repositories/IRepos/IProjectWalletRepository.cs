@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IProjectWalletRepository
     {
         //CREATE
-        public Task<string> CreateProjectWallet(Guid projectManagerId, Guid walletTypeId, Guid currentUserId);
+        public Task<string> CreateProjectWallet(ProjectWallet projectWalletDTO);
 
         //READ
         public Task<List<ProjectWallet>> GetProjectWalletsByProjectManagerId(Guid projectManagerId);
