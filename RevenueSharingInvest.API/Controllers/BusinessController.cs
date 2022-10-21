@@ -98,10 +98,6 @@ namespace RevenueSharingInvest.API.Controllers
 
             if (currentUser.roleId.Equals(currentUser.adminRoleId))
             {
-                if (currentUser.businessId.Equals(""))
-                {
-                    throw new System.UnauthorizedAccessException("You Have To Create Business First!!");
-                }
                 var result = await _businessService.UpdateBusiness(businessDTO, id, currentUser);
                 return Ok(result);
             }
