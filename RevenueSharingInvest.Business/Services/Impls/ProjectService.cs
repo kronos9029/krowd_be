@@ -1191,6 +1191,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             List<Investment> investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, projectId.ToString(), null, Guid.Parse(currentUser.roleId));
                             InvestorWallet investorWallet = new InvestorWallet();
                             ProjectWallet projectWallet = new ProjectWallet();
+                            projectWallet.ProjectManagerId = project.ManagerId;
+                            projectWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P3"));
+                            projectWallet.UpdateBy = Guid.Parse(currentUser.userId);
                             WalletTransaction walletTransaction = new WalletTransaction();
 
                             foreach (Investment item in investmentList)
@@ -1200,6 +1203,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"));
                                 investorWallet.Balance = -item.TotalPrice;
                                 investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
+                                await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
 
                                 //Create CASH_OUT WalletTransaction from I3 to P3
                                 walletTransaction = new WalletTransaction();
@@ -1213,11 +1217,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
                                 //Add P3 balance
-                                investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"));
-                                investorWallet.Balance = payment.Amount;
-                                await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
+                                projectWallet.Balance = item.TotalPrice;
+                                await _projectWalletRepository.UpdateProjectWalletBalance(projectWallet);
 
                                 //Create CASH_IN WalletTransaction from I3 to P3
+                                walletTransaction.Description = "Receive money from I3 to P3 to prepare for activation";
+                                walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
+                                await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
                             }
                         }
 
