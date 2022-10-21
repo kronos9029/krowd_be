@@ -4,6 +4,7 @@ using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -100,7 +101,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         //}
 
         //GET ALL
-        public async Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize, string projectStatus, string businessId, string projectId, string investorId, Guid roleId)
+        public async Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId, Guid roleId)
         {
             try
             {
@@ -113,16 +114,28 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var projectIdCondition = " AND I.ProjectId = @ProjectId ";
                 var investorIdCondition = " AND I.InvestorId = @InvestorId ";
 
-                if (projectStatus != null)
+                if (walletTypeId != null)
                 {
-                    whereCondition = whereCondition + projectStatusCondition;
-                    parameters.Add("Status", projectStatus, DbType.String);
+                    if (Guid.Parse(walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"))))
+                    {
+                        whereCondition = whereCondition + " AND (P.Status = @CALLING_FOR_INVESTMENT OR P.Status = @CALLING_TIME_IS_OVER OR P.Status = @WAITING_TO_ACTIVATE) ";
+                        parameters.Add("CALLING_FOR_INVESTMENT", ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), DbType.String);
+                        parameters.Add("CALLING_TIME_IS_OVER", ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString(), DbType.String);
+                        parameters.Add("WAITING_TO_ACTIVATE", ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString(), DbType.String);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + projectStatusCondition;
+                        parameters.Add("Status", ProjectStatusEnum.ACTIVE.ToString(), DbType.String);
+                    }              
                 }
                 else
                 {
-                    whereCondition = whereCondition + " AND (P.Status = @I3 OR P.Status = @I4) ";
-                    parameters.Add("I3", ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), DbType.String);
-                    parameters.Add("I4", ProjectStatusEnum.ACTIVE.ToString(), DbType.String);
+                    whereCondition = whereCondition + " AND (P.Status = @CALLING_FOR_INVESTMENT OR P.Status = @CALLING_TIME_IS_OVER OR P.Status = @WAITING_TO_ACTIVATE OR P.Status = @ACTIVE) ";
+                    parameters.Add("CALLING_FOR_INVESTMENT", ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), DbType.String);
+                    parameters.Add("CALLING_TIME_IS_OVER", ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString(), DbType.String);
+                    parameters.Add("WAITING_TO_ACTIVATE", ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString(), DbType.String);
+                    parameters.Add("ACTIVE", ProjectStatusEnum.ACTIVE.ToString(), DbType.String);
                 }
                 if (businessId != null)
                 {
