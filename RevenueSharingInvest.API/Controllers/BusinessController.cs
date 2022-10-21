@@ -96,7 +96,7 @@ namespace RevenueSharingInvest.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
-            if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+            if (currentUser.roleId.Equals(currentUser.adminRoleId))
             {
                 if (currentUser.businessId.Equals(""))
                 {

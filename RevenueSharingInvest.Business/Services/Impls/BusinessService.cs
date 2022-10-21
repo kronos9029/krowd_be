@@ -363,7 +363,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-                Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(Guid.Parse(currentUser.businessId));
+                Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(businessId);
                 if (business == null)
                     throw new InvalidFieldException("This businessId is not existed!!!");
 
@@ -412,7 +412,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (businessDTO.image != null)
                 {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, currentUser.businessId);
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, businessId.ToString());
                 }
                 entity.UpdateBy = Guid.Parse(currentUser.userId);
 
