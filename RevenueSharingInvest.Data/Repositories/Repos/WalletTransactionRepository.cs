@@ -81,77 +81,34 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         //GET ALL
         public async Task<List<WalletTransaction>> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, Guid? userRoleId, Guid? walletId, string fromDate, string toDate, string type, string order)
         {
-            string selectColumns = " W.Id , W.PaymentId , W.SystemWalletId , W.ProjectWalletId , W.InvestorWalletId , W.Amount , W.Description , W.Type , W.FromWalletId , W.ToWalletId , W.Fee , W.CreateDate , W.CreateBy ";
-            string whereClause = "";
-            string fromClause = " FROM WalletTransaction W ";
-            string orderClause = " ORDER BY W.CreateDate DESC ";
+            //string selectColumns = " W.Id , W.PaymentId , W.SystemWalletId , W.ProjectWalletId , W.InvestorWalletId , W.Amount , W.Description , W.Type , W.FromWalletId , W.ToWalletId , W.Fee , W.CreateDate , W.CreateBy ";
+            //string whereClause = "";
+            //string fromClause = " FROM WalletTransaction W ";
+            //string orderClause = " ORDER BY W.CreateDate DESC ";
 
-            string userIdCondition = " AND U.Id = @UserId ";
-            string dateCondition = " AND W.CreateDate BETWEEN @FromDate AND @ToDate ";
+            //string userIdCondition = " AND U.Id = @UserId ";
+            //string dateCondition = " AND W.CreateDate BETWEEN @FromDate AND @ToDate ";
+            //string typeCondition = " AND W.Type = @Type ";
+            //string walletIdCondition = " AND ((W.FromWalletId = @WalletId AND W.Type = 'CASH_OUT') " +
+            //                           " OR (W.ToWalletId = @WalletId AND W.Type ='CASH_IN') " +
+            //                           " OR (W.ToWalletId = @WalletId AND W.Type ='DEPOSIT') " +
+            //                           " OR (W.FromWalletId = @WalletId AND W.Type ='WITHDRAW')) ";
+            string queryString = "";
+            string whereClause = "";
+
+            string fromWalletIdCondition = "";
+            string toWalletIdCondition = "";
+            string dateCondition = " AND ( W.CreateDate BETWEEN @FromDate AND @ToDate ) ";
             string typeCondition = " AND W.Type = @Type ";
-            string walletIdCondition = " AND ((W.FromWalletId = @WalletId AND W.Type = 'CASH_OUT') " +
-                                       " OR (W.ToWalletId = @WalletId AND W.Type ='CASH_IN') " +
-                                       " OR (W.ToWalletId = @WalletId AND W.Type ='DEPOSIT') " +
-                                       " OR (W.FromWalletId = @WalletId AND W.Type ='WITHDRAW')) ";
 
             try
             {
                 var parameters = new DynamicParameters();
-                //if(!userId.Equals("")){
-
-                //    whereClause = "WHERE CreateBy = '"+Guid.Parse(userId)+"'";
-                //    if(!fromDate.Equals("") || !toDate.Equals(""))
-                //    {
-                //        whereClause += " AND CreateDate >= '"+fromDate+"' AND CreateDate <= '"+toDate+"'";
-                //    }
-                //    if (!walletId.Equals(""))
-                //    {
-                //        whereClause += " AND (FromWalletId = '" + Guid.Parse(walletId) + "' OR ToWalletId = '" + Guid.Parse(walletId) + "')";
-                //    }
-                //} else 
-                //{
-                //    if (!fromDate.Equals("") || !toDate.Equals(""))
-                //    {
-                //        whereClause += " WHERE CreateDate >= '" + fromDate + "' AND CreateDate <= '" + toDate + "'";
-                //    }
-                //    if (!walletId.Equals(""))
-                //    {
-                //        whereClause += " AND (FromWalletId = '" + Guid.Parse(walletId) + "' OR ToWalletId = '" + Guid.Parse(walletId) + "')";
-                //    }
-                //}
-
-                //sort ??= "";
-                //if (sort.Equals(""))
-                //{
-                //    sort = "DESC";
-                //} else
-                //{
-                //    sort = "ASC";
-                //}
-
-                if (userRoleId != null)
-                {
-                    if (userRoleId.Equals(Guid.Parse(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"))))
-                    {
-                        fromClause = " FROM WalletTransaction W "
-                            + "         JOIN ProjectWallet PW ON (W.FromWalletId = PW.Id OR W.ToWalletId = PW.Id) "
-                            + "         JOIN [User] U ON PW.ProjectManagerId = U.Id ";
-                    }
-                    else if (userRoleId.Equals(Guid.Parse(RoleDictionary.role.GetValueOrDefault("INVESTOR"))))
-                    {
-                        fromClause = " FROM WalletTransaction W " 
-                            + "         JOIN InvestorWallet IW ON (W.FromWalletId = IW.Id OR W.ToWalletId = IW.Id) " 
-                            + "         JOIN Investor I ON IW.InvestorId = I.Id " 
-                            + "         JOIN [User] U ON I.UserId = U.Id ";
-                    }
-
-                    whereClause = whereClause + userIdCondition;
-                    parameters.Add("UserId", userId, DbType.Guid);
-                }
 
                 if (walletId != null)
                 {
-                    whereClause = whereClause + walletIdCondition;
+                    fromWalletIdCondition = " AND W.FromWalletId = @WalletId ";
+                    toWalletIdCondition = " AND W.ToWalletId = @WalletId ";
                     parameters.Add("WalletId", walletId, DbType.Guid);
                 }
 
@@ -168,25 +125,60 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     parameters.Add("Type", type, DbType.String);
                 }
 
-                if (order != null)
-                {
-                    orderClause = " ORDER BY W.CreateDate " + order;
-                }
+                order = order == null ? "DESC" : order;
 
-                whereClause = whereClause.Length != 0 ? "WHERE " + whereClause.Substring(4, whereClause.Length - 4) : "";
+                if (userRoleId != null)
+                {
+                    if (userRoleId.Equals(Guid.Parse(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"))))
+                    {
+                        queryString = " SELECT W.* "
+                            + "         FROM WalletTransaction W "
+                            + "             JOIN ProjectWallet PW ON W.FromWalletId = PW.Id "
+                            + "             JOIN [User] U ON PW.ProjectManagerId = U.Id "
+                            + "         WHERE "
+                            + "             U.Id = @UserId "
+                            + "             AND (W.Type = 'CASH_OUT' OR W.Type = 'WITHDRAW') " + whereClause + fromWalletIdCondition
+                            + "         UNION "
+                            + "         SELECT W.* "
+                            + "         FROM WalletTransaction W "
+                            + "             JOIN ProjectWallet PW ON W.ToWalletId = PW.Id "
+                            + "             JOIN [User] U ON PW.ProjectManagerId = U.Id "
+                            + "         WHERE "
+                            + "             U.Id = @UserId "
+                            + "             AND (W.Type = 'CASH_IN' OR W.Type = 'DEPOSIT') " + whereClause + toWalletIdCondition;
+                    }
+                    else if (userRoleId.Equals(Guid.Parse(RoleDictionary.role.GetValueOrDefault("INVESTOR"))))
+                    {
+                        queryString = " SELECT W.* "
+                            + "         FROM WalletTransaction W "
+                            + "             JOIN InvestorWallet IW ON W.FromWalletId = IW.Id "
+                            + "             JOIN Investor I ON IW.InvestorId = I.Id "
+                            + "             JOIN [User] U ON I.UserId = U.Id "
+                            + "         WHERE "
+                            + "             U.Id = @UserId "
+                            + "             AND (W.Type = 'CASH_OUT' OR W.Type = 'WITHDRAW') " + whereClause + fromWalletIdCondition
+                            + "         UNION "
+                            + "         SELECT W.* "
+                            + "         FROM WalletTransaction W "
+                            + "             JOIN InvestorWallet IW ON W.ToWalletId = IW.Id "
+                            + "             JOIN Investor I ON IW.InvestorId = I.Id "
+                            + "             JOIN [User] U ON I.UserId = U.Id "
+                            + "         WHERE "
+                            + "             U.Id = @UserId "
+                            + "             AND (W.Type = 'CASH_IN' OR W.Type = 'DEPOSIT') " + whereClause + toWalletIdCondition;
+                    }
+                    parameters.Add("UserId", userId, DbType.Guid);
+                }
 
                 if (pageIndex != 0 && pageSize != 0)
                 {
                     var query = "WITH X AS ( "
                     + "         SELECT "
                     + "             ROW_NUMBER() OVER ( "
-                    +               orderClause
-                    + "             ) AS Num, "
-                    +               selectColumns
-                    +           fromClause
-                    +           whereClause
-                    + "         GROUP BY "
-                    +               selectColumns
+                    + "             ORDER BY CreateDate " + order
+                    + "             ) AS Num, Z.*"
+                    + "         FROM ( "
+                    +               queryString + " ) AS Z"
                     + "         )"
                     + "     SELECT  "
                     + "         Id, "
@@ -214,7 +206,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT DISTINCT W.* " + fromClause + whereClause + orderClause;
+                    var query = "SELECT Z.* FROM ( " + queryString + " ) AS Z ORDER BY Z.CreateDate " + order;
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<WalletTransaction>(query, parameters)).ToList();
                 }

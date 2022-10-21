@@ -125,22 +125,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
             Guid? userRoleId = null;
             try
             {
-                //if(!fromDate.Equals("") || !toDate.Equals(""))
-                //{
-                //    fromDate += " 00:00:00";
-                //    toDate += " 23:59:59";
-                //}
-
-                //List<WalletTransaction> walletTransactionList = await _walletTransactionRepository.GetAllWalletTransactions(pageIndex, pageSize,userId,sort, fromDate, toDate, walletId);
-                //List<WalletTransactionDTO> list = _mapper.Map<List<WalletTransactionDTO>>(walletTransactionList);
-
-                //foreach (WalletTransactionDTO item in list)
-                //{
-                //    item.createDate = await _validationService.FormatDateOutput(item.createDate);
-                //}
-
-                //return list;
-                if (userId != null)
+                if (userId == null)
+                {
+                    if (currentUser.roleId.Equals(currentUser.adminRoleId))
+                        throw new InvalidFieldException("userId can not be null!!!");
+                }  
+                else
                 {
                     if (!await _validationService.CheckExistenceId("[User]", (Guid)userId))
                         throw new NotFoundException("This userId is not existed!!!");
@@ -200,8 +190,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (order != null && !order.Equals(OrderEnum.ASC.ToString()) && !order.Equals(OrderEnum.DESC.ToString()))
                     throw new InvalidFieldException("order must be ASC or DESC!!!");
 
-                userId = ((currentUser.roleId.Equals(currentUser.projectManagerRoleId) || currentUser.roleId.Equals(currentUser.investorRoleId))) ? Guid.Parse(currentUser.userId) : userId;
-                userRoleId = userId == null ? null : (await _userRepository.GetUserById((Guid)userId)).RoleId;
+                userId = (currentUser.roleId.Equals(currentUser.adminRoleId)) ? userId : Guid.Parse(currentUser.userId);
+                userRoleId = (await _userRepository.GetUserById((Guid)userId)).RoleId;
 
                 List<WalletTransaction> walletTransactionsEntityList = await _walletTransactionRepository.GetAllWalletTransactions(pageIndex, pageSize, userId, userRoleId, walletId, fromDate, toDate, type, order);
                 List<WalletTransactionDTO> result = _mapper.Map<List<WalletTransactionDTO>>(walletTransactionsEntityList);
