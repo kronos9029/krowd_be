@@ -38,6 +38,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IPackageRepository _packageRepository;       
         private readonly IPaymentRepository _paymentRepository;
         private readonly IProjectWalletRepository _projectWalletRepository;
+        private readonly IInvestmentRepository _investmentRepository;
+        private readonly IInvestorWalletRepository _investorWalletRepository;
+        private readonly IWalletTransactionRepository _walletTransactionRepository;
 
         private readonly IValidationService _validationService;
         private readonly IProjectTagService _projectTagService;
@@ -58,7 +61,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IPeriodRevenueHistoryRepository periodRevenueHistoryRepository,
             IProjectWalletRepository projectWalletRepository,
             IPackageRepository packageRepository,
-            IPaymentRepository paymentRepository, 
+            IPaymentRepository paymentRepository,
+            IInvestmentRepository investmentRepository,
+            IInvestorWalletRepository investorWalletRepository,
+            IWalletTransactionRepository walletTransactionRepository,
+
             IValidationService validationService,
             IProjectTagService projectTagService,
             IFileUploadService fileUploadService,
@@ -78,6 +85,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _packageRepository = packageRepository;
             _paymentRepository = paymentRepository;
             _projectWalletRepository = projectWalletRepository;
+            _investmentRepository = investmentRepository;
+            _investorWalletRepository = investorWalletRepository;
+            _walletTransactionRepository = walletTransactionRepository;
 
             _validationService = validationService;
             _projectTagService = projectTagService;
@@ -1166,15 +1176,49 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 projectService => projectService
                                 .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.StartDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
 
-                            //Tạo Schedule chuyển status CALLING_FOR_INVESTMENT to CALLING_TIME_IS_OVER
+                            //Tạo Schedule chuyển status CALLING_FOR_INVESTMENT to CALLING_TIME_IS_OVER or WAITING_TO_ACTIVATE
                             _backgroundJobClient.Schedule<ProjectService>(
                                 projectService => projectService
                                 .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
 
-                            //Tạo Schedule chuyển status CALLING_FOR_INVESTMENT to WAITING_TO_ACTIVATE
-                            _backgroundJobClient.Schedule<ProjectService>(
-                                projectService => projectService
-                                .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+                            ////Tạo Schedule chuyển status CALLING_FOR_INVESTMENT to WAITING_TO_ACTIVATE
+                            //_backgroundJobClient.Schedule<ProjectService>(
+                            //    projectService => projectService
+                            //    .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+                        }
+                        else if (status.Equals(ProjectStatusEnum.ACTIVE.ToString()))
+                        {
+                            List<Investment> investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, projectId.ToString(), null, Guid.Parse(currentUser.roleId));
+                            InvestorWallet investorWallet = new InvestorWallet();
+                            ProjectWallet projectWallet = new ProjectWallet();
+                            WalletTransaction walletTransaction = new WalletTransaction();
+
+                            foreach (Investment item in investmentList)
+                            {
+                                //Subtract I3 balance
+                                investorWallet.InvestorId = item.InvestorId;
+                                investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"));
+                                investorWallet.Balance = -item.TotalPrice;
+                                investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
+
+                                //Create CASH_OUT WalletTransaction from I3 to P3
+                                walletTransaction = new WalletTransaction();
+                                walletTransaction.Amount = item.TotalPrice;
+                                walletTransaction.Fee = 0;
+                                walletTransaction.Description = "Transfer money from I3 to P3 to prepare for activation";
+                                walletTransaction.FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.InvestorId, WalletTypeEnum.I3.ToString())).Id;
+                                walletTransaction.ToWalletId = (await _projectWalletRepository.GetProjectWalletByProjectOwnerIdAndType(project.ManagerId, WalletTypeEnum.P3.ToString())).Id;
+                                walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
+                                walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
+                                await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+
+                                //Add P3 balance
+                                investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"));
+                                investorWallet.Balance = payment.Amount;
+                                await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
+
+                                //Create CASH_IN WalletTransaction from I3 to P3
+                            }
                         }
 
                     }

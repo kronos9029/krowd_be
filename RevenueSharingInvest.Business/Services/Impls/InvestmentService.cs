@@ -240,8 +240,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             try
             {
-                string projectStatus = null;
-
                 if (walletTypeId != null)
                 {
                     if (!await _validationService.CheckUUIDFormat(walletTypeId.ToString()))
@@ -255,10 +253,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     {
                         throw new InvalidFieldException("walletTypeId must be the id of type I3 or I4 WalletType!!!");
                     }
-
-                    projectStatus = walletTypeId.Equals(
-                        WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"), 
-                        StringComparison.InvariantCultureIgnoreCase) ? ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString() : ProjectStatusEnum.ACTIVE.ToString();
                 }
                 if (businessId != null)
                 {
@@ -311,7 +305,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         investorId = currentUser.investorId;
                 }
 
-                List<Investment> investmentList = await _investmentRepository.GetAllInvestments(pageIndex, pageSize, projectStatus, businessId, projectId, investorId, Guid.Parse(currentUser.roleId));
+                List<Investment> investmentList = await _investmentRepository.GetAllInvestments(pageIndex, pageSize, walletTypeId, businessId, projectId, investorId, Guid.Parse(currentUser.roleId));
                 List<GetInvestmentDTO> list = _mapper.Map<List<GetInvestmentDTO>>(investmentList);
 
                 foreach (GetInvestmentDTO item in list)
