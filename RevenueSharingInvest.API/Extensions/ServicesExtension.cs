@@ -53,6 +53,10 @@ namespace RevenueSharingInvest.API.Extensions
             services.AddScoped<IBusinessFieldService, BusinessFieldService>();
             services.AddScoped<IBusinessFieldRepository, BusinessFieldRepository>();
 
+            //DAILY REPORT
+            services.AddScoped<IDailyReportService, DailyReportService>();
+            services.AddScoped<IDailyReportRepository, DailyReportRepository>();
+
             //FIELD
             services.AddScoped<IFieldService, FieldService>();
             services.AddScoped<IFieldRepository, FieldRepository>();

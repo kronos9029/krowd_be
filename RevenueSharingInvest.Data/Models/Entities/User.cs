@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 #nullable disable
 
@@ -50,7 +51,9 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public virtual ICollection<Investor> Investors { get; set; }
         public virtual ICollection<ProjectWallet> ProjectWallets { get; set; }
         public virtual ICollection<Project> Projects { get; set; }
+        [InverseProperty(nameof(WithdrawRequest.CreateByNavigation))]
         public virtual ICollection<WithdrawRequest> WithdrawRequestCreateByNavigations { get; set; }
+        [InverseProperty(nameof(WithdrawRequest.UpdateByNavigation))]
         public virtual ICollection<WithdrawRequest> WithdrawRequestUpdateByNavigations { get; set; }
     }
 }

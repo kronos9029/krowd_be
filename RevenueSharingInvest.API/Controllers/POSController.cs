@@ -5,6 +5,7 @@ using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.DTOs;
@@ -44,14 +45,19 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPost]
         [Route("Krowd-upload")]
-        public async Task<IActionResult> UploadBillsFromKrowd(List<BillDTO> bills)
+        public async Task<IActionResult> UploadBillsFromKrowd(List<BillDTO> bills, string date)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             InsertBillDTO billDTO = new();
-            billDTO.ProjectId = currentUser.projectId;
-            billDTO.Bills = bills;
-            var result = await _billService.BulkInsertBills(billDTO, billDTO.ProjectId);
-            return Ok(result);
+
+            if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            {
+                billDTO.ProjectId = currentUser.projectId;
+                billDTO.Bills = bills;
+                var result = await _billService.BulkInsertBills(billDTO, billDTO.ProjectId, date);
+                return Ok(result);
+            }
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER can perform this action!!!");
         }
 
         [HttpPost]
@@ -69,7 +75,7 @@ namespace RevenueSharingInvest.API.Controllers
                 InsertBillDTO billDTO = new();
                 billDTO.ProjectId = info.ProjectId.ToString();
                 billDTO.Bills = request.bills;
-                var result = await _billService.BulkInsertBills(billDTO, billDTO.ProjectId);
+                var result = await _billService.BulkInsertBills(billDTO, billDTO.ProjectId, request.date);
                 return Ok(result);
             }
 
@@ -119,6 +125,7 @@ namespace RevenueSharingInvest.API.Controllers
     public class ClientUploadRevenueRequest
     {
         public string projectId { get; set; }
+        public string date { get; set; }
         public string signature { get; set; }
         public List<BillDTO> bills { get; set; }
     }

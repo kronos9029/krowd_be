@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 #nullable disable
 
@@ -32,6 +33,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
 
         public virtual User FromUser { get; set; }
         public virtual User ToUser { get; set; }
+        [ForeignKey(nameof(WithdrawRequestId))]
+        [InverseProperty("AccountTransactions")]
         public virtual WithdrawRequest WithdrawRequest { get; set; }
     }
 }

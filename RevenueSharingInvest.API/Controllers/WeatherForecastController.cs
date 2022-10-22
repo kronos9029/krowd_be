@@ -38,9 +38,21 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Getokok(string projectId, decimal amount)
         {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
-            var result = await _iTextService.GenerateProjectContract(currentUser, projectId, amount);
-            return Ok(result);
+            string accessKey = GenerateAccessKey();
+            string secretKey = GenerateSecretKey();
+
+
+            //IntegrateInfo info = await _projectService.GetIntegrateInfoByUserEmail(request.projectId);
+
+            //string userMessage = "projectId=" + request.projectId + "&accessKey=" + request.accessKey;
+            //string systemMessage = "projectId=" + info.ProjectId + "&accessKey=" + info.AccessKey;
+
+            //string userSignature = CreateSignature(userMessage, info.SecretKey);
+            //string systemSignature = CreateSignature(systemMessage, info.SecretKey);
+
+            //bool check = userSignature.Equals(systemMessage);
+
+            return Ok(0);
         }
 
         private string CreateSignature(string message, string key)

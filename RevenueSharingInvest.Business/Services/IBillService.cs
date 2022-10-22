@@ -9,6 +9,6 @@ namespace RevenueSharingInvest.Business.Services
 {
     public interface IBillService
     {
-        public Task<int> BulkInsertBills(InsertBillDTO bills, string projectId);
+        public Task<DailyReportDTO> BulkInsertBills(InsertBillDTO bills, string projectId, string date);
     }
 }

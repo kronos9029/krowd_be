@@ -23,14 +23,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "INSERT INTO Bill (InvoiceId, Amount, Description, CreateBy,  CreateDate, ProjectId) VALUES ";
+                var query = "INSERT INTO Bill (InvoiceId, Amount, Description, CreateBy,  CreateDate, DailyReportId) VALUES ";
 
                 for (int i = 0; i < request.Bills.Count; i++)
                 {
                     if (i == request.Bills.Count - 1)
-                        query += "(" + "'" + request.Bills[i].InvoiceId + "'" + "," + "'" + request.Bills[i].Amount + "'" + "," + "'" + (request.Bills[i].Description ??= "") + "'" + "," + "'" + request.Bills[i].CreateBy + "'" + "," + "'" + request.Bills[i].CreateDate + "'" + "," + "'" + request.Bills[i].ProjectId + "'" + ")";
+                        query += "('" + request.Bills[i].InvoiceId + "'" + "," + request.Bills[i].Amount  + "," + "'" + (request.Bills[i].Description ??= "") + "'" + "," + "'" + request.Bills[i].CreateBy + "'" + "," + "'" + request.Bills[i].CreateDate + "'" + "," + "'" + request.Bills[i].DailyReportId + "')";
                     else
-                        query += "(" + "'" + request.Bills[i].InvoiceId + "'" + "," + "'" + request.Bills[i].Amount + "'" + "," + "'" + (request.Bills[i].Description ??= "") + "'" + "," + "'" + request.Bills[i].CreateBy + "'" + "," + "'" + request.Bills[i].CreateDate + "'" + "," + "'" + request.Bills[i].ProjectId + "'" + "),";
+                        query += "('" + request.Bills[i].InvoiceId + "'" + "," + request.Bills[i].Amount  + "," + "'" + (request.Bills[i].Description ??= "") + "'" + "," + "'" + request.Bills[i].CreateBy + "'" + "," + "'" + request.Bills[i].CreateDate + "'" + "," + "'" + request.Bills[i].DailyReportId + "'),";
 
                 }
                 using var connection = CreateConnection();

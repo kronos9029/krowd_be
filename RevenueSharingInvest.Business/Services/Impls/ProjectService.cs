@@ -41,6 +41,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IInvestmentRepository _investmentRepository;
         private readonly IInvestorWalletRepository _investorWalletRepository;
         private readonly IWalletTransactionRepository _walletTransactionRepository;
+        private readonly IDailyReportRepository _dailyReportRepository;
 
         private readonly IValidationService _validationService;
         private readonly IProjectTagService _projectTagService;
@@ -65,6 +66,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IInvestmentRepository investmentRepository,
             IInvestorWalletRepository investorWalletRepository,
             IWalletTransactionRepository walletTransactionRepository,
+            IDailyReportRepository dailyReportRepository,
 
             IValidationService validationService,
             IProjectTagService projectTagService,
@@ -88,6 +90,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _investmentRepository = investmentRepository;
             _investorWalletRepository = investorWalletRepository;
             _walletTransactionRepository = walletTransactionRepository;
+            _dailyReportRepository = dailyReportRepository;
 
             _validationService = validationService;
             _projectTagService = projectTagService;
@@ -1224,6 +1227,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 walletTransaction.Description = "Receive money from I3 to P3 to prepare for activation";
                                 walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                                 await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+
+                                //Create DailyReports
+                                DailyReport dailyReport = new DailyReport();
+                                dailyReport.CreateDate = DateTimePicker.GetDateTimeByTimeZone();
+                                dailyReport.CreateBy = Guid.Parse(currentUser.userId);
+                                dailyReport.Status = DailyReportStatusEnum.UNDUE.ToString();
+                                List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0);
+                                int numOfReport;
+                                foreach (Stage stage in stageList)
+                                {
+                                    dailyReport.StageId = stage.Id;
+                                    dailyReport.ReportDate = stage.StartDate;
+                                    
+                                    numOfReport = (int)DateAndTime.DateDiff(DateInterval.Day, stage.StartDate, stage.EndDate) + 1;
+
+                                    await _dailyReportRepository.CreateDailyReports(dailyReport, numOfReport);
+                                }
+
                             }
                         }
 
@@ -1322,6 +1343,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             try
             {
+                if (!await _validationService.CheckExistenceId("Project", projectId))
+                    throw new NotFoundException("This projectId is not existed!!!");
+
                 Project project = await _projectRepository.GetProjectById(projectId);
                 if (project.Status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
                 {
