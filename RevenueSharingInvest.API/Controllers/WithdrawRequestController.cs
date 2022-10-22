@@ -87,12 +87,12 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PENDING.ToString()))
                     {
-                        var result = await _withdrawRequestService.AdminApproveWithdrawRequest(currentUser.userId, currentRequest.Id);
+                        var result = await _withdrawRequestService.AdminApproveWithdrawRequest(currentUser, currentRequest.Id, currentRequest.Amount);
                         return Ok(result);
                     } 
                     else if (currentRequest.Status.Equals(WithdrawRequestEnum.PARTIAL_ADMIN.ToString()))
                     {
-                        var result = await _withdrawRequestService.AdminApproveWithdrawRequest(currentUser.userId, currentRequest.Id);
+                        var result = await _withdrawRequestService.AdminApproveWithdrawRequest(currentUser, currentRequest.Id, currentRequest.Amount);
                         return Ok(result);
                     }
                 } 

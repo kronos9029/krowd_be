@@ -21,14 +21,23 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IInvestorWalletRepository _investorWalletRepository;
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
+        private readonly IWalletTransactionService _walletTransactionService;
+        private readonly IAccountTransactionService _accountTransactionService;
 
 
-        public WithdrawRequestService(IWithdrawRequestRepository withdrawRequestRepository, IValidationService validationService, IMapper mapper, IInvestorWalletRepository investorWalletRepository)
+        public WithdrawRequestService(IWithdrawRequestRepository withdrawRequestRepository, 
+            IValidationService validationService, 
+            IMapper mapper, 
+            IInvestorWalletRepository investorWalletRepository, 
+            IWalletTransactionService walletTransactionService,
+            IAccountTransactionService accountTransactionService)
         {
             _withdrawRequestRepository = withdrawRequestRepository;
             _validationService = validationService;
             _mapper = mapper;
             _investorWalletRepository = investorWalletRepository;
+            _walletTransactionService = walletTransactionService;
+            _accountTransactionService = accountTransactionService;
         }
 
 
@@ -43,8 +52,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     if (request.Amount < 0 || request.Amount > remainBalance)
                         throw new WalletBalanceException("Invalid Amount!!");
 
-                    WithdrawRequest withdrawRequest = _mapper.Map<WithdrawRequest>(request);
+                    InvestorWallet fromWallet = await _investorWalletRepository.GetInvestorWalletById(Guid.Parse(request.FromWalletId));
+                    InvestorWallet toWallet = await _investorWalletRepository.GetInvestorWalletById(Guid.Parse(request.ToWalletId));
 
+                    _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
+
+                    WithdrawRequest withdrawRequest = _mapper.Map<WithdrawRequest>(request);
+                     
                     withdrawRequest.CreateBy = Guid.Parse(currentUser.userId);
                     withdrawRequest.Status = WithdrawRequestEnum.PENDING.ToString();
 
@@ -61,12 +75,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> AdminApproveWithdrawRequest(string userId, string requestId)
+        public async Task<dynamic> AdminApproveWithdrawRequest(ThisUserObj currentUser, string requestId, double amount)
         {
             try
             {
-                dynamic result = await _withdrawRequestRepository.AdminApproveWithdrawRequest(Guid.Parse(userId), Guid.Parse(requestId));
-                return result;
+                dynamic result = await _withdrawRequestRepository.AdminApproveWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(requestId));
+
+                InvestorWallet investorWallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), "I1");
+                if (investorWallet == null)
+                    throw new NotFoundException("No Such Wallet With That ID!!");
+
+                var resultString = await _accountTransactionService.CreateWithdrawAccountTransaction(investorWallet, currentUser.userId, amount, requestId);
+                return resultString;
             }catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
@@ -79,6 +99,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             try
             {
                 dynamic result = await _withdrawRequestRepository.InvestorApproveWithdrawRequest(Guid.Parse(userId), Guid.Parse(requestId));
+
                 return result;
             }catch(Exception e)
             {

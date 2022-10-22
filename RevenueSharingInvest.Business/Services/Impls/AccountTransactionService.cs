@@ -50,7 +50,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreateAccountTransaction(MomoPaymentResult momoPaymentResult)
+        public async Task<IdDTO> CreateTopUpAccountTransaction(MomoPaymentResult momoPaymentResult)
         {
             IdDTO newId = new IdDTO();
             try
@@ -171,6 +171,52 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 return newId;
             }
             catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<string> CreateWithdrawAccountTransaction(InvestorWallet investorWallet, string userId, double amount, string requestId)
+        {
+            try
+            {
+                Guid currentUserId = Guid.Parse(userId);
+                investorWallet.Balance -= amount;
+                investorWallet.UpdateBy = currentUserId;
+                await _investorWalletRepository.UpdateWalletBalance(investorWallet);
+
+                WalletTransaction walletTransaction = new()
+                {
+                    Amount = amount,
+                    Fee = 0,
+                    Description = "Withdraw money out of I1 wallet",
+                    Type = WalletTransactionTypeEnum.WITHDRAW.ToString(),
+                    FromWalletId = investorWallet.Id,
+                    CreateBy = currentUserId
+                };
+                await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+
+
+
+
+
+                AccountTransaction accountTransaction = new()
+                {
+                    FromUserId = currentUserId,
+                    Amount = long.Parse(amount.ToString()),
+                    Message = "Giao dịch thành công.",
+                    OrderType = "system",
+                    PayType = "app",
+                    ResultCode = 0,
+                    Type = "WITHDRAW",
+                    WithdrawRequestId = Guid.Parse(requestId)
+                };
+
+                string result = await _accountTransactionRepository.CreateAccountTransaction(accountTransaction);
+                return result;
+            }
+            catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);

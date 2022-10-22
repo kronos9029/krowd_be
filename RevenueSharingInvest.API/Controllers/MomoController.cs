@@ -152,7 +152,7 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("response")]
         public async Task<IActionResult> ResponseFromMomo(MomoPaymentResult momoPaymentResult)
         {
-            var result = await _accountTransactionService.CreateAccountTransaction(momoPaymentResult);
+            var result = await _accountTransactionService.CreateTopUpAccountTransaction(momoPaymentResult);
             return Ok(result);
         }
 

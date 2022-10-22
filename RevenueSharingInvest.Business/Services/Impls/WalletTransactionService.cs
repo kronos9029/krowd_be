@@ -37,7 +37,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IWalletTypeRepository walletTypeRepository,
             IUserRepository userRepository,
             IProjectWalletRepository projectWalletRepository, 
-
             IValidationService validationService, 
             IMapper mapper
             )
@@ -47,7 +46,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _walletTypeRepository = walletTypeRepository;
             _userRepository = userRepository;
             _projectWalletRepository = projectWalletRepository;
-
             _validationService = validationService;
             _mapper = mapper;           
         }
@@ -111,9 +109,58 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
+        }
 
+        public async void TransferMoney(dynamic from, dynamic to, double amount, string userId)
+        {
+            try
+            {
+                
+                var arrayOfAllKeys = WalletTypeDictionary.walletTypes.Keys.ToArray();
 
+                string fromType = "";
+                string toType = "";
 
+                foreach (var key in arrayOfAllKeys)
+                {
+                    if (from.InvestorId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault(key))))
+                        fromType = key;
+                    if (to.InvestorId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault(key))))
+                        toType = key;
+                }
+
+                //Subtract  balance
+                from.Balance -= amount;
+                from.UpdateBy = Guid.Parse(userId);
+                await _investorWalletRepository.UpdateInvestorWalletBalance(from);
+
+                //Create CASH_OUT WalletTransaction
+                WalletTransaction walletTransaction = new WalletTransaction
+                {
+                    Amount = amount,
+                    Fee = 0,
+                    Description = "Transfer money from "+fromType+" to "+toType,
+                    FromWalletId = from.Id,
+                    ToWalletId = to.Id,
+                    Type = WalletTransactionTypeEnum.CASH_OUT.ToString(),
+                    CreateBy = Guid.Parse(userId)
+                };
+                await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+
+                //Add to balance
+                to.Balance += amount;
+                await _investorWalletRepository.UpdateInvestorWalletBalance(to);
+
+                //Create CASH_IN WalletTransaction
+                walletTransaction.Description = "Receive money from "+toType+" to "+fromType;
+                walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
+                await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
         }
 
         //GET ALL

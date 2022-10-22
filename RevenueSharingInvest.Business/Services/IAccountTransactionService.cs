@@ -13,11 +13,12 @@ namespace RevenueSharingInvest.Business.Services
     public interface IAccountTransactionService
     {
         //CREATE
-        public Task<IdDTO> CreateAccountTransaction(MomoPaymentResult momoPaymentResult);
+        public Task<IdDTO> CreateTopUpAccountTransaction(MomoPaymentResult momoPaymentResult);
 
         //READ
         public Task<List<AccountTransactionDTO>> GetAllAccountTransactions(int pageIndex, int pageSize, string sort, ThisUserObj currentUser);
         public Task<List<AccountTransactionDTO>> GetAccountTransactionsByDate(int pageIndex, int pageSize, string fromDate, string toDate, string sort, ThisUserObj currentUser);
+        public Task<string> CreateWithdrawAccountTransaction(InvestorWallet investorWallet, string userId, double amount, string requestId);
         //public Task<AccountTransactionDTO> GetAccountTransactionById(Guid accountTransactionId);
 
         //UPDATE
