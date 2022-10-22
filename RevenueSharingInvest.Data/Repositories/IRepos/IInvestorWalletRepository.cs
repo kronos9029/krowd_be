@@ -16,7 +16,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<List<InvestorWallet>> GetInvestorWalletsByInvestorId(Guid investorId);
         public Task<InvestorWallet> GetInvestorWalletByInvestorIdAndType(Guid investorId, string walletType);
         public Task<InvestorWallet> GetInvestorWalletById(Guid id);
-
+        public Task<double> GetInvestorWalletBalanceById(Guid id);
         //UPDATE
         public Task<int> UpdateInvestorWallet(InvestorWallet investorWalletDTO, Guid investorWalletId);
         //public Task<int> InvestorTopUpWallet(InvestorWallet investorWalletDTO);

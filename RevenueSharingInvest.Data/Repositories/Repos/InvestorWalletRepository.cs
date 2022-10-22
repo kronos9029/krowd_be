@@ -225,10 +225,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("InvestorId", investorWalletDTO.InvestorId, DbType.Guid);
                 parameters.Add("WalletTypeId", investorWalletDTO.WalletTypeId, DbType.Guid);
 
-                using (var connection = CreateConnection())
-                {
-                    return await connection.ExecuteAsync(query, parameters);
-                }
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
             {
@@ -246,6 +244,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Id", id, DbType.Guid);
                 using var connection = CreateConnection();
                 return await connection.QueryFirstOrDefaultAsync<InvestorWallet>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<double> GetInvestorWalletBalanceById(Guid id)
+        {
+            try
+            {
+                string query = "SELECT Balance FROM InvestorWallet WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", id, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<double>(query, parameters);
             }
             catch (Exception e)
             {

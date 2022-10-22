@@ -149,6 +149,10 @@ namespace RevenueSharingInvest.API.Extensions
             services.AddScoped<IBillRepository, BillRepository>();
             services.AddScoped<IBillService, BillService>();
 
+            // WITHDRAW REQUEST
+            services.AddScoped<IWithdrawRequestRepository, WithdrawRequestRepository>();
+            services.AddScoped<IWithdrawRequestService, WithdrawRequestService>();
+
             //MOMO
             services.AddScoped<IMomoService, MomoService>();
 

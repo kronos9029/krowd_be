@@ -104,6 +104,8 @@ namespace RevenueSharingInvest.Business.Helpers
 
             CreateMap<Payment, InvestmentPaymentDTO>().ReverseMap();
             CreateMap<Payment, PeriodRevenuePaymentDTO>().ReverseMap();
+
+            CreateMap<WalletType, WalletTypeDTO>().ReverseMap();
         }
     }
 }
