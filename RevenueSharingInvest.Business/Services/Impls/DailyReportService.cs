@@ -56,6 +56,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 List<DailyReportDTO> list = _mapper.Map<List<DailyReportDTO>>(dailyReportList);
                 foreach (DailyReportDTO item in list)
                 {
+                    item.reportDate = await _validationService.FormatDateOutput(item.reportDate);
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = item.updateDate == null ? null : await _validationService.FormatDateOutput(item.updateDate);
 
@@ -81,6 +82,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (result == null)
                     throw new NotFoundException("No DailyReport Object Found!");
 
+                result.reportDate = await _validationService.FormatDateOutput(result.reportDate);
                 result.createDate = await _validationService.FormatDateOutput(result.createDate);
                 result.updateDate = result.updateDate == null ? null : await _validationService.FormatDateOutput(result.updateDate);
 
@@ -104,6 +106,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (result == null)
                     throw new NotFoundException("No DailyReport Object Found!");
 
+                result.reportDate = await _validationService.FormatDateOutput(result.reportDate);
                 result.createDate = await _validationService.FormatDateOutput(result.createDate);
                 result.updateDate = result.updateDate == null ? null : await _validationService.FormatDateOutput(result.updateDate);
 

@@ -1,4 +1,4 @@
-﻿/*using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RevenueSharingInvest.Business.Helpers;
@@ -44,19 +44,19 @@ namespace RevenueSharingInvest.API.Controllers
         {
             string accessKey = GenerateAccessKey();
             string secretKey = GenerateSecretKey();
-                
 
-            IntegrateInfo info = await _projectService.GetIntegrateInfoByUserEmail(request.projectId);
 
-            string userMessage = "projectId=" + request.projectId + "&accessKey=" + request.accessKey;
-            string systemMessage = "projectId=" + info.ProjectId + "&accessKey=" + info.AccessKey;
+            //IntegrateInfo info = await _projectService.GetIntegrateInfoByUserEmail(request.projectId);
 
-            string userSignature = CreateSignature(userMessage, info.SecretKey);
-            string systemSignature = CreateSignature(systemMessage, info.SecretKey);
+            //string userMessage = "projectId=" + request.projectId + "&accessKey=" + request.accessKey;
+            //string systemMessage = "projectId=" + info.ProjectId + "&accessKey=" + info.AccessKey;
 
-            bool check = userSignature.Equals(systemMessage);
+            //string userSignature = CreateSignature(userMessage, info.SecretKey);
+            //string systemSignature = CreateSignature(systemMessage, info.SecretKey);
 
-            return Ok(check);
+            //bool check = userSignature.Equals(systemMessage);
+
+            return Ok(0);
         }
 
         private string CreateSignature(string message, string key)
@@ -111,4 +111,3 @@ namespace RevenueSharingInvest.API.Controllers
 
     }
 }
-*/

@@ -45,14 +45,19 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPost]
         [Route("Krowd-upload")]
-        public async Task<IActionResult> UploadBillsFromKrowd(List<BillDTO> bills)
+        public async Task<IActionResult> UploadBillsFromKrowd(List<BillDTO> bills, string date)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             InsertBillDTO billDTO = new();
-            billDTO.ProjectId = currentUser.projectId;
-            billDTO.Bills = bills;
-            var result = await _billService.BulkInsertBills(billDTO, billDTO.ProjectId, DateTimePicker.GetDateTimeByTimeZone().ToString());
-            return Ok(result);
+
+            if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            {
+                billDTO.ProjectId = currentUser.projectId;
+                billDTO.Bills = bills;
+                var result = await _billService.BulkInsertBills(billDTO, billDTO.ProjectId, date);
+                return Ok(result);
+            }
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER can perform this action!!!");
         }
 
         [HttpPost]

@@ -2,6 +2,7 @@
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
+using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -56,7 +57,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Project project = await _projectRepository.GetProjectById(Guid.Parse(projectId));
                 DailyReport dailyReport = await _dailyReportRepository.GetDailyReportByProjectIdAndDate(Guid.Parse(projectId), date);
 
-                for(int i = 0; i < bills.Bills.Count; i++)
+                if (dailyReport.Amount != 0 && dailyReport.Status.Equals(DailyReportStatusEnum.REPORTED.ToString()))
+                    throw new InvalidFieldException("You have reported for this day already!!!");
+                else if (dailyReport.Amount != 0 && dailyReport.Status.Equals(DailyReportStatusEnum.UNDUE.ToString()))
+                    throw new InvalidFieldException("You can report for this day soon!!!");
+
+                for (int i = 0; i < bills.Bills.Count; i++)
                 {
                     bills.Bills[i].DailyReportId = dailyReport.Id.ToString();
                     dailyReport.Amount += bills.Bills[i].Amount;

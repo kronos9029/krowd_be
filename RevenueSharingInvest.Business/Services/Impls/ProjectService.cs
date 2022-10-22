@@ -1329,6 +1329,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             try
             {
+                if (!await _validationService.CheckExistenceId("Project", projectId))
+                    throw new NotFoundException("This projectId is not existed!!!");
+
                 Project project = await _projectRepository.GetProjectById(projectId);
                 if (project.Status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
                 {
