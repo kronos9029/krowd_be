@@ -23,6 +23,7 @@ using System.Linq;
 using Google.Cloud.Firestore;
 using RevenueSharingInvest.Data.Helpers;
 using System.Text.Json;
+using RevenueSharingInvest.Business.Services.Extensions.iText;
 
 namespace RevenueSharingInvest.API.Extensions
 {
@@ -162,6 +163,9 @@ namespace RevenueSharingInvest.API.Extensions
             ///
             //Upload File To Firebase
             services.AddScoped<IFileUploadService, FileUploadService>();
+
+            // iText
+            services.AddScoped<IITextService, ITextService>();
         }
 
         public static void AddSafeListAnnotation(this IServiceCollection services, IConfiguration configuration)

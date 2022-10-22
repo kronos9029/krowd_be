@@ -273,10 +273,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", investorDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", investorId, DbType.Guid);
 
-                using (var connection = CreateConnection())
-                {
-                    return await connection.ExecuteAsync(query, parameters);
-                }
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
             {
@@ -297,6 +295,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 return await connection.QueryFirstOrDefaultAsync<Investor>(query, parameters);
             }
             catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<InvestorContractInfo> GetInvestorNameByEmail(string email)
+        {
+            try
+            {
+                string query = "SELECT I.Id, U.LastName, U.FirstName, U.PhoneNum, U.IdCard, U.DateOfBirth, U.City, U.District, U.Address FROM Investor I LEFT JOIN [User] U ON I.UserId = U.Id WHERE U.Email = @Email";
+                var parameters = new DynamicParameters();
+                parameters.Add("Email", email, DbType.String);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<InvestorContractInfo>(query, parameters);
+            }
+            catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
@@ -333,5 +348,18 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+    }
+
+    public class InvestorContractInfo
+    {
+        public Guid Id { get; set; }
+        public string LastName { get; set; }
+        public string FirstName { get; set; }
+        public string PhoneNum { get; set; }
+        public string IdCard { get; set; }
+        public string DateOfBirth { get; set; }
+        public string City { get; set; }
+        public string District { get; set; }
+        public string Address { get; set; }
     }
 }

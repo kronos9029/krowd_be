@@ -1,4 +1,5 @@
 ﻿using RevenueSharingInvest.Data.Models.Entities;
+using RevenueSharingInvest.Data.Repositories.Repos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<Investor> GetInvestorById(Guid investorId);
         public Task<Guid> GetInvestorByEmail(String email);
         public Task<Investor> GetInvestorByUserId(Guid userId);
+        public Task<InvestorContractInfo> GetInvestorNameByEmail(string email);
 
         //UPDATE
         public Task<int> UpdateInvestorStatus(Guid userId, string status, Guid currentUserId);

@@ -994,6 +994,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        public async Task<string> GetProjectNameForContractById(Guid projectId)
+        {
+            try
+            {
+                var query = "SELECT Name FROM Project WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<string>(query, parameters);
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
     }
 
     public enum RoleEnum
