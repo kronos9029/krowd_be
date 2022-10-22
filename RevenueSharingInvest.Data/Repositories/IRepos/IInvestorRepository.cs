@@ -17,7 +17,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<Investor> GetInvestorById(Guid investorId);
         public Task<Guid> GetInvestorByEmail(String email);
         public Task<Investor> GetInvestorByUserId(Guid userId);
-        public Task<InvestorName> GetInvestorNameByEmail(string email);
+        public Task<InvestorContractInfo> GetInvestorNameByEmail(string email);
 
         //UPDATE
         public Task<int> UpdateInvestorStatus(Guid userId, string status, Guid currentUserId);

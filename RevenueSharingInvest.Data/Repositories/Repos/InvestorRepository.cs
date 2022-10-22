@@ -301,15 +301,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public async Task<InvestorName> GetInvestorNameByEmail(string email)
+        public async Task<InvestorContractInfo> GetInvestorNameByEmail(string email)
         {
             try
             {
-                string query = "SELECT I.Id, U.LastName, U.FirstName FROM Investor I LEFT JOIN [User] U ON I.UserId = U.Id WHERE U.Email = @Email";
+                string query = "SELECT I.Id, U.LastName, U.FirstName, U.PhoneNum, U.IdCard, U.DateOfBirth, U.City, U.District, U.Address FROM Investor I LEFT JOIN [User] U ON I.UserId = U.Id WHERE U.Email = @Email";
                 var parameters = new DynamicParameters();
                 parameters.Add("Email", email, DbType.String);
                 using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<InvestorName>(query, parameters);
+                return await connection.QueryFirstOrDefaultAsync<InvestorContractInfo>(query, parameters);
             }
             catch(Exception e)
             {
@@ -350,10 +350,16 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
     }
 
-    public class InvestorName
+    public class InvestorContractInfo
     {
         public Guid Id { get; set; }
         public string LastName { get; set; }
         public string FirstName { get; set; }
+        public string PhoneNum { get; set; }
+        public string IdCard { get; set; }
+        public string DateOfBirth { get; set; }
+        public string City { get; set; }
+        public string District { get; set; }
+        public string Address { get; set; }
     }
 }

@@ -36,11 +36,11 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Getokok(string projectId)
+        public async Task<IActionResult> Getokok(string projectId, decimal amount)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
-            _iTextService.GenerateProjectContract(currentUser, projectId);
-            return Ok(0);
+            var result = await _iTextService.GenerateProjectContract(currentUser, projectId, amount);
+            return Ok(result);
         }
 
         private string CreateSignature(string message, string key)
