@@ -36,6 +36,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public string Type { get; set; }
+        public Guid? WithdrawRequestId { get; set; }
 
         [ForeignKey(nameof(FromUserId))]
         [InverseProperty(nameof(User.AccountTransactionFromUsers))]
@@ -43,5 +44,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [ForeignKey(nameof(ToUserId))]
         [InverseProperty(nameof(User.AccountTransactionToUsers))]
         public virtual User ToUser { get; set; }
+        [ForeignKey(nameof(WithdrawRequestId))]
+        [InverseProperty("AccountTransactions")]
+        public virtual WithdrawRequest WithdrawRequest { get; set; }
     }
 }

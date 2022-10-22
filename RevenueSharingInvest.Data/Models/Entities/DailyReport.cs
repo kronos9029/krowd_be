@@ -19,15 +19,15 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Key]
         public Guid Id { get; set; }
         public Guid StageId { get; set; }
-        public double? Amount { get; set; }
+        public double Amount { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? ReportDate { get; set; }
+        public DateTime ReportDate { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
-        public Guid? UpdateBy { get; set; }
+        public string? UpdateBy { get; set; }
         [StringLength(20)]
         public string Status { get; set; }
 

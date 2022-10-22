@@ -47,6 +47,7 @@ namespace RevenueSharingInvest.Data.Helpers
         public virtual DbSet<VoucherItem> VoucherItems { get; set; }
         public virtual DbSet<WalletTransaction> WalletTransactions { get; set; }
         public virtual DbSet<WalletType> WalletTypes { get; set; }
+        public virtual DbSet<WithdrawRequest> WithdrawRequests { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -55,6 +56,7 @@ namespace RevenueSharingInvest.Data.Helpers
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
                 //optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=Krowd;User ID=sa;Password=123");
                 //optionsBuilder.UseSqlServer("Data Source=krowddb.cn4oiq8oeltn.ap-southeast-1.rds.amazonaws.com;Initial Catalog=KrowdDB;User ID=krowdAdmin2022;Password=krowd2022");
+
             }
         }
 
@@ -83,6 +85,11 @@ namespace RevenueSharingInvest.Data.Helpers
                     .WithMany(p => p.AccountTransactionToUsers)
                     .HasForeignKey(d => d.ToUserId)
                     .HasConstraintName("FK_AccountTransaction_User1");
+
+                entity.HasOne(d => d.WithdrawRequest)
+                    .WithMany(p => p.AccountTransactions)
+                    .HasForeignKey(d => d.WithdrawRequestId)
+                    .HasConstraintName("FK_AccountTransaction_WithdrawRequest");
             });
 
             modelBuilder.Entity<Area>(entity =>
@@ -126,8 +133,6 @@ namespace RevenueSharingInvest.Data.Helpers
             modelBuilder.Entity<DailyReport>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.HasOne(d => d.Stage)
                     .WithMany(p => p.DailyReports)
@@ -403,6 +408,21 @@ namespace RevenueSharingInvest.Data.Helpers
             modelBuilder.Entity<WalletType>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+            });
+
+            modelBuilder.Entity<WithdrawRequest>(entity =>
+            {
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.HasOne(d => d.CreateByNavigation)
+                    .WithMany(p => p.WithdrawRequestCreateByNavigations)
+                    .HasForeignKey(d => d.CreateBy)
+                    .HasConstraintName("FK_WithdrawRequest_User");
+
+                entity.HasOne(d => d.UpdateByNavigation)
+                    .WithMany(p => p.WithdrawRequestUpdateByNavigations)
+                    .HasForeignKey(d => d.UpdateBy)
+                    .HasConstraintName("FK_WithdrawRequest_User1");
             });
 
             OnModelCreatingPartial(modelBuilder);

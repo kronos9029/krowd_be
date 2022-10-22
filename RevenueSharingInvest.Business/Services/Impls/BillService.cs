@@ -1,5 +1,9 @@
-﻿using RevenueSharingInvest.Data.Helpers.Logger;
+﻿using AutoMapper;
+using RevenueSharingInvest.Business.Exceptions;
+using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
 using System.Collections.Generic;
@@ -12,23 +16,57 @@ namespace RevenueSharingInvest.Business.Services.Impls
     public class BillService : IBillService
     {
         private readonly IBillRepository _billRepository;
-        public BillService(IBillRepository billRepository)
+        private readonly IProjectRepository _projectRepository;
+        private readonly IStageRepository _stageRepository;
+        private readonly IDailyReportRepository _dailyReportRepository;
+
+        private readonly IValidationService _validationService;
+        private readonly IMapper _mapper;
+        public BillService(
+            IBillRepository billRepository,
+            IProjectRepository projectRepository,
+            IStageRepository stageRepository,
+            IDailyReportRepository dailyReportRepository,
+
+            IValidationService validationService,
+            IMapper mapper)
         {
             _billRepository = billRepository;
+            _projectRepository = projectRepository;
+            _stageRepository = stageRepository;
+            _dailyReportRepository = dailyReportRepository;
+
+            _validationService = validationService;
+
+            _mapper = mapper;
         }
-        public async Task<int> BulkInsertBills(InsertBillDTO bills, string projectId)
+        public async Task<DailyReportDTO> BulkInsertBills(InsertBillDTO bills, string projectId, string date)
         {
             try
             {
-                Guid currentProjectId = Guid.Parse(projectId);
+                if (projectId == null || !await _validationService.CheckUUIDFormat(projectId))
+                    throw new InvalidFieldException("Invalid projectId!!!");
+
+                if (!await _validationService.CheckExistenceId("Project", Guid.Parse(projectId)))
+                    throw new NotFoundException("This projectId is not existed!!!");
+
+                if (date == null || !await _validationService.CheckDate(date))
+                    throw new InvalidFieldException("Invalid date!!!");
+
+                Project project = await _projectRepository.GetProjectById(Guid.Parse(projectId));
+                DailyReport dailyReport = await _dailyReportRepository.GetDailyReportByProjectIdAndDate(Guid.Parse(projectId), date);
 
                 for(int i = 0; i < bills.Bills.Count; i++)
                 {
-                    bills.Bills[i].ProjectId = currentProjectId;
-                }
+                    bills.Bills[i].DailyReportId = dailyReport.Id.ToString();
+                    dailyReport.Amount += bills.Bills[i].Amount;
+                }          
 
                 var result = await _billRepository.BulkInsertInvoice(bills);
-                return result;
+
+                await _dailyReportRepository.UpdateDailyReport(dailyReport);
+
+                return _mapper.Map<DailyReportDTO>(await _dailyReportRepository.GetDailyReportById(dailyReport.Id));
             }
             catch(Exception e)
             {

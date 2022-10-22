@@ -18,6 +18,7 @@ namespace RevenueSharingInvest.Business.Helpers
             CreateMap<Area, AreaDTO>().ReverseMap();
             CreateMap<BusinessField, BusinessFieldDTO>().ReverseMap();
             CreateMap<RevenueSharingInvest.Data.Models.Entities.Business, BusinessDTO>().ReverseMap();            
+            CreateMap<DailyReport, DailyReportDTO>().ReverseMap();            
             CreateMap<Field, FieldDTO>().ReverseMap();
             CreateMap<Investment, InvestmentDTO>().ReverseMap();
             CreateMap<Investor, InvestorDTO>().ReverseMap();

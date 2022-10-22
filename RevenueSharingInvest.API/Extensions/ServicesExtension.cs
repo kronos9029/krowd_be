@@ -44,6 +44,10 @@ namespace RevenueSharingInvest.API.Extensions
             services.AddScoped<IAreaService, AreaService>();
             services.AddScoped<IAreaRepository, AreaRepository>();
 
+            // BILL
+            services.AddScoped<IBillRepository, BillRepository>();
+            services.AddScoped<IBillService, BillService>();
+
             //BUSINESS
             services.AddScoped<IBusinessService, BusinessService>();
             services.AddScoped<IBusinessRepository, BusinessRepository>();
@@ -51,6 +55,10 @@ namespace RevenueSharingInvest.API.Extensions
             //BUSINESS FIELD
             services.AddScoped<IBusinessFieldService, BusinessFieldService>();
             services.AddScoped<IBusinessFieldRepository, BusinessFieldRepository>();
+
+            //DAILY REPORT
+            services.AddScoped<IDailyReportService, DailyReportService>();
+            services.AddScoped<IDailyReportRepository, DailyReportRepository>();
 
             //FIELD
             services.AddScoped<IFieldService, FieldService>();
@@ -144,10 +152,6 @@ namespace RevenueSharingInvest.API.Extensions
             services.AddScoped<IWalletTypeRepository, WalletTypeRepository>();
             services.AddScoped<IWalletTypeService, WalletTypeService>();
 
-            // BILL
-            services.AddScoped<IBillRepository, BillRepository>();
-            services.AddScoped<IBillService, BillService>();
-
             //MOMO
             services.AddScoped<IMomoService, MomoService>();
 
@@ -162,6 +166,7 @@ namespace RevenueSharingInvest.API.Extensions
             ///
             //Upload File To Firebase
             services.AddScoped<IFileUploadService, FileUploadService>();
+
         }
 
         public static void AddSafeListAnnotation(this IServiceCollection services, IConfiguration configuration)

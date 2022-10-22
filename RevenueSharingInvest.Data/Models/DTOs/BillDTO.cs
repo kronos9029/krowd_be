@@ -9,11 +9,11 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class BillDTO
     {
         public string InvoiceId { get; set; }
+        public string DailyReportId { get; set; }
         public double Amount { get; set; }
         public string Description { get; set; }
         public string CreateBy { get; set; }
         public string CreateDate { get; set; }
-        public Guid ProjectId { get; set; }
     }
 
     public class InsertBillDTO

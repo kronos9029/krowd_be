@@ -15,6 +15,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //READ
         public Task<List<Stage>> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pagesize);
         public Task<Stage> GetStageById(Guid stageId);
+        public Task<Stage> GetStageByProjectIdAndDate(Guid projectId, string date);
 
         //UPDATE
         public Task<int> UpdateStage(Stage stageDTO, Guid stageId);
