@@ -45,16 +45,16 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPost]
         [Route("Krowd-upload")]
-        public async Task<IActionResult> UploadBillsFromKrowd(List<BillDTO> bills, string date)
+        public async Task<IActionResult> UploadBillsFromKrowd(KrowdUploadRevenueRequest request)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             InsertBillDTO billDTO = new();
 
             if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
-                billDTO.ProjectId = currentUser.projectId;
-                billDTO.Bills = bills;
-                var result = await _billService.BulkInsertBills(billDTO, billDTO.ProjectId, date);
+                billDTO.projectId = request.projectId;
+                billDTO.bills = request.bills;
+                var result = await _billService.BulkInsertBills(billDTO, billDTO.projectId, request.date);
                 return Ok(result);
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER can perform this action!!!");
@@ -73,9 +73,9 @@ namespace RevenueSharingInvest.API.Controllers
             if (systemSignature.Equals(request.signature))
             {
                 InsertBillDTO billDTO = new();
-                billDTO.ProjectId = info.ProjectId.ToString();
-                billDTO.Bills = request.bills;
-                var result = await _billService.BulkInsertBills(billDTO, billDTO.ProjectId, request.date);
+                billDTO.projectId = info.ProjectId.ToString();
+                billDTO.bills = request.bills;
+                var result = await _billService.BulkInsertBills(billDTO, billDTO.projectId, request.date);
                 return Ok(result);
             }
 
@@ -127,6 +127,13 @@ namespace RevenueSharingInvest.API.Controllers
         public string projectId { get; set; }
         public string date { get; set; }
         public string signature { get; set; }
+        public List<BillDTO> bills { get; set; }
+    }
+
+    public class KrowdUploadRevenueRequest
+    {
+        public string projectId { get; set; }
+        public string date { get; set; }
         public List<BillDTO> bills { get; set; }
     }
 }

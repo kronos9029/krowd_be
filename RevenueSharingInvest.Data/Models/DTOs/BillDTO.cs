@@ -8,17 +8,23 @@ namespace RevenueSharingInvest.Data.Models.DTOs
 {
     public class BillDTO
     {
-        public string InvoiceId { get; set; }
-        public string DailyReportId { get; set; }
-        public double Amount { get; set; }
-        public string Description { get; set; }
-        public string CreateBy { get; set; }
-        public string CreateDate { get; set; }
+        public string invoiceId { get; set; }
+        public double amount { get; set; }
+        public string description { get; set; }
+        public string createBy { get; set; }
+        public string createDate { get; set; }
     }
 
     public class InsertBillDTO
     {
-        public string ProjectId { get; set; }
-        public List<BillDTO> Bills { get; set; }
+        public string projectId { get; set; }
+        public string dailyReportId { get; set; }
+        public List<BillDTO> bills { get; set; }
+    }
+
+    public class GetBillDTO : BillDTO
+    {
+        public string id { get; set; }
+        public string dailyReportId { get; set; }
     }
 }

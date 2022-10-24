@@ -44,6 +44,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<List<BusinessProjectDTO>> GetBusinessProjectsToAuthor(Guid businessId);
         public Task<IntegrateInfo> GetIntegrateInfoByProjectId(Guid projectId);
         public Task<string> GetProjectNameForContractById(Guid projectId);
+        public Task<Project> GetProjectByDailyReportId(Guid dailyReportId);
 
         //UPDATE
         public Task<int> UpdateProject(Project projectDTO, Guid projectId);

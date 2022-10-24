@@ -45,6 +45,10 @@ namespace RevenueSharingInvest.API.Extensions
             services.AddScoped<IAreaService, AreaService>();
             services.AddScoped<IAreaRepository, AreaRepository>();
 
+            // BILL
+            services.AddScoped<IBillRepository, BillRepository>();
+            services.AddScoped<IBillService, BillService>();
+
             //BUSINESS
             services.AddScoped<IBusinessService, BusinessService>();
             services.AddScoped<IBusinessRepository, BusinessRepository>();
@@ -148,10 +152,6 @@ namespace RevenueSharingInvest.API.Extensions
             // WALLET TYPE
             services.AddScoped<IWalletTypeRepository, WalletTypeRepository>();
             services.AddScoped<IWalletTypeService, WalletTypeService>();
-
-            // BILL
-            services.AddScoped<IBillRepository, BillRepository>();
-            services.AddScoped<IBillService, BillService>();
 
             // WITHDRAW REQUEST
             services.AddScoped<IWithdrawRequestRepository, WithdrawRequestRepository>();

@@ -1011,6 +1011,30 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET BY DAILY REPORT ID
+        public async Task<Project> GetProjectByDailyReportId(Guid dailyReportId)
+        {
+            try
+            {
+                string query = "SELECT " 
+                    + "             P.* " 
+                    + "         FROM " 
+                    + "             Project P "
+                    + "             JOIN Stage S ON P.Id = S.ProjectId "
+                    + "             JOIN DailyReport DR ON S.Id = DR.StageId "
+                    + "         WHERE " 
+                    + "             DR.Id = @DailyReportId";
+                var parameters = new DynamicParameters();
+                parameters.Add("DailyReportId", dailyReportId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Project>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 
     public enum RoleEnum
