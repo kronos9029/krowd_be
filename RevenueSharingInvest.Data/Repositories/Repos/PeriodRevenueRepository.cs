@@ -101,6 +101,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         StageId, "
                     + "         ActualAmount, "
                     + "         SharedAmount, "
+                    + "         PaidAmount, "
                     + "         PessimisticExpectedAmount, "
                     + "         NormalExpectedAmount, "
                     + "         OptimisticExpectedAmount, "
