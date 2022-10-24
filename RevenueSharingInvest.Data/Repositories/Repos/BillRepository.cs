@@ -19,7 +19,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         public BillRepository(IConfiguration configuration) : base(configuration)
         {
         }
-
+        
+        //CREATE
         public async Task<int> BulkInsertInvoice(InsertBillDTO request)
         {
             try
@@ -63,6 +64,34 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
+            }
+        }
+
+        //DELETE BY PROJECT ID
+        public async Task<int> DeleteBillByProjectId(Guid projectId)
+        {
+            try
+            {
+                var query = "DELETE FROM Bill "
+                    + "     WHERE "
+                    + "         DailyReportId IN  "
+                    + "         (SELECT "
+                    + "             DR.Id "
+                    + "         FROM "
+                    + "             DailyReport DR "
+                    + "             JOIN Stage S ON DR.StageId = S.Id "
+                    + "         WHERE "
+                    + "             S.ProjectId = @ProjectId)";
+                using var connection = CreateConnection();
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
             }
         }
 

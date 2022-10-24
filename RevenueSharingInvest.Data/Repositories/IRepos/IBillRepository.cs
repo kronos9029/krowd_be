@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //UPDATE
 
         //DELETE
+        public Task<int> DeleteBillByProjectId(Guid projectId);
     }
 }

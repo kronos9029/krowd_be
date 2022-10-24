@@ -81,6 +81,28 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //DELETE BY PROJECT ID
+        public async Task<int> DeleteDailyReportByProjectId(Guid projectId)
+        {
+            try
+            {
+                var query = "DELETE FROM DailyReport "
+                    + "     WHERE "
+                    + "         StageId IN  "
+                    + "         (SELECT Id FROM Stage WHERE ProjectId = @ProjectId)";
+                using var connection = CreateConnection();
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
         //GET ALL
         public async Task<List<DailyReport>> GetAllDailyReports(int pageIndex, int pageSize, string projectId, string stageId, string roleId)
         {

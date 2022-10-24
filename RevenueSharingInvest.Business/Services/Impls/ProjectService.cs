@@ -42,6 +42,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IInvestorWalletRepository _investorWalletRepository;
         private readonly IWalletTransactionRepository _walletTransactionRepository;
         private readonly IDailyReportRepository _dailyReportRepository;
+        private readonly IBillRepository _billRepository;
 
         private readonly IValidationService _validationService;
         private readonly IProjectTagService _projectTagService;
@@ -67,6 +68,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IInvestorWalletRepository investorWalletRepository,
             IWalletTransactionRepository walletTransactionRepository,
             IDailyReportRepository dailyReportRepository,
+            IBillRepository billRepository,
 
             IValidationService validationService,
             IProjectTagService projectTagService,
@@ -91,6 +93,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _investorWalletRepository = investorWalletRepository;
             _walletTransactionRepository = walletTransactionRepository;
             _dailyReportRepository = dailyReportRepository;
+            _billRepository = billRepository;
 
             _validationService = validationService;
             _projectTagService = projectTagService;
@@ -531,6 +534,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 await _periodRevenueHistoryRepository.DeletePeriodRevenueHistoryByProjectId(projectId);
                 //Xóa PeriodRevenue
                 await _periodRevenueRepository.DeletePeriodRevenueByProjectId(projectId);
+                //Xóa Bill
+                await _billRepository.DeleteBillByProjectId(projectId);
+                //Xóa DailyReport
+                await _dailyReportRepository.DeleteDailyReportByProjectId(projectId);
                 //Xóa Stage
                 await _stageRepository.DeleteStageByProjectId(projectId);
                 //Xóa ProjectEntity
