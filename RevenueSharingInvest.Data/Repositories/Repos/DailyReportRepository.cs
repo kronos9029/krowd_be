@@ -55,6 +55,29 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //COUNT NOT_REPORTED STATUS BY STAGE ID
+        public async Task<int> CountNotReportedDailyReportsByStageId(Guid stageId)
+        {
+            try
+            {
+                string query = "SELECT COUNT(*) "
+                    + "         FROM "
+                    + "             DailyReport "
+                    + "         WHERE "
+                    + "             StageId = @StageId "
+                    + "             AND Status IN ('UNDUE', 'DUE', 'NOT_REPORTED') ";
+                var parameters = new DynamicParameters();
+                parameters.Add("StageId", stageId, DbType.Guid);
+                using var connection = CreateConnection();
+                return ((int)connection.ExecuteScalar(query, parameters));
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //CREATE
         public async Task<int> CreateDailyReports(DailyReport dailyReport, int numOfReport)
         {
@@ -163,6 +186,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<DailyReport>(query, parameters)).ToList();
                 }
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //GET BY STAGE ID
+        public async Task<List<DailyReport>> GetAllDailyReportsByStageId(Guid stageId)
+        {
+            try
+            {
+                var query = "SELECT * FROM DailyReport WHERE StageId = @StageId ORDER BY ReportDate ASC";
+                var parameters = new DynamicParameters();
+                parameters.Add("StageId", stageId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<DailyReport>(query, parameters)).ToList();
             }
             catch (Exception e)
             {

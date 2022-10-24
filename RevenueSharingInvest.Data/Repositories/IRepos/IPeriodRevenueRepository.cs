@@ -18,7 +18,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<PeriodRevenue> GetPeriodRevenueByStageId(Guid stageId);
 
         //UPDATE
-        public Task<int> UpdatePeriodRevenue(PeriodRevenue periodRevenueDTO, Guid periodRevenueId);
+        public Task<int> UpdatePeriodRevenue(PeriodRevenue periodRevenueDTO);
         public Task<int> UpdatePeriodRevenueByStageId(PeriodRevenue periodRevenueDTO, Guid stageId);
 
         //DELETE

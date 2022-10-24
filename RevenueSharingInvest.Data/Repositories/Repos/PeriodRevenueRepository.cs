@@ -156,25 +156,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdatePeriodRevenue(PeriodRevenue periodRevenueDTO, Guid periodRevenueId)
+        public async Task<int> UpdatePeriodRevenue(PeriodRevenue periodRevenueDTO)
         {
             try
             {
                 var query = "UPDATE PeriodRevenue "
                     + "     SET "
-                    + "         ProjectId = @ProjectId, "
-                    + "         StageId = @StageId, "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy "
+                    + "         ActualAmount = ISNULL(ROUND(@ActualAmount, 0), ActualAmount), "
+                    + "         SharedAmount = ISNULL(ROUND(@SharedAmount, 0), SharedAmount), "
+                    + "         UpdateDate = @UpdateDate "
                     + "     WHERE "
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("ProjectId", periodRevenueDTO.ProjectId, DbType.Guid);
-                parameters.Add("StageId", periodRevenueDTO.StageId, DbType.Guid);
+                parameters.Add("ActualAmount", periodRevenueDTO.ActualAmount, DbType.Double);
+                parameters.Add("SharedAmount", periodRevenueDTO.SharedAmount, DbType.Double);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                parameters.Add("UpdateBy", periodRevenueDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", periodRevenueId, DbType.Guid);
+                parameters.Add("Id", periodRevenueDTO.Id, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {
