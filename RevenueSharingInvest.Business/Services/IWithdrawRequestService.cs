@@ -22,6 +22,7 @@ namespace RevenueSharingInvest.Business.Services
         public Task<dynamic> InvestorReportWithdrawRequest(string userId, string requestId, string description);
         public Task<GetWithdrawRequestDTO> GetWithdrawRequestByRequestIdAndUserId(string requestId, string userId);
         public Task<List<GetWithdrawRequestDTO>> GetWithdrawRequestByUserId(string userId);
+        public Task<dynamic> AdminResponeToWithdrawRequest(ThisUserObj currentUser, string requestId);
 
     }
 }

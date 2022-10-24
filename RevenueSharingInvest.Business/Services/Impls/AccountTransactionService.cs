@@ -184,7 +184,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Guid currentUserId = Guid.Parse(userId);
                 investorWallet.Balance -= amount;
                 investorWallet.UpdateBy = currentUserId;
-                await _investorWalletRepository.UpdateWalletBalance(investorWallet);
+                if (await _investorWalletRepository.UpdateWalletBalance(investorWallet) < 1)
+                    throw new UpdateObjectException("Update Wallet Balance Failed!!");
 
                 WalletTransaction walletTransaction = new()
                 {
@@ -195,11 +196,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     FromWalletId = investorWallet.Id,
                     CreateBy = currentUserId
                 };
-                await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
-
-
-
-
+                string checkWalletTransaction = await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+                if (checkWalletTransaction == null || checkWalletTransaction.Equals(""))
+                    throw new CreateObjectException("Create Wallet Transaction Failed!!");
 
                 AccountTransaction accountTransaction = new()
                 {
@@ -214,6 +213,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 };
 
                 string result = await _accountTransactionRepository.CreateAccountTransaction(accountTransaction);
+                if (result == null || result.Equals(""))
+                    throw new CreateObjectException("Create Account Transaction Failed!!");
                 return result;
             }
             catch(Exception e)

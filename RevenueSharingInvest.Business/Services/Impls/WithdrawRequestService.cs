@@ -64,8 +64,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     newRequestId = await _withdrawRequestRepository.CreateWithdrawRequest(withdrawRequest);
                 }
-
-
                 return newRequestId;
             }
             catch(Exception e)
@@ -87,6 +85,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 var resultString = await _accountTransactionService.CreateWithdrawAccountTransaction(investorWallet, currentUser.userId, amount, requestId);
                 return resultString;
+            }catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<dynamic> AdminResponeToWithdrawRequest(ThisUserObj currentUser, string requestId)
+        {
+            try
+            {
+                dynamic result = await _withdrawRequestRepository.AdminApproveWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(requestId));
+                return result;
+
             }catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());

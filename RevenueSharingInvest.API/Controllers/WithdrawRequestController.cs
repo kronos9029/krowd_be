@@ -79,7 +79,7 @@ namespace RevenueSharingInvest.API.Controllers
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             var currentRequest = await _withdrawRequestService.GetWithdrawRequestByRequestIdAndUserId(request.requestId, currentUser.userId);
             if (currentRequest == null)
-                throw new NotFoundException("No Suck Request With This Request ID!!");
+                throw new NotFoundException("No Such Request With This Request ID!!");
 
             if(currentUser.roleId.Equals(currentUser.adminRoleId))
             {
@@ -92,7 +92,7 @@ namespace RevenueSharingInvest.API.Controllers
                     } 
                     else if (currentRequest.Status.Equals(WithdrawRequestEnum.PARTIAL_ADMIN.ToString()))
                     {
-                        var result = await _withdrawRequestService.AdminApproveWithdrawRequest(currentUser, currentRequest.Id, currentRequest.Amount);
+                        var result = await _withdrawRequestService.AdminResponeToWithdrawRequest(currentUser, currentRequest.Id);
                         return Ok(result);
                     }
                 } 
