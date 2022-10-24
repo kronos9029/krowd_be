@@ -75,11 +75,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 
                 bills.dailyReportId = dailyReport.Id.ToString();
 
-                var result = await _billRepository.BulkInsertInvoice(bills);
+                await _billRepository.BulkInsertInvoice(bills);
 
                 await _dailyReportRepository.UpdateDailyReport(dailyReport);
 
-                return _mapper.Map<DailyReportDTO>(await _dailyReportRepository.GetDailyReportById(dailyReport.Id));
+                var result = _mapper.Map<DailyReportDTO>(await _dailyReportRepository.GetDailyReportById(dailyReport.Id));
+                result.reportDate = result.reportDate == null ? null : await _validationService.FormatDateOutput(result.reportDate);
+                result.createDate = result.createDate == null ? null : await _validationService.FormatDateOutput(result.createDate);
+                result.updateDate = result.updateDate == null ? null : await _validationService.FormatDateOutput(result.updateDate);
+
+                return result;
             }
             catch(Exception e)
             {

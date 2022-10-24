@@ -30,9 +30,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 for (int i = 0; i < request.bills.Count; i++)
                 {
                     if (i == request.bills.Count - 1)
-                        query += "('" + request.bills[i].invoiceId + "'" + "," + request.bills[i].amount  + "," + "'" + (request.bills[i].description ??= "") + "'" + "," + "'" + request.bills[i].createBy + "'" + "," + "'" + request.bills[i].createDate + "'" + "," + "'" + request.dailyReportId + "')";
+                        query += "('" + request.bills[i].invoiceId + "'" + "," + request.bills[i].amount  + "," + "'" + (request.bills[i].description ??= "") + "'" + "," + "'" + request.bills[i].createBy + "'" + "," + "'" + DateTime.ParseExact(request.bills[i].createDate, "dd/MM/yyyy HH:mm:ss", null) + "'" + "," + "'" + request.dailyReportId + "')";
                     else
-                        query += "('" + request.bills[i].invoiceId + "'" + "," + request.bills[i].amount  + "," + "'" + (request.bills[i].description ??= "") + "'" + "," + "'" + request.bills[i].createBy + "'" + "," + "'" + request.bills[i].createDate + "'" + "," + "'" + request.dailyReportId + "'),";
+                        query += "('" + request.bills[i].invoiceId + "'" + "," + request.bills[i].amount  + "," + "'" + (request.bills[i].description ??= "") + "'" + "," + "'" + request.bills[i].createBy + "'" + "," + "'" + DateTime.ParseExact(request.bills[i].createDate, "dd/MM/yyyy HH:mm:ss", null) + "'" + "," + "'" + request.dailyReportId + "'),";
 
                 }
                 using var connection = CreateConnection();
