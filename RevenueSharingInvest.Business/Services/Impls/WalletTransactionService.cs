@@ -111,7 +111,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async void TransferMoney(InvestorWallet from, dynamic to, double amount, string userId)
+        public async void TransferMoney(dynamic from, dynamic to, double amount, string userId)
         {
             try
             {
