@@ -45,23 +45,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (periodRevenueHistoryDTO.description != null && (periodRevenueHistoryDTO.description.Equals("string") || periodRevenueHistoryDTO.description.Length == 0))
                     periodRevenueHistoryDTO.description = null;
 
-                if (!await _validationService.CheckText(periodRevenueHistoryDTO.status))
-                    throw new InvalidFieldException("Invalid status!!!");
-
                 if (periodRevenueHistoryDTO.createBy != null && periodRevenueHistoryDTO.createBy.Length >= 0)
                 {
                     if (periodRevenueHistoryDTO.createBy.Equals("string"))
                         periodRevenueHistoryDTO.createBy = null;
                     else if (!await _validationService.CheckUUIDFormat(periodRevenueHistoryDTO.createBy))
                         throw new InvalidFieldException("Invalid createBy!!!");
-                }
-
-                if (periodRevenueHistoryDTO.updateBy != null && periodRevenueHistoryDTO.updateBy.Length >= 0)
-                {
-                    if (periodRevenueHistoryDTO.updateBy.Equals("string"))
-                        periodRevenueHistoryDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(periodRevenueHistoryDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
                 }
 
                 PeriodRevenueHistory dto = _mapper.Map<PeriodRevenueHistory>(periodRevenueHistoryDTO);
@@ -105,7 +94,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 foreach (PeriodRevenueHistoryDTO item in list)
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
-                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
                 }
 
                 return list;
@@ -129,7 +117,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new NotFoundException("No PeriodRevenueHistory Object Found!");
 
                 result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
 
                 return result;
             }
@@ -158,23 +145,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (periodRevenueHistoryDTO.description != null && (periodRevenueHistoryDTO.description.Equals("string") || periodRevenueHistoryDTO.description.Length == 0))
                     periodRevenueHistoryDTO.description = null;
 
-                if (!await _validationService.CheckText(periodRevenueHistoryDTO.status))
-                    throw new InvalidFieldException("Invalid status!!!");
-
                 if (periodRevenueHistoryDTO.createBy != null && periodRevenueHistoryDTO.createBy.Length >= 0)
                 {
                     if (periodRevenueHistoryDTO.createBy.Equals("string"))
                         periodRevenueHistoryDTO.createBy = null;
                     else if (!await _validationService.CheckUUIDFormat(periodRevenueHistoryDTO.createBy))
                         throw new InvalidFieldException("Invalid createBy!!!");
-                }
-
-                if (periodRevenueHistoryDTO.updateBy != null && periodRevenueHistoryDTO.updateBy.Length >= 0)
-                {
-                    if (periodRevenueHistoryDTO.updateBy.Equals("string"))
-                        periodRevenueHistoryDTO.updateBy = null;
-                    else if (!await _validationService.CheckUUIDFormat(periodRevenueHistoryDTO.updateBy))
-                        throw new InvalidFieldException("Invalid updateBy!!!");
                 }
 
                 PeriodRevenueHistory dto = _mapper.Map<PeriodRevenueHistory>(periodRevenueHistoryDTO);
