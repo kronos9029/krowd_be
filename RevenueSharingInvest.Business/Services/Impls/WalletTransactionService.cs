@@ -111,11 +111,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async void TransferMoney(dynamic from, dynamic to, double amount, string userId)
+        public async void TransferMoney(InvestorWallet from, dynamic to, double amount, string userId)
         {
             try
             {
-                
+                if (amount < 0 || amount > from.Balance)
+                    throw new WalletBalanceException("Invalid Amount!!");
                 var arrayOfAllKeys = WalletTypeDictionary.walletTypes.Keys.ToArray();
 
                 string fromType = "";
@@ -123,16 +124,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 foreach (var key in arrayOfAllKeys)
                 {
-                    if (from.InvestorId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault(key))))
+                    if (from.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault(key))))
                         fromType = key;
-                    if (to.InvestorId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault(key))))
+                    if (to.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault(key))))
                         toType = key;
+                    if (!fromType.Equals("") && !toType.Equals(""))
+                        break;
                 }
 
                 //Subtract  balance
                 from.Balance -= amount;
                 from.UpdateBy = Guid.Parse(userId);
-                await _investorWalletRepository.UpdateInvestorWalletBalance(from);
+                if (await _investorWalletRepository.UpdateInvestorWalletBalance(from) < 1)
+                    throw new UpdateObjectException("Update Investor Wallet "+fromType+" Balance Failed!!");
 
                 //Create CASH_OUT WalletTransaction
                 WalletTransaction walletTransaction = new WalletTransaction
@@ -145,16 +149,22 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     Type = WalletTransactionTypeEnum.CASH_OUT.ToString(),
                     CreateBy = Guid.Parse(userId)
                 };
-                await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+                string newWalletTransactionId = await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+                if (newWalletTransactionId == null || newWalletTransactionId.Equals(""))
+                    throw new CreateObjectException("Create Wallet Transaction Failed!!");
 
                 //Add to balance
                 to.Balance += amount;
-                await _investorWalletRepository.UpdateInvestorWalletBalance(to);
+                if (await _investorWalletRepository.UpdateInvestorWalletBalance(to) < 1)
+                    throw new UpdateObjectException("Update Investor Wallet " + toType + " Balance Failed!!");
 
                 //Create CASH_IN WalletTransaction
                 walletTransaction.Description = "Receive money from "+toType+" to "+fromType;
                 walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
-                await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+                newWalletTransactionId = "";
+                newWalletTransactionId = await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+                if (newWalletTransactionId == null || newWalletTransactionId.Equals(""))
+                    throw new CreateObjectException("Create Wallet Transaction Failed!!");
             }
             catch(Exception e)
             {
