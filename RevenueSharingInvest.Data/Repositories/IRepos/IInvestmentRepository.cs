@@ -17,6 +17,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId, Guid roleId);
         public Task<Investment> GetInvestmentById(Guid investmentId);
         public Task<List<InvestorInvestmentDTO>> GetInvestmentByProjectIdForAuthor(Guid projectId);
+        public Task<List<InvestedRecord>> GetInvestmentRecord(Guid projectId, Guid investorId);
         //public Task<List<Investment>> GetInvestmentForWallet(Guid investorId, string status);
 
         //UPDATE

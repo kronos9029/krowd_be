@@ -1035,13 +1035,27 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
-    }
 
-    public enum RoleEnum
-    {
-        ADMIN,
-        INVESTOR,
-        BUSINESS_MANAGER,
-        PROJECT_MANAGER
+        public async Task<InvestedProjectDetail> GetInvestedProjectDetail(Guid projectId, Guid investorId)
+        {
+            try
+            {
+                var query = "SELECT P.Name AS ProjectName, P.Status AS ProjectStatus, (SUM(I.TotalPrice) * P.Multiplier) AS ExpectedRevenue, P.NumOfStage " +
+                            "FROM Project P JOIN Investment I ON I.ProjectId = P.Id " +
+                            "WHERE P.Id = @Id AND I.InvestorId = @InvestorId " +
+                            "GROUP BY P.Name, P.Status, P.Multiplier, P.NumOfStage";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", projectId, DbType.Guid);
+                parameters.Add("InvestorId", investorId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<InvestedProjectDetail>(query, parameters);
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

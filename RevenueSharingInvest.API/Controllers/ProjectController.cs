@@ -243,6 +243,19 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
         }
 
+        //GET DETAILED INVESTED PROJECT
+        [HttpGet]
+        [Route("investedProject/{projectId}")]
+        [Authorize]
+        public async Task<IActionResult> GetInvestedProjectsDetail(string projectId)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            var result = await _projectService.GetInvestedProjectDetail(projectId, currentUser.investorId);
+
+            return Ok(result);
+            //return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
+        }
+
         //UPDATE
         [HttpPut]
         [Route("{id}")]

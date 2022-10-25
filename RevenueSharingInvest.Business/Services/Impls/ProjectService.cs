@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Google.Api.Gax.ResourceNames;
 using Hangfire;
 using Microsoft.VisualBasic;
 using RevenueSharingInvest.API;
@@ -1380,5 +1381,34 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 throw new Exception(e.Message);
             }
         }
+
+        public async Task<InvestedProjectDetailWithInvestment> GetInvestedProjectDetail(string projectId, string investorId)
+        {
+            try
+            {
+                Guid project = Guid.Parse(projectId);
+                Guid investor = Guid.Parse(investorId);
+
+                InvestedProjectDetail detail = await _projectRepository.GetInvestedProjectDetail(project, investor);
+                List<InvestedRecord> investedRecords = await _investmentRepository.GetInvestmentRecord(project, investor);
+
+
+                InvestedProjectDetailWithInvestment detailWithInvestment = new()
+                {
+                    ProjectName = detail.ProjectName,
+                    ProjectStatus = detail.ProjectStatus,
+                    ExpectedRevenue = detail.ExpectedRevenue,
+                    NumOfStage = detail.NumOfStage,
+                    investmentRecords = investedRecords
+                };
+
+                return detailWithInvestment;
+            }catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
     }
 }

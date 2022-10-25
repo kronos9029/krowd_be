@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.Repos;
 using System;

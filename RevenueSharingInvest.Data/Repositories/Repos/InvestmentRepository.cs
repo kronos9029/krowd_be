@@ -329,10 +329,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", investmentDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", investmentDTO.Id, DbType.Guid);
 
-                using (var connection = CreateConnection())
-                {
-                    return await connection.ExecuteAsync(query, parameters);
-                }
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
             {
@@ -340,5 +338,25 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        public async Task<List<InvestedRecord>> GetInvestmentRecord(Guid projectId, Guid investorId)
+        {
+            try
+            {
+                var query = "SELECT PA.Name AS PackageName, IV.Quantity, IV.TotalPrice, IV.CreateDate FROM Investment IV JOIN Package PA ON IV.PackageId = PA.Id WHERE IV.ProjectId = @ProjectId AND IV.InvestorId = @InvestorId";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                parameters.Add("InvestorId", investorId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<InvestedRecord>(query, parameters)).ToList();
+
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
     }
 }
