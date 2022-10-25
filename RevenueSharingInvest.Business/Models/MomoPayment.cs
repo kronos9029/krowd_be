@@ -61,7 +61,7 @@ namespace RevenueSharingInvest.Business.Models
         public string extraData { get; set; }
         public string lang { get; set; }
         public string signature { get; set; }
-
+        public string role { get; set; }
 
     }
 

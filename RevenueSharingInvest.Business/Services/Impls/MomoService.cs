@@ -71,25 +71,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
 
                 //build body json request
-                JObject message = new JObject
-            {
-                { "partnerCode", partnerCode },
-                { "partnerName", "Revenue Sharing Invest" },
-                { "storeId", "MomoTestStore" },
-                { "requestId", requestId },
-                { "amount", amount },
-                { "orderId", orderid },
-                { "orderInfo", orderInfo },
-                { "redirectUrl", returnUrl },
-                { "ipnUrl", notifyurl },
-                { "lang", "vi" },
-                { "extraData", extraData },
-                { "requestType", requestType },
-                { "partnerClientId", request.partnerClientId },
-                { "userInfo", userInfoJson },
-                { "signature", signature }
-
-            };
+                JObject message = new()
+                {
+                    { "partnerCode", partnerCode },
+                    { "partnerName", "Revenue Sharing Invest" },
+                    { "storeId", "MomoTestStore" },
+                    { "requestId", requestId },
+                    { "amount", amount },
+                    { "orderId", orderid },
+                    { "orderInfo", orderInfo },
+                    { "redirectUrl", returnUrl },
+                    { "ipnUrl", notifyurl },
+                    { "lang", "vi" },
+                    { "extraData", extraData },
+                    { "requestType", requestType },
+                    { "partnerClientId", request.partnerClientId },
+                    { "userInfo", userInfoJson },
+                    { "signature", signature }
+                };
 
                 string responseFromMomo = PaymentRequest.sendPaymentRequest(apiEndpoint, message.ToString());
 

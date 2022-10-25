@@ -116,20 +116,23 @@ namespace RevenueSharingInvest.API.Controllers
         
         [HttpPost]
         [Route("request")]
-        public async Task<IActionResult> RequestPaymentTest([FromForm]long amount)
+        public async Task<IActionResult> RequestPayment([FromForm]long amount)
         {
-            MomoPaymentRequest request = new();
-            request.amount = amount;
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
-            if (currentUser.email == null 
-                || currentUser.email == "" 
-                || currentUser.userId == null 
+            if (currentUser.email == null
+                || currentUser.email == ""
+                || currentUser.userId == null
                 || currentUser.userId == "")
             {
                 throw new LoginException("You Have To Login First!!");
             }
-            request.partnerClientId = currentUser.userId;
-            request.email = currentUser.email;
+            MomoPaymentRequest request = new()
+            {
+                amount = amount,
+                partnerClientId = currentUser.userId,
+                email = currentUser.email,
+                role = currentUser.roleName
+            };
 
             var result = _momoService.RequestPaymentWeb(request);
             return Ok(result);
