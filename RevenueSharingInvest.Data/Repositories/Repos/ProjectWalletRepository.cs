@@ -215,10 +215,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("ProjectManagerId", projectWalletDTO.ProjectManagerId, DbType.Guid);
                 parameters.Add("WalletTypeId", projectWalletDTO.WalletTypeId, DbType.Guid);
 
-                using (var connection = CreateConnection())
-                {
-                    return await connection.ExecuteAsync(query, parameters);
-                }
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
             {

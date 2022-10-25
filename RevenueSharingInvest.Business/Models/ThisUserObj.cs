@@ -10,6 +10,7 @@ namespace RevenueSharingInvest.API
         public string userId { get; set; }
         public string email { get; set; }
         public string roleId { get; set; }
+        public string roleName { get; set; }
         public string businessId { get; set; }
         public string investorId { get; set; }
         public string projectId { get; set; }

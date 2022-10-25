@@ -113,6 +113,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
+        public async Task<string> GetRoleNameByUserId(string userId)
+        {
+            try
+            {
+                string roleName = await _roleRepository.GetRoleNameByUserId(Guid.Parse(userId));
+
+                return roleName;
+            }catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
         //GET BY ID
         public async Task<RoleDTO> GetRoleById(Guid roleId)
         {
