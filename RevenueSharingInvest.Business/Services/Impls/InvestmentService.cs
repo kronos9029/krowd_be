@@ -87,6 +87,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 Package package = await _packageRepository.GetPackageById(Guid.Parse(investmentDTO.packageId));
 
+                Project project = await _projectRepository.GetProjectById(package.ProjectId);
+
+                if ((double)(project.InvestedCapital + (package.Price * investmentDTO.quantity)) > project.InvestmentTargetCapital)
+                    throw new InvalidFieldException("You can not invest because InvestedCapital after investment is greater than InvestmentTargetCapital!!!");
+
                 if (investmentDTO.quantity > package.RemainingQuantity)
                     throw new InvalidFieldException("This package remainingQuantity is " + package.RemainingQuantity + "!!!");
 
@@ -121,7 +126,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     result = _mapper.Map<InvestmentPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
                     result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                    Project project = await _projectRepository.GetProjectById(package.ProjectId);
+                    //Project project = await _projectRepository.GetProjectById(package.ProjectId);
                     result.projectId = project.Id.ToString();
                     result.projectName = project.Name;
                     result.packageId = package.Id.ToString();
@@ -194,7 +199,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         //Format Payment response
                         result = _mapper.Map<InvestmentPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
                         result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                        Project project = await _projectRepository.GetProjectById(package.ProjectId);
+                        //Project project = await _projectRepository.GetProjectById(package.ProjectId);
                         result.projectId = project.Id.ToString();
                         result.projectName = project.Name;
                         result.packageId = package.Id.ToString();
@@ -209,7 +214,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         paymentId = await _paymentRepository.CreatePayment(payment);
                         result = _mapper.Map<InvestmentPaymentDTO>(await _paymentRepository.GetPaymentById(Guid.Parse(paymentId)));
                         result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                        Project project = await _projectRepository.GetProjectById(package.ProjectId);
+                        //Project project = await _projectRepository.GetProjectById(package.ProjectId);
                         result.projectId = project.Id.ToString();
                         result.projectName = project.Name;
                         result.packageId = package.Id.ToString();

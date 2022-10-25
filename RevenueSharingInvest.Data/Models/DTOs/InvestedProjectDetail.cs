@@ -22,12 +22,8 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public DateTime CreateDate  { get; set; }
     }
 
-    public class InvestedProjectDetailWithInvestment
+    public class InvestedProjectDetailWithInvestment : InvestedProjectDetail
     {
-        public string ProjectName { get; set; }
-        public string ProjectStatus { get; set; }
-        public double ExpectedRevenue { get; set; }
-        public int NumOfStage { get; set; }
         public List<InvestedRecord> investmentRecords { get; set; }
     }
 }
