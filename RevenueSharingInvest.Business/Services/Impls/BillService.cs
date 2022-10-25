@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.VisualBasic;
 using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Extensions;
@@ -22,6 +23,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IProjectRepository _projectRepository;
         private readonly IStageRepository _stageRepository;
         private readonly IDailyReportRepository _dailyReportRepository;
+        private readonly IPeriodRevenueRepository _periodRevenueRepository;
 
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
@@ -30,6 +32,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IProjectRepository projectRepository,
             IStageRepository stageRepository,
             IDailyReportRepository dailyReportRepository,
+            IPeriodRevenueRepository periodRevenueRepository,
 
             IValidationService validationService,
             IMapper mapper)
@@ -38,6 +41,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _projectRepository = projectRepository;
             _stageRepository = stageRepository;
             _dailyReportRepository = dailyReportRepository;
+            _periodRevenueRepository = periodRevenueRepository;
 
             _validationService = validationService;
 
@@ -61,7 +65,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Project project = await _projectRepository.GetProjectById(Guid.Parse(projectId));
                 DailyReport dailyReport = await _dailyReportRepository.GetDailyReportByProjectIdAndDate(Guid.Parse(projectId), date);
                 if (dailyReport == null)
-                    throw new InvalidFieldException("This date is not within the project revenue reporting periods!!!");
+                    throw new InvalidFieldException("This date is not within the project revenue reporting periods!!!");               
 
                 if (dailyReport.Amount != 0 && dailyReport.Status.Equals(DailyReportStatusEnum.REPORTED.ToString()))
                     throw new InvalidFieldException("You have reported for this day already!!!");
@@ -71,13 +75,29 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 for (int i = 0; i < bills.bills.Count; i++)
                 {
                     dailyReport.Amount += bills.bills[i].amount;
-                }   
+                }
                 
                 bills.dailyReportId = dailyReport.Id.ToString();
 
                 await _billRepository.BulkInsertInvoice(bills);
 
                 await _dailyReportRepository.UpdateDailyReport(dailyReport);
+
+                Stage stage = await _stageRepository.GetStageById(dailyReport.StageId);
+                //Check to create PeriodRevenue
+                if (await _dailyReportRepository.CountNotReportedDailyReportsByStageId(stage.Id) == 0)
+                {
+                    PeriodRevenue periodRevenue = await _periodRevenueRepository.GetPeriodRevenueByStageId(stage.Id);
+                    periodRevenue.ActualAmount = new double();
+                    List<DailyReport> dailyReportList = await _dailyReportRepository.GetAllDailyReportsByStageId(stage.Id);
+                    foreach (DailyReport item in dailyReportList)
+                    {
+                        periodRevenue.ActualAmount += item.Amount;
+                    }
+                    periodRevenue.SharedAmount = periodRevenue.ActualAmount * project.SharedRevenue / 100;
+                    await _periodRevenueRepository.UpdatePeriodRevenue(periodRevenue);
+                }
+
 
                 var result = _mapper.Map<DailyReportDTO>(await _dailyReportRepository.GetDailyReportById(dailyReport.Id));
                 result.reportDate = result.reportDate == null ? null : await _validationService.FormatDateOutput(result.reportDate);

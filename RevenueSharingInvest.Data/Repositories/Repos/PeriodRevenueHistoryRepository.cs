@@ -29,38 +29,26 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Name, "
                     + "         PeriodRevenueId, "
                     + "         Amount, "
-                    + "         StageTotalAmount, "
                     + "         Description, "
-                    + "         Status, "
                     + "         CreateDate, "
-                    + "         CreateBy, "
-                    + "         UpdateDate, "
-                    + "         UpdateBy ) "
+                    + "         CreateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @Name, "
                     + "         @PeriodRevenueId, "
                     + "         @Amount, "
-                    + "         @StageTotalAmount, "
                     + "         @Description, "
-                    + "         @Status, "
                     + "         @CreateDate, "
-                    + "         @CreateBy, "
-                    + "         @UpdateDate, "
-                    + "         @UpdateBy )";
+                    + "         @CreateB )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", periodRevenueHistoryDTO.Name, DbType.String);
                 parameters.Add("PeriodRevenueId", periodRevenueHistoryDTO.PeriodRevenueId, DbType.Guid);
                 parameters.Add("Amount", periodRevenueHistoryDTO.Amount, DbType.Double);
-                parameters.Add("StageTotalAmount", periodRevenueHistoryDTO.StageTotalAmount, DbType.Double);
                 parameters.Add("Description", periodRevenueHistoryDTO.Description, DbType.String);
-                parameters.Add("Status", periodRevenueHistoryDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", periodRevenueHistoryDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                parameters.Add("UpdateBy", periodRevenueHistoryDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
@@ -121,13 +109,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Name, "
                     + "         PeriodRevenueId, "
                     + "         Amount, "
-                    + "         StageTotalAmount, "
                     + "         Description, "
-                    + "         Status, "
                     + "         CreateDate, "
-                    + "         CreateBy, "
-                    + "         UpdateDate, "
-                    + "         UpdateBy "
+                    + "         CreateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -181,10 +165,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SET "
                     + "         Name = @Name, "
                     + "         PeriodRevenueId = @PeriodRevenueId, "
-                    + "         Description = @Description, "
-                    + "         Status = @Status, "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy"
+                    + "         Description = @Description "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -192,9 +173,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Name", periodRevenueHistoryDTO.Name, DbType.String);
                 parameters.Add("PeriodRevenueId", periodRevenueHistoryDTO.PeriodRevenueId, DbType.Guid);
                 parameters.Add("Description", periodRevenueHistoryDTO.Description, DbType.String);
-                parameters.Add("Status", periodRevenueHistoryDTO.Status, DbType.String);
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                parameters.Add("UpdateBy", periodRevenueHistoryDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", periodRevenueHistoryId, DbType.Guid);
 
                 using (var connection = CreateConnection())

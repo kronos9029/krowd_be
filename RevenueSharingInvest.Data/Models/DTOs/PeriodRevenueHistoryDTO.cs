@@ -12,12 +12,8 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string name { get; set; }
         public string periodRevenueId { get; set; }
         public double amount { get; set; }
-        public double stageTotalAmount { get; set; }
         public string description { get; set; }
-        public string status { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
-        public string updateDate { get; set; }
-        public string updateBy { get; set; }
     }
 }

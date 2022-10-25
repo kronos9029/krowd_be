@@ -14,9 +14,11 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //READ
         public Task<List<DailyReport>> GetAllDailyReports(int pageIndex, int pageSize, string projectId, string stageId, string roleId);
+        public Task<List<DailyReport>> GetAllDailyReportsByStageId(Guid stageId);
         public Task<int> CountAllDailyReports(string projectId, string stageId, string roleId);
         public Task<DailyReport> GetDailyReportById(Guid id);
         public Task<DailyReport> GetDailyReportByProjectIdAndDate(Guid projectId, string date);
+        public Task<int> CountNotReportedDailyReportsByStageId(Guid stageId);
 
         //UPDATE
         public Task<int> UpdateDailyReport(DailyReport dailyReport);
