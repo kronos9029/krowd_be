@@ -12,7 +12,7 @@ namespace RevenueSharingInvest.Business.Services
 {
     public interface IWithdrawRequestService
     {
-        public Task<WithdrawRequest> CreateInvestorWithdrawRequest(InvestorWithdrawRequest request, ThisUserObj currentUser);
+        public Task<GetWithdrawRequestDTO> CreateInvestorWithdrawRequest(InvestorWithdrawRequest request, ThisUserObj currentUser);
 
         public Task<dynamic> AdminApproveWithdrawRequest(ThisUserObj currentUser, string requestId, double amount);
 

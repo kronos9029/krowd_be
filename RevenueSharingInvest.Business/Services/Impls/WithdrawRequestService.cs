@@ -42,12 +42,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
 
-        public async Task<WithdrawRequest> CreateInvestorWithdrawRequest(InvestorWithdrawRequest request, ThisUserObj currentUser)
+        public async Task<GetWithdrawRequestDTO> CreateInvestorWithdrawRequest(InvestorWithdrawRequest request, ThisUserObj currentUser)
         {
             try
             {
                 string newRequestId;
                 WithdrawRequest withdrawRequest = new();
+                GetWithdrawRequestDTO getWithdrawRequestDTO = new();
                 if (currentUser.roleId.Equals(currentUser.investorRoleId)){
                     InvestorWallet fromWallet = await _investorWalletRepository.GetInvestorWalletById(Guid.Parse(request.FromWalletId));
 
@@ -72,11 +73,27 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     newRequestId = await _withdrawRequestRepository.CreateWithdrawRequest(withdrawRequest);
                     if (newRequestId == null || newRequestId.Equals(""))
                         throw new CreateObjectException("Withdraw Request Failed!!");
-                    
+
+                    withdrawRequest.Id = Guid.Parse(newRequestId);
+
+                    getWithdrawRequestDTO = new()
+                    {
+                        Id = newRequestId,
+                        BankName = withdrawRequest.BankName,
+                        AccountName = withdrawRequest.AccountName,
+                        BankAccount = withdrawRequest.BankAccount,
+                        Description = withdrawRequest.Description,
+                        Amount = withdrawRequest.Amount,
+                        Status = withdrawRequest.Status,
+                        RefusalReason = withdrawRequest.RefusalReason,
+                        CreateDate = withdrawRequest.CreateDate.ToString(),
+                        CreateBy = withdrawRequest.CreateBy.ToString(),
+
+                    };
                     _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
 
                 }
-                return withdrawRequest;
+                return getWithdrawRequestDTO;
             }
             catch(Exception e)
             {
