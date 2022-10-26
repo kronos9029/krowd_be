@@ -41,11 +41,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
 
-        public async Task<string> CreateInvestorWithdrawRequest(InvestorWithdrawRequest request, ThisUserObj currentUser)
+        public async Task<WithdrawRequest> CreateInvestorWithdrawRequest(InvestorWithdrawRequest request, ThisUserObj currentUser)
         {
             try
             {
-                string newRequestId = "";
+                string newRequestId;
+                WithdrawRequest withdrawRequest = new();
                 if (currentUser.roleId.Equals(currentUser.investorRoleId)){
                     InvestorWallet fromWallet = await _investorWalletRepository.GetInvestorWalletById(Guid.Parse(request.FromWalletId));
 
@@ -55,9 +56,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     
                     InvestorWallet toWallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), "I1");
 
-                    _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
-
-                    WithdrawRequest withdrawRequest = new()
+                    withdrawRequest = new()
                     {
                         BankName = request.BankName,
                         BankAccount = request.BankAccount,
@@ -67,10 +66,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         Status = WithdrawRequestEnum.PENDING.ToString(),
                         Description = "Withdraw Money"
                     };
-                    
+
                     newRequestId = await _withdrawRequestRepository.CreateWithdrawRequest(withdrawRequest);
+                    if (newRequestId == null || newRequestId.Equals(""))
+                        throw new CreateObjectException("Withdraw Request Failed!!");
+                    
+                    _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
+
                 }
-                return newRequestId;
+                return withdrawRequest;
             }
             catch(Exception e)
             {

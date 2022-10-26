@@ -1,6 +1,7 @@
 ﻿using RevenueSharingInvest.API;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace RevenueSharingInvest.Business.Services
 {
     public interface IWithdrawRequestService
     {
-        public Task<string> CreateInvestorWithdrawRequest(InvestorWithdrawRequest request, ThisUserObj currentUser);
+        public Task<WithdrawRequest> CreateInvestorWithdrawRequest(InvestorWithdrawRequest request, ThisUserObj currentUser);
 
         public Task<dynamic> AdminApproveWithdrawRequest(ThisUserObj currentUser, string requestId, double amount);
 
