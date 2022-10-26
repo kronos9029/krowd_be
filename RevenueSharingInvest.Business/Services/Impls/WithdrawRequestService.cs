@@ -2,6 +2,7 @@
 using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
@@ -64,7 +65,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         Amount = request.Amount,
                         CreateBy = Guid.Parse(currentUser.userId),
                         Status = WithdrawRequestEnum.PENDING.ToString(),
-                        Description = "Withdraw Money"
+                        Description = "Withdraw Money",
+                        CreateDate = DateTimePicker.GetDateTimeByTimeZone()
                     };
 
                     newRequestId = await _withdrawRequestRepository.CreateWithdrawRequest(withdrawRequest);
