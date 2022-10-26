@@ -133,7 +133,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
 
                 //Subtract  balance
-                from.Balance -= amount;
+                from.Balance = -amount;
                 from.UpdateBy = Guid.Parse(userId);
                 if (await _investorWalletRepository.UpdateInvestorWalletBalance(from) < 1)
                     throw new UpdateObjectException("Update Investor Wallet "+fromType+" Balance Failed!!");
@@ -154,7 +154,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new CreateObjectException("Create Wallet Transaction Failed!!");
 
                 //Add to balance
-                to.Balance += amount;
+                to.Balance = amount;
                 if (await _investorWalletRepository.UpdateInvestorWalletBalance(to) < 1)
                     throw new UpdateObjectException("Update Investor Wallet " + toType + " Balance Failed!!");
 

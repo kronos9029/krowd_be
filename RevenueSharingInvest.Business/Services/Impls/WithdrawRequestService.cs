@@ -47,12 +47,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 string newRequestId = "";
                 if (currentUser.roleId.Equals(currentUser.investorRoleId)){
-                    double remainBalance = await _investorWalletRepository.GetInvestorWalletBalanceById(Guid.Parse(request.WalletId));
-
-                    if (request.Amount < 0 || request.Amount > remainBalance)
-                        throw new WalletBalanceException("Invalid Amount!!");
-
                     InvestorWallet fromWallet = await _investorWalletRepository.GetInvestorWalletById(Guid.Parse(request.FromWalletId));
+
+                    if (request.Amount < 0 || request.Amount > fromWallet.Balance)
+                        throw new WalletBalanceException("You Don't Have Enough Money To Withdraw!!");
+
+                    
                     InvestorWallet toWallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), "I1");
 
                     _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);

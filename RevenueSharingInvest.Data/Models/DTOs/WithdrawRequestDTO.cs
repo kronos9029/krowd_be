@@ -29,7 +29,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string AccountName { get; set; }
         public string BankAccount { get; set; }
         public double Amount { get; set; }
-        public string WalletId { get; set; }
     }
 
     public class UpdateWithdrawRequest
