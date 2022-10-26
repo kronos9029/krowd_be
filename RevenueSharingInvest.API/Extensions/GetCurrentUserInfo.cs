@@ -23,12 +23,14 @@ namespace RevenueSharingInvest.API.Extensions
                 currentUser.userId = "";
                 currentUser.email = "";
                 currentUser.investorId = "";
+                currentUser.roleName = "";
             }
             else
             {
                 currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
                 currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
                 currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
+                currentUser.roleName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
             }
 
             List<RoleDTO> roleList = await _roleService.GetAllRoles();
@@ -42,6 +44,7 @@ namespace RevenueSharingInvest.API.Extensions
             else
             {
                 currentUser.roleId = userDTO.role.id;
+                
                 if (userDTO.business != null)
                 {
                     currentUser.businessId = userDTO.business.id;

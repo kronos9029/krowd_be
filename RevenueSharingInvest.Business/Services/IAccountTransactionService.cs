@@ -13,7 +13,7 @@ namespace RevenueSharingInvest.Business.Services
     public interface IAccountTransactionService
     {
         //CREATE
-        public Task<IdDTO> CreateTopUpAccountTransaction(MomoPaymentResult momoPaymentResult);
+        public Task<string> CreateTopUpAccountTransaction(MomoPaymentResult momoPaymentResult);
 
         //READ
         public Task<List<AccountTransactionDTO>> GetAllAccountTransactions(int pageIndex, int pageSize, string sort, ThisUserObj currentUser);

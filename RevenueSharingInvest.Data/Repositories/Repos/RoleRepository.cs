@@ -155,6 +155,30 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET BY USER ID
+        public async Task<string> GetRoleNameByUserId(Guid userId)
+        {
+            try
+            {
+                var query = "SELECT "
+                    + "         R.Name "
+                    + "     FROM "
+                    + "         Role R "
+                    + "         JOIN [User] U ON R.Id = U.RoleId"
+                    + "     WHERE "
+                    + "         U.Id = @UserId";
+                var parameters = new DynamicParameters();
+                parameters.Add("UserId", userId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<string>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //UPDATE
         public async Task<int> UpdateRole(Role roleDTO, Guid roleId)
         {

@@ -15,6 +15,7 @@ namespace RevenueSharingInvest.Business.Services
         //READ
         public Task<List<RoleDTO>> GetAllRoles();
         public Task<RoleDTO> GetRoleById(Guid roleId);
+        public Task<string> GetRoleNameByUserId(string userId);
 
         //UPDATE
         public Task<int> UpdateRole(RoleDTO roleDTO, Guid roleId);
