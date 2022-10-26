@@ -25,7 +25,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class InvestorWithdrawRequest
     {
         public string FromWalletId { get; set; }
-        public string ToWalletId { get; set; }
         public string BankName { get; set; }
         public string AccountName { get; set; }
         public string BankAccount { get; set; }

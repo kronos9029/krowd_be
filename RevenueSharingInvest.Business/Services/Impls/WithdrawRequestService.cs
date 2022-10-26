@@ -53,7 +53,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new WalletBalanceException("Invalid Amount!!");
 
                     InvestorWallet fromWallet = await _investorWalletRepository.GetInvestorWalletById(Guid.Parse(request.FromWalletId));
-                    InvestorWallet toWallet = await _investorWalletRepository.GetInvestorWalletById(Guid.Parse(request.ToWalletId));
+                    InvestorWallet toWallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), "I1");
 
                     _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
 
