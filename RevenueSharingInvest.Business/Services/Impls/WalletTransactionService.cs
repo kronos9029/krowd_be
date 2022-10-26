@@ -139,7 +139,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new UpdateObjectException("Update Investor Wallet "+fromType+" Balance Failed!!");
 
                 //Create CASH_OUT WalletTransaction
-                WalletTransaction walletTransaction = new WalletTransaction
+                WalletTransaction walletTransaction = new()
                 {
                     Amount = amount,
                     Fee = 0,

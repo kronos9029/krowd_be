@@ -57,11 +57,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
 
-                    WithdrawRequest withdrawRequest = _mapper.Map<WithdrawRequest>(request);
-                     
-                    withdrawRequest.CreateBy = Guid.Parse(currentUser.userId);
-                    withdrawRequest.Status = WithdrawRequestEnum.PENDING.ToString();
-
+                    WithdrawRequest withdrawRequest = new()
+                    {
+                        BankName = request.BankName,
+                        BankAccount = request.BankAccount,
+                        AccountName = request.AccountName,
+                        Amount = request.Amount,
+                        CreateBy = Guid.Parse(currentUser.userId),
+                        Status = WithdrawRequestEnum.PENDING.ToString(),
+                        Description = "Withdraw Money"
+                    };
+                    
                     newRequestId = await _withdrawRequestRepository.CreateWithdrawRequest(withdrawRequest);
                 }
                 return newRequestId;

@@ -55,11 +55,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("BankName", request.BankName, DbType.String);
-                parameters.Add("AccountName", request.AccountName, DbType.Guid);
-                parameters.Add("BankAccount", request.BankAccount, DbType.Double);
+                parameters.Add("AccountName", request.AccountName, DbType.String);
+                parameters.Add("BankAccount", request.BankAccount, DbType.String);
                 parameters.Add("Description", request.Description, DbType.String);
-                parameters.Add("Amount", request.Amount, DbType.Int16);
-                parameters.Add("Status", request.Status, DbType.Int16);
+                parameters.Add("Amount", request.Amount, DbType.Int64);
+                parameters.Add("Status", request.Status, DbType.String);
                 parameters.Add("RefusalReason", request.RefusalReason, DbType.String);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", request.CreateBy, DbType.Guid);
