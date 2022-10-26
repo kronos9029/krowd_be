@@ -1395,12 +1395,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 InvestedProjectDetailWithInvestment detailWithInvestment = new()
                 {
+                    ProjectImage = detail.ProjectImage,
                     ProjectName = detail.ProjectName,
                     ProjectStatus = detail.ProjectStatus,
-                    ExpectedRevenue = detail.ExpectedRevenue,
+                    ExpectedReturn = detail.ExpectedReturn,
+                    ReturnedAmount = await _projectRepository.GetReturnedDeptOfOneInvestor(project,investor),
+                    InvestedAmount = detail.InvestedAmount,
                     NumOfStage = detail.NumOfStage,
-                    investmentRecords = investedRecords
+                    InvestmentRecords = investedRecords
                 };
+                detailWithInvestment.MustPaidDept = detail.InvestedAmount - detailWithInvestment.ReturnedAmount;
+                detailWithInvestment.ProfitableDebt = detail.ExpectedReturn - detailWithInvestment.ReturnedAmount;
 
                 return detailWithInvestment;
             }catch(Exception e)

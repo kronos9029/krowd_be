@@ -1040,10 +1040,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "SELECT P.Name AS ProjectName, P.Status AS ProjectStatus, (SUM(I.TotalPrice) * P.Multiplier) AS ExpectedRevenue, P.NumOfStage " +
+                var query = "SELECT P.Name AS ProjectName, P.Image AS ProjectImage, P.Status AS ProjectStatus, (SUM(I.TotalPrice) * P.Multiplier) AS ExpectedReturn, SUM(I.TotalPrice) AS InvestedAmount, P.NumOfStage " +
                             "FROM Project P JOIN Investment I ON I.ProjectId = P.Id " +
                             "WHERE P.Id = @Id AND I.InvestorId = @InvestorId " +
-                            "GROUP BY P.Name, P.Status, P.Multiplier, P.NumOfStage";
+                            "GROUP BY P.Name, P.Status, P.Multiplier, P.NumOfStage, P.Image";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Id", projectId, DbType.Guid);
@@ -1057,5 +1057,29 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        public async Task<double> GetReturnedDeptOfOneInvestor(Guid projectId, Guid userId)
+        {
+            try
+            {
+                var query = "SELECT ISNULL(SUM(Amount),0) AS ReturnedDept " +
+                    "FROM Payment P JOIN PeriodRevenue PR ON P.PeriodRevenueId = PR.Id WHERE ToId = @UserId AND Type = 'PERIOD_REVENUE' AND PR.ProjectId = @ProjectId";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("UserId", userId, DbType.Guid);
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<double>(query, parameters);
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+
+
+
     }
 }
