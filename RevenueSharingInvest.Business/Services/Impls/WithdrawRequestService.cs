@@ -173,7 +173,28 @@ namespace RevenueSharingInvest.Business.Services.Impls
             try
             {
                 List<WithdrawRequest> withdrawRequestList = await _withdrawRequestRepository.GetWithdrawRequestByUserId(Guid.Parse(userId));
-                List<GetWithdrawRequestDTO> withdrawRequestDTOList = _mapper.Map<List<GetWithdrawRequestDTO>>(withdrawRequestList);
+                //List<GetWithdrawRequestDTO> withdrawRequestDTOList = _mapper.Map<List<GetWithdrawRequestDTO>>(withdrawRequestList);
+                List<GetWithdrawRequestDTO> withdrawRequestDTOList = new();
+                
+
+                foreach (WithdrawRequest withdrawRequest in withdrawRequestList)
+                {
+                    GetWithdrawRequestDTO withdrawRequestDTO = new();
+                    withdrawRequestDTO.Id = withdrawRequest.Id.ToString();
+                    withdrawRequestDTO.BankName = withdrawRequest.BankName;
+                    withdrawRequestDTO.AccountName = withdrawRequest.AccountName;
+                    withdrawRequestDTO.BankAccount = withdrawRequest.BankAccount;
+                    withdrawRequestDTO.Description = withdrawRequest.Description;
+                    withdrawRequestDTO.Amount = withdrawRequest.Amount;
+                    withdrawRequestDTO.Status = withdrawRequest.Status;
+                    withdrawRequestDTO.RefusalReason = withdrawRequest.RefusalReason;
+                    withdrawRequestDTO.CreateDate = withdrawRequest.CreateDate.ToString();
+                    withdrawRequestDTO.CreateBy = withdrawRequest.CreateBy.ToString();
+                    withdrawRequestDTO.UpdateDate = withdrawRequest.UpdateBy.ToString();
+                    withdrawRequestDTO.UpdateBy = withdrawRequest.UpdateBy.ToString();
+                    withdrawRequestDTOList.Add(withdrawRequestDTO);
+                }
+
                 return withdrawRequestDTOList;
             }
             catch (Exception e)

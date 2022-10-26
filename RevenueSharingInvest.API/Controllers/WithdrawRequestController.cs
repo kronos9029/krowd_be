@@ -35,12 +35,20 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetWithdrawRequestByUserId()
+        public async Task<IActionResult> GetWithdrawRequestByUserId(string investorId)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            if (currentUser.roleId.Equals(currentUser.investorRoleId))
+            {
+                var result = await _withdrawRequestService.GetWithdrawRequestByUserId(currentUser.userId);
+                return Ok(result);
+            } else if (currentUser.roleId.Equals(currentUser.adminRoleId))
+            {
+                var result = await _withdrawRequestService.GetWithdrawRequestByUserId(investorId);
+                return Ok(result);
 
-            var result = await _withdrawRequestService.GetWithdrawRequestByUserId(currentUser.userId);
-            return Ok(result);
+            }
+            return StatusCode((int)HttpStatusCode.Forbidden, "");
         }
 
         [HttpGet]
