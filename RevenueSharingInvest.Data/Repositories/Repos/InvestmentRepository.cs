@@ -358,5 +358,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //COUNT BY PROJECT ID AND INVESTOR ID
+        public async Task<int> CountInvestmentByProjectAndInvestor(Guid projectId, Guid investorId)
+        {
+            try
+            {
+                string query = "SELECT COUNT(*) FROM Investment WHERE ProjectId = @ProjectId AND InvestorId = @InvestorId";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                parameters.Add("InvestorId", investorId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }
