@@ -216,5 +216,31 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        public async Task<Stage> GetLastStageByProjectId(Guid projectId)
+        {
+            try
+            {
+                string query = "SELECT "
+                    + "             S.* "
+                    + "         FROM "
+                    + "             Stage S "
+                    + "             JOIN ( "
+                    + "                 SELECT MAX(EndDate) 'EndDate' "
+                    + "                 FROM Stage "
+                    + "                 WHERE ProjectId = @ProjectId) AS X ON S.EndDate = X.EndDate "
+                    + "         WHERE " 
+                    + "             S.ProjectId = @ProjectId ";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Stage>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

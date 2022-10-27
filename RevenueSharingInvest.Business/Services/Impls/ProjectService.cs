@@ -1222,7 +1222,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 walletTransaction.Fee = 0;
                                 walletTransaction.Description = "Transfer money from I3 to P3 to prepare for activation";
                                 walletTransaction.FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.InvestorId, WalletTypeEnum.I3.ToString())).Id;
-                                walletTransaction.ToWalletId = (await _projectWalletRepository.GetProjectWalletByProjectOwnerIdAndType(project.ManagerId, WalletTypeEnum.P3.ToString())).Id;
+                                walletTransaction.ToWalletId = (await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(project.ManagerId, WalletTypeEnum.P3.ToString(), projectId)).Id;
                                 walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
                                 walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
                                 await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);

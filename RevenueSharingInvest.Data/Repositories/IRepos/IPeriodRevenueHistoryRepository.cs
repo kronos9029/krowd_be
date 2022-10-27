@@ -15,6 +15,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //READ
         public Task<List<PeriodRevenueHistory>> GetAllPeriodRevenueHistories(int pageIndex, int pageSize);
         public Task<PeriodRevenueHistory> GetPeriodRevenueHistoryById(Guid periodRevenueHistoryId);
+        public Task<int> CountPeriodRevenueHistoryByPeriodRevenueId(Guid periodRevenueId);
 
         //UPDATE
         public Task<int> UpdatePeriodRevenueHistory(PeriodRevenueHistory periodRevenueHistoryDTO, Guid periodRevenueHistoryId);

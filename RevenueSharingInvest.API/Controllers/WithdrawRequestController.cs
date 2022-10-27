@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/WithdrawRequest")]
+    [Route("api/v1.0/withdraw_requests")]
     [EnableCors]
     [Authorize]
     public class WithdrawRequestController : ControllerBase

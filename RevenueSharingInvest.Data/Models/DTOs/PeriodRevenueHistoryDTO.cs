@@ -16,4 +16,10 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string createDate { get; set; }
         public string createBy { get; set; }
     }
+
+    public class CreatePeriodRevenueHistoryDTO
+    {
+        public string stageId { get; set; }
+        public double amount { get; set; }
+    }
 }

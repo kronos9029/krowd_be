@@ -19,11 +19,11 @@ namespace RevenueSharingInvest.API.Controllers
     public class PeriodRevenueController : ControllerBase
     {
         private readonly IPeriodRevenueService _periodRevenueService;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         public PeriodRevenueController(IPeriodRevenueService periodRevenueService, IHttpContextAccessor httpContextAccessor)
         {
             _periodRevenueService = periodRevenueService;
-            this.httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor;
         }
     }
 }

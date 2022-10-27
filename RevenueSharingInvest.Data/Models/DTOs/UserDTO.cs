@@ -114,4 +114,10 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string updateDate { get; set; }
         public string updateBy { get; set; }
     }
+
+    public class PaidInvestorDTO
+    {
+        public Guid investorId { get; set; }
+        public double amount { get; set; }
+    }    
 }
