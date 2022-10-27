@@ -242,5 +242,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        //COUNT
+        public async Task<int> CountAllStagesByProjectId(Guid projectId)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+                var query = "SELECT COUNT(*) FROM Stage WHERE ProjectId = @ProjectId";
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

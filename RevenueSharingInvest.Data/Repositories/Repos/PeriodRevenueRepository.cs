@@ -265,5 +265,39 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message);
             }
         }
+
+        //UPDATE PAID AMOUNT
+        public async Task<int> UpdatePeriodRevenueByPaidAmount(PeriodRevenue periodRevenueDTO)
+        {
+            try
+            {
+                var query = "UPDATE PeriodRevenue "
+                    + "     SET "
+                    + "         PaidAmount = CASE " 
+                    + "                         WHEN PaidAmount IS NULL THEN 0 + @PaidAmount " 
+                    + "                         WHEN PaidAmount IS NOT NULL THEN PaidAmount + @PaidAmount " 
+                    + "                      END, "
+                    + "         UpdateDate = @UpdateDate, "
+                    + "         UpdateBy = @UpdateBy "
+                    + "     WHERE "
+                    + "         Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("PaidAmount", periodRevenueDTO.PaidAmount, DbType.Double);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                parameters.Add("UpdateBy", periodRevenueDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", periodRevenueDTO.Id, DbType.Guid);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }
