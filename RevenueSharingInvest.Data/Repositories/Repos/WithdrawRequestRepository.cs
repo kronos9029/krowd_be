@@ -231,6 +231,56 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //GET ALL
+        public async Task<List<WithdrawRequest>> GetAllWithdrawRequest(int pageIndex, int pageSize, string userId)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+                var whereClause = "";
+                if (!userId.Equals(""))
+                {
+                    whereClause = " WHERE CreateBy = @UserId ";
+                    parameters.Add("UserId", Guid.Parse(userId), DbType.Guid);
+                }
+                if (pageIndex != 0 && pageSize != 0)
+                {
+                    var query = "WITH X AS ( "
+                    + "         SELECT "
+                    + "             ROW_NUMBER() OVER ( "
+                    + "                 ORDER BY "
+                    + "                     CreateDate DESC ) AS Num, "
+                    + "             * "
+                    + "         FROM  WithdrawRequest "
+                    +           whereClause
+                    + "         ) "
+                    + "     SELECT *"
+                    + "     FROM "
+                    + "         X "
+                    + "     WHERE "
+                    + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
+                    + "         AND @PageIndex * @PageSize";
+
+                    parameters.Add("PageIndex", pageIndex, DbType.Int16);
+                    parameters.Add("PageSize", pageSize, DbType.Int16);
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<WithdrawRequest>(query, parameters)).ToList();
+                } else
+                {
+                    var query = "SELECT * FROM WithdrawRequest " + whereClause + " ORDER BY CreateDate DESC";
+                    using var connection = CreateConnection();
+                    return (await connection.QueryAsync<WithdrawRequest>(query, parameters)).ToList();
+                }
+
+
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
 
         public async Task<WithdrawRequest> GetWithdrawRequestByRequestId(Guid requestId)
         {
