@@ -26,6 +26,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string BankAccount { get; set; }
         [Required]
         public string Description { get; set; }
+        public string ReportMessage { get; set; }
         public double Amount { get; set; }
         [Required]
         public string Status { get; set; }

@@ -153,13 +153,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
         
 
-        public async Task<int> ReportWithdrawRequest(Guid userId, Guid requestId, string description)
+        public async Task<int> ReportWithdrawRequest(Guid userId, Guid requestId, string reportMessage)
         {
             try
             {
                 var query = "UPDATE WithdrawRequest SET " +
                             "Status = '"+WithdrawRequestEnum.PARTIAL_ADMIN.ToString()+"', " +
-                            "Description = @Description" +
+                            "ReportMessage = @ReportMessage" +
                             "UpdateBy = @UpdateBy, " +
                             "UpdateDate = @UpdateDate " +
                             "WHERE Id = @Id";
@@ -168,7 +168,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", userId, DbType.Guid);
                 parameters.Add("Id", requestId, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                parameters.Add("Description", description, DbType.String);
+                parameters.Add("ReportMessage", reportMessage, DbType.String);
                 using var connection = CreateConnection();
                 return await connection.QueryFirstOrDefaultAsync<int>(query, parameters);
             }

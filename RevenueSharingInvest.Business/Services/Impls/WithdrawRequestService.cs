@@ -223,11 +223,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> ReportWithdrawRequest(string userId, string requestId, string description)
+        public async Task<dynamic> ReportWithdrawRequest(string userId, string requestId, string reportMessage)
         {
             try
             {
-                dynamic result = await _withdrawRequestRepository.ReportWithdrawRequest(Guid.Parse(userId), Guid.Parse(requestId), description);
+                dynamic result = await _withdrawRequestRepository.ReportWithdrawRequest(Guid.Parse(userId), Guid.Parse(requestId), reportMessage);
                 return result;
             }
             catch (Exception e)

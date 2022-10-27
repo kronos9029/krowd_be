@@ -37,6 +37,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string requestId { get; set; }
         public string description { get; set; }
         public string refusalReason { get; set; }
+        public string reportMessage { get; set; }
         public IFormFile receipt { get; set; }
     }
 }

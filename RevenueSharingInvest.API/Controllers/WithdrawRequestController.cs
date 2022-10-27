@@ -134,7 +134,7 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PARTIAL.ToString()))
                     {
-                        var result = await _withdrawRequestService.ReportWithdrawRequest(currentUser.userId, currentRequest.Id, request.description);
+                        var result = await _withdrawRequestService.ReportWithdrawRequest(currentUser.userId, currentRequest.Id, request.reportMessage);
                         return Ok(result);
                     }
                 }

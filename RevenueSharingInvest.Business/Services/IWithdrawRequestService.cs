@@ -20,7 +20,7 @@ namespace RevenueSharingInvest.Business.Services
 
         public Task<dynamic> AdminRejectWithdrawRequest(string userId, string requestId, string RefusalReason);
 
-        public Task<dynamic> ReportWithdrawRequest(string userId, string requestId, string description);
+        public Task<dynamic> ReportWithdrawRequest(string userId, string requestId, string reportMessage);
         public Task<GetWithdrawRequestDTO> GetWithdrawRequestByRequestIdAndUserId(string requestId, string userId);
         public Task<List<GetWithdrawRequestDTO>> GetWithdrawRequestByUserId(string userId);
         public Task<GetWithdrawRequestDTO> GetWithdrawRequestById(string id);
