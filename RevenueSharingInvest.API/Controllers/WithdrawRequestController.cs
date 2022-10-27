@@ -107,8 +107,8 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PENDING.ToString()))
                     {
-                        string receiptLink = await _uploadService.UploadAdminTracsactionReceipt(request.requestId, request.receipt, currentUser.userId);
-                        var result = await _withdrawRequestService.AdminApproveWithdrawRequest(currentUser, currentRequest.Id, receiptLink);
+                        //string receiptLink = await _uploadService.UploadAdminTracsactionReceipt(request.requestId, request.receipt, currentUser.userId);
+                        var result = await _withdrawRequestService.AdminApproveWithdrawRequest(currentUser, currentRequest.Id, null);
                         return Ok(result);
                     } 
                     else if (currentRequest.Status.Equals(WithdrawRequestEnum.PARTIAL_ADMIN.ToString()))
