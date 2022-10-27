@@ -132,7 +132,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE WithdrawRequest SET " +
                             "Status = '"+WithdrawRequestEnum.REJECTED.ToString()+"', " +
-                            "RefusalReason = @RefusalReason" +
+                            "RefusalReason = @RefusalReason," +
                             "UpdateBy = @UpdateBy, " +
                             "UpdateDate = @UpdateDate " +
                             "WHERE Id = @Id";
