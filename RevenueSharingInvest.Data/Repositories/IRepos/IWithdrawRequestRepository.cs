@@ -10,7 +10,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
     public interface IWithdrawRequestRepository
     {
         public Task<string> CreateWithdrawRequest(WithdrawRequest request);
-        public Task<int> AdminApproveWithdrawRequest(Guid userId, Guid requestId);
+        public Task<int> AdminApproveWithdrawRequest(Guid userId, Guid requestId, string receipt);
         public Task<int> InvestorApproveWithdrawRequest(Guid userId, Guid requestId);
         public Task<int> AdminRejectWithdrawRequest(Guid userId, Guid requestId, string RefusalReason);
         public Task<int> ReportWithdrawRequest(Guid userId, Guid requestId, string description);

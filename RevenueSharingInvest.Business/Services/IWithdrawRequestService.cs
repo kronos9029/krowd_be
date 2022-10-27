@@ -14,7 +14,7 @@ namespace RevenueSharingInvest.Business.Services
     {
         public Task<GetWithdrawRequestDTO> CreateInvestorWithdrawRequest(WithdrawRequestDTO request, ThisUserObj currentUser);
 
-        public Task<dynamic> AdminApproveWithdrawRequest(ThisUserObj currentUser, string requestId);
+        public Task<dynamic> AdminApproveWithdrawRequest(ThisUserObj currentUser, string requestId, string receipt);
 
         public Task<dynamic> ApproveWithdrawRequest(string userId, string requestId);
 

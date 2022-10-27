@@ -76,12 +76,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public async Task<int> AdminApproveWithdrawRequest(Guid userId, Guid requestId)
+        public async Task<int> AdminApproveWithdrawRequest(Guid userId, Guid requestId, string receipt)
         {
             try
             {
                 var query = "UPDATE WithdrawRequest SET " +
                             "Status = '"+WithdrawRequestEnum.PARTIAL.ToString()+"', " +
+                            "Description = @Description, " +
                             "UpdateBy = @UpdateBy, " +
                             "UpdateDate = @UpdateDate " +
                             "WHERE Id = @Id";
@@ -90,6 +91,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", userId, DbType.Guid);
                 parameters.Add("Id", requestId, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                parameters.Add("Description", receipt, DbType.String);
                 using var connection = CreateConnection();
                 return await connection.QueryFirstOrDefaultAsync<int>(query, parameters);
             }

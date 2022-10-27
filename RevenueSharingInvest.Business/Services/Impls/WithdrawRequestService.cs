@@ -178,11 +178,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> AdminResponeToWithdrawRequest(ThisUserObj currentUser, string requestId)
+        public async Task<dynamic> AdminResponeToWithdrawRequest(ThisUserObj currentUser, string requestId, string receipt)
         {
             try
             {
-                dynamic result = await _withdrawRequestRepository.AdminApproveWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(requestId));
+                dynamic result = await _withdrawRequestRepository.AdminApproveWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(requestId), receipt);
                 return result;
 
             }catch(Exception e)

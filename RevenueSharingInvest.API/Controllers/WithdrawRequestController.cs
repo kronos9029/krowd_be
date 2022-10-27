@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
@@ -23,13 +24,16 @@ namespace RevenueSharingInvest.API.Controllers
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
         private readonly IWithdrawRequestService _withdrawRequestService;
+        private readonly IFileUploadService _uploadService;
         public WithdrawRequestController(IUserService userService,
             IRoleService roleService,
-            IWithdrawRequestService withdrawRequestService)
+            IWithdrawRequestService withdrawRequestService,
+            IFileUploadService fileUploadService)
         {
             _userService = userService;
             _roleService = roleService;
             _withdrawRequestService = withdrawRequestService;
+            _uploadService = fileUploadService;
         }
 
 
@@ -89,7 +93,7 @@ namespace RevenueSharingInvest.API.Controllers
         //PUT
         [HttpPut]
         [Authorize]
-        public async Task<IActionResult> UpdateWithdrawRequest([FromBody] UpdateWithdrawRequest request, WithdrawAction action)
+        public async Task<IActionResult> UpdateWithdrawRequest([FromForm] UpdateWithdrawRequest request, WithdrawAction action)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             var currentRequest = await _withdrawRequestService.GetWithdrawRequestByRequestIdAndUserId(request.requestId, currentUser.userId);
@@ -102,7 +106,8 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PENDING.ToString()))
                     {
-                        var result = await _withdrawRequestService.AdminApproveWithdrawRequest(currentUser, currentRequest.Id);
+                        string receiptLink = await _uploadService.UploadAdminTracsactionReceipt(request.requestId, request.receipt, currentUser.userId);
+                        var result = await _withdrawRequestService.AdminApproveWithdrawRequest(currentUser, currentRequest.Id, receiptLink);
                         return Ok(result);
                     } 
                     else if (currentRequest.Status.Equals(WithdrawRequestEnum.PARTIAL_ADMIN.ToString()))

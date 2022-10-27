@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,5 +37,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string requestId { get; set; }
         public string description { get; set; }
         public string refusalReason { get; set; }
+        public IFormFile receipt { get; set; }
     }
 }
