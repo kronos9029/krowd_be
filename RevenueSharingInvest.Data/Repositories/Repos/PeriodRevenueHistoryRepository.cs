@@ -58,7 +58,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @Amount, "
                     + "         @Description, "
                     + "         @CreateDate, "
-                    + "         @CreateB )";
+                    + "         @CreateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", periodRevenueHistoryDTO.Name, DbType.String);
