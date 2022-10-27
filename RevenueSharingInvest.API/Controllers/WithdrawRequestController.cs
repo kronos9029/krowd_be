@@ -44,9 +44,15 @@ namespace RevenueSharingInvest.API.Controllers
                 return Ok(result);
             } else if (currentUser.roleId.Equals(currentUser.adminRoleId))
             {
-                var result = await _withdrawRequestService.GetWithdrawRequestByUserId(investorId);
-                return Ok(result);
-
+                if (!investorId.Equals("") || investorId != null)
+                {
+                    var result = await _withdrawRequestService.GetWithdrawRequestByUserId(investorId);
+                    return Ok(result);
+                } else
+                {
+                    var result = await _withdrawRequestService.AdminGetAllWithdrawRequest();
+                    return Ok(result);
+                }
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "");
         }

@@ -212,5 +212,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        //GET ALL
+        public async Task<List<WithdrawRequest>> AdminGetAllWithdrawRequest()
+        {
+            try
+            {
+                var query = "SELECT * FROM WithdrawRequest";
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<WithdrawRequest>(query)).ToList();
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

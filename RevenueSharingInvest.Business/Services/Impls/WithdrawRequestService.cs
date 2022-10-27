@@ -227,6 +227,42 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
+        public async Task<List<GetWithdrawRequestDTO>> AdminGetAllWithdrawRequest()
+        {
+            try
+            {
+                List<WithdrawRequest> withdrawRequests = await _withdrawRequestRepository.AdminGetAllWithdrawRequest();
+                List<GetWithdrawRequestDTO> withdrawRequestDTOList = new();
+
+
+                foreach (WithdrawRequest withdrawRequest in withdrawRequests)
+                {
+                    GetWithdrawRequestDTO withdrawRequestDTO = new()
+                    {
+                        Id = withdrawRequest.Id.ToString(),
+                        BankName = withdrawRequest.BankName,
+                        AccountName = withdrawRequest.AccountName,
+                        BankAccount = withdrawRequest.BankAccount,
+                        Description = withdrawRequest.Description,
+                        Amount = withdrawRequest.Amount,
+                        Status = withdrawRequest.Status,
+                        RefusalReason = withdrawRequest.RefusalReason,
+                        CreateDate = withdrawRequest.CreateDate.ToString(),
+                        CreateBy = withdrawRequest.CreateBy.ToString(),
+                        UpdateDate = withdrawRequest.UpdateBy.ToString(),
+                        UpdateBy = withdrawRequest.UpdateBy.ToString()
+                    };
+                    withdrawRequestDTOList.Add(withdrawRequestDTO);
+                }
+                return withdrawRequestDTOList;
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
 
     }
 }
