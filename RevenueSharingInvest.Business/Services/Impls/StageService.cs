@@ -23,16 +23,28 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IPeriodRevenueRepository _periodRevenueRepository;
         private readonly IProjectRepository _projectRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IInvestmentRepository _investmentRepository;
+
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
 
-        public StageService(IStageRepository stageRepository, IPeriodRevenueRepository periodRevenueRepository, IProjectRepository projectRepository, IUserRepository userRepository, IValidationService validationService, IMapper mapper)
+        public StageService(
+            IStageRepository stageRepository, 
+            IPeriodRevenueRepository periodRevenueRepository, 
+            IProjectRepository projectRepository, 
+            IUserRepository userRepository,
+            IInvestmentRepository investmentRepository,
+
+            IValidationService validationService, 
+            IMapper mapper)
         {
             _stageRepository = stageRepository;
             _periodRevenueRepository = periodRevenueRepository;
             _projectRepository = projectRepository;
             _userRepository = userRepository;
+            _investmentRepository = investmentRepository;
+
             _validationService = validationService;
             _mapper = mapper;
         }
@@ -55,7 +67,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     throw new NotFoundException("This projectId is not belong to your's Business!!!");
                 }
+
                 //
+
+                bool isShowed = currentUser.roleId.Equals("") || (currentUser.roleId.Equals(currentUser.investorRoleId)
+                    && await _investmentRepository.CountInvestmentByProjectAndInvestor(projectId, Guid.Parse(currentUser.investorId)) == 0) ? false : true;
 
                 AllStageDTO result = new AllStageDTO();
                 result.listOfStage = new List<GetStageDTO>();
@@ -82,10 +98,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         periodRevenue.CreateBy = (item.createBy == null) ? null : Guid.Parse(item.projectId);
                         periodRevenue.UpdateBy = (item.updateBy == null) ? null : Guid.Parse(item.projectId);
                         await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
-                    }    
-                    item.optimisticExpectedAmount = (periodRevenue.OptimisticExpectedAmount == null) ? 0 : (float)periodRevenue.OptimisticExpectedAmount;
-                    item.normalExpectedAmount = (periodRevenue.NormalExpectedAmount == null) ? 0 : (float)periodRevenue.NormalExpectedAmount;
-                    item.pessimisticExpectedAmount = (periodRevenue.PessimisticExpectedAmount == null) ? 0 : (float)periodRevenue.PessimisticExpectedAmount;
+                    }
+                    item.actualAmount = periodRevenue.ActualAmount != null && isShowed ? (double)periodRevenue.ActualAmount : null;
+                    item.sharedAmount = periodRevenue.SharedAmount != null && isShowed ? (double)periodRevenue.SharedAmount : null;
+                    item.paidAmount = periodRevenue.PaidAmount != null && isShowed ? (double)periodRevenue.PaidAmount : null;
+                    item.optimisticExpectedAmount = (periodRevenue.OptimisticExpectedAmount == null) ? 0 : (double)periodRevenue.OptimisticExpectedAmount;
+                    item.normalExpectedAmount = (periodRevenue.NormalExpectedAmount == null) ? 0 : (double)periodRevenue.NormalExpectedAmount;
+                    item.pessimisticExpectedAmount = (periodRevenue.PessimisticExpectedAmount == null) ? 0 : (double)periodRevenue.PessimisticExpectedAmount;
                     item.optimisticExpectedRatio = (periodRevenue.OptimisticExpectedRatio == null) ? 0 : (float)periodRevenue.OptimisticExpectedRatio;
                     item.normalExpectedRatio = (periodRevenue.NormalExpectedRatio == null) ? 0 : (float)periodRevenue.NormalExpectedRatio;
                     item.pessimisticExpectedRatio = (periodRevenue.PessimisticExpectedRatio == null) ? 0 : (float)periodRevenue.PessimisticExpectedRatio;
@@ -111,6 +130,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Stage stage = await _stageRepository.GetStageById(stageId);               
                 if (stage == null)
                     throw new NotFoundException("No Stage Object Found!");
+
+                bool isShowed = currentUser.roleId.Equals("") || (currentUser.roleId.Equals(currentUser.investorRoleId)
+                    && await _investmentRepository.CountInvestmentByProjectAndInvestor(stage.ProjectId, Guid.Parse(currentUser.investorId)) == 0) ? false : true;
 
                 //Kiểm tra projectId có thuộc về business của người xem có role BuM hay PM không
                 Project project = await _projectRepository.GetProjectById(stage.ProjectId);
@@ -139,9 +161,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     periodRevenue.UpdateBy = (result.updateBy == null) ? null : Guid.Parse(result.projectId);
                     await _periodRevenueRepository.CreatePeriodRevenue(periodRevenue);
                 }
-                result.optimisticExpectedAmount = (periodRevenue.OptimisticExpectedAmount == null) ? 0 : (float)periodRevenue.OptimisticExpectedAmount;
-                result.normalExpectedAmount = (periodRevenue.NormalExpectedAmount == null) ? 0 : (float)periodRevenue.NormalExpectedAmount;
-                result.pessimisticExpectedAmount = (periodRevenue.PessimisticExpectedAmount == null) ? 0 : (float)periodRevenue.PessimisticExpectedAmount;
+                result.actualAmount = periodRevenue.ActualAmount != null && isShowed ? (double)periodRevenue.ActualAmount : null;
+                result.sharedAmount = periodRevenue.SharedAmount != null && isShowed ? (double)periodRevenue.SharedAmount : null;
+                result.paidAmount = periodRevenue.PaidAmount != null && isShowed ? (double)periodRevenue.PaidAmount : null;
+                result.optimisticExpectedAmount = (periodRevenue.OptimisticExpectedAmount == null) ? 0 : (double)periodRevenue.OptimisticExpectedAmount;
+                result.normalExpectedAmount = (periodRevenue.NormalExpectedAmount == null) ? 0 : (double)periodRevenue.NormalExpectedAmount;
+                result.pessimisticExpectedAmount = (periodRevenue.PessimisticExpectedAmount == null) ? 0 : (double)periodRevenue.PessimisticExpectedAmount;
                 result.optimisticExpectedRatio = (periodRevenue.OptimisticExpectedRatio == null) ? 0 : (float)periodRevenue.OptimisticExpectedRatio;
                 result.normalExpectedRatio = (periodRevenue.NormalExpectedRatio == null) ? 0 : (float)periodRevenue.NormalExpectedRatio;
                 result.pessimisticExpectedRatio = (periodRevenue.PessimisticExpectedRatio == null) ? 0 : (float)periodRevenue.PessimisticExpectedRatio;

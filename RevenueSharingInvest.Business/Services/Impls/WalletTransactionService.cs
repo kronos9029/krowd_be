@@ -27,9 +27,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IWalletTypeRepository _walletTypeRepository;
         private readonly IUserRepository _userRepository;
         private readonly IProjectWalletRepository _projectWalletRepository;
-
         private readonly IMapper _mapper;
-
 
         public WalletTransactionService(
             IWalletTransactionRepository walletTransactionRepository,
@@ -139,7 +137,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new UpdateObjectException("Update Investor Wallet "+fromType+" Balance Failed!!");
 
                 //Create CASH_OUT WalletTransaction
-                WalletTransaction walletTransaction = new WalletTransaction
+                WalletTransaction walletTransaction = new()
                 {
                     Amount = amount,
                     Fee = 0,

@@ -8,6 +8,7 @@ using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
+using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -200,8 +201,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             try
             {
                 double realAmount = Convert.ToDouble(accountTransaction.Amount);
-                ProjectWallet P1 = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType((Guid)accountTransaction.FromUserId, WalletTypeEnum.P1.ToString(), null);
-                P1.Balance += realAmount;
+                ProjectWallet P1 = await _projectWalletRepository.GetProjectWalletByProjectOwnerIdAndType((Guid)accountTransaction.FromUserId, WalletTypeEnum.P1.ToString());
+                P1.Balance = realAmount;
                 P1.UpdateBy = accountTransaction.FromUserId;
 
                 int checkTopUp = await _projectWalletRepository.UpdateProjectWalletBalance(P1);
@@ -224,7 +225,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (P2 == null)
                     throw new NotFoundException("P2 Wallet Not Found!!");
 
-                P1.Balance -= realAmount;
+                P1.Balance = -realAmount;
                 P1.UpdateBy = accountTransaction.FromUserId;
                 int checkSuccess = await _projectWalletRepository.UpdateProjectWalletBalance(P1);
                 if (checkSuccess == 0)
@@ -238,7 +239,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
-                P2.Balance += realAmount;
+                P2.Balance = realAmount;
                 P2.UpdateBy = P1.UpdateBy;
                 checkSuccess = await _projectWalletRepository.UpdateProjectWalletBalance(P2);
                 if (checkSuccess == 0)
@@ -261,23 +262,40 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<string> CreateWithdrawAccountTransaction(InvestorWallet investorWallet, string userId, double amount, string requestId)
+        public async Task<string> CreateWithdrawAccountTransaction(dynamic wallet, WithdrawRequest withdrawRequest, string userId, string roleName)
         {
             try
             {
+                string fromType = "";
+                var arrayOfAllKeys = WalletTypeDictionary.walletTypes.Keys.ToArray();
+                foreach (var key in arrayOfAllKeys)
+                {
+                    if (wallet.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault(key))))
+                        fromType = key;
+                    if (!fromType.Equals(""))
+                        break;
+                }
                 Guid currentUserId = Guid.Parse(userId);
-                investorWallet.Balance -= amount;
-                investorWallet.UpdateBy = currentUserId;
-                if (await _investorWalletRepository.UpdateWalletBalance(investorWallet) < 1)
-                    throw new UpdateObjectException("Update Wallet Balance Failed!!");
+                wallet.Balance = -withdrawRequest.Amount;
+                wallet.UpdateBy = currentUserId;
+                if (roleName.Equals(RoleEnum.INVESTOR.ToString()))
+                {
+                    if (await _investorWalletRepository.UpdateInvestorWalletBalance(wallet) < 1)
+                        throw new UpdateObjectException("Update Wallet Balance Failed!!");
+                } else if (roleName.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
+                {
+                    if (await _projectWalletRepository.UpdateProjectWalletBalance(wallet) < 1)
+                        throw new UpdateObjectException("Update Wallet Balance Failed!!");
+                }
+
 
                 WalletTransaction walletTransaction = new()
                 {
-                    Amount = amount,
+                    Amount = withdrawRequest.Amount,
                     Fee = 0,
-                    Description = "Withdraw money out of I1 wallet",
+                    Description = "Withdraw money out of "+fromType+" wallet",
                     Type = WalletTransactionTypeEnum.WITHDRAW.ToString(),
-                    FromWalletId = investorWallet.Id,
+                    FromWalletId = wallet.Id,
                     CreateBy = currentUserId
                 };
                 string checkWalletTransaction = await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
@@ -287,13 +305,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 AccountTransaction accountTransaction = new()
                 {
                     FromUserId = currentUserId,
-                    Amount = long.Parse(amount.ToString()),
+                    Amount = long.Parse(withdrawRequest.Amount.ToString()),
                     Message = "Giao dịch thành công.",
                     OrderType = "system",
                     PayType = "app",
                     ResultCode = 0,
                     Type = "WITHDRAW",
-                    WithdrawRequestId = Guid.Parse(requestId)
+                    WithdrawRequestId = withdrawRequest.Id
                 };
 
                 string result = await _accountTransactionRepository.CreateAccountTransaction(accountTransaction);

@@ -8,10 +8,15 @@ namespace RevenueSharingInvest.Data.Models.DTOs
 {
     public class InvestedProjectDetail
     {
+        public string ProjectImage { get; set; }
         public string ProjectName { get; set; }
         public string ProjectStatus { get; set; }
-        public double ExpectedRevenue { get; set; }
+        public double ExpectedReturn { get; set; }
+        public double ReturnedAmount { get; set; }
+        public double DeptRemain { get; set; }
+        public double InvestedAmount { get; set; }
         public int NumOfStage { get; set; }
+        public int NumOfPayedStage { get; set; }
     }
 
     public class InvestedRecord
@@ -24,6 +29,10 @@ namespace RevenueSharingInvest.Data.Models.DTOs
 
     public class InvestedProjectDetailWithInvestment : InvestedProjectDetail
     {
-        public List<InvestedRecord> investmentRecords { get; set; }
+        public double MustPaidDept { get; set; }
+        public double ProfitableDebt { get; set; }
+        public int PaidStage { get; set; }
+        public DateTime LatestPayment { get; set; }
+        public List<InvestedRecord> InvestmentRecords { get; set; }
     }
 }

@@ -13,8 +13,10 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> AdminApproveWithdrawRequest(Guid userId, Guid requestId);
         public Task<int> InvestorApproveWithdrawRequest(Guid userId, Guid requestId);
         public Task<int> AdminRejectWithdrawRequest(Guid userId, Guid requestId, string RefusalReason);
-        public Task<int> InvestorReportWithdrawRequest(Guid userId, Guid requestId, string description);
+        public Task<int> ReportWithdrawRequest(Guid userId, Guid requestId, string description);
         public Task<WithdrawRequest> GetWithdrawRequestByRequestIdAndUserId(Guid requestId, Guid userId);
         public Task<List<WithdrawRequest>> GetWithdrawRequestByUserId(Guid userId);
+        public Task<List<WithdrawRequest>> AdminGetAllWithdrawRequest();
+        public Task<WithdrawRequest> GetWithdrawRequestByRequestId(Guid requestId);
     }
 }

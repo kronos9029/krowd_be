@@ -18,7 +18,7 @@ namespace RevenueSharingInvest.Business.Services
         //READ
         public Task<List<AccountTransactionDTO>> GetAllAccountTransactions(int pageIndex, int pageSize, string sort, ThisUserObj currentUser);
         public Task<List<AccountTransactionDTO>> GetAccountTransactionsByDate(int pageIndex, int pageSize, string fromDate, string toDate, string sort, ThisUserObj currentUser);
-        public Task<string> CreateWithdrawAccountTransaction(InvestorWallet investorWallet, string userId, double amount, string requestId);
+        public Task<string> CreateWithdrawAccountTransaction(dynamic wallet, WithdrawRequest withdrawRequest, string userId, string roleName);
         //public Task<AccountTransactionDTO> GetAccountTransactionById(Guid accountTransactionId);
 
         //UPDATE

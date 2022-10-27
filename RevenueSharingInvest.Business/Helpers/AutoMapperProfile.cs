@@ -113,6 +113,7 @@ namespace RevenueSharingInvest.Business.Helpers
             CreateMap<BillDTO, GetBillDTO>().ReverseMap();
 
             CreateMap<InvestedProjectDetailWithInvestment, InvestedProjectDetail>().ReverseMap();
+            CreateMap<WithdrawRequest, GetWithdrawRequestDTO>().ReverseMap();
 
         }
     }

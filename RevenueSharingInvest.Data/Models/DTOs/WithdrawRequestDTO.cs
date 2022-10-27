@@ -22,7 +22,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string UpdateBy { get; set; }
     }
 
-    public class InvestorWithdrawRequest
+    public class WithdrawRequestDTO
     {
         public string FromWalletId { get; set; }
         public string BankName { get; set; }
