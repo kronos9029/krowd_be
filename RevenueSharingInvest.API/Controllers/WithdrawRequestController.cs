@@ -37,6 +37,7 @@ namespace RevenueSharingInvest.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetWithdrawRequestByUserId(string userId)
         {
+            userId ??= "";
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             if (currentUser.roleId.Equals(currentUser.investorRoleId))
             {
@@ -44,7 +45,7 @@ namespace RevenueSharingInvest.API.Controllers
                 return Ok(result);
             } else if (currentUser.roleId.Equals(currentUser.adminRoleId))
             {
-                if (!userId.Equals("") || userId != null)
+                if (!userId.Equals(""))
                 {
                     var result = await _withdrawRequestService.GetWithdrawRequestByUserId(userId);
                     return Ok(result);
