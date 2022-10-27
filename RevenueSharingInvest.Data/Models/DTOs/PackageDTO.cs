@@ -40,7 +40,9 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     public class PackagePercentDTO
     {
         public Guid id { get; set; }
+        public int numOfPackage { get; set; }
         public float percent { get; set; }
         public double paidAmount { get; set; }
+        public double paidPerInvestment { get; set; }
     }
 }

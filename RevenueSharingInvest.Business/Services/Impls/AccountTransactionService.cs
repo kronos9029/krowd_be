@@ -201,7 +201,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             try
             {
                 double realAmount = Convert.ToDouble(accountTransaction.Amount);
-                ProjectWallet P1 = await _projectWalletRepository.GetProjectWalletByProjectOwnerIdAndType((Guid)accountTransaction.FromUserId, WalletTypeEnum.P1.ToString());
+                ProjectWallet P1 = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType((Guid)accountTransaction.FromUserId, WalletTypeEnum.P1.ToString(), null);
                 P1.Balance = realAmount;
                 P1.UpdateBy = accountTransaction.FromUserId;
 

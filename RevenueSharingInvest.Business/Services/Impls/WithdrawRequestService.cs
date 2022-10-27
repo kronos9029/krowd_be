@@ -104,7 +104,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     if (request.Amount < 0 || request.Amount > fromWallet.Balance)
                         throw new WalletBalanceException("You Don't Have Enough Money To Withdraw!!");
 
-                    ProjectWallet toWallet = await _projectWalletRepository.GetProjectWalletByProjectOwnerIdAndType(Guid.Parse(currentUser.userId), "P1");
+                    ProjectWallet toWallet = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(Guid.Parse(currentUser.userId), "P1", null);
                     
                     withdrawRequest = new()
                     {
@@ -166,7 +166,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
                 else if (roleName.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
                 {
-                    ProjectWallet wallet = await _projectWalletRepository.GetProjectWalletByProjectOwnerIdAndType((Guid)withdrawRequest.CreateBy, "P1");
+                    ProjectWallet wallet = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType((Guid)withdrawRequest.CreateBy, "P1", null);
                     resultString = await _accountTransactionService.CreateWithdrawAccountTransaction(wallet, withdrawRequest, currentUser.userId, roleName);
                 }
                     

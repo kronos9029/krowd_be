@@ -95,13 +95,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     List<Package> packageList = await _packageRepository.GetAllPackagesByProjectId(project.Id);
                     List<PackagePercentDTO> packagePercentList = new List<PackagePercentDTO>();
                     PackagePercentDTO packagePercent;
+                    project.InvestmentTargetCapital = 210000000;///////////Test xong bo
                     foreach (Package package in packageList)
                     {
                         packagePercent = new PackagePercentDTO();
                         packagePercent.id = package.Id;
-                        packagePercent.percent = (float)((package.Quantity - package.RemainingQuantity) * package.Price / project.InvestmentTargetCapital);
+                        packagePercent.numOfPackage = package.Quantity - package.RemainingQuantity;
+                        packagePercent.percent = (float)Math.Round(packagePercent.numOfPackage * package.Price / project.InvestmentTargetCapital, 2);
                         packagePercent.paidAmount = Math.Floor(packagePercent.percent * createPeriodRevenueHistoryDTO.amount);
-                        packagePercentList.Add(packagePercent);                      
+                        packagePercent.paidPerInvestment = Math.Floor(packagePercent.paidAmount / packagePercent.numOfPackage);
+                        packagePercentList.Add(packagePercent);                 
                     }
 
                     //Lấy các Investment

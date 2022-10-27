@@ -117,6 +117,12 @@ namespace RevenueSharingInvest.Data.Models.DTOs
 
     public class PaidInvestorDTO
     {
+        public PaidInvestorDTO(Guid investorId, double amount)
+        {
+            this.investorId = investorId;
+            this.amount = amount;
+        }
+
         public Guid investorId { get; set; }
         public double amount { get; set; }
     }    
