@@ -287,11 +287,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<List<GetWithdrawRequestDTO>> GetAllWithdrawRequest(int pageIndex, int pageSize, string userId)
+        public async Task<List<GetWithdrawRequestDTO>> GetAllWithdrawRequest(int pageIndex, int pageSize, string userId, string filter)
         {
             try
             {
-                List<WithdrawRequest> withdrawRequests = await _withdrawRequestRepository.GetAllWithdrawRequest(pageIndex, pageSize, userId);
+                List<WithdrawRequest> withdrawRequests = await _withdrawRequestRepository.GetAllWithdrawRequest(pageIndex, pageSize, userId, filter);
                 List<GetWithdrawRequestDTO> withdrawRequestDTOList = new();
 
 

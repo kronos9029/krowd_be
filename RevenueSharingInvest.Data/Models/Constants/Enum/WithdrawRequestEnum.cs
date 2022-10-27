@@ -8,6 +8,7 @@ namespace RevenueSharingInvest.Data.Models.Constants.Enum
 {
     public enum WithdrawRequestEnum
     {
+        ALL,
         PENDING,
         PARTIAL,
         PARTIAL_ADMIN,

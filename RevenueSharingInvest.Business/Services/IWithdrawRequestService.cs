@@ -25,7 +25,7 @@ namespace RevenueSharingInvest.Business.Services
         public Task<List<GetWithdrawRequestDTO>> GetWithdrawRequestByUserId(string userId);
         public Task<GetWithdrawRequestDTO> GetWithdrawRequestById(string id);
         public Task<dynamic> AdminResponeToWithdrawRequest(ThisUserObj currentUser, string requestId, string receipt);
-        public Task<List<GetWithdrawRequestDTO>> GetAllWithdrawRequest(int pageIndex, int pageSize, string userId);
+        public Task<List<GetWithdrawRequestDTO>> GetAllWithdrawRequest(int pageIndex, int pageSize, string userId, string filter);
 
     }
 }
