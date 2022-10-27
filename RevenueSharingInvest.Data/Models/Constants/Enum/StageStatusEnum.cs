@@ -11,7 +11,6 @@ namespace RevenueSharingInvest.Data.Models.Constants.Enum
         INACTIVE,
         UNDUE,
         DUE,
-        PAID,
-        OVERDUE
+        DONE
     }
 }

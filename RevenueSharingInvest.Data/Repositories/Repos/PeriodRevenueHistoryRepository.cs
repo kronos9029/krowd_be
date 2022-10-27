@@ -20,6 +20,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
         }
 
+        //COUNT BY PERIOD REVENUE ID
+        public async Task<int> CountPeriodRevenueHistoryByPeriodRevenueId(Guid periodRevenueId)
+        {
+            try
+            {
+                string query = "SELECT COUNT(*) FROM PeriodRevenueHistory WHERE PeriodRevenueId = @PeriodRevenueId";
+                var parameters = new DynamicParameters();
+                parameters.Add("PeriodRevenueId", periodRevenueId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //CREATE
         public async Task<string> CreatePeriodRevenueHistory(PeriodRevenueHistory periodRevenueHistoryDTO)
         {

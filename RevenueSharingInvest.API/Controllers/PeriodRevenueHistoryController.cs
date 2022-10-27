@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.API.Controllers
@@ -19,18 +21,32 @@ namespace RevenueSharingInvest.API.Controllers
     public class PeriodRevenueHistoryController : ControllerBase
     {
         private readonly IPeriodRevenueHistoryService _periodRevenueHistoryService;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        public PeriodRevenueHistoryController(IPeriodRevenueHistoryService periodRevenueHistoryService, IHttpContextAccessor httpContextAccessor)
+        private readonly IUserService _userService;
+        private readonly IRoleService _roleService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public PeriodRevenueHistoryController(IPeriodRevenueHistoryService periodRevenueHistoryService, IUserService userService, IRoleService roleService, IHttpContextAccessor httpContextAccessor)
         {
             _periodRevenueHistoryService = periodRevenueHistoryService;
-            this.httpContextAccessor = httpContextAccessor;
+            _userService = userService;
+            _roleService = roleService;
+
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreatePeriodRevenueHistory([FromBody] PeriodRevenueHistoryDTO periodRevenueHistoryDTO)
+        [Authorize]
+        public async Task<IActionResult> CreatePeriodRevenueHistory([FromBody] CreatePeriodRevenueHistoryDTO createPeriodRevenueHistoryDTO)
         {
-            var result = await _periodRevenueHistoryService.CreatePeriodRevenueHistory(periodRevenueHistoryDTO);
-            return Ok(result);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+
+            //PROJECT_MANAGER
+            if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            {
+                var result = await _periodRevenueHistoryService.CreatePeriodRevenueHistory(createPeriodRevenueHistoryDTO, currentUser);
+                return Ok(result);
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER can perform this action!!!");
         }
 
         [HttpGet]
@@ -49,21 +65,5 @@ namespace RevenueSharingInvest.API.Controllers
             dto = await _periodRevenueHistoryService.GetPeriodRevenueHistoryById(id);
             return Ok(dto);
         }
-
-        [HttpPut]
-        [Route("{id}")]
-        public async Task<IActionResult> UpdatePeriodRevenueHistory([FromBody] PeriodRevenueHistoryDTO periodRevenueHistoryDTO, Guid id)
-        {
-            var result = await _periodRevenueHistoryService.UpdatePeriodRevenueHistory(periodRevenueHistoryDTO, id);
-            return Ok(result);
-        }
-
-        //[HttpDelete]
-        //[Route("{id}")]
-        //public async Task<IActionResult> DeletePeriodRevenueHistory(Guid id)
-        //{
-        //    var result = await _periodRevenueHistoryService.DeletePeriodRevenueHistoryById(id);
-        //    return Ok(result);
-        //}
     }
 }
