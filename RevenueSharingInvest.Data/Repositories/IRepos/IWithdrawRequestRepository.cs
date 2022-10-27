@@ -16,7 +16,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> ReportWithdrawRequest(Guid userId, Guid requestId, string reportMessage);
         public Task<WithdrawRequest> GetWithdrawRequestByRequestIdAndUserId(Guid requestId, Guid userId);
         public Task<List<WithdrawRequest>> GetWithdrawRequestByUserId(Guid userId);
-        public Task<List<WithdrawRequest>> GetAllWithdrawRequest(int pageIndex, int pageSize, string userId);
+        public Task<List<WithdrawRequest>> GetAllWithdrawRequest(int pageIndex, int pageSize, string userId, string filter);
         public Task<WithdrawRequest> GetWithdrawRequestByRequestId(Guid requestId);
     }
 }

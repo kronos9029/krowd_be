@@ -232,7 +232,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<WithdrawRequest>> GetAllWithdrawRequest(int pageIndex, int pageSize, string userId)
+        public async Task<List<WithdrawRequest>> GetAllWithdrawRequest(int pageIndex, int pageSize, string userId, string filter)
         {
             try
             {
@@ -243,6 +243,17 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereClause = " WHERE CreateBy = @UserId ";
                     parameters.Add("UserId", Guid.Parse(userId), DbType.Guid);
                 }
+                if (!filter.Equals("ALL"))
+                {
+                    if (whereClause.Equals(""))
+                        whereClause = " WHERE Status = @Status ";
+                    else
+                        whereClause += " AND Status = @Status ";
+
+                    parameters.Add("Status", filter, DbType.String);
+                }
+
+                
                 if (pageIndex != 0 && pageSize != 0)
                 {
                     var query = "WITH X AS ( "
