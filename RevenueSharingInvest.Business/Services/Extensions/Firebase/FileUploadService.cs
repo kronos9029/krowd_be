@@ -548,7 +548,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
                 {"permission", "allow" }
             };
 
-            string storageToken = await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(uid, tokenDescriptor);
+            string storageToken = await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(userId, tokenDescriptor);
 
             var auth = new FirebaseAuthProvider(new FirebaseConfig(_firebaseSettings.ApiKey));
 
@@ -570,7 +570,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
 
             var downloadUrl = await task;
 
-            await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.DeleteUserAsync(uid);
+            await FirebaseAdmin.Auth.FirebaseAuth.DefaultInstance.DeleteUserAsync(userId);
 
             return downloadUrl.ToString();
         }

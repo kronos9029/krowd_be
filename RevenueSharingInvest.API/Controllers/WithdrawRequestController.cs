@@ -112,7 +112,8 @@ namespace RevenueSharingInvest.API.Controllers
                     } 
                     else if (currentRequest.Status.Equals(WithdrawRequestEnum.PARTIAL_ADMIN.ToString()))
                     {
-                        var result = await _withdrawRequestService.AdminResponeToWithdrawRequest(currentUser, currentRequest.Id);
+                        string receiptLink = await _uploadService.UploadAdminTracsactionReceipt(request.requestId, request.receipt, currentUser.userId);
+                        var result = await _withdrawRequestService.AdminResponeToWithdrawRequest(currentUser, currentRequest.Id, receiptLink);
                         return Ok(result);
                     }
                 } 

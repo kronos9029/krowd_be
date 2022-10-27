@@ -148,12 +148,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> AdminApproveWithdrawRequest(ThisUserObj currentUser, string requestId)
+        public async Task<dynamic> AdminApproveWithdrawRequest(ThisUserObj currentUser, string requestId, string receipt)
         {
             try
             {
                 var resultString = "";
-                dynamic result = await _withdrawRequestRepository.AdminApproveWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(requestId));
+                dynamic result = await _withdrawRequestRepository.AdminApproveWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(requestId), receipt);
                 WithdrawRequest withdrawRequest = await _withdrawRequestRepository.GetWithdrawRequestByRequestId(Guid.Parse(requestId));
 
                 string roleName = await _roleRepository.GetRoleNameByUserId((Guid)withdrawRequest.CreateBy);
@@ -184,7 +184,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 dynamic result = await _withdrawRequestRepository.AdminApproveWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(requestId), receipt);
                 return result;
-
             }catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
