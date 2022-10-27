@@ -79,7 +79,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, pageIndex, pageSize);
                 List<GetStageDTO> list = _mapper.Map<List<GetStageDTO>>(stageList);
-                result.numOfStage = list.Count;              
+                result.numOfStage = list.Count;           
 
                 foreach (GetStageDTO item in list)
                 {

@@ -24,8 +24,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IStageRepository _stageRepository;
         private readonly IProjectRepository _projectRepository;
         private readonly IProjectWalletRepository _projectWalletRepository;
+        private readonly IInvestorWalletRepository _investorWalletRepository;
         private readonly IInvestmentRepository _investmentRepository;
         private readonly IPackageRepository _packageRepository;
+        private readonly IWalletTransactionRepository _walletTransactionRepository;
 
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
@@ -37,9 +39,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IStageRepository stageRepository, 
             IProjectRepository projectRepository,
             IProjectWalletRepository projectWalletRepository,
+            IInvestorWalletRepository investorWalletRepository,
             IInvestmentRepository investmentRepository,
             IPackageRepository packageRepository,
-
+            IWalletTransactionRepository walletTransactionRepository,
 
             IValidationService validationService, IMapper mapper)
         {
@@ -48,8 +51,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _stageRepository = stageRepository;
             _projectRepository = projectRepository;
             _projectWalletRepository = projectWalletRepository;
+            _investorWalletRepository = investorWalletRepository;
             _investmentRepository = investmentRepository;
             _packageRepository = packageRepository;
+            _walletTransactionRepository = walletTransactionRepository;
 
             _validationService = validationService;
             _mapper = mapper;
@@ -61,41 +66,48 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IdDTO newId = new IdDTO();
             try
             {
-                //if (createPeriodRevenueHistoryDTO.stageId == null || !await _validationService.CheckUUIDFormat(createPeriodRevenueHistoryDTO.stageId)) throw new InvalidFieldException("Invalid stageId!!!");
+                if (createPeriodRevenueHistoryDTO.stageId == null || !await _validationService.CheckUUIDFormat(createPeriodRevenueHistoryDTO.stageId)) throw new InvalidFieldException("Invalid stageId!!!");
 
                 Stage stage = await _stageRepository.GetStageById(Guid.Parse(createPeriodRevenueHistoryDTO.stageId));
-                //if (stage == null) throw new InvalidFieldException("stageId is not existed!!!");
-                //if (!stage.Status.Equals(StageStatusEnum.DUE.ToString())) throw new InvalidFieldException("The Stage's status is not DUE!!!");
+                if (stage == null) throw new InvalidFieldException("stageId is not existed!!!");
+                if (!stage.Status.Equals(StageStatusEnum.DUE.ToString())) throw new InvalidFieldException("The Stage's status is not DUE!!!");
 
                 Project project = await _projectRepository.GetProjectById(stage.ProjectId);
-                //if (!project.ManagerId.Equals(Guid.Parse(currentUser.userId))) throw new InvalidFieldException("This stageId is not belong to your Projects!!!");
-                //if (createPeriodRevenueHistoryDTO.amount > project.RemainingMaximumPayableAmount) throw new InvalidFieldException("amount can not greater than Project's RemainingMaximumPayableAmount = " + project.RemainingMaximumPayableAmount +"!!!");
+                if (!project.ManagerId.Equals(Guid.Parse(currentUser.userId))) throw new InvalidFieldException("This stageId is not belong to your Projects!!!");
+                if (createPeriodRevenueHistoryDTO.amount > project.RemainingMaximumPayableAmount) throw new InvalidFieldException("amount can not greater than Project's RemainingMaximumPayableAmount = " + project.RemainingMaximumPayableAmount + "!!!");
 
-                //ProjectWallet projectWallet = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(Guid.Parse(currentUser.userId), WalletTypeEnum.P4.ToString(), project.Id);
-                //if (projectWallet.Balance < createPeriodRevenueHistoryDTO.amount) throw new InvalidFieldException("You do not have enough money in PROJECT_PAYMENT_WALLET!!!");
+                ProjectWallet projectWallet = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(Guid.Parse(currentUser.userId), WalletTypeEnum.P4.ToString(), project.Id);
+                if (projectWallet.Balance < createPeriodRevenueHistoryDTO.amount) throw new InvalidFieldException("You do not have enough money in PROJECT_PAYMENT_WALLET!!!");
 
-                //PeriodRevenue periodRevenue = await _periodRevenueRepository.GetPeriodRevenueByStageId(stage.Id);
-                //if (periodRevenue == null) throw new NotFoundException("No PeriodRevenue Object Found!!!");
+                PeriodRevenue periodRevenue = await _periodRevenueRepository.GetPeriodRevenueByStageId(stage.Id);
+                if (periodRevenue == null) throw new NotFoundException("No PeriodRevenue Object Found!!!");
 
-                //int numOfPeriodRevenueHistory = await _periodRevenueHistoryRepository.CountPeriodRevenueHistoryByPeriodRevenueId(periodRevenue.Id) + 1;
+                int numOfPeriodRevenueHistory = await _periodRevenueHistoryRepository.CountPeriodRevenueHistoryByPeriodRevenueId(periodRevenue.Id) + 1;
 
-                //PeriodRevenueHistory periodRevenueHistory = new PeriodRevenueHistory();
-                //periodRevenueHistory.Name = "Lần " + numOfPeriodRevenueHistory + " " + stage.Name;
-                //periodRevenueHistory.PeriodRevenueId = periodRevenue.Id;
-                //periodRevenueHistory.Amount = createPeriodRevenueHistoryDTO.amount;
-                //periodRevenueHistory.Description = "Thanh toán cho " + stage.Name + " lần thứ " + numOfPeriodRevenueHistory;
-                //periodRevenueHistory.CreateBy = Guid.Parse(currentUser.userId);
+                PeriodRevenueHistory periodRevenueHistory = new PeriodRevenueHistory();
+                periodRevenueHistory.Name = "Lần " + numOfPeriodRevenueHistory + " " + stage.Name;
+                periodRevenueHistory.PeriodRevenueId = periodRevenue.Id;
+                periodRevenueHistory.Amount = createPeriodRevenueHistoryDTO.amount;
+                periodRevenueHistory.Description = "Thanh toán cho " + stage.Name + " lần thứ " + numOfPeriodRevenueHistory;
+                periodRevenueHistory.CreateBy = Guid.Parse(currentUser.userId);
 
-                //newId.id = await _periodRevenueHistoryRepository.CreatePeriodRevenueHistory(periodRevenueHistory);
-                newId.id = "asdfa";
+                newId.id = await _periodRevenueHistoryRepository.CreatePeriodRevenueHistory(periodRevenueHistory);
+                //newId.id = "asdfa";
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create PeriodRevenueHistory Object!");
                 else
                 {
+                    List<Investment> investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, project.Id.ToString(), null, Guid.Parse(currentUser.roleId));
+                    List<Investment> packageInvestmentList = new List<Investment>();
+
+                    //***
+                    List<PaidInvestorDTO> paidInvestorList = new List<PaidInvestorDTO>();
+
+                    PaidInvestorDTO paidInvestor = new PaidInvestorDTO();
                     List<Package> packageList = await _packageRepository.GetAllPackagesByProjectId(project.Id);
                     List<PackagePercentDTO> packagePercentList = new List<PackagePercentDTO>();
                     PackagePercentDTO packagePercent;
-                    project.InvestmentTargetCapital = 210000000;///////////Test xong bo
+                    //project.InvestmentTargetCapital = 210000000;///////////Test xong bo
                     foreach (Package package in packageList)
                     {
                         packagePercent = new PackagePercentDTO();
@@ -104,13 +116,62 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         packagePercent.percent = (float)Math.Round(packagePercent.numOfPackage * package.Price / project.InvestmentTargetCapital, 2);
                         packagePercent.paidAmount = Math.Floor(packagePercent.percent * createPeriodRevenueHistoryDTO.amount);
                         packagePercent.paidPerInvestment = Math.Floor(packagePercent.paidAmount / packagePercent.numOfPackage);
-                        packagePercentList.Add(packagePercent);                 
+
+                        packageInvestmentList = investmentList.FindAll(x => x.PackageId.Equals(packagePercent.id));
+
+                        foreach (Investment investment in packageInvestmentList)
+                        {
+                            if (paidInvestorList.Find(x => x.investorId.Equals(investment.InvestorId)) == null)
+                                paidInvestorList.Add(new PaidInvestorDTO(investment.InvestorId, Math.Floor((int)investment.Quantity * packagePercent.paidPerInvestment)));
+                            else
+                            {
+                                var foundInvestor = paidInvestorList.ToDictionary(x => x.investorId);
+                                paidInvestor = paidInvestorList.Find(x => x.investorId.Equals(investment.InvestorId));
+                                if (foundInvestor.TryGetValue(paidInvestor.investorId, out paidInvestor)) 
+                                    paidInvestor.amount = paidInvestor.amount + Math.Floor((int)investment.Quantity * packagePercent.paidPerInvestment);
+                            }                    
+                        }
+                        //packagePercentList.Add(packagePercent);                 
                     }
 
-                    //Lấy các Investment
-                    List<Investment> investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, project.Id.ToString(), null, Guid.Parse(currentUser.roleId));
+                    projectWallet = new ProjectWallet();
+                    projectWallet.ProjectManagerId = project.ManagerId;
+                    projectWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P4"));
+                    projectWallet.UpdateBy = Guid.Parse(currentUser.userId);
 
-                    //Lấy các Investor
+                    InvestorWallet investorWallet = new InvestorWallet();
+
+                    WalletTransaction walletTransaction = new WalletTransaction();
+
+                    foreach (PaidInvestorDTO item in paidInvestorList)
+                    {
+                        //Subtract P4 balance
+                        projectWallet.Balance = -item.amount;
+                        await _projectWalletRepository.UpdateProjectWalletBalance(projectWallet);
+
+                        //Create CASH_OUT WalletTransaction from P4 to I4
+                        walletTransaction = new WalletTransaction();
+                        walletTransaction.Amount = item.amount;
+                        walletTransaction.Fee = 0;
+                        walletTransaction.Description = "Transfer money from I3 to P3 for stage payment";
+                        walletTransaction.FromWalletId = (await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(project.ManagerId, WalletTypeEnum.P4.ToString(), project.Id)).Id;
+                        walletTransaction.ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.investorId, WalletTypeEnum.I4.ToString())).Id;
+                        walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
+                        walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
+                        await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+
+                        //Add I4 balance
+                        investorWallet.InvestorId = item.investorId;
+                        investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I4"));
+                        investorWallet.Balance = item.amount;
+                        investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
+                        await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
+
+                        //Create CASH_IN WalletTransaction from P4 to I4
+                        walletTransaction.Description = "Receive money from I3 to P3 to for stage payment";
+                        walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
+                        await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+                    }
                 }
                 return newId;
             }
