@@ -11,7 +11,7 @@ namespace RevenueSharingInvest.Business.Services
     public interface IPeriodRevenueHistoryService
     {
         //CREATE
-        public Task<IdDTO> CreatePeriodRevenueHistory(CreatePeriodRevenueHistoryDTO createPeriodRevenueHistoryDTO, ThisUserObj currentUser);
+        public Task<PeriodRevenueHistoryDTO> CreatePeriodRevenueHistory(CreatePeriodRevenueHistoryDTO createPeriodRevenueHistoryDTO, ThisUserObj currentUser);
 
         //READ
         public Task<List<PeriodRevenueHistoryDTO>> GetAllPeriodRevenueHistories(int pageIndex, int pageSize);

@@ -61,9 +61,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //CREATE
-        public async Task<IdDTO> CreatePeriodRevenueHistory(CreatePeriodRevenueHistoryDTO createPeriodRevenueHistoryDTO, ThisUserObj currentUser)
+        public async Task<PeriodRevenueHistoryDTO> CreatePeriodRevenueHistory(CreatePeriodRevenueHistoryDTO createPeriodRevenueHistoryDTO, ThisUserObj currentUser)
         {
-            IdDTO newId = new IdDTO();
+            PeriodRevenueHistoryDTO result = new PeriodRevenueHistoryDTO();
             try
             {
                 if (createPeriodRevenueHistoryDTO.stageId == null || !await _validationService.CheckUUIDFormat(createPeriodRevenueHistoryDTO.stageId)) throw new InvalidFieldException("Invalid stageId!!!");
@@ -91,12 +91,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 periodRevenueHistory.Description = "Thanh toán cho " + stage.Name + " lần thứ " + numOfPeriodRevenueHistory;
                 periodRevenueHistory.CreateBy = Guid.Parse(currentUser.userId);
 
-                newId.id = await _periodRevenueHistoryRepository.CreatePeriodRevenueHistory(periodRevenueHistory);
-                //newId.id = "asdfa";
-                if (newId.id.Equals(""))
+                string newId = await _periodRevenueHistoryRepository.CreatePeriodRevenueHistory(periodRevenueHistory);
+                if (newId.Equals(""))
                     throw new CreateObjectException("Can not create PeriodRevenueHistory Object!");
                 else
                 {
+                    periodRevenue.Id = Guid.Parse(newId);
+
                     List<Investment> investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, project.Id.ToString(), null, Guid.Parse(currentUser.roleId));
                     List<Investment> packageInvestmentList = new List<Investment>();
 
@@ -107,7 +108,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     List<Package> packageList = await _packageRepository.GetAllPackagesByProjectId(project.Id);
                     List<PackagePercentDTO> packagePercentList = new List<PackagePercentDTO>();
                     PackagePercentDTO packagePercent;
-                    //project.InvestmentTargetCapital = 210000000;///////////Test xong bo
+
                     foreach (Package package in packageList)
                     {
                         packagePercent = new PackagePercentDTO();
@@ -130,8 +131,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 if (foundInvestor.TryGetValue(paidInvestor.investorId, out paidInvestor)) 
                                     paidInvestor.amount = paidInvestor.amount + Math.Floor((int)investment.Quantity * packagePercent.paidPerInvestment);
                             }                    
-                        }
-                        //packagePercentList.Add(packagePercent);                 
+                        }              
                     }
 
                     projectWallet = new ProjectWallet();
@@ -173,7 +173,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
                     }
                 }
-                return newId;
+
+                result = _mapper.Map<PeriodRevenueHistoryDTO>(periodRevenueHistory);
+
+                return result;
             }
             catch (Exception e)
             {
