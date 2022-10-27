@@ -58,11 +58,11 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpGet]
         [Authorize]
         [Route("{id}")]
-        public async Task<IActionResult> GetWithdrawRequestById(string requestId)
+        public async Task<IActionResult> GetWithdrawRequestById(string id)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
-            var result = await _withdrawRequestService.GetWithdrawRequestByRequestIdAndUserId(requestId, currentUser.userId);
+            var result = await _withdrawRequestService.GetWithdrawRequestByRequestIdAndUserId(id, currentUser.userId);
             return Ok(result);
         }
 
