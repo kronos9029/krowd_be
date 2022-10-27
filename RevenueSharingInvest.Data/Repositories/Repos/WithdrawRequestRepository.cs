@@ -151,7 +151,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
         
 
-        public async Task<int> InvestorReportWithdrawRequest(Guid userId, Guid requestId, string description)
+        public async Task<int> ReportWithdrawRequest(Guid userId, Guid requestId, string description)
         {
             try
             {
@@ -221,6 +221,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "SELECT * FROM WithdrawRequest";
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<WithdrawRequest>(query)).ToList();
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+
+        public async Task<WithdrawRequest> GetWithdrawRequestByRequestId(Guid requestId)
+        {
+            try
+            {
+                var query = "SELECT * FROM WithdrawRequest WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", requestId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<WithdrawRequest>(query, parameters);
             }
             catch (Exception e)
             {

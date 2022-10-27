@@ -27,9 +27,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IWalletTypeRepository _walletTypeRepository;
         private readonly IUserRepository _userRepository;
         private readonly IProjectWalletRepository _projectWalletRepository;
-
         private readonly IMapper _mapper;
-
 
         public WalletTransactionService(
             IWalletTransactionRepository walletTransactionRepository,

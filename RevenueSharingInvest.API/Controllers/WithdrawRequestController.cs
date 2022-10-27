@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace RevenueSharingInvest.API.Controllers
 {
     [ApiController]
-    [Route("api/v1.0/WithdrawRequest")]
+    [Route("api/v1.0/Withdraw_Request")]
     [EnableCors]
     [Authorize]
     public class WithdrawRequestController : ControllerBase
@@ -35,7 +35,7 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetWithdrawRequestByUserId(string investorId)
+        public async Task<IActionResult> GetWithdrawRequestByUserId(string userId)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             if (currentUser.roleId.Equals(currentUser.investorRoleId))
@@ -44,9 +44,9 @@ namespace RevenueSharingInvest.API.Controllers
                 return Ok(result);
             } else if (currentUser.roleId.Equals(currentUser.adminRoleId))
             {
-                if (!investorId.Equals("") || investorId != null)
+                if (!userId.Equals("") || userId != null)
                 {
-                    var result = await _withdrawRequestService.GetWithdrawRequestByUserId(investorId);
+                    var result = await _withdrawRequestService.GetWithdrawRequestByUserId(userId);
                     return Ok(result);
                 } else
                 {
@@ -71,7 +71,7 @@ namespace RevenueSharingInvest.API.Controllers
         //CREATE
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreateWithdrawRequest([FromBody] InvestorWithdrawRequest request)
+        public async Task<IActionResult> CreateWithdrawRequest([FromBody] WithdrawRequestDTO request)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
@@ -101,7 +101,7 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PENDING.ToString()))
                     {
-                        var result = await _withdrawRequestService.AdminApproveWithdrawRequest(currentUser, currentRequest.Id, currentRequest.Amount);
+                        var result = await _withdrawRequestService.AdminApproveWithdrawRequest(currentUser, currentRequest.Id);
                         return Ok(result);
                     } 
                     else if (currentRequest.Status.Equals(WithdrawRequestEnum.PARTIAL_ADMIN.ToString()))
@@ -120,13 +120,13 @@ namespace RevenueSharingInvest.API.Controllers
 
                 }
             } 
-            else if (currentUser.roleId.Equals(currentUser.investorRoleId))
+            else if (currentUser.roleId.Equals(currentUser.investorRoleId) || currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
                 if (WithdrawAction.REPORT.ToString().Equals(action))
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PARTIAL.ToString()))
                     {
-                        var result = await _withdrawRequestService.AdminRejectWithdrawRequest(currentUser.userId, currentRequest.Id, request.refusalReason);
+                        var result = await _withdrawRequestService.ReportWithdrawRequest(currentUser.userId, currentRequest.Id, request.description);
                         return Ok(result);
                     }
                 }
@@ -134,15 +134,13 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PARTIAL.ToString()))
                     {
-                        var result = await _withdrawRequestService.InvestorApproveWithdrawRequest(currentUser.userId, currentRequest.Id);
+                        var result = await _withdrawRequestService.ApproveWithdrawRequest(currentUser.userId, currentRequest.Id);
                         return result;
                     }
                 }
-
-
             }
             
-            return StatusCode((int)HttpStatusCode.Forbidden, "");
+            return StatusCode((int)HttpStatusCode.Forbidden, "ERROR");
         }
     }
 

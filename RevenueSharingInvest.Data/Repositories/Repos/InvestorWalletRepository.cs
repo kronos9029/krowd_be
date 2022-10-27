@@ -175,7 +175,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }        
         
         //Investor Top-up 
-        public async Task<int> UpdateWalletBalance(InvestorWallet investorWalletDTO)
+        public async Task<int> UpdateWalletBalance(dynamic investorWalletDTO)
         {
             try
             {
@@ -191,12 +191,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Balance", investorWalletDTO.Balance, DbType.Double);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", investorWalletDTO.Id, DbType.Guid);    
+                parameters.Add("Id", investorWalletDTO.Id, DbType.Guid);
 
-                using (var connection = CreateConnection())
-                {
-                    return await connection.ExecuteAsync(query, parameters);
-                }
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
             {

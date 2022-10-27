@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
+using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
@@ -24,6 +25,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IMapper _mapper;
         private readonly IWalletTransactionService _walletTransactionService;
         private readonly IAccountTransactionService _accountTransactionService;
+        private readonly IProjectWalletRepository _projectWalletRepository;
+        private readonly IRoleRepository _roleRepository;
 
 
         public WithdrawRequestService(IWithdrawRequestRepository withdrawRequestRepository, 
@@ -31,7 +34,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IMapper mapper, 
             IInvestorWalletRepository investorWalletRepository, 
             IWalletTransactionService walletTransactionService,
-            IAccountTransactionService accountTransactionService)
+            IAccountTransactionService accountTransactionService,
+            IProjectWalletRepository projectWalletRepository,
+            IRoleRepository roleRepository)
         {
             _withdrawRequestRepository = withdrawRequestRepository;
             _validationService = validationService;
@@ -39,10 +44,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _investorWalletRepository = investorWalletRepository;
             _walletTransactionService = walletTransactionService;
             _accountTransactionService = accountTransactionService;
+            _projectWalletRepository = projectWalletRepository;
+            _roleRepository = roleRepository;
         }
 
 
-        public async Task<GetWithdrawRequestDTO> CreateInvestorWithdrawRequest(InvestorWithdrawRequest request, ThisUserObj currentUser)
+        public async Task<GetWithdrawRequestDTO> CreateInvestorWithdrawRequest(WithdrawRequestDTO request, ThisUserObj currentUser)
         {
             try
             {
@@ -87,11 +94,50 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         Status = withdrawRequest.Status,
                         RefusalReason = withdrawRequest.RefusalReason,
                         CreateDate = withdrawRequest.CreateDate.ToString(),
-                        CreateBy = withdrawRequest.CreateBy.ToString(),
-
+                        CreateBy = withdrawRequest.CreateBy.ToString()
                     };
                     _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
 
+                } else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+                {
+                    ProjectWallet fromWallet = await _projectWalletRepository.GetProjectWalletById(Guid.Parse(request.FromWalletId));
+                    if (request.Amount < 0 || request.Amount > fromWallet.Balance)
+                        throw new WalletBalanceException("You Don't Have Enough Money To Withdraw!!");
+
+                    ProjectWallet toWallet = await _projectWalletRepository.GetProjectWalletByProjectOwnerIdAndType(Guid.Parse(currentUser.userId), "P1");
+                    
+                    withdrawRequest = new()
+                    {
+                        BankName = request.BankName,
+                        BankAccount = request.BankAccount,
+                        AccountName = request.AccountName,
+                        Amount = request.Amount,
+                        CreateBy = Guid.Parse(currentUser.userId),
+                        Status = WithdrawRequestEnum.PENDING.ToString(),
+                        Description = "Withdraw Money",
+                        CreateDate = DateTimePicker.GetDateTimeByTimeZone()
+                    };
+
+                    newRequestId = await _withdrawRequestRepository.CreateWithdrawRequest(withdrawRequest);
+                    if (newRequestId == null || newRequestId.Equals(""))
+                        throw new CreateObjectException("Withdraw Request Failed!!");
+
+                    withdrawRequest.Id = Guid.Parse(newRequestId);
+
+                    getWithdrawRequestDTO = new()
+                    {
+                        Id = newRequestId,
+                        BankName = withdrawRequest.BankName,
+                        AccountName = withdrawRequest.AccountName,
+                        BankAccount = withdrawRequest.BankAccount,
+                        Description = withdrawRequest.Description,
+                        Amount = withdrawRequest.Amount,
+                        Status = withdrawRequest.Status,
+                        RefusalReason = withdrawRequest.RefusalReason,
+                        CreateDate = withdrawRequest.CreateDate.ToString(),
+                        CreateBy = withdrawRequest.CreateBy.ToString()
+                    };
+                    _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
                 }
                 return getWithdrawRequestDTO;
             }
@@ -102,17 +148,28 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> AdminApproveWithdrawRequest(ThisUserObj currentUser, string requestId, double amount)
+        public async Task<dynamic> AdminApproveWithdrawRequest(ThisUserObj currentUser, string requestId)
         {
             try
             {
+                var resultString = "";
                 dynamic result = await _withdrawRequestRepository.AdminApproveWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(requestId));
+                WithdrawRequest withdrawRequest = await _withdrawRequestRepository.GetWithdrawRequestByRequestId(Guid.Parse(requestId));
 
-                InvestorWallet investorWallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), "I1");
-                if (investorWallet == null)
-                    throw new NotFoundException("No Such Wallet With That ID!!");
-
-                var resultString = await _accountTransactionService.CreateWithdrawAccountTransaction(investorWallet, currentUser.userId, amount, requestId);
+                string roleName = await _roleRepository.GetRoleNameByUserId((Guid)withdrawRequest.CreateBy);
+                if (roleName == null || roleName.Equals(""))
+                    throw new NotFoundException("User not Exits!!");
+                else if (roleName.Equals(RoleEnum.INVESTOR.ToString()))
+                {
+                    InvestorWallet wallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType((Guid)withdrawRequest.CreateBy, "I1");
+                    resultString = await _accountTransactionService.CreateWithdrawAccountTransaction(wallet, withdrawRequest, currentUser.userId, roleName);
+                }
+                else if (roleName.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
+                {
+                    ProjectWallet wallet = await _projectWalletRepository.GetProjectWalletByProjectOwnerIdAndType((Guid)withdrawRequest.CreateBy, "P1");
+                    resultString = await _accountTransactionService.CreateWithdrawAccountTransaction(wallet, withdrawRequest, currentUser.userId, roleName);
+                }
+                    
                 return resultString;
             }catch(Exception e)
             {
@@ -135,7 +192,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> InvestorApproveWithdrawRequest(string userId, string requestId)
+        public async Task<dynamic> ApproveWithdrawRequest(string userId, string requestId)
         {
             try
             {
@@ -163,11 +220,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> InvestorReportWithdrawRequest(string userId, string requestId, string description)
+        public async Task<dynamic> ReportWithdrawRequest(string userId, string requestId, string description)
         {
             try
             {
-                dynamic result = await _withdrawRequestRepository.InvestorReportWithdrawRequest(Guid.Parse(userId), Guid.Parse(requestId), description);
+                dynamic result = await _withdrawRequestRepository.ReportWithdrawRequest(Guid.Parse(userId), Guid.Parse(requestId), description);
                 return result;
             }
             catch (Exception e)
