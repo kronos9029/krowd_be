@@ -96,13 +96,14 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> UpdateWithdrawRequest([FromForm] UpdateWithdrawRequest request, WithdrawAction action)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
-            var currentRequest = await _withdrawRequestService.GetWithdrawRequestByRequestIdAndUserId(request.requestId, currentUser.userId);
+            var currentRequest = await _withdrawRequestService.GetWithdrawRequestByRequestIdAndUserId(request.requestId
+                , currentUser.roleId.Equals(currentUser.adminRoleId) ? (await _withdrawRequestService.GetWithdrawRequestById(request.requestId)).CreateBy : currentUser.userId);
             if (currentRequest == null)
                 throw new NotFoundException("No Such Request With This Request ID!!");
 
             if(currentUser.roleId.Equals(currentUser.adminRoleId))
             {
-                if (WithdrawAction.APPROVE.ToString().Equals(action))
+                if (WithdrawAction.APPROVE.ToString().Equals(action.ToString()))
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PENDING.ToString()))
                     {
@@ -117,7 +118,7 @@ namespace RevenueSharingInvest.API.Controllers
                         return Ok(result);
                     }
                 } 
-                else if (WithdrawAction.REJECT.ToString().Equals(action))
+                else if (WithdrawAction.REJECT.ToString().Equals(action.ToString()))
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PENDING.ToString()))
                     {
@@ -129,7 +130,7 @@ namespace RevenueSharingInvest.API.Controllers
             } 
             else if (currentUser.roleId.Equals(currentUser.investorRoleId) || currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
-                if (WithdrawAction.REPORT.ToString().Equals(action))
+                if (WithdrawAction.REPORT.ToString().Equals(action.ToString()))
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PARTIAL.ToString()))
                     {
@@ -137,7 +138,7 @@ namespace RevenueSharingInvest.API.Controllers
                         return Ok(result);
                     }
                 }
-                else if (WithdrawAction.APPROVE.ToString().Equals(action))
+                else if (WithdrawAction.APPROVE.ToString().Equals(action.ToString()))
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PARTIAL.ToString()))
                     {

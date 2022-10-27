@@ -319,6 +319,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-
+        //GET BY ID
+        public async Task<GetWithdrawRequestDTO> GetWithdrawRequestById(string id)
+        {
+            try
+            {
+                WithdrawRequest withdrawRequest = await _withdrawRequestRepository.GetWithdrawRequestByRequestId(Guid.Parse(id));
+                GetWithdrawRequestDTO withdrawRequestDTO = _mapper.Map<GetWithdrawRequestDTO>(withdrawRequest);
+                return withdrawRequestDTO;
+            }
+            
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
     }
 }
