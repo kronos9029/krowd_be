@@ -96,7 +96,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new CreateObjectException("Can not create PeriodRevenueHistory Object!");
                 else
                 {
-                    periodRevenue.Id = Guid.Parse(newId);
+                    //Chuyển tiền cho Investor
+                    periodRevenueHistory.Id = Guid.Parse(newId);
 
                     List<Investment> investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, project.Id.ToString(), null, Guid.Parse(currentUser.roleId));
                     List<Investment> packageInvestmentList = new List<Investment>();
@@ -172,6 +173,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
                     }
+
+                    //Cập nhật PeriodRevenue
+                    periodRevenue.PaidAmount = createPeriodRevenueHistoryDTO.amount;
+                    periodRevenue.UpdateBy = Guid.Parse(currentUser.userId);
+                    await _periodRevenueRepository.UpdatePeriodRevenueByPaidAmount(periodRevenue);
                 }
 
                 result = _mapper.Map<PeriodRevenueHistoryDTO>(periodRevenueHistory);
