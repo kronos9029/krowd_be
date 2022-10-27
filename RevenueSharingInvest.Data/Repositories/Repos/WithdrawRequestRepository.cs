@@ -82,7 +82,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE WithdrawRequest SET " +
                             "Status = '"+WithdrawRequestEnum.PARTIAL.ToString()+"', " +
-                            "Description = @Description, " +
+                            "Description = ISNULL(@Description, Description), " +
                             "UpdateBy = @UpdateBy, " +
                             "UpdateDate = @UpdateDate " +
                             "WHERE Id = @Id";

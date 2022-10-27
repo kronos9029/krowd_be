@@ -21,6 +21,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
     {
         private readonly IWithdrawRequestRepository _withdrawRequestRepository;
         private readonly IInvestorWalletRepository _investorWalletRepository;
+        private readonly IInvestorRepository _investorRepository;
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
         private readonly IWalletTransactionService _walletTransactionService;
@@ -36,6 +37,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IWalletTransactionService walletTransactionService,
             IAccountTransactionService accountTransactionService,
             IProjectWalletRepository projectWalletRepository,
+            IInvestorRepository investorRepository,
             IRoleRepository roleRepository)
         {
             _withdrawRequestRepository = withdrawRequestRepository;
@@ -46,6 +48,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _accountTransactionService = accountTransactionService;
             _projectWalletRepository = projectWalletRepository;
             _roleRepository = roleRepository;
+            _investorRepository = investorRepository;
         }
 
 
@@ -161,7 +164,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new NotFoundException("User not Exits!!");
                 else if (roleName.Equals(RoleEnum.INVESTOR.ToString()))
                 {
-                    InvestorWallet wallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType((Guid)withdrawRequest.CreateBy, "I1");
+                    Investor investor = await _investorRepository.GetInvestorByUserId((Guid)withdrawRequest.CreateBy);
+                    InvestorWallet wallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(investor.Id, "I1");
                     resultString = await _accountTransactionService.CreateWithdrawAccountTransaction(wallet, withdrawRequest, currentUser.userId, roleName);
                 }
                 else if (roleName.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
