@@ -201,7 +201,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             try
             {
                 double realAmount = Convert.ToDouble(accountTransaction.Amount);
-                ProjectWallet P1 = await _projectWalletRepository.GetProjectWalletByProjectOwnerIdAndType((Guid)accountTransaction.FromUserId, WalletTypeEnum.P1.ToString());
+                ProjectWallet P1 = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType((Guid)accountTransaction.FromUserId, WalletTypeEnum.P1.ToString(), null);
                 P1.Balance = realAmount;
                 P1.UpdateBy = accountTransaction.FromUserId;
 
@@ -221,7 +221,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 };
                 await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
-                ProjectWallet P2 = await _projectWalletRepository.GetProjectWalletByProjectOwnerIdAndType((Guid)accountTransaction.FromUserId, WalletTypeEnum.I2.ToString());
+                ProjectWallet P2 = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType((Guid)accountTransaction.FromUserId, WalletTypeEnum.I2.ToString(), null);
                 if (P2 == null)
                     throw new NotFoundException("P2 Wallet Not Found!!");
 

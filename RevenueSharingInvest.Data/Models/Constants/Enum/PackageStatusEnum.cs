@@ -10,6 +10,7 @@ namespace RevenueSharingInvest.Data.Models.Constants
     {
         INACTIVE,
         IN_STOCK,
-        OUT_OF_STOCK
+        OUT_OF_STOCK,
+        BLOCKED
     }
 }

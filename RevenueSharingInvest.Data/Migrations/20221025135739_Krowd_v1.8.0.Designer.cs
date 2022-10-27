@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RevenueSharingInvest.Data.Helpers;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
     [DbContext(typeof(KrowdContext))]
-    partial class KrowdContextModelSnapshot : ModelSnapshot
+    [Migration("20221025135739_Krowd_v1.8.0")]
+    partial class Krowd_v180
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1442,9 +1444,6 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RefusalReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReportMessage")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")

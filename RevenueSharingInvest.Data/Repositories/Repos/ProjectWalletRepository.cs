@@ -165,11 +165,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //GET BY PROJECT OWNER ID AND TYPE
-        public async Task<ProjectWallet> GetProjectWalletByProjectOwnerIdAndType(Guid projectOwnerId, string walletType)
+        //GET BY PROJECT OWNER ID, TYPE AND PROJECT ID
+        public async Task<ProjectWallet> GetProjectWalletByProjectManagerIdAndType(Guid projectOwnerId, string walletType, Guid? projectId)
         {
             try
             {
+                var parameters = new DynamicParameters();
+                var whereClause = " WHERE "
+                    + "             WT.Type = @Type "
+                    + "             AND PW.ProjectManagerId = @ProjectManagerId ";
+
+                if (projectId != null)
+                {
+                    whereClause += " AND PW.ProjectId = @ProjectId ";
+                    parameters.Add("ProjectId", projectId, DbType.Guid);
+                }
+
                 string query = "SELECT "
                     + "             PW.Id, "
                     + "             PW.ProjectManagerId, "
@@ -178,10 +189,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         FROM "
                     + "             ProjectWallet PW "
                     + "             JOIN WalletType WT ON PW.WalletTypeId = WT.Id "
-                    + "         WHERE "
-                    + "             WT.Type = @Type "
-                    + "             AND PW.ProjectManagerId = @ProjectManagerId ";
-                var parameters = new DynamicParameters();
+                    +           whereClause;
+                
                 parameters.Add("ProjectManagerId", projectOwnerId, DbType.Guid);
                 parameters.Add("Type", walletType, DbType.String);
                 using var connection = CreateConnection();
