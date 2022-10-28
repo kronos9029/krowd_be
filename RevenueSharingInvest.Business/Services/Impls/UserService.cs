@@ -81,7 +81,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckExistenceId("Business", Guid.Parse(userDTO.businessId)))
                     throw new NotFoundException("This businessId " + userDTO.businessId + " is not existed!!!");
 
-                if (await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(userDTO.businessId)) != null)
+                if (currentUser.roleId.Equals(currentUser.adminRoleId) && await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(userDTO.businessId)) != null)
                     throw new InvalidFieldException("This Business has a BUSINESS_MANAGER already!!!");
 
                 if (!await _validationService.CheckText(userDTO.lastName))
