@@ -4,6 +4,7 @@ using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
+using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -21,15 +22,23 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IProjectWalletRepository _projectWalletRepository;
         private readonly IWalletTypeRepository _walletTypeRepository;
         private readonly IProjectRepository _projectRepository;
+        private readonly IWalletTransactionRepository _walletTransactionRepository;
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
 
 
-        public ProjectWalletService(IProjectWalletRepository projectWalletRepository, IWalletTypeRepository walletTypeRepository, IProjectRepository projectRepository, IValidationService validationService, IMapper mapper)
+        public ProjectWalletService(
+            IProjectWalletRepository projectWalletRepository, 
+            IWalletTypeRepository walletTypeRepository, 
+            IProjectRepository projectRepository,
+            IWalletTransactionRepository walletTransactionRepository,
+            IValidationService validationService, 
+            IMapper mapper)
         {
             _projectWalletRepository = projectWalletRepository;
             _walletTypeRepository = walletTypeRepository;
             _projectRepository = projectRepository;
+            _walletTransactionRepository = walletTransactionRepository;
             _validationService = validationService;
             _mapper = mapper;
         }
@@ -110,6 +119,75 @@ namespace RevenueSharingInvest.Business.Services.Impls
             catch (Exception e)
             {
                 LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
+        //TRANSFER MONEY
+        public async Task<TransferResponseDTO> TransferBetweenProjectWallet(TransferDTO transferDTO, ThisUserObj currentUser)
+        {
+            TransferResponseDTO result = new TransferResponseDTO();
+            try
+            {
+                ProjectWallet fromWallet = await _projectWalletRepository.GetProjectWalletById(transferDTO.fromWalletId);
+                WalletType fromWalletType = await _walletTypeRepository.GetWalletTypeById((Guid)fromWallet.WalletTypeId);
+                ProjectWallet toWallet = await _projectWalletRepository.GetProjectWalletById(transferDTO.toWalletId);
+                WalletType toWalletType = await _walletTypeRepository.GetWalletTypeById((Guid)toWallet.WalletTypeId);
+
+                if (fromWallet.WalletTypeId.Equals(WalletTypeDictionary.walletTypes.GetValueOrDefault("P3"))
+                    && !fromWallet.WalletTypeId.Equals(WalletTypeDictionary.walletTypes.GetValueOrDefault("P5")))
+                    throw new InvalidFieldException("You can transfer money from P3 to P5 only!!!");
+                else if (fromWallet.WalletTypeId.Equals(WalletTypeDictionary.walletTypes.GetValueOrDefault("P5"))
+                    && !fromWallet.WalletTypeId.Equals(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2")))
+                    throw new InvalidFieldException("You can transfer money from P5 to P2 only!!!");
+                else if (fromWallet.WalletTypeId.Equals(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2"))
+                    && !fromWallet.WalletTypeId.Equals(WalletTypeDictionary.walletTypes.GetValueOrDefault("P4")))
+                    throw new InvalidFieldException("You can transfer money from P2 to P4 only!!!");
+
+                if (fromWallet.Balance < transferDTO.amount) throw new InvalidFieldException("Your wallet balance is not enough to transfer!!!");
+
+                //Subtract fromWallet balance
+                ProjectWallet projectWallet = new ProjectWallet();
+                projectWallet.ProjectManagerId = Guid.Parse(currentUser.userId);
+                projectWallet.WalletTypeId = fromWallet.WalletTypeId;
+                projectWallet.Balance = -transferDTO.amount;
+                projectWallet.UpdateBy = Guid.Parse(currentUser.userId);
+                await _projectWalletRepository.UpdateProjectWalletBalance(projectWallet);
+
+                //Create CASH_OUT WalletTransaction from fromWallet to toWallet
+                WalletTransaction walletTransaction = new WalletTransaction();
+                walletTransaction.Amount = transferDTO.amount;
+                walletTransaction.Fee = 0;
+                walletTransaction.Description = "Transfer money from " + fromWalletType.Type + " to " + toWalletType.Type;
+                walletTransaction.FromWalletId = transferDTO.fromWalletId;
+                walletTransaction.ToWalletId = transferDTO.toWalletId;
+                walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
+                walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
+                await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+
+                //Add toWallet balance
+                projectWallet.WalletTypeId = toWallet.WalletTypeId;
+                projectWallet.Balance = transferDTO.amount;
+                await _projectWalletRepository.UpdateProjectWalletBalance(projectWallet);
+
+                //Create CASH_IN WalletTransaction fromWallet to toWallet
+                walletTransaction.Description = "Receive money from " + fromWalletType.Type + " to " + toWalletType.Type;
+                walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
+                await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+
+                //Mapping response
+                result.fromWalletId = fromWallet.Id;
+                result.fromWalletName = fromWalletType.Name;
+                result.fromWalletType = fromWalletType.Type;
+                result.toWalletId = toWallet.Id;
+                result.toWalletName = toWalletType.Name;
+                result.toWalletType = toWalletType.Type;
+                result.amount = transferDTO.amount;
+
+                return result;
+            }
+            catch (Exception e)
+            {
                 throw new Exception(e.Message);
             }
         }

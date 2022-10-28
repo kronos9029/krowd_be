@@ -19,6 +19,7 @@ namespace RevenueSharingInvest.Business.Services
         public Task<GetInvestorWalletDTO> GetInvestorWalletById(Guid id, ThisUserObj currentUser);
 
         //UPDATE
+        public Task<TransferResponseDTO> TransferBetweenInvestorWallet(TransferDTO transferDTO, ThisUserObj currentUser);
 
         //DELETE
     }

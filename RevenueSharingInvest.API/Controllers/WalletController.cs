@@ -6,6 +6,7 @@ using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
@@ -73,6 +74,26 @@ namespace RevenueSharingInvest.API.Controllers
             else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
                 var result = await _projectWalletService.GetAllProjectWalletById(id, currentUser);
+                return Ok(result);
+            }
+
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR or PROJECT_MANAGER can perform this action!!!");
+        }
+
+        //TRANSFER BETWEEN WALLETS
+        [HttpPut]
+        public async Task<IActionResult> TransferBetweenWallets(TransferDTO transferDTO)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+
+            if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            {
+                var result = await _projectWalletService.TransferBetweenProjectWallet(transferDTO, currentUser);
+                return Ok(result);
+            }
+            else if (currentUser.roleId.Equals(currentUser.investorRoleId))
+            {
+                var result = await _investorWalletService.TransferBetweenInvestorWallet(transferDTO, currentUser);
                 return Ok(result);
             }
 
