@@ -137,7 +137,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 WalletTransaction walletTransaction = new WalletTransaction();
                 walletTransaction.Amount = transferDTO.amount;
                 walletTransaction.Fee = 0;
-                walletTransaction.Description = "Transfer money from " + fromWalletType.Type + " to " + toWalletType.Type;
+                walletTransaction.Description = "Transfer money from " + fromWalletType.Type + " wallet to " + toWalletType.Type + " wallet";
                 walletTransaction.FromWalletId = transferDTO.fromWalletId;
                 walletTransaction.ToWalletId = transferDTO.toWalletId;
                 walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
@@ -150,7 +150,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
 
                 //Create CASH_IN WalletTransaction fromWallet to toWallet
-                walletTransaction.Description = "Receive money from " + fromWalletType.Type + " to " + toWalletType.Type;
+                walletTransaction.Description = "Receive money from " + fromWalletType.Type + " wallet to " + toWalletType.Type + " wallet";
                 walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                 await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 

@@ -154,7 +154,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         walletTransaction = new WalletTransaction();
                         walletTransaction.Amount = item.amount;
                         walletTransaction.Fee = 0;
-                        walletTransaction.Description = "Transfer money from I3 to P3 for stage payment";
+                        walletTransaction.Description = "Transfer money from I3 wallet to P3 wallet for stage payment";
                         walletTransaction.FromWalletId = (await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(project.ManagerId, WalletTypeEnum.P4.ToString(), project.Id)).Id;
                         walletTransaction.ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.investorId, WalletTypeEnum.I4.ToString())).Id;
                         walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
@@ -169,7 +169,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
 
                         //Create CASH_IN WalletTransaction from P4 to I4
-                        walletTransaction.Description = "Receive money from I3 to P3 to for stage payment";
+                        walletTransaction.Description = "Receive money from I3 wallet to P3 wallet for stage payment";
                         walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
                     }
