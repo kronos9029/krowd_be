@@ -1078,8 +1078,37 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        //UPDATE REMAINING AMOUNT
+        public async Task<int> UpdateProjectRemainingAmount(Project projectDTO)
+        {
+            try
+            {
+                var query = "UPDATE Project "
+                    + "     SET "
+                    + "         RemainingPayableAmount = ISNULL(@RemainingPayableAmount, RemainingPayableAmount), "
+                    + "         RemainingMaximumPayableAmount = ISNULL(@RemainingMaximumPayableAmount, RemainingMaximumPayableAmount), "
+                    + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
+                    + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
+                    + "     WHERE "
+                    + "         Id = @Id";
 
+                var parameters = new DynamicParameters();
+                parameters.Add("RemainingPayableAmount", projectDTO.RemainingPayableAmount, DbType.Double);
+                parameters.Add("RemainingMaximumPayableAmount", projectDTO.RemainingMaximumPayableAmount, DbType.Double);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", projectDTO.Id, DbType.Guid);
 
-
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

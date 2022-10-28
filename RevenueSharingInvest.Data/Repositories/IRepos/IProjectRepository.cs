@@ -53,6 +53,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> UpdateProjectImage(string url, Guid projectId);
         public Task<int> UpdateProjectStatus(Guid projectId, string status, Guid updaterId);
         public Task<int> UpdateProjectInvestedCapital(Guid projectId, double investedAmount, Guid updateBy);
+        public Task<int> UpdateProjectRemainingAmount(Project projectDTO);
         public Task<int> ApproveProject(Guid projectId, Guid updateBy);
 
         //DELETE

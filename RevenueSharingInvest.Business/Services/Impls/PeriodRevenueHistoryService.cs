@@ -174,10 +174,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
                     }
 
-                    //Cập nhật PeriodRevenue
+                    //Update PeriodRevenue
                     periodRevenue.PaidAmount = createPeriodRevenueHistoryDTO.amount;
                     periodRevenue.UpdateBy = Guid.Parse(currentUser.userId);
                     await _periodRevenueRepository.UpdatePeriodRevenueByPaidAmount(periodRevenue);
+
+                    //Update Project Amounts
+                    project.RemainingPayableAmount = project.RemainingPayableAmount - createPeriodRevenueHistoryDTO.amount;
+                    project.RemainingMaximumPayableAmount = project.RemainingMaximumPayableAmount - createPeriodRevenueHistoryDTO.amount;
+                    project.UpdateBy = Guid.Parse(currentUser.userId);
+                    await _projectRepository.UpdateProjectRemainingAmount(project);
                 }
 
                 result = _mapper.Map<PeriodRevenueHistoryDTO>(periodRevenueHistory);

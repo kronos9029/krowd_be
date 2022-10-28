@@ -82,7 +82,8 @@ namespace RevenueSharingInvest.API.Controllers
 
         //TRANSFER BETWEEN WALLETS
         [HttpPut]
-        public async Task<IActionResult> TransferBetweenWallets(TransferDTO transferDTO)
+        [Authorize]
+        public async Task<IActionResult> TransferBetweenWallets([FromBody] TransferDTO transferDTO)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
