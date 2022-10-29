@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Firebase.Auth;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualBasic;
 using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models;
@@ -11,6 +12,7 @@ using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using RevenueSharingInvest.Data.Repositories.Repos;
@@ -347,27 +349,32 @@ namespace RevenueSharingInvest.Business.Services.Impls
         //}
 
         ////GET ALL
-        public async Task<List<AccountTransactionDTO>> GetAllAccountTransactions(int pageIndex, int pageSize, string sort, ThisUserObj currentUser)
+        public async Task<AllAccountTransactionDTO> GetAllAccountTransactions(int pageIndex, int pageSize, string sort, ThisUserObj currentUser)
         {
             try
             {
+                AllAccountTransactionDTO result = new AllAccountTransactionDTO();
+                result.listOfAccountTransaction = new List<AccountTransactionDTO>();
+
                 List<AccountTransaction> accountTransactionList = new();
                 if (currentUser.roleId.Equals(currentUser.adminRoleId))
                 {
                     accountTransactionList = await _accountTransactionRepository.GetAllAccountTransactions(pageIndex, pageSize, "", sort);
+                    result.numOfAccountTransaction = await _accountTransactionRepository.CountAllAccountTransactions("");
                 }
                 else
                 {
                     accountTransactionList = await _accountTransactionRepository.GetAllAccountTransactions(pageIndex, pageSize, currentUser.userId, sort);
+                    result.numOfAccountTransaction = await _accountTransactionRepository.CountAllAccountTransactions(currentUser.userId);
                 }
 
-                
-                List<AccountTransactionDTO> list = _mapper.Map<List<AccountTransactionDTO>>(accountTransactionList);
-                foreach (AccountTransactionDTO item in list)
+
+                result.listOfAccountTransaction = _mapper.Map<List<AccountTransactionDTO>>(accountTransactionList);
+                foreach (AccountTransactionDTO item in result.listOfAccountTransaction)
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                 }
-                return list;
+                return result;
             }
             catch (Exception e)
             {
@@ -375,29 +382,47 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 throw new Exception(e.Message);
             }
         }
-        public async Task<List<AccountTransactionDTO>> GetAccountTransactionsByDate(int pageIndex, int pageSize, string fromDate, string toDate, string sort, ThisUserObj currentUser)
+        public async Task<AllAccountTransactionDTO> GetAccountTransactionsByDate(int pageIndex, int pageSize, string fromDate, string toDate, string sort, ThisUserObj currentUser)
         {
             try
             {
-                fromDate += " 00:00:00";
-                toDate += " 23:59:59";
+                AllAccountTransactionDTO result = new AllAccountTransactionDTO();
+                result.listOfAccountTransaction = new List<AccountTransactionDTO>();
+
+                if (fromDate == null || toDate == null)
+                    throw new InvalidFieldException("fromDate and toDate can not be null!!");
+
+                if (!await _validationService.CheckDate(fromDate))
+                    throw new InvalidFieldException("Invalid fromDate!!!");
+
+                if (!await _validationService.CheckDate(toDate))
+                    throw new InvalidFieldException("Invalid toDate!!!");
+
+                fromDate = fromDate.Remove(fromDate.Length - 8) + "00:00:00";
+                toDate = toDate.Remove(toDate.Length - 8) + "23:59:59";
+
+                if ((DateAndTime.DateDiff(DateInterval.Day, DateTime.ParseExact(fromDate, "dd/MM/yyyy HH:mm:ss", null), DateTime.ParseExact(toDate, "dd/MM/yyyy HH:mm:ss", null))) < 0)
+                    throw new InvalidFieldException("fromDate can not bigger than toDate!!!");
+
                 List<AccountTransaction> accountTransactionList = new();
                 if (currentUser.roleId.Equals(currentUser.adminRoleId))
                 {
                     accountTransactionList = await _accountTransactionRepository.GetAccountTransactionsByDate(pageIndex, pageSize, fromDate, toDate, sort, "");
+                    result.numOfAccountTransaction = await _accountTransactionRepository.CountAccountTransactionsByDate(fromDate, toDate, "");
                 }
                 else
                 {
                     accountTransactionList = await _accountTransactionRepository.GetAccountTransactionsByDate(pageIndex, pageSize, fromDate, toDate, sort, currentUser.userId);
+                    result.numOfAccountTransaction = await _accountTransactionRepository.CountAccountTransactionsByDate(fromDate, toDate, currentUser.userId);
                 }
 
 
-                List<AccountTransactionDTO> list = _mapper.Map<List<AccountTransactionDTO>>(accountTransactionList);
-                foreach (AccountTransactionDTO item in list)
+                result.listOfAccountTransaction = _mapper.Map<List<AccountTransactionDTO>>(accountTransactionList);
+                foreach (AccountTransactionDTO item in result.listOfAccountTransaction)
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                 }
-                return list;
+                return result;
             }
             catch(Exception e)
             {

@@ -14,7 +14,9 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         ////READ
         public Task<List<AccountTransaction>> GetAllAccountTransactions(int pageIndex, int pageSize, string userId, string sort);
+        public Task<int> CountAllAccountTransactions(string userId);
         public Task<List<AccountTransaction>> GetAccountTransactionsByDate(int pageIndex, int pageSize, string fromDate, string toDate, string sort, string userId);
+        public Task<int> CountAccountTransactionsByDate(string fromDate, string toDate, string userId);
         //public Task<AccountTransaction> GetAccountTransactionById(Guid accountTransactionId);
 
         ////UPDATE

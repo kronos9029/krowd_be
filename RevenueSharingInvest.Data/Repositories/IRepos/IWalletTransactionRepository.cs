@@ -14,6 +14,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
 
         //READ
         public Task<List<WalletTransaction>> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, Guid? userRoleId, Guid? walletId, string fromDate, string toDate, string type, string order);
+        public Task<int> CountAllWalletTransactions(Guid? userId, Guid? userRoleId, Guid? walletId, string fromDate, string toDate, string type);
         public Task<WalletTransaction> GetWalletTransactionById(Guid walletTransactionId);
 
         //UPDATE

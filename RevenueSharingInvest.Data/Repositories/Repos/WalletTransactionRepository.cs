@@ -20,6 +20,94 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
         }
 
+        //COUNT ALL
+        public async Task<int> CountAllWalletTransactions(Guid? userId, Guid? userRoleId, Guid? walletId, string fromDate, string toDate, string type)
+        {
+            string queryString = "";
+            string whereClause = "";
+
+            string fromWalletIdCondition = "";
+            string toWalletIdCondition = "";
+            string dateCondition = " AND ( W.CreateDate BETWEEN @FromDate AND @ToDate ) ";
+            string typeCondition = " AND W.Type = @Type ";
+
+            try
+            {
+                var parameters = new DynamicParameters();
+
+                if (walletId != null)
+                {
+                    fromWalletIdCondition = " AND W.FromWalletId = @WalletId ";
+                    toWalletIdCondition = " AND W.ToWalletId = @WalletId ";
+                    parameters.Add("WalletId", walletId, DbType.Guid);
+                }
+
+                if (fromDate != null && toDate != null)
+                {
+                    whereClause = whereClause + dateCondition;
+                    parameters.Add("FromDate", DateTime.ParseExact(fromDate, "dd/MM/yyyy HH:mm:ss", null), DbType.DateTime);
+                    parameters.Add("ToDate", DateTime.ParseExact(toDate, "dd/MM/yyyy HH:mm:ss", null), DbType.DateTime);
+                }
+
+                if (type != null)
+                {
+                    whereClause = whereClause + typeCondition;
+                    parameters.Add("Type", type, DbType.String);
+                }
+
+                if (userRoleId != null)
+                {
+                    if (userRoleId.Equals(Guid.Parse(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"))))
+                    {
+                        queryString = " SELECT W.* "
+                            + "         FROM WalletTransaction W "
+                            + "             JOIN ProjectWallet PW ON W.FromWalletId = PW.Id "
+                            + "             JOIN [User] U ON PW.ProjectManagerId = U.Id "
+                            + "         WHERE "
+                            + "             U.Id = @UserId "
+                            + "             AND (W.Type = 'CASH_OUT' OR W.Type = 'WITHDRAW') " + whereClause + fromWalletIdCondition
+                            + "         UNION "
+                            + "         SELECT W.* "
+                            + "         FROM WalletTransaction W "
+                            + "             JOIN ProjectWallet PW ON W.ToWalletId = PW.Id "
+                            + "             JOIN [User] U ON PW.ProjectManagerId = U.Id "
+                            + "         WHERE "
+                            + "             U.Id = @UserId "
+                            + "             AND (W.Type = 'CASH_IN' OR W.Type = 'DEPOSIT') " + whereClause + toWalletIdCondition;
+                    }
+                    else if (userRoleId.Equals(Guid.Parse(RoleDictionary.role.GetValueOrDefault("INVESTOR"))))
+                    {
+                        queryString = " SELECT W.* "
+                            + "         FROM WalletTransaction W "
+                            + "             JOIN InvestorWallet IW ON W.FromWalletId = IW.Id "
+                            + "             JOIN Investor I ON IW.InvestorId = I.Id "
+                            + "             JOIN [User] U ON I.UserId = U.Id "
+                            + "         WHERE "
+                            + "             U.Id = @UserId "
+                            + "             AND (W.Type = 'CASH_OUT' OR W.Type = 'WITHDRAW') " + whereClause + fromWalletIdCondition
+                            + "         UNION "
+                            + "         SELECT W.* "
+                            + "         FROM WalletTransaction W "
+                            + "             JOIN InvestorWallet IW ON W.ToWalletId = IW.Id "
+                            + "             JOIN Investor I ON IW.InvestorId = I.Id "
+                            + "             JOIN [User] U ON I.UserId = U.Id "
+                            + "         WHERE "
+                            + "             U.Id = @UserId "
+                            + "             AND (W.Type = 'CASH_IN' OR W.Type = 'DEPOSIT') " + whereClause + toWalletIdCondition;
+                    }
+                    parameters.Add("UserId", userId, DbType.Guid);
+                }
+                var query = "SELECT COUNT(*) FROM (SELECT Y.* FROM ( " + queryString + " ) AS Y) AS Z";
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //CREATE
         public async Task<string> CreateWalletTransaction(WalletTransaction walletTransactionDTO)
         {

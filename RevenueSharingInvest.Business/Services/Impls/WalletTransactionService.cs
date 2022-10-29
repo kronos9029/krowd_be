@@ -8,6 +8,7 @@ using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -172,11 +173,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<WalletTransactionDTO>> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, Guid? walletId, string fromDate, string toDate, string type, string order, ThisUserObj currentUser)
+        public async Task<AllWalletTransactionDTO> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, Guid? walletId, string fromDate, string toDate, string type, string order, ThisUserObj currentUser)
         {
-            //fromDate ??= "";
-            //toDate ??= "";
-            //walletId ??= "";
+            AllWalletTransactionDTO result = new AllWalletTransactionDTO();
+            result.listOfWalletTransaction = new List<WalletTransactionDTO>();
             Guid? userRoleId = null;
             try
             {
@@ -249,8 +249,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 userRoleId = (await _userRepository.GetUserById((Guid)userId)).RoleId;
 
                 List<WalletTransaction> walletTransactionsEntityList = await _walletTransactionRepository.GetAllWalletTransactions(pageIndex, pageSize, userId, userRoleId, walletId, fromDate, toDate, type, order);
-                List<WalletTransactionDTO> result = _mapper.Map<List<WalletTransactionDTO>>(walletTransactionsEntityList);
-                foreach (WalletTransactionDTO item in result)
+                result.listOfWalletTransaction = _mapper.Map<List<WalletTransactionDTO>>(walletTransactionsEntityList);
+                result.numOfWalletTransaction = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, walletId, fromDate, toDate, type);
+                foreach (WalletTransactionDTO item in result.listOfWalletTransaction)
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                 }
