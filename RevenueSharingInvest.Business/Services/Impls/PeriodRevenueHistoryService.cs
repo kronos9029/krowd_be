@@ -156,7 +156,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         walletTransaction.Fee = 0;
                         walletTransaction.Description = "Transfer money from I3 wallet to P3 wallet for stage payment";
                         walletTransaction.FromWalletId = (await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(project.ManagerId, WalletTypeEnum.P4.ToString(), project.Id)).Id;
+                        walletTransaction.ProjectWalletId = walletTransaction.FromWalletId;
                         walletTransaction.ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.investorId, WalletTypeEnum.I4.ToString())).Id;
+                        walletTransaction.InvestorWalletId = walletTransaction.ToWalletId;
                         walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
                         walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);

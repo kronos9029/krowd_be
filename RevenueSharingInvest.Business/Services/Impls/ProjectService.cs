@@ -1221,9 +1221,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 walletTransaction = new WalletTransaction();
                                 walletTransaction.Amount = item.TotalPrice;
                                 walletTransaction.Fee = 0;
-                                walletTransaction.Description = "Transfer money from I3 to P3 to prepare for activation";
+                                walletTransaction.Description = "Transfer money from I3 wallet to P3 wallet to prepare for activation";
                                 walletTransaction.FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.InvestorId, WalletTypeEnum.I3.ToString())).Id;
+                                walletTransaction.InvestorWalletId = walletTransaction.FromWalletId;
                                 walletTransaction.ToWalletId = (await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(project.ManagerId, WalletTypeEnum.P3.ToString(), projectId)).Id;
+                                walletTransaction.ProjectWalletId = walletTransaction.ToWalletId;
                                 walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
                                 walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
                                 await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
@@ -1233,7 +1235,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 await _projectWalletRepository.UpdateProjectWalletBalanceToActivate(projectWallet);
 
                                 //Create CASH_IN WalletTransaction from I3 to P3
-                                walletTransaction.Description = "Receive money from I3 to P3 to prepare for activation";
+                                walletTransaction.Description = "Receive money from I3 wallet to P3 wallet to prepare for activation";
                                 walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                                 await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
                             }
@@ -1242,7 +1244,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             DailyReport dailyReport = new DailyReport();
                             dailyReport.CreateDate = DateTimePicker.GetDateTimeByTimeZone();
                             dailyReport.CreateBy = Guid.Parse(currentUser.userId);
-                            dailyReport.Status = DailyReportStatusEnum.UNDUE.ToString();
                             List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0);
                             int numOfReport;
                             foreach (Stage stage in stageList)

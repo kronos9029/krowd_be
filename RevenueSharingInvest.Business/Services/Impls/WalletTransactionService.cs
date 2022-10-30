@@ -142,7 +142,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     Amount = amount,
                     Fee = 0,
-                    Description = "Transfer money from "+fromType+" to "+toType,
+                    Description = "Transfer money from " + fromType + " wallet to " + toType + " wallet",
                     FromWalletId = from.Id,
                     ToWalletId = to.Id,
                     Type = WalletTransactionTypeEnum.CASH_OUT.ToString(),
@@ -158,7 +158,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new UpdateObjectException("Update Investor Wallet " + toType + " Balance Failed!!");
 
                 //Create CASH_IN WalletTransaction
-                walletTransaction.Description = "Receive money from "+toType+" to "+fromType;
+                walletTransaction.Description = "Receive money from " + fromType + " wallet to " + toType + " wallet";
                 walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                 newWalletTransactionId = "";
                 newWalletTransactionId = await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);

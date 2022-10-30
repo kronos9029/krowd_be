@@ -179,7 +179,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         walletTransaction.PaymentId = Guid.Parse(paymentId);
                         walletTransaction.Amount = payment.Amount;
                         walletTransaction.Fee = 0;
-                        walletTransaction.Description = "Transfer money from I2 to I3 to invest";
+                        walletTransaction.Description = "Transfer money from I2 wallet to I3 wallet to invest";
                         walletTransaction.FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString())).Id;
                         walletTransaction.ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString())).Id;
                         walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
@@ -192,7 +192,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
 
                         //Create CASH_IN WalletTransaction from I2 to I3
-                        walletTransaction.Description = "Receive money from I2 to I3 to invest";
+                        walletTransaction.Description = "Receive money from I2 wallet to I3 wallet to invest";
                         walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
