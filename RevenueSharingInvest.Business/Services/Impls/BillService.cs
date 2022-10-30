@@ -66,11 +66,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 DailyReport dailyReport = await _dailyReportRepository.GetDailyReportByProjectIdAndDate(Guid.Parse(projectId), date);
                 if (dailyReport == null)
                     throw new InvalidFieldException("This date is not within the project revenue reporting periods!!!");               
-
-                if (dailyReport.Amount != 0 && dailyReport.Status.Equals(DailyReportStatusEnum.REPORTED.ToString()))
-                    throw new InvalidFieldException("You have reported for this day already!!!");
-                else if (dailyReport.Amount != 0 && dailyReport.Status.Equals(DailyReportStatusEnum.UNDUE.ToString()))
-                    throw new InvalidFieldException("You can report for this day soon!!!");
+                //**Review xong bo comment
+                //if (dailyReport.Amount != 0 && dailyReport.Status.Equals(DailyReportStatusEnum.REPORTED.ToString()))
+                //    throw new InvalidFieldException("You have reported for this day already!!!");
+                //else if (dailyReport.Status.Equals(DailyReportStatusEnum.UNDUE.ToString()))
+                //    throw new InvalidFieldException("You can report for this day soon!!!");
 
                 for (int i = 0; i < bills.bills.Count; i++)
                 {
