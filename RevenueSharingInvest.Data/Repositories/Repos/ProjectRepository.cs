@@ -1085,8 +1085,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 var query = "UPDATE Project "
                     + "     SET "
-                    + "         RemainingPayableAmount = ISNULL(@RemainingPayableAmount, RemainingPayableAmount), "
-                    + "         RemainingMaximumPayableAmount = ISNULL(@RemainingMaximumPayableAmount, RemainingMaximumPayableAmount), "
+                    + "         RemainingPayableAmount = ISNULL(ROUND(@RemainingPayableAmount, 0), RemainingPayableAmount), "
+                    + "         RemainingMaximumPayableAmount = ISNULL(ROUND(@RemainingMaximumPayableAmount, 0), RemainingMaximumPayableAmount), "
                     + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
                     + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
                     + "     WHERE "

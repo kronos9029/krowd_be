@@ -135,9 +135,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         }              
                     }
 
-                    projectWallet = new ProjectWallet();
-                    projectWallet.ProjectManagerId = project.ManagerId;
-                    projectWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P4"));
                     projectWallet.UpdateBy = Guid.Parse(currentUser.userId);
 
                     InvestorWallet investorWallet = new InvestorWallet();
@@ -164,8 +161,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
                         //Add I4 balance
-                        investorWallet.InvestorId = item.investorId;
-                        investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I4"));
+                        investorWallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.investorId, WalletTypeEnum.I4.ToString());
                         investorWallet.Balance = item.amount;
                         investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
                         await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);

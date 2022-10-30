@@ -147,12 +147,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (fromWallet.Balance < transferDTO.amount) throw new InvalidFieldException("Your wallet balance is not enough to transfer!!!");
 
                 //Subtract fromWallet balance
-                ProjectWallet projectWallet = new ProjectWallet();
-                projectWallet.ProjectManagerId = Guid.Parse(currentUser.userId);
-                projectWallet.WalletTypeId = fromWallet.WalletTypeId;
-                projectWallet.Balance = -transferDTO.amount;
-                projectWallet.UpdateBy = Guid.Parse(currentUser.userId);
-                await _projectWalletRepository.UpdateProjectWalletBalance(projectWallet);
+                fromWallet.Balance = -transferDTO.amount;
+                fromWallet.UpdateBy = Guid.Parse(currentUser.userId);
+                await _projectWalletRepository.UpdateProjectWalletBalance(fromWallet);
 
                 //Create CASH_OUT WalletTransaction from fromWallet to toWallet
                 WalletTransaction walletTransaction = new WalletTransaction();
@@ -166,9 +163,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
                 //Add toWallet balance
-                projectWallet.WalletTypeId = toWallet.WalletTypeId;
-                projectWallet.Balance = transferDTO.amount;
-                await _projectWalletRepository.UpdateProjectWalletBalance(projectWallet);
+                toWallet.Balance = transferDTO.amount;
+                toWallet.UpdateBy = Guid.Parse(currentUser.userId);
+                await _projectWalletRepository.UpdateProjectWalletBalance(toWallet);
 
                 //Create CASH_IN WalletTransaction fromWallet to toWallet
                 walletTransaction.Description = "Receive money from " + fromWalletType.Type + " wallet to " + toWalletType.Type + " wallet";

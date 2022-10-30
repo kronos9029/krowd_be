@@ -213,15 +213,13 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy"
                     + "     WHERE "
-                    + "         InvestorId = @InvestorId" 
-                    + "         AND WalletTypeId = @WalletTypeId";
+                    + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Balance", investorWalletDTO.Balance, DbType.Double);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", investorWalletDTO.UpdateBy, DbType.Guid);
-                parameters.Add("InvestorId", investorWalletDTO.InvestorId, DbType.Guid);
-                parameters.Add("WalletTypeId", investorWalletDTO.WalletTypeId, DbType.Guid);
+                parameters.Add("Id", investorWalletDTO.Id, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);

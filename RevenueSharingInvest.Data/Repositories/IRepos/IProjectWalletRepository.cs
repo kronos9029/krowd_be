@@ -20,7 +20,6 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //UPDATE
         public Task<int> UpdateProjectWallet(ProjectWallet projectWalletDTO, Guid projectWalletId);
         public Task<int> UpdateProjectWalletBalance(ProjectWallet projectWalletDTO);
-        public Task<int> UpdateProjectWalletBalanceToActivate(ProjectWallet projectWalletDTO);
 
         //DELETE
         public Task<int> DeleteProjectWalletByBusinessId(Guid businessId);

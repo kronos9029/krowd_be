@@ -208,54 +208,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
+                var parameters = new DynamicParameters();
+                string projectIdCondition = " AND ProjectId = @ProjectId ";
+                if (projectWalletDTO.ProjectId != null) parameters.Add("ProjectId", projectWalletDTO.ProjectId, DbType.Guid);
+
                 var query = "UPDATE ProjectWallet "
                     + "     SET "
                     + "         Balance = Balance + @Balance, "
                     + "         UpdateDate = @UpdateDate, "
                     + "         UpdateBy = @UpdateBy "
                     + "     WHERE "
-                    + "         ProjectManagerId = @ProjectManagerId "
-                    + "         AND WalletTypeId = @WalletTypeId ";
+                    + "         Id = @Id ";
 
-                var parameters = new DynamicParameters();
+                
                 parameters.Add("Balance", projectWalletDTO.Balance, DbType.Double);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", projectWalletDTO.UpdateBy, DbType.Guid);
-                parameters.Add("ProjectManagerId", projectWalletDTO.ProjectManagerId, DbType.Guid);
-                parameters.Add("WalletTypeId", projectWalletDTO.WalletTypeId, DbType.Guid);
-
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message, e);
-            }
-        }
-
-        //UPDATE BALANCE TO ACTIVATE
-        public async Task<int> UpdateProjectWalletBalanceToActivate(ProjectWallet projectWalletDTO)
-        {
-            try
-            {
-                var query = "UPDATE ProjectWallet "
-                    + "     SET "
-                    + "         Balance = Balance + @Balance, "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy "
-                    + "     WHERE "
-                    + "         ProjectManagerId = @ProjectManagerId "
-                    + "         AND ProjectId = @ProjectId "
-                    + "         AND WalletTypeId = @WalletTypeId ";
-
-                var parameters = new DynamicParameters();
-                parameters.Add("Balance", projectWalletDTO.Balance, DbType.Double);
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                parameters.Add("UpdateBy", projectWalletDTO.UpdateBy, DbType.Guid);
-                parameters.Add("ProjectManagerId", projectWalletDTO.ProjectManagerId, DbType.Guid);
-                parameters.Add("ProjectId", projectWalletDTO.ProjectId, DbType.Guid);
-                parameters.Add("WalletTypeId", projectWalletDTO.WalletTypeId, DbType.Guid);
+                parameters.Add("Id", projectWalletDTO.Id, DbType.Guid);                
 
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);

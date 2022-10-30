@@ -167,9 +167,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         await _projectRepository.UpdateProjectInvestedCapital(package.ProjectId, (double)payment.Amount, Guid.Parse(currentUser.userId));
 
                         //Subtract I2 balance
-                        InvestorWallet investorWallet = new InvestorWallet();
-                        investorWallet.InvestorId = Guid.Parse(currentUser.investorId);
-                        investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2"));
+                        InvestorWallet investorWallet = await _investorWalletRepository
+                            .GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString());
                         investorWallet.Balance = -payment.Amount;
                         investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
                         await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
@@ -187,8 +186,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
                         //Add I3 balance
-                        investorWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"));
+                        investorWallet = await _investorWalletRepository
+                            .GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString());
                         investorWallet.Balance = payment.Amount;
+                        investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
                         await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
 
                         //Create CASH_IN WalletTransaction from I2 to I3
