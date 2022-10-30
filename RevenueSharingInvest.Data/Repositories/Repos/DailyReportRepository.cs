@@ -83,14 +83,14 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "INSERT INTO DailyReport (StageId, ReportDate, CreateDate,  CreateBy, Status ) VALUES ";
+                var query = "INSERT INTO DailyReport (StageId, ReportDate, CreateDate,  CreateBy ) VALUES ";
 
                 for (int i = 1; i <= numOfReport; i++)
                 {
                     if (i == numOfReport)
-                        query += "(" + "'" + dailyReport.StageId + "'" + "," + "'" + dailyReport.ReportDate + "'" + "," + "'" + dailyReport.CreateDate + "'" + "," + "'" + dailyReport.CreateBy + "'" + "," + "'" + dailyReport.Status + "'" + ")";
+                        query += "(" + "'" + dailyReport.StageId + "'" + "," + "'" + dailyReport.ReportDate + "'" + "," + "'" + dailyReport.CreateDate + "'" + "," + "'" + dailyReport.CreateBy + "')";
                     else
-                        query += "(" + "'" + dailyReport.StageId + "'" + "," + "'" + dailyReport.ReportDate + "'" + "," + "'" + dailyReport.CreateDate + "'" + "," + "'" + dailyReport.CreateBy + "'" + "," + "'" + dailyReport.Status + "'" + "), ";
+                        query += "(" + "'" + dailyReport.StageId + "'" + "," + "'" + dailyReport.ReportDate + "'" + "," + "'" + dailyReport.CreateDate + "'" + "," + "'" + dailyReport.CreateBy + "'), ";
 
                     dailyReport.ReportDate = dailyReport.ReportDate.AddDays(1);
                 }

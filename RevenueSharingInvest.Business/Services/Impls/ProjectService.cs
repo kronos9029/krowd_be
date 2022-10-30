@@ -434,7 +434,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     stage.ProjectId = Guid.Parse(newId.id);
                     stage.CreateBy = Guid.Parse(currentUser.userId);
                     //stage.StartDate = entity.EndDate.AddDays(1);
-                    stage.StartDate = DateTime.ParseExact(DateTime.Parse(entity.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(entity.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:00:00", "dd/MM/yyyy HH:mm:ss", null).AddDays(1);
+                    stage.StartDate = DateTime.ParseExact(DateTime.Parse(entity.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(entity.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:00:00", "dd/MM/yyyy HH:mm:ss", null).AddDays(11);
                     stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "23:59:59", "dd/MM/yyyy HH:mm:ss", null);
 
                     periodRevenue.ProjectId = Guid.Parse(newId.id);
@@ -1035,7 +1035,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     stage.ProjectId = projectId;
                     stage.CreateBy = Guid.Parse(currentUser.userId);
-                    stage.StartDate = DateTime.ParseExact(DateTime.Parse(project.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(project.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:00:00", "dd/MM/yyyy HH:mm:ss", null).AddDays(1);
+                    stage.StartDate = DateTime.ParseExact(DateTime.Parse(project.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(project.EndDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "00:00:00", "dd/MM/yyyy HH:mm:ss", null).AddDays(11);
                     stage.EndDate = DateTime.ParseExact(DateTime.Parse(stage.StartDate.AddDays(daysPerStage - 1).ToString()).ToString("dd/MM/yyyy HH:mm:ss").Remove(DateTime.Parse(stage.StartDate.ToString()).ToString("dd/MM/yyyy HH:mm:ss").Length - 8) + "23:59:59", "dd/MM/yyyy HH:mm:ss", null);
 
                     periodRevenue.ProjectId = projectId;
@@ -1203,6 +1203,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             InvestorWallet investorWallet = new InvestorWallet();
                             ProjectWallet projectWallet = new ProjectWallet();
                             projectWallet.ProjectManagerId = project.ManagerId;
+                            projectWallet.ProjectId = project.Id;
                             projectWallet.WalletTypeId = Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P3"));
                             projectWallet.UpdateBy = Guid.Parse(currentUser.userId);
                             WalletTransaction walletTransaction = new WalletTransaction();
@@ -1229,30 +1230,29 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                                 //Add P3 balance
                                 projectWallet.Balance = item.TotalPrice;
-                                await _projectWalletRepository.UpdateProjectWalletBalance(projectWallet);
+                                await _projectWalletRepository.UpdateProjectWalletBalanceToActivate(projectWallet);
 
                                 //Create CASH_IN WalletTransaction from I3 to P3
                                 walletTransaction.Description = "Receive money from I3 to P3 to prepare for activation";
                                 walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                                 await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+                            }
 
-                                //Create DailyReports
-                                DailyReport dailyReport = new DailyReport();
-                                dailyReport.CreateDate = DateTimePicker.GetDateTimeByTimeZone();
-                                dailyReport.CreateBy = Guid.Parse(currentUser.userId);
-                                dailyReport.Status = DailyReportStatusEnum.UNDUE.ToString();
-                                List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0);
-                                int numOfReport;
-                                foreach (Stage stage in stageList)
-                                {
-                                    dailyReport.StageId = stage.Id;
-                                    dailyReport.ReportDate = stage.StartDate;
-                                    
-                                    numOfReport = (int)DateAndTime.DateDiff(DateInterval.Day, stage.StartDate, stage.EndDate) + 1;
+                            //Create DailyReports
+                            DailyReport dailyReport = new DailyReport();
+                            dailyReport.CreateDate = DateTimePicker.GetDateTimeByTimeZone();
+                            dailyReport.CreateBy = Guid.Parse(currentUser.userId);
+                            dailyReport.Status = DailyReportStatusEnum.UNDUE.ToString();
+                            List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0);
+                            int numOfReport;
+                            foreach (Stage stage in stageList)
+                            {
+                                dailyReport.StageId = stage.Id;
+                                dailyReport.ReportDate = stage.StartDate;
 
-                                    await _dailyReportRepository.CreateDailyReports(dailyReport, numOfReport);
-                                }
+                                numOfReport = (int)DateAndTime.DateDiff(DateInterval.Day, stage.StartDate, stage.EndDate) + 1;
 
+                                await _dailyReportRepository.CreateDailyReports(dailyReport, numOfReport);
                             }
                         }
 
