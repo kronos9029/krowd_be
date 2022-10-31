@@ -26,7 +26,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
 
         [Key]
         public Guid Id { get; set; }
-        [StringLength(50)]
+        [StringLength(255)]
         public string Name { get; set; }
         public Guid BusinessId { get; set; }
         [StringLength(50)]
