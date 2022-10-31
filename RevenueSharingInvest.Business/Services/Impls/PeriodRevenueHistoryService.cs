@@ -70,7 +70,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 Stage stage = await _stageRepository.GetStageById(Guid.Parse(createPeriodRevenueHistoryDTO.stageId));
                 if (stage == null) throw new InvalidFieldException("stageId is not existed!!!");
-                //if (!stage.Status.Equals(StageStatusEnum.DUE.ToString())) throw new InvalidFieldException("The Stage's status is not DUE!!!");
+                if (!stage.Status.Equals(StageStatusEnum.DUE.ToString())) throw new InvalidFieldException("The Stage's status is not DUE!!!");
 
                 Project project = await _projectRepository.GetProjectById(stage.ProjectId);
                 if (!project.ManagerId.Equals(Guid.Parse(currentUser.userId))) throw new InvalidFieldException("This stageId is not belong to your Projects!!!");

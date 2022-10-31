@@ -65,8 +65,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "             DailyReport "
                     + "         WHERE "
                     + "             StageId = @StageId "
-                    + "             AND Amount = 0 ";
-                    //+ "             AND Status IN ('UNDUE', 'DUE', 'NOT_REPORTED') ";
+                    + "             AND Status IN ('UNDUE', 'DUE', 'NOT_REPORTED') ";
                 var parameters = new DynamicParameters();
                 parameters.Add("StageId", stageId, DbType.Guid);
                 using var connection = CreateConnection();
