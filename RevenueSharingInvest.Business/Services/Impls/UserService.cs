@@ -537,7 +537,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new UpdateObjectException("Can not update User Object!");
                 else
                 {
-                    if (currentUser.roleId.Equals(currentUser.projectManagerRoleId) && userDTO.phoneNum != null && !userDTO.phoneNum.Equals(user.PhoneNum.ToString()))
+                    if (currentUser.roleId.Equals(currentUser.projectManagerRoleId) && userDTO.phoneNum != null && (!userDTO.phoneNum.Equals(user.PhoneNum.ToString()) || user.PhoneNum == null))
                     {
                         await _projectEntityRepository.UpdateProjectManagerContactExtension(Guid.Parse(currentUser.userId), userDTO.phoneNum);
                     }
