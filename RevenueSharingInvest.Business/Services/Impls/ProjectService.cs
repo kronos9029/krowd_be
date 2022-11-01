@@ -1075,7 +1075,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     project.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, RoleDictionary.role.GetValueOrDefault("ADMIN"));
                 }
                 project.RemainingPayableAmount = project.InvestmentTargetCapital;
-                project.RemainingMaximumPayableAmount = (double)(project.InvestmentTargetCapital * project.Multiplier);
+                project.RemainingMaximumPayableAmount = (double)Math.Round(project.InvestmentTargetCapital * Math.Round(project.Multiplier, 1));
                 project.UpdateBy = Guid.Parse(currentUser.userId);
 
                 result = await _projectRepository.UpdateProject(project, projectId);

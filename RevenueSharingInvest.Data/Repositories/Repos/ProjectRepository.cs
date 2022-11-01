@@ -93,7 +93,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Duration", projectDTO.Duration, DbType.Int16);
                 parameters.Add("NumOfStage", projectDTO.NumOfStage, DbType.Int16);
                 parameters.Add("RemainingPayableAmount", projectDTO.InvestmentTargetCapital, DbType.Double);
-                parameters.Add("RemainingMaximumPayableAmount", (double)(projectDTO.InvestmentTargetCapital * projectDTO.Multiplier), DbType.Double);
+                parameters.Add("RemainingMaximumPayableAmount", (double)Math.Round(projectDTO.InvestmentTargetCapital * Math.Round(projectDTO.Multiplier, 1)), DbType.Double);
                 parameters.Add("StartDate", Convert.ToDateTime(projectDTO.StartDate), DbType.DateTime);
                 parameters.Add("EndDate", Convert.ToDateTime(projectDTO.EndDate), DbType.DateTime);
                 parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
