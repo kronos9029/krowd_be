@@ -14,7 +14,7 @@ namespace RevenueSharingInvest.Business.Services
         //CREATE
 
         //READ
-        public Task<AllStageDTO> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pageSize, ThisUserObj currentUser);
+        public Task<AllStageDTO> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pageSize, string status, ThisUserObj currentUser);
         public Task<GetStageDTO> GetStageById(Guid stageId, ThisUserObj currentUser);
         public Task<List<StageChartDTO>> GetStageChartByProjectId(Guid projectId, ThisUserObj currentUser);
 

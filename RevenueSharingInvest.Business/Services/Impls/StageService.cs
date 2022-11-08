@@ -50,36 +50,31 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<AllStageDTO> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pageSize, ThisUserObj currentUser)
+        public async Task<AllStageDTO> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pageSize, string status, ThisUserObj currentUser)
         {
             try
             {
-                if (projectId == null || !await _validationService.CheckUUIDFormat(projectId.ToString()))
-                    throw new InvalidFieldException("Invalid projectId!!!");
-
                 if (!await _validationService.CheckExistenceId("Project", projectId))
                     throw new NotFoundException("This projectId is not existed!!!");
+
+                if (!status.Equals("") && !Enum.IsDefined(typeof(StageStatusEnum), status)) throw new InvalidFieldException("status must be INACTIVE or UNDUE or DUE or DONE!!!");
 
                 //Kiểm tra projectId có thuộc về business của người xem có role BuM hay PM không
                 Project project = await _projectRepository.GetProjectById(projectId);
                 if ((currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("BUSINESS_MANAGER")) || currentUser.roleId.Equals(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")))
-                    && !project.BusinessId.ToString().Equals(currentUser.businessId))
-                {
-                    throw new NotFoundException("This projectId is not belong to your's Business!!!");
-                }
-
-                //
+                    && !project.BusinessId.ToString().Equals(currentUser.businessId)) throw new NotFoundException("This projectId is not belong to your's Business!!!");
 
                 bool isShowed = currentUser.roleId.Equals("") || (currentUser.roleId.Equals(currentUser.investorRoleId)
                     && await _investmentRepository.CountInvestmentByProjectAndInvestor(projectId, Guid.Parse(currentUser.investorId)) == 0) ? false : true;
 
                 AllStageDTO result = new AllStageDTO();
                 result.listOfStage = new List<GetStageDTO>();
+                result.filterCount = new CountStageDTO();
                 PeriodRevenue periodRevenue = new PeriodRevenue();
 
-                List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, pageIndex, pageSize);
+                List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, pageIndex, pageSize, status.Equals("") ? null : status);
                 List<GetStageDTO> list = _mapper.Map<List<GetStageDTO>>(stageList);
-                result.numOfStage = await _stageRepository.CountAllStagesByProjectId(projectId);           
+                result.numOfStage = await _stageRepository.CountAllStagesByProjectId(projectId, status.Equals("") ? null : status);           
 
                 foreach (GetStageDTO item in list)
                 {
@@ -102,6 +97,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     item.actualAmount = periodRevenue.ActualAmount != null && isShowed ? (double)periodRevenue.ActualAmount : null;
                     item.sharedAmount = periodRevenue.SharedAmount != null && isShowed ? (double)periodRevenue.SharedAmount : null;
                     item.paidAmount = periodRevenue.PaidAmount != null && isShowed ? (double)periodRevenue.PaidAmount : null;
+                    item.receivableAmount = item.sharedAmount == null ? null : null;
                     item.optimisticExpectedAmount = (periodRevenue.OptimisticExpectedAmount == null) ? 0 : (double)periodRevenue.OptimisticExpectedAmount;
                     item.normalExpectedAmount = (periodRevenue.NormalExpectedAmount == null) ? 0 : (double)periodRevenue.NormalExpectedAmount;
                     item.pessimisticExpectedAmount = (periodRevenue.PessimisticExpectedAmount == null) ? 0 : (double)periodRevenue.PessimisticExpectedAmount;
@@ -111,6 +107,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
 
                 result.listOfStage = list;
+
+                //Filter count
+                List<Stage> filterCountStageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0, null);
+                result.filterCount.inactive = filterCountStageList.FindAll(x => x.Status.Equals(StageStatusEnum.INACTIVE.ToString())).Count;
+                result.filterCount.undue = filterCountStageList.FindAll(x => x.Status.Equals(StageStatusEnum.UNDUE.ToString())).Count;
+                result.filterCount.due = filterCountStageList.FindAll(x => x.Status.Equals(StageStatusEnum.DUE.ToString())).Count;
+                result.filterCount.done = filterCountStageList.FindAll(x => x.Status.Equals(StageStatusEnum.DONE.ToString())).Count;              
 
                 return result;
             }
@@ -221,7 +224,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 PER.name = "Tỷ lệ mong đợi bi quan";
                 PER.data = new List<double>();
 
-                List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0);
+                List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0, null);
                 List<GetStageDTO> list = _mapper.Map<List<GetStageDTO>>(stageList);
                 PeriodRevenue periodRevenue = new PeriodRevenue();
 

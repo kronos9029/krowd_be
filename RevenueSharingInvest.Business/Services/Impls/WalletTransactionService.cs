@@ -28,6 +28,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IWalletTypeRepository _walletTypeRepository;
         private readonly IUserRepository _userRepository;
         private readonly IProjectWalletRepository _projectWalletRepository;
+        private readonly IInvestorRepository _investorRepository;
         private readonly IMapper _mapper;
 
         public WalletTransactionService(
@@ -36,7 +37,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IWalletTypeRepository walletTypeRepository,
             IUserRepository userRepository,
             IProjectWalletRepository projectWalletRepository, 
-            IValidationService validationService, 
+            IValidationService validationService,
+            IInvestorRepository investorRepository,
             IMapper mapper
             )
         {
@@ -45,6 +47,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _walletTypeRepository = walletTypeRepository;
             _userRepository = userRepository;
             _projectWalletRepository = projectWalletRepository;
+            _investorRepository = investorRepository;
             _validationService = validationService;
             _mapper = mapper;           
         }
@@ -177,6 +180,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             AllWalletTransactionDTO result = new AllWalletTransactionDTO();
             result.listOfWalletTransaction = new List<WalletTransactionDTO>();
+            result.filterCount = new CountWalletTransactionDTO();
             Guid? userRoleId = null;
             try
             {
@@ -255,6 +259,56 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                 }
+
+                //Filter count
+
+                dynamic wallets = userRoleId.Equals(Guid.Parse(currentUser.investorRoleId))
+                    ? await _investorWalletRepository.GetInvestorWalletsByInvestorId((await _investorRepository.GetInvestorByUserId((Guid)userId)).Id)
+                    : await _projectWalletRepository.GetProjectWalletsByProjectManagerId((Guid)userId);
+
+                foreach (dynamic item in wallets)
+                {
+                    if (userRoleId.Equals(Guid.Parse(currentUser.investorRoleId)))
+                    {
+                        if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I1"))))
+                            result.filterCount.i1 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+                        
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2"))))
+                            result.filterCount.i2 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+                        
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"))))
+                            result.filterCount.i3 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+                        
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I4"))))
+                            result.filterCount.i4 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+                        
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I5"))))
+                            result.filterCount.i5 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+                    }
+                    else if (userRoleId.Equals(Guid.Parse(currentUser.projectManagerRoleId)))
+                    {
+                        if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P1"))))
+                            result.filterCount.p1 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2"))))
+                            result.filterCount.p2 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P3"))))
+                            result.filterCount.p3 = result.filterCount.p3 == null ? 0 : result.filterCount.p3 + await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P4"))))
+                            result.filterCount.p4 = result.filterCount.p4 == null ? 0 : result.filterCount.p4 + await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P5"))))
+                            result.filterCount.p5 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+                    }
+                }
+
+                result.filterCount.cashIn = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, null, null, null, WalletTransactionTypeEnum.CASH_IN.ToString());
+                result.filterCount.cashOut = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, null, null, null, WalletTransactionTypeEnum.CASH_OUT.ToString());
+                result.filterCount.deposit = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, null, null, null, WalletTransactionTypeEnum.DEPOSIT.ToString());
+                result.filterCount.withdraw = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, null, null, null, WalletTransactionTypeEnum.WITHDRAW.ToString());
+
                 return result;
             }
             catch (Exception e)

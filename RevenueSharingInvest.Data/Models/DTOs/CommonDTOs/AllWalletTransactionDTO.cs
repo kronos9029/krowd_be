@@ -10,5 +10,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs.CommonDTOs
     {
         public int numOfWalletTransaction { get; set; }
         public List<WalletTransactionDTO> listOfWalletTransaction { get; set; }
+        public CountWalletTransactionDTO filterCount { get; set; }
     }
 }

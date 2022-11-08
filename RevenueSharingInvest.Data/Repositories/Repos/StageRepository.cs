@@ -68,11 +68,20 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Stage>> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pageSize)
+        public async Task<List<Stage>> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pageSize, string? status)
         {
             try
             {
                 var parameters = new DynamicParameters();
+
+                string whereClause = " WHERE ProjectId = @ProjectId ";
+
+                if (status != null)
+                {
+                    whereClause = whereClause + " AND Status = @Status ";
+                    parameters.Add("Status", status, DbType.String);
+                }
+
                 if (pageIndex != 0 && pageSize != 0)
                 {
                     var query = "WITH X AS ( "
@@ -82,8 +91,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     CreateDate ASC ) AS Num, "
                     + "             * "
                     + "         FROM Stage "
-                    + "         WHERE "
-                    + "             ProjectId = @ProjectId ) "
+                    +           whereClause
+                    + "          ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         Name, "
@@ -111,7 +120,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM Stage WHERE ProjectId = @ProjectId ORDER BY CreateDate ASC";
+                    var query = "SELECT * FROM Stage " + whereClause + " ORDER BY CreateDate ASC";
                     parameters.Add("ProjectId", projectId, DbType.Guid);
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<Stage>(query, parameters)).ToList();
@@ -244,12 +253,21 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //COUNT
-        public async Task<int> CountAllStagesByProjectId(Guid projectId)
+        public async Task<int> CountAllStagesByProjectId(Guid projectId, string? status)
         {
             try
             {
                 var parameters = new DynamicParameters();
-                var query = "SELECT COUNT(*) FROM Stage WHERE ProjectId = @ProjectId";
+
+                string whereClause = " WHERE ProjectId = @ProjectId ";
+
+                if (status != null)
+                {
+                    whereClause = whereClause + " AND Status = @Status ";
+                    parameters.Add("Status", status, DbType.String);
+                }
+
+                var query = "SELECT COUNT(*) FROM Stage " + whereClause;
                 parameters.Add("ProjectId", projectId, DbType.Guid);
                 using var connection = CreateConnection();
                 return (int)connection.ExecuteScalar(query, parameters);

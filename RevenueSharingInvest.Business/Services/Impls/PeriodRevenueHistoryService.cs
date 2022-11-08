@@ -28,6 +28,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IInvestmentRepository _investmentRepository;
         private readonly IPackageRepository _packageRepository;
         private readonly IWalletTransactionRepository _walletTransactionRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IPaymentRepository _paymentRepository;
+        private readonly IInvestorRepository _investorRepository;
 
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
@@ -43,6 +46,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IInvestmentRepository investmentRepository,
             IPackageRepository packageRepository,
             IWalletTransactionRepository walletTransactionRepository,
+            IUserRepository userRepository,
+            IPaymentRepository paymentRepository,
+            IInvestorRepository investorRepository,
 
             IValidationService validationService, IMapper mapper)
         {
@@ -55,6 +61,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _investmentRepository = investmentRepository;
             _packageRepository = packageRepository;
             _walletTransactionRepository = walletTransactionRepository;
+            _userRepository = userRepository;
+            _paymentRepository = paymentRepository;
+            _investorRepository = investorRepository;
 
             _validationService = validationService;
             _mapper = mapper;
@@ -170,6 +179,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         walletTransaction.Description = "Receive money from I3 wallet to P3 wallet for stage payment";
                         walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+
+                        //Create Payment
+                        Payment payment = new Payment();
+                        payment.PeriodRevenueId = periodRevenue.Id;
+                        payment.StageId = stage.Id;
+                        payment.Amount = item.amount;
+                        payment.Description = "Nhận tiền thanh toán lần " + numOfPeriodRevenueHistory + " của " + stage.Name + " từ dự án " + project.Name;
+                        payment.Type = PaymentTypeEnum.PERIOD_REVENUE.ToString();
+                        payment.FromId = Guid.Parse(currentUser.userId);
+                        payment.ToId = (await _investorRepository.GetInvestorById(item.investorId)).UserId;
+                        payment.CreateBy = Guid.Parse(currentUser.userId);
+                        payment.Status = TransactionStatusEnum.SUCCESS.ToString();
+
+                        string paymentId = await _paymentRepository.CreatePayment(payment);
                     }
 
                     //Update PeriodRevenue

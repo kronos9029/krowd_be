@@ -1241,7 +1241,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             DailyReport dailyReport = new DailyReport();
                             dailyReport.CreateDate = DateTimePicker.GetDateTimeByTimeZone();
                             dailyReport.CreateBy = Guid.Parse(currentUser.userId);
-                            List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0);
+                            List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0, null);
                             int numOfReport;
                             foreach (Stage stage in stageList)
                             {

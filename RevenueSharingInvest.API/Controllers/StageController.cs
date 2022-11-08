@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -38,7 +39,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpGet]
         [Route("project/{project_id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAllStagesByProjectId(Guid project_id, int pageIndex, int pageSize)
+        public async Task<IActionResult> GetAllStagesByProjectId(Guid project_id, int pageIndex, int pageSize, StageStatusEnum? status)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
@@ -50,7 +51,7 @@ namespace RevenueSharingInvest.API.Controllers
                 || currentUser.roleId.Equals(""))
             {
                 var result = new AllStageDTO();
-                result = await _stageService.GetAllStagesByProjectId(project_id, pageIndex, pageSize, currentUser);
+                result = await _stageService.GetAllStagesByProjectId(project_id, pageIndex, pageSize, status == null ? "" : status.ToString(), currentUser);
                 return Ok(result);
             }
 
