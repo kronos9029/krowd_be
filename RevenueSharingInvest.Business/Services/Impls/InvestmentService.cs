@@ -317,6 +317,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 List<Investment> investmentList = await _investmentRepository.GetAllInvestments(pageIndex, pageSize, walletTypeId, businessId, projectId, investorId, Guid.Parse(currentUser.roleId));
                 result.listOfInvestment = _mapper.Map<List<GetInvestmentDTO>>(investmentList);
+                result.numOfInvestment = await _investmentRepository.CountAllInvestments(walletTypeId, businessId, projectId, investorId, Guid.Parse(currentUser.roleId));
 
                 foreach (GetInvestmentDTO item in result.listOfInvestment)
                 {

@@ -1086,7 +1086,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "UPDATE Project "
                     + "     SET "
                     + "         RemainingPayableAmount = ISNULL(ROUND(@RemainingPayableAmount, 0), RemainingPayableAmount), "
-                    //+ "         RemainingMaximumPayableAmount = ISNULL(ROUND(@RemainingMaximumPayableAmount, 0), RemainingMaximumPayableAmount), "
+                    + "         PaidAmount = ISNULL(ROUND(@PaidAmount, 0), PaidAmount), "
                     + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
                     + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
                     + "     WHERE "
@@ -1094,7 +1094,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("RemainingPayableAmount", projectDTO.RemainingPayableAmount, DbType.Double);
-                //parameters.Add("RemainingMaximumPayableAmount", projectDTO.RemainingMaximumPayableAmount, DbType.Double);
+                parameters.Add("PaidAmount", projectDTO.PaidAmount, DbType.Double);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", projectDTO.Id, DbType.Guid);

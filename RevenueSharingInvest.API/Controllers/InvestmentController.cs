@@ -60,8 +60,7 @@ namespace RevenueSharingInvest.API.Controllers
                 || currentUser.roleId.Equals(currentUser.projectManagerRoleId)
                 || currentUser.roleId.Equals(currentUser.investorRoleId))
             {
-                var result = new List<GetInvestmentDTO>();
-                result = await _investmentService.GetAllInvestments(pageIndex, pageSize, walletTypeId, businessId, projectId, investorId, currentUser);
+                var result = await _investmentService.GetAllInvestments(pageIndex, pageSize, walletTypeId, businessId, projectId, investorId, currentUser);
                 return Ok(result);
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUINESS_MANAGER or PROJECT_MANAGER or INVESTOR can perform this action!!!");

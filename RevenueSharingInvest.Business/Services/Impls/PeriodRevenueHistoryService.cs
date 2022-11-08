@@ -83,7 +83,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 Project project = await _projectRepository.GetProjectById(stage.ProjectId);
                 if (!project.ManagerId.Equals(Guid.Parse(currentUser.userId))) throw new InvalidFieldException("This stageId is not belong to your Projects!!!");
-                if (createPeriodRevenueHistoryDTO.amount > (double)Math.Round(project.InvestmentTargetCapital * project.Multiplier)) throw new InvalidFieldException("amount can not greater than Project's RemainingMaximumPayableAmount = " + (double)Math.Round(project.InvestmentTargetCapital * project.Multiplier) + "!!!");
+                if (createPeriodRevenueHistoryDTO.amount > (double)Math.Round(project.InvestmentTargetCapital * project.Multiplier) - project.PaidAmount) throw new InvalidFieldException("amount can not greater than " + (double)Math.Round(project.InvestmentTargetCapital * project.Multiplier) + "!!!");
 
                 ProjectWallet projectWallet = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(Guid.Parse(currentUser.userId), WalletTypeEnum.P4.ToString(), project.Id);
                 if (projectWallet.Balance < createPeriodRevenueHistoryDTO.amount) throw new InvalidFieldException("You do not have enough money in PROJECT_PAYMENT_WALLET!!!");
@@ -202,7 +202,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     //Update Project Amounts
                     project.RemainingPayableAmount = project.RemainingPayableAmount - createPeriodRevenueHistoryDTO.amount;
-                    //project.RemainingMaximumPayableAmount = project.RemainingMaximumPayableAmount - createPeriodRevenueHistoryDTO.amount;
+                    project.PaidAmount = project.PaidAmount + createPeriodRevenueHistoryDTO.amount;
                     project.UpdateBy = Guid.Parse(currentUser.userId);
                     await _projectRepository.UpdateProjectRemainingAmount(project);
                 }

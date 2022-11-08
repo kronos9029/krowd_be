@@ -75,31 +75,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //DELETE
-        //public async Task<int> DeleteInvestmentById(Guid investmentId)
-        //{
-        //    try
-        //    {
-        //        var query = "UPDATE Investment "
-        //            + "     SET "
-        //            + "         UpdateDate = @UpdateDate, "
-        //            //+ "         UpdateBy = @UpdateBy "
-        //            + "     WHERE "
-        //            + "         Id=@Id";
-        //        using var connection = CreateConnection();
-        //        var parameters = new DynamicParameters();
-        //        parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-        //        //parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
-        //        parameters.Add("Id", investmentId, DbType.Guid);
-
-        //        return await connection.ExecuteAsync(query, parameters);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
-
         //GET ALL
         public async Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId, Guid roleId)
         {
@@ -161,24 +136,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "             ROW_NUMBER() OVER ( "
                     + "                 ORDER BY "
                     + "                     I.CreateDate DESC ) AS Num, "
-                    + "             * "
+                    + "             I.* "
                     + "         FROM " 
                     + "             Investment I " 
                     + "                 JOIN Project P ON I.ProjectId = P.Id "
                     +           whereCondition
                     + "         ) "
                     + "     SELECT "
-                    + "         I.Id, "
-                    + "         I.InvestorId, "
-                    + "         I.ProjectId, "
-                    + "         I.PackageId, "
-                    + "         I.Quantity, "
-                    + "         I.TotalPrice, "
-                    + "         I.Status, "
-                    + "         I.CreateDate, "
-                    + "         I.CreateBy, "
-                    + "         I.UpdateDate, "
-                    + "         I.UpdateBy "
+                    + "         Id, "
+                    + "         InvestorId, "
+                    + "         ProjectId, "
+                    + "         PackageId, "
+                    + "         Quantity, "
+                    + "         TotalPrice, "
+                    + "         Status, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -381,7 +356,71 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         //COUNT ALL
         public async Task<int> CountAllInvestments(string walletTypeId, string businessId, string projectId, string investorId, Guid roleId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var parameters = new DynamicParameters();
+
+                var whereCondition = "";
+
+                var projectStatusCondition = " AND P.Status = @Status ";
+                var businessIdCondition = " AND P.BusinessId = @BusinessId ";
+                var projectIdCondition = " AND I.ProjectId = @ProjectId ";
+                var investorIdCondition = " AND I.InvestorId = @InvestorId ";
+
+                if (walletTypeId != null)
+                {
+                    if (Guid.Parse(walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"))))
+                    {
+                        whereCondition = whereCondition + " AND (P.Status = @CALLING_FOR_INVESTMENT OR P.Status = @CALLING_TIME_IS_OVER OR P.Status = @WAITING_TO_ACTIVATE) ";
+                        parameters.Add("CALLING_FOR_INVESTMENT", ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), DbType.String);
+                        parameters.Add("CALLING_TIME_IS_OVER", ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString(), DbType.String);
+                        parameters.Add("WAITING_TO_ACTIVATE", ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString(), DbType.String);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + projectStatusCondition;
+                        parameters.Add("Status", ProjectStatusEnum.ACTIVE.ToString(), DbType.String);
+                    }
+                }
+                else
+                {
+                    whereCondition = whereCondition + " AND (P.Status = @CALLING_FOR_INVESTMENT OR P.Status = @CALLING_TIME_IS_OVER OR P.Status = @WAITING_TO_ACTIVATE OR P.Status = @ACTIVE) ";
+                    parameters.Add("CALLING_FOR_INVESTMENT", ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), DbType.String);
+                    parameters.Add("CALLING_TIME_IS_OVER", ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString(), DbType.String);
+                    parameters.Add("WAITING_TO_ACTIVATE", ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString(), DbType.String);
+                    parameters.Add("ACTIVE", ProjectStatusEnum.ACTIVE.ToString(), DbType.String);
+                }
+                if (businessId != null)
+                {
+                    whereCondition = whereCondition + businessIdCondition;
+                    parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
+                }
+                if (projectId != null)
+                {
+                    whereCondition = whereCondition + projectIdCondition;
+                    parameters.Add("ProjectId", Guid.Parse(projectId), DbType.Guid);
+                }
+                if (investorId != null)
+                {
+                    whereCondition = whereCondition + investorIdCondition;
+                    parameters.Add("InvestorId", Guid.Parse(investorId), DbType.Guid);
+                }
+                whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
+
+                var query = " SELECT COUNT(*) FROM (SELECT "
+                + "                                     I.* "
+                + "                                 FROM "
+                + "                                     Investment I JOIN Project P ON I.ProjectId = P.Id "
+                +                                   whereCondition
+                + "                                 ) AS X";
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
         }
     }
 }

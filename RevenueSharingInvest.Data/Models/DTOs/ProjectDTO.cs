@@ -48,7 +48,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public double investedCapital { get; set; }
         public int numOfStage { get; set; }
         public double remainingPayableAmount { get; set; }
-        public double remainingMaximumPayableAmount { get; set; }
+        public double paidAmount { get; set; }
         public string businessLicense { get; set; }
         public string approvedDate { get; set; }
         public string approvedBy { get; set; }
@@ -70,7 +70,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public double investedCapital { get; set; }
         public int numOfStage { get; set; }
         public double remainingPayableAmount { get; set; }
-        public double remainingMaximumPayableAmount { get; set; }
+        public double paidAmount { get; set; }
         public string businessLicense { get; set; }
         public string approvedDate { get; set; }
         public string approvedBy { get; set; }
@@ -99,7 +99,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public double investedCapital { get; set; }
         public int numOfStage { get; set; }
         public double remainingPayableAmount { get; set; }
-        public double remainingMaximumPayableAmount { get; set; }
+        public double paidAmount { get; set; }
         public string approvedDate { get; set; }
         public string approvedBy { get; set; }
         public string status { get; set; }
