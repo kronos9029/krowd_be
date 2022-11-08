@@ -42,7 +42,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Duration, "
                     + "         NumOfStage, "
                     + "         RemainingPayableAmount, "
-                    + "         RemainingMaximumPayableAmount, "
+                    + "         PaidAmount, "
                     + "         StartDate, "
                     + "         EndDate, "
                     + "         BusinessLicense, "
@@ -68,7 +68,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @Duration, "
                     + "         @NumOfStage, "
                     + "         ROUND(@RemainingPayableAmount, 0), "
-                    + "         ROUND(@RemainingMaximumPayableAmount, 0), "
+                    + "         0, "
                     + "         @StartDate, "
                     + "         @EndDate, "
                     + "         @BusinessLicense, "
@@ -93,7 +93,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Duration", projectDTO.Duration, DbType.Int16);
                 parameters.Add("NumOfStage", projectDTO.NumOfStage, DbType.Int16);
                 parameters.Add("RemainingPayableAmount", projectDTO.InvestmentTargetCapital, DbType.Double);
-                parameters.Add("RemainingMaximumPayableAmount", (double)Math.Round(projectDTO.InvestmentTargetCapital * Math.Round(projectDTO.Multiplier, 1)), DbType.Double);
+                //parameters.Add("RemainingMaximumPayableAmount", (double)Math.Round(projectDTO.InvestmentTargetCapital * Math.Round(projectDTO.Multiplier, 1)), DbType.Double);
                 parameters.Add("StartDate", Convert.ToDateTime(projectDTO.StartDate), DbType.DateTime);
                 parameters.Add("EndDate", Convert.ToDateTime(projectDTO.EndDate), DbType.DateTime);
                 parameters.Add("BusinessLicense", projectDTO.BusinessLicense, DbType.String);
@@ -388,7 +388,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Duration, "
                     + "         NumOfStage, "
                     + "         RemainingPayableAmount, "
-                    + "         RemainingMaximumPayableAmount, "
+                    + "         PaidAmount, "
                     + "         StartDate, "
                     + "         EndDate, "
                     + "         BusinessLicense, "
@@ -454,7 +454,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Address = ISNULL(@Address, Address), "
                     + "         InvestmentTargetCapital = ISNULL(@InvestmentTargetCapital, InvestmentTargetCapital), "
                     + "         RemainingPayableAmount = ISNULL(@RemainingPayableAmount, RemainingPayableAmount), "
-                    + "         RemainingMaximumPayableAmount = ISNULL(@RemainingMaximumPayableAmount, RemainingMaximumPayableAmount), "
+                    //+ "         RemainingMaximumPayableAmount = ISNULL(@RemainingMaximumPayableAmount, RemainingMaximumPayableAmount), "
                     + "         SharedRevenue = ISNULL(ROUND(@SharedRevenue, 1), SharedRevenue), "
                     + "         Multiplier = ISNULL(ROUND(@Multiplier, 1), Multiplier), "
                     + "         Duration = ISNULL(@Duration, Duration), "
@@ -474,7 +474,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Address", projectDTO.Address, DbType.String);
                 parameters.Add("InvestmentTargetCapital", projectDTO.InvestmentTargetCapital, DbType.Double);
                 parameters.Add("RemainingPayableAmount", projectDTO.RemainingPayableAmount, DbType.Double);
-                parameters.Add("RemainingMaximumPayableAmount", projectDTO.RemainingMaximumPayableAmount, DbType.Double);
+                //parameters.Add("RemainingMaximumPayableAmount", projectDTO.RemainingMaximumPayableAmount, DbType.Double);
                 parameters.Add("InvestedCapital", projectDTO.InvestedCapital, DbType.Double);
                 parameters.Add("SharedRevenue", projectDTO.SharedRevenue, DbType.Double);
                 parameters.Add("Multiplier", projectDTO.Multiplier, DbType.Double);
@@ -1086,7 +1086,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "UPDATE Project "
                     + "     SET "
                     + "         RemainingPayableAmount = ISNULL(ROUND(@RemainingPayableAmount, 0), RemainingPayableAmount), "
-                    + "         RemainingMaximumPayableAmount = ISNULL(ROUND(@RemainingMaximumPayableAmount, 0), RemainingMaximumPayableAmount), "
+                    //+ "         RemainingMaximumPayableAmount = ISNULL(ROUND(@RemainingMaximumPayableAmount, 0), RemainingMaximumPayableAmount), "
                     + "         UpdateDate = ISNULL(@UpdateDate, UpdateDate), "
                     + "         UpdateBy = ISNULL(@UpdateBy, UpdateBy) "
                     + "     WHERE "
@@ -1094,7 +1094,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("RemainingPayableAmount", projectDTO.RemainingPayableAmount, DbType.Double);
-                parameters.Add("RemainingMaximumPayableAmount", projectDTO.RemainingMaximumPayableAmount, DbType.Double);
+                //parameters.Add("RemainingMaximumPayableAmount", projectDTO.RemainingMaximumPayableAmount, DbType.Double);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", projectDTO.Id, DbType.Guid);

@@ -36,7 +36,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public double InvestedCapital { get; set; }
         public double SharedRevenue { get; set; }
         public double Multiplier { get; set; }
-        public double RemainingMaximumPayableAmount { get; set; }
+        public double PaidAmount { get; set; }
         public double RemainingPayableAmount { get; set; }
         public int Duration { get; set; }
         public int NumOfStage { get; set; }

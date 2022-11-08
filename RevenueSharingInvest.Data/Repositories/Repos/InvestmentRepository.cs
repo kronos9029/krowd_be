@@ -376,5 +376,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+
+        //COUNT ALL
+        public async Task<int> CountAllInvestments(string walletTypeId, string businessId, string projectId, string investorId, Guid roleId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

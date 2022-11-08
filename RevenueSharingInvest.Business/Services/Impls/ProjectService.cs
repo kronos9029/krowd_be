@@ -1075,7 +1075,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     project.Image = await _fileUploadService.UploadImageToFirebaseProject(projectDTO.image, RoleDictionary.role.GetValueOrDefault("ADMIN"));
                 }
                 project.RemainingPayableAmount = project.InvestmentTargetCapital;
-                project.RemainingMaximumPayableAmount = (double)Math.Round(project.InvestmentTargetCapital * Math.Round(project.Multiplier, 1));
+                //project.RemainingMaximumPayableAmount = (double)Math.Round(project.InvestmentTargetCapital * Math.Round(project.Multiplier, 1));
                 project.UpdateBy = Guid.Parse(currentUser.userId);
 
                 result = await _projectRepository.UpdateProject(project, projectId);
@@ -1131,11 +1131,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         if (!status.Equals(ProjectStatusEnum.DENIED.ToString()) && !status.Equals(ProjectStatusEnum.WAITING_TO_PUBLISH.ToString()))
                             throw new InvalidFieldException("ADMIN can update Project's status from WAITING_FOR_APPROVAL to DENIED or WAITING_TO_PUBLISH!!!");
                     }
-                    else if (project.Status.Equals(ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString()))
-                    {
-                        if (!status.Equals(ProjectStatusEnum.CLOSED.ToString()))
-                            throw new InvalidFieldException("ADMIN can update Project's status from CALLING_TIME_IS_OVER to CLOSED!!!");
-                    }
+                    //else if (project.Status.Equals(ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString()))
+                    //{
+                    //    if (!status.Equals(ProjectStatusEnum.CLOSED.ToString()))
+                    //        throw new InvalidFieldException("ADMIN can update Project's status from CALLING_TIME_IS_OVER to CLOSED!!!");
+                    //}
                     else if (project.Status.Equals(ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString()))
                     {
                         if (!status.Equals(ProjectStatusEnum.ACTIVE.ToString()))

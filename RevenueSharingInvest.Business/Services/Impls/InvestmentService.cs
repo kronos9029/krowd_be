@@ -7,6 +7,7 @@ using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -242,10 +243,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<GetInvestmentDTO>> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId, ThisUserObj currentUser)
+        public async Task<AllInvestmentDTO> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId, ThisUserObj currentUser)
         {
             try
             {
+                AllInvestmentDTO result = new AllInvestmentDTO();
+                result.listOfInvestment = new List<GetInvestmentDTO>();
+
                 if (walletTypeId != null)
                 {
                     if (!await _validationService.CheckUUIDFormat(walletTypeId.ToString()))
@@ -312,15 +316,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
 
                 List<Investment> investmentList = await _investmentRepository.GetAllInvestments(pageIndex, pageSize, walletTypeId, businessId, projectId, investorId, Guid.Parse(currentUser.roleId));
-                List<GetInvestmentDTO> list = _mapper.Map<List<GetInvestmentDTO>>(investmentList);
+                result.listOfInvestment = _mapper.Map<List<GetInvestmentDTO>>(investmentList);
 
-                foreach (GetInvestmentDTO item in list)
+                foreach (GetInvestmentDTO item in result.listOfInvestment)
                 {
                     item.createDate = item.createDate == null ? null : await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = item.updateDate == null ? null : await _validationService.FormatDateOutput(item.updateDate);
                 }
 
-                return list;
+                return result;
             }
             catch (Exception e)
             {
