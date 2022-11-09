@@ -848,7 +848,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         Duration, "
                     + "         NumOfStage, "
                     + "         RemainingPayableAmount, "
-                    + "         RemainingMaximumPayableAmount, "
+                    + "         PaidAmount, "
                     + "         StartDate, "
                     + "         EndDate, "
                     + "         BusinessLicense, "
