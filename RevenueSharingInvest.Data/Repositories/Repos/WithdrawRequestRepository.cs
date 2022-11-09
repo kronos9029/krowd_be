@@ -309,5 +309,38 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        //COUNT
+        public async Task<int> CountAllWithdrawRequest(string userId, string filter)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+                var whereClause = "";
+                if (!userId.Equals(""))
+                {
+                    whereClause = " WHERE CreateBy = @UserId ";
+                    parameters.Add("UserId", Guid.Parse(userId), DbType.Guid);
+                }
+                if (!filter.Equals("ALL"))
+                {
+                    if (whereClause.Equals(""))
+                        whereClause = " WHERE Status = @Status ";
+                    else
+                        whereClause += " AND Status = @Status ";
+
+                    parameters.Add("Status", filter, DbType.String);
+                }
+
+                var query = "SELECT COUNT(*) FROM (SELECT * FROM WithdrawRequest " + whereClause + ") AS X";
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@ using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -53,15 +54,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<dynamic> GetAllPayments(int pageIndex, int pageSize, string type, ThisUserObj currentUser)
+        public async Task<AllPaymentDTO> GetAllPayments(int pageIndex, int pageSize, string type, ThisUserObj currentUser)
         {
-            dynamic result;
+            AllPaymentDTO result = new AllPaymentDTO();
             try
             {
                 if (!type.Equals(PaymentTypeEnum.INVESTMENT.ToString()) && !type.Equals(PaymentTypeEnum.PERIOD_REVENUE.ToString()))
                     throw new InvalidFieldException("Invalid type!!!");
 
                 List<Payment> paymentList = await _paymentRepository.GetAllPayments(pageIndex, pageSize, type, Guid.Parse(currentUser.roleId), Guid.Parse(currentUser.userId));
+                result.numOfPayment = await _paymentRepository.CountAllPayments(type, Guid.Parse(currentUser.roleId), Guid.Parse(currentUser.userId));
                 Project project = new Project();
                 
 
@@ -82,7 +84,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         item.investedQuantity = (int)(await _investmentRepository.GetInvestmentById(Guid.Parse(item.investmentId))).Quantity;
                         item.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")))).Name;
                     }
-                    result = list;
+                    result.listOfInvestmentPayment = list;                    
                 }
                 else
                 {
@@ -101,7 +103,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         item.stageName = stage == null ? "Gói không còn tồn tại" : stage.Name;
                         item.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2")))).Name;
                     }
-                    result = list;
+                    result.listOfPeriodRevenuePayment = list;
                 }
                 return result;
             }

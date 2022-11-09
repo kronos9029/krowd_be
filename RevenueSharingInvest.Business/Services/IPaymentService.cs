@@ -1,5 +1,6 @@
 ﻿using RevenueSharingInvest.API;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace RevenueSharingInvest.Business.Services
         //CREATE
 
         //READ
-        public Task<dynamic> GetAllPayments(int pageIndex, int pageSize, string type, ThisUserObj currentUser);
+        public Task<AllPaymentDTO> GetAllPayments(int pageIndex, int pageSize, string type, ThisUserObj currentUser);
         public Task<dynamic> GetPaymentById(Guid paymentId, ThisUserObj currentUser);
 
         //UPDATE

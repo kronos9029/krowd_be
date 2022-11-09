@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
@@ -25,18 +26,21 @@ namespace RevenueSharingInvest.API.Controllers
         private readonly IRoleService _roleService;
         private readonly IWithdrawRequestService _withdrawRequestService;
         private readonly IFileUploadService _uploadService;
+        private readonly IValidationService _validationService;
         public WithdrawRequestController(IUserService userService,
             IRoleService roleService,
             IWithdrawRequestService withdrawRequestService,
-            IFileUploadService fileUploadService)
+            IFileUploadService fileUploadService,
+            IValidationService validationService)
         {
             _userService = userService;
             _roleService = roleService;
             _withdrawRequestService = withdrawRequestService;
             _uploadService = fileUploadService;
+            _validationService = validationService;
         }
 
-
+        //GET ALL
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetWithdrawRequestByUserId(int pageIndex, int pageSize, string userId, WithdrawRequestEnum filter)
@@ -45,16 +49,23 @@ namespace RevenueSharingInvest.API.Controllers
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             if (currentUser.roleId.Equals(currentUser.investorRoleId))
             {
+                if (!userId.Equals("") && !userId.Equals(currentUser.userId)) throw new InvalidFieldException("This userId is not your userId!!!");
+
                 var result = await _withdrawRequestService.GetAllWithdrawRequest(pageIndex, pageSize, currentUser.userId, filter.ToString());
                 return Ok(result);
             } else if (currentUser.roleId.Equals(currentUser.adminRoleId))
             {
+                if (userId.Equals("") || !await _validationService.CheckUUIDFormat(userId)) throw new InvalidFieldException("Invalid userId!!!");
+
+                if (!await _validationService.CheckExistenceId("[User]", Guid.Parse(userId))) throw new NotFoundException("This userId is not existed!!!");
+
                 var result = await _withdrawRequestService.GetAllWithdrawRequest(pageIndex, pageSize, userId, filter.ToString());
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or INVESTOR can perform this action!!!");
         }
 
+        //GET BY ID
         [HttpGet]
         [Authorize]
         [Route("{id}")]
@@ -78,12 +89,12 @@ namespace RevenueSharingInvest.API.Controllers
                 var result = await _withdrawRequestService.CreateInvestorWithdrawRequest(request, currentUser);
                 return Ok(result);
             }
-            
-            return StatusCode((int)HttpStatusCode.Forbidden, "");
+
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
         }
 
 
-        //PUT
+        //UPDATE
         [HttpPut]
         [Authorize]
         public async Task<IActionResult> UpdateWithdrawRequest([FromForm] UpdateWithdrawRequest request, WithdrawAction action)

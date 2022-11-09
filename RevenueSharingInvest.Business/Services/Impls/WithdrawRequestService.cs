@@ -7,6 +7,7 @@ using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -287,13 +288,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<List<GetWithdrawRequestDTO>> GetAllWithdrawRequest(int pageIndex, int pageSize, string userId, string filter)
+        //GET ALL
+        public async Task<AllWithdrawRequestDTO> GetAllWithdrawRequest(int pageIndex, int pageSize, string userId, string filter)
         {
             try
             {
-                List<WithdrawRequest> withdrawRequests = await _withdrawRequestRepository.GetAllWithdrawRequest(pageIndex, pageSize, userId, filter);
-                List<GetWithdrawRequestDTO> withdrawRequestDTOList = new();
+                AllWithdrawRequestDTO result = new AllWithdrawRequestDTO();
+                result.listOfWithdrawRequest = new List<GetWithdrawRequestDTO>();
 
+                if (!Enum.IsDefined(typeof(WithdrawRequestEnum), filter)) throw new InvalidFieldException("filter must be ALL or PENDING or PARTIAL or PARTIAL_ADMIN or REJECTED or APPROVED!!!");
+
+                List<WithdrawRequest> withdrawRequests = await _withdrawRequestRepository.GetAllWithdrawRequest(pageIndex, pageSize, userId, filter);
+                result.numOfWithdrawRequest = await _withdrawRequestRepository.CountAllWithdrawRequest(userId, filter);
 
                 foreach (WithdrawRequest withdrawRequest in withdrawRequests)
                 {
@@ -312,9 +318,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         UpdateDate = withdrawRequest.UpdateBy.ToString(),
                         UpdateBy = withdrawRequest.UpdateBy.ToString()
                     };
-                    withdrawRequestDTOList.Add(withdrawRequestDTO);
+                    result.listOfWithdrawRequest.Add(withdrawRequestDTO);
                 }
-                return withdrawRequestDTOList;
+                return result;
             }
             catch(Exception e)
             {
