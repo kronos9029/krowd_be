@@ -15,8 +15,11 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
             NotificationDetail notification = new();
             notification.Title = newNoti.Title;
             notification.Description = newNoti.Description;
+            notification.Image = newNoti.Image;
             notification.CreateDate ??= DateTimePicker.GetDateTimeByTimeZone().ToString();
             notification.Seen = false;
+
+
             Notification result = await GetRecordAsync<Notification>(cache, userId);
             if (result == null)
             {
