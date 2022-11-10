@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using RevenueSharingInvest.Data.Helpers;
-using RevenueSharingInvest.Data.Models.Entities;
 using System.Data;
 using System.Data.SqlClient;
+using StackExchange.Redis;
 
 namespace RevenueSharingInvest.API.Extensions
 {
@@ -21,6 +20,11 @@ namespace RevenueSharingInvest.API.Extensions
 
             //Register DBcontext for migration
             services.AddDbContext<Data.Helpers.KrowdContext>(options => options.UseSqlServer(dbConnectionString));
+
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = configuration.GetConnectionString("RedisCache");
+            });
         }
 
     }
