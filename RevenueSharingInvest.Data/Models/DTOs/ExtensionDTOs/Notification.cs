@@ -18,5 +18,12 @@ namespace RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs
         public string Description { get; set; }
         public string CreateDate { get; set; }
         public bool Seen { get; set; }
+    }    
+    public class NotificationDetailDTO
+    {
+        public string Title { get; set; }
+        public string Description { get; set; }
     }
+
+
 }

@@ -47,7 +47,7 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateNoti(string userId, NotificationDetail newNoti)
+        public async Task<IActionResult> UpdateNoti(string userId, NotificationDetailDTO newNoti)
         {
            var result = await DistributedCacheExtensions.UpdateNotification(_distributedCache, userId, newNoti);
 
