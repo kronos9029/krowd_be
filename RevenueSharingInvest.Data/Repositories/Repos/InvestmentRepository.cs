@@ -76,7 +76,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId, Guid roleId)
+        public async Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId, string status, Guid roleId)
         {
             try
             {
@@ -88,6 +88,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var businessIdCondition = " AND P.BusinessId = @BusinessId ";
                 var projectIdCondition = " AND I.ProjectId = @ProjectId ";
                 var investorIdCondition = " AND I.InvestorId = @InvestorId ";
+                var statusCondition = " AND I.Status = @Status ";
 
                 if (walletTypeId != null)
                 {
@@ -126,6 +127,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 {
                     whereCondition = whereCondition + investorIdCondition;
                     parameters.Add("InvestorId", Guid.Parse(investorId), DbType.Guid);
+                }
+                if (status != null)
+                {
+                    whereCondition = whereCondition + statusCondition;
+                    parameters.Add("Status", status, DbType.String);
                 }
                 whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
 
@@ -354,7 +360,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
 
         //COUNT ALL
-        public async Task<int> CountAllInvestments(string walletTypeId, string businessId, string projectId, string investorId, Guid roleId)
+        public async Task<int> CountAllInvestments(string walletTypeId, string businessId, string projectId, string investorId, string status, Guid roleId)
         {
             try
             {
@@ -366,6 +372,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var businessIdCondition = " AND P.BusinessId = @BusinessId ";
                 var projectIdCondition = " AND I.ProjectId = @ProjectId ";
                 var investorIdCondition = " AND I.InvestorId = @InvestorId ";
+                var statusCondition = " AND I.Status = @Status ";
 
                 if (walletTypeId != null)
                 {
@@ -404,6 +411,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 {
                     whereCondition = whereCondition + investorIdCondition;
                     parameters.Add("InvestorId", Guid.Parse(investorId), DbType.Guid);
+                }
+                if (status != null)
+                {
+                    whereCondition = whereCondition + statusCondition;
+                    parameters.Add("Status", status, DbType.String);
                 }
                 whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
 

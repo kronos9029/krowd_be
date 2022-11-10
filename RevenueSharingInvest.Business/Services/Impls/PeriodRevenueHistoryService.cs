@@ -108,7 +108,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     //Chuyển tiền cho Investor
                     periodRevenueHistory.Id = Guid.Parse(newId);
 
-                    List<Investment> investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, project.Id.ToString(), null, Guid.Parse(currentUser.roleId));
+                    List<Investment> investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, project.Id.ToString(), null, TransactionStatusEnum.SUCCESS.ToString(), Guid.Parse(currentUser.roleId));
                     List<Investment> packageInvestmentList = new List<Investment>();
 
                     //***
@@ -185,7 +185,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         payment.PeriodRevenueId = periodRevenue.Id;
                         payment.StageId = stage.Id;
                         payment.Amount = item.amount;
-                        payment.Description = "Nhận tiền thanh toán lần " + numOfPeriodRevenueHistory + " của " + stage.Name + " từ dự án " + project.Name;
+                        payment.Description = "Nhận tiền thanh toán lần " + numOfPeriodRevenueHistory + " của '" + stage.Name + "' từ dự án '" + project.Name + "'";
                         payment.Type = PaymentTypeEnum.PERIOD_REVENUE.ToString();
                         payment.FromId = Guid.Parse(currentUser.userId);
                         payment.ToId = (await _investorRepository.GetInvestorById(item.investorId)).UserId;

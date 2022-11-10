@@ -77,8 +77,8 @@ namespace RevenueSharingInvest.API.Extensions
 
             if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
-                currentUser.projectId = await _userService.GetProjectIdByManagerEmail(currentUser.email);
-                currentUser.projectId??="";
+                //currentUser.projectId = await _userService.GetProjectIdByManagerEmail(currentUser.email);
+                //currentUser.projectId??="";
 
             }
 

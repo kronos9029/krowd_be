@@ -63,6 +63,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
+        //CANCEL
+        public async Task<int> CancelInvestment(Guid investmentId, ThisUserObj currentUser)
+        {
+            try
+            {
+                Investment investment = await _investmentRepository.GetInvestmentById(investmentId);
+
+                if (!investment.InvestorId.Equals(Guid.Parse(currentUser.investorId))) throw new InvalidFieldException("This is not your Investment!!!");
+
+
+                return 0;
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
         //CREATE
         public async Task<InvestmentPaymentDTO> CreateInvestment(CreateInvestmentDTO investmentDTO, ThisUserObj currentUser)
         {
@@ -116,7 +135,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     payment.InvestmentId = null;
                     payment.PackageId = package.Id;
                     payment.Amount = investment.TotalPrice;
-                    payment.Description = "Đầu tư gói '" + package.Name + "' x" + investmentDTO.quantity;
+                    payment.Description = "Đầu tư gói '" + package.Name + "' x" + investmentDTO.quantity + " của dự án '" + project.Name + "'";
                     payment.Type = PaymentTypeEnum.INVESTMENT.ToString();
                     payment.FromId = Guid.Parse(currentUser.userId);
                     payment.ToId = projectManager.Id;
@@ -144,7 +163,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     payment.InvestmentId = Guid.Parse(investmentId);
                     payment.PackageId = package.Id;
                     payment.Amount = investment.TotalPrice;
-                    payment.Description = "Đầu tư gói '" + package.Name + "' x" + investmentDTO.quantity;
+                    payment.Description = "Đầu tư gói '" + package.Name + "' x" + investmentDTO.quantity + " của dự án '" + project.Name + "'";
                     payment.Type = PaymentTypeEnum.INVESTMENT.ToString();
                     payment.FromId = Guid.Parse(currentUser.userId);
                     payment.ToId = projectManager.Id;
@@ -243,12 +262,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<AllInvestmentDTO> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId, ThisUserObj currentUser)
+        public async Task<AllInvestmentDTO> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId, string status, ThisUserObj currentUser)
         {
             try
             {
                 AllInvestmentDTO result = new AllInvestmentDTO();
                 result.listOfInvestment = new List<GetInvestmentDTO>();
+                result.filterCount = new CountInvestmentDTO();
 
                 if (walletTypeId != null)
                 {
@@ -288,6 +308,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     if (!await _validationService.CheckExistenceId("Investor", Guid.Parse(investorId)))
                         throw new NotFoundException("This investorId is not existed!!!");
                 }
+                if (status != null && !Enum.IsDefined(typeof(TransactionStatusEnum), status)) throw new InvalidFieldException("status must be WAITING or SUCCESS or FAILED or CANCELED!!!");
 
                 if (currentUser.roleId.Equals(currentUser.businessManagerRoleId, StringComparison.InvariantCultureIgnoreCase) 
                     || currentUser.roleId.Equals(currentUser.projectManagerRoleId, StringComparison.InvariantCultureIgnoreCase))
@@ -315,15 +336,27 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         investorId = currentUser.investorId;
                 }
 
-                List<Investment> investmentList = await _investmentRepository.GetAllInvestments(pageIndex, pageSize, walletTypeId, businessId, projectId, investorId, Guid.Parse(currentUser.roleId));
+                List<Investment> investmentList = await _investmentRepository.GetAllInvestments(pageIndex, pageSize, walletTypeId, businessId, projectId, investorId, status, Guid.Parse(currentUser.roleId));
                 result.listOfInvestment = _mapper.Map<List<GetInvestmentDTO>>(investmentList);
-                result.numOfInvestment = await _investmentRepository.CountAllInvestments(walletTypeId, businessId, projectId, investorId, Guid.Parse(currentUser.roleId));
+                result.numOfInvestment = await _investmentRepository.CountAllInvestments(walletTypeId, businessId, projectId, investorId, status, Guid.Parse(currentUser.roleId));
 
                 foreach (GetInvestmentDTO item in result.listOfInvestment)
                 {
                     item.createDate = item.createDate == null ? null : await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = item.updateDate == null ? null : await _validationService.FormatDateOutput(item.updateDate);
                 }
+
+                List<Investment> filterCountList = await _investmentRepository
+                    .GetAllInvestments(0, 0, null, 
+                    currentUser.roleId.Equals(currentUser.businessManagerRoleId) ? businessId : null,
+                    currentUser.roleId.Equals(currentUser.projectManagerRoleId) ? projectId : null,
+                    currentUser.roleId.Equals(currentUser.investorRoleId) ? investorId : null, 
+                    null, Guid.Parse(currentUser.roleId));
+
+                result.filterCount.waiting = filterCountList.FindAll(x => x.Status.Equals(TransactionStatusEnum.WAITING.ToString())).Count;
+                result.filterCount.success = filterCountList.FindAll(x => x.Status.Equals(TransactionStatusEnum.SUCCESS.ToString())).Count;
+                result.filterCount.failed = filterCountList.FindAll(x => x.Status.Equals(TransactionStatusEnum.FAILED.ToString())).Count;
+                result.filterCount.canceled = filterCountList.FindAll(x => x.Status.Equals(TransactionStatusEnum.CANCELED.ToString())).Count;
 
                 return result;
             }

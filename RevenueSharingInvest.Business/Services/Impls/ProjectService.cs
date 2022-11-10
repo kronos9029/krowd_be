@@ -1199,7 +1199,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         }
                         else if (status.Equals(ProjectStatusEnum.ACTIVE.ToString()))
                         {
-                            List<Investment> investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, projectId.ToString(), null, Guid.Parse(currentUser.roleId));
+                            List<Investment> investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, projectId.ToString(), null, TransactionStatusEnum.SUCCESS.ToString(), Guid.Parse(currentUser.roleId));
                             InvestorWallet investorWallet = new InvestorWallet();
                             ProjectWallet projectWallet = await _projectWalletRepository
                                 .GetProjectWalletByProjectManagerIdAndType(project.ManagerId, WalletTypeEnum.P3.ToString(), projectId);

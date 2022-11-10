@@ -10,5 +10,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs.CommonDTOs
     {
         public int numOfInvestment { get; set; }
         public List<GetInvestmentDTO> listOfInvestment { get; set; }
+        public CountInvestmentDTO filterCount { get; set; }
     }
 }

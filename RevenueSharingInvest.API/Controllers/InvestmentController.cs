@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using System;
@@ -51,7 +52,7 @@ namespace RevenueSharingInvest.API.Controllers
         //GET ALL
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId)
+        public async Task<IActionResult> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId, TransactionStatusEnum? status)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
@@ -60,7 +61,7 @@ namespace RevenueSharingInvest.API.Controllers
                 || currentUser.roleId.Equals(currentUser.projectManagerRoleId)
                 || currentUser.roleId.Equals(currentUser.investorRoleId))
             {
-                var result = await _investmentService.GetAllInvestments(pageIndex, pageSize, walletTypeId, businessId, projectId, investorId, currentUser);
+                var result = await _investmentService.GetAllInvestments(pageIndex, pageSize, walletTypeId, businessId, projectId, investorId, status == null ? null : status.ToString(), currentUser);
                 return Ok(result);
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUINESS_MANAGER or PROJECT_MANAGER or INVESTOR can perform this action!!!");
