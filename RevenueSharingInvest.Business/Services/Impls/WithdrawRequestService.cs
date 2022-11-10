@@ -63,11 +63,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 GetWithdrawRequestDTO getWithdrawRequestDTO = new();                
 
                 if (currentUser.roleId.Equals(currentUser.investorRoleId)){
-                    if (!(await _investorWalletRepository.GetInvestorWalletById(Guid.Parse(request.FromWalletId))).WalletTypeId
-                        .Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2"))))
-                        throw new InvalidFieldException("FromWalletId type must be I2!!!");
 
-                        InvestorWallet fromWallet = await _investorWalletRepository.GetInvestorWalletById(Guid.Parse(request.FromWalletId));
+                    InvestorWallet fromWallet = await _investorWalletRepository.GetInvestorWalletById(Guid.Parse(request.FromWalletId));
+
+                    if (!fromWallet.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")))
+                        && !fromWallet.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I5"))))
+                        throw new InvalidFieldException("FromWalletId type must be I2 or I5!!!");
 
                     if (request.Amount < 0 || request.Amount > fromWallet.Balance)
                         throw new WalletBalanceException("You Don't Have Enough Money To Withdraw!!");
@@ -110,11 +111,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 } else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
                 {
-                    if (!(await _projectWalletRepository.GetProjectWalletById(Guid.Parse(request.FromWalletId))).WalletTypeId
-                        .Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2"))))
-                        throw new InvalidFieldException("FromWalletId type must be P2!!!");
-
                     ProjectWallet fromWallet = await _projectWalletRepository.GetProjectWalletById(Guid.Parse(request.FromWalletId));
+
+                    if (!fromWallet.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2"))) 
+                        && !fromWallet.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P5"))))
+                        throw new InvalidFieldException("FromWalletId type must be P2 or P5!!!");
+
                     if (request.Amount < 0 || request.Amount > fromWallet.Balance)
                         throw new WalletBalanceException("You Don't Have Enough Money To Withdraw!!");
 

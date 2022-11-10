@@ -66,14 +66,51 @@ namespace RevenueSharingInvest.Business.Services.Impls
         //CANCEL
         public async Task<int> CancelInvestment(Guid investmentId, ThisUserObj currentUser)
         {
+            int result;
             try
             {
                 Investment investment = await _investmentRepository.GetInvestmentById(investmentId);
 
                 if (!investment.InvestorId.Equals(Guid.Parse(currentUser.investorId))) throw new InvalidFieldException("This is not your Investment!!!");
+                if (!investment.Status.Equals(TransactionStatusEnum.SUCCESS.ToString())) throw new UpdateObjectException("You can not cancel this Investment because its status is not 'SUCCESS'!!!");
 
+                result = await _investmentRepository.CancelInvestment(investmentId, Guid.Parse(currentUser.userId));
 
-                return 0;
+                if (result != 0)
+                {
+                    //Subtract I3 balance
+                    InvestorWallet investorWallet = await _investorWalletRepository
+                        .GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString());
+                    investorWallet.Balance = -investment.TotalPrice;
+                    investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
+                    await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
+
+                    //Create CASH_OUT WalletTransaction from I3 to I2
+                    WalletTransaction walletTransaction = new WalletTransaction();
+                    walletTransaction.Amount = investment.TotalPrice;
+                    walletTransaction.Fee = 0;
+                    walletTransaction.Description = "Transfer money from I3 wallet to I2 wallet due to investment cancellation";
+                    walletTransaction.FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString())).Id;
+                    walletTransaction.ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString())).Id;
+                    walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
+                    walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
+                    await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+
+                    //Add I2 balance
+                    investorWallet = await _investorWalletRepository
+                        .GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString());
+                    investorWallet.Balance = investment.TotalPrice;
+                    investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
+                    await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
+
+                    //Create CASH_IN WalletTransaction from I3 to I2
+                    walletTransaction.Description = "Receive money from I3 wallet to I2 wallet due to investment cancellation";
+                    walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
+                    await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+                }
+                else throw new UpdateObjectException("Cancel failed!!!");
+
+                return result;
             }
             catch (Exception e)
             {
@@ -342,6 +379,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 foreach (GetInvestmentDTO item in result.listOfInvestment)
                 {
+                    User user = await _userRepository.GetUserByInvestorId(Guid.Parse(item.investorId));
+                    item.investorName = (user.FirstName == null ? "" : user.FirstName) + " " + (user.LastName == null ? "" : user.LastName);
+                    item.investorImage = user.Image;
+                    item.investorEmail = user.Email;
+
+                    Package package = await _packageRepository.GetPackageById(Guid.Parse(item.packageId));
+                    item.packageName = package.Name;
+                    item.packagePrice = package.Price;
+
+                    item.projectName = (await _projectRepository.GetProjectById(Guid.Parse(item.projectId))).Name;
+
                     item.createDate = item.createDate == null ? null : await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = item.updateDate == null ? null : await _validationService.FormatDateOutput(item.updateDate);
                 }
@@ -396,6 +444,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result = _mapper.Map<GetInvestmentDTO>(investment);
                 if (result == null)
                     throw new NotFoundException("No Investment Object Found!");
+
+                User user = await _userRepository.GetUserByInvestorId(Guid.Parse(result.investorId));
+                result.investorName = (user.FirstName == null ? "" : user.FirstName) + " " + (user.LastName == null ? "" : user.LastName);
+                result.investorImage = user.Image;
+                result.investorEmail = user.Email;
+
+                Package package = await _packageRepository.GetPackageById(Guid.Parse(result.packageId));
+                result.packageName = package.Name;
+                result.packagePrice = package.Price;
+
+                result.projectName = (await _projectRepository.GetProjectById(Guid.Parse(result.projectId))).Name;
 
                 result.createDate = result.createDate == null ? null : await _validationService.FormatDateOutput(result.createDate);
                 result.updateDate = result.updateDate == null ? null : await _validationService.FormatDateOutput(result.updateDate);

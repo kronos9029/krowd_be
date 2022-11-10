@@ -944,5 +944,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        public async Task<User> GetUserByInvestorId(Guid investorId)
+        {
+            try
+            {
+                string query = "SELECT U.* FROM Investor I JOIN [User] U ON I.UserId = U.Id WHERE I.Id = @InvestorId";
+                var parameters = new DynamicParameters();
+                parameters.Add("InvestorId", investorId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<User>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

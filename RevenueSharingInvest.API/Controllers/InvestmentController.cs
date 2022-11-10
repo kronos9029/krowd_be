@@ -86,6 +86,23 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUINESS_MANAGER or PROJECT_MANAGER or INVESTOR can perform this action!!!");
         }
 
+        //CANCEL
+        [HttpPut]
+        [Route("{id}")]
+        [Authorize]
+        public async Task<IActionResult> CancelInvestment(Guid id)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+
+            //INVESTOR
+            if (currentUser.roleId.Equals(currentUser.investorRoleId))
+            {
+                var result = await _investmentService.CancelInvestment(id, currentUser);
+                return Ok(result);
+            }
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
+        }
+
         //[HttpGet]
         //[Route("wallet/{walletType}")]
         //[Authorize]

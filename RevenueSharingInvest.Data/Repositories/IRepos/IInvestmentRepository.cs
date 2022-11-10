@@ -23,7 +23,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //public Task<List<Investment>> GetInvestmentForWallet(Guid investorId, string status);
 
         //UPDATE
-        //public Task<int> UpdateInvestment(Investment investmentDTO, Guid investmentId);
+        public Task<int> CancelInvestment(Guid investmentId, Guid updateBy);
         public Task<int> UpdateInvestmentStatus(Investment investmentDTO);
 
         //DELETE

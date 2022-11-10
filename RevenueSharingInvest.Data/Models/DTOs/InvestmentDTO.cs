@@ -28,5 +28,11 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string createBy { get; set; }
         public string updateDate { get; set; }
         public string updateBy { get; set; }
+        public string investorName { get; set; }
+        public string investorImage { get; set; }
+        public string investorEmail { get; set; }
+        public string packageName { get; set; }
+        public double packagePrice { get; set; }
+        public string projectName { get; set; }
     }
 }
