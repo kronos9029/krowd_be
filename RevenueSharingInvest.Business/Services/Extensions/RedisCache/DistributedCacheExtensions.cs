@@ -52,6 +52,14 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
         public static async Task<Notification> GetNotification(this IDistributedCache cache, string userId, bool seen)
         {
             Notification result = await GetRecordAsync<Notification>(cache, userId);
+
+            result ??= new()
+                {
+                    Total = 0,
+                    New = 0,
+                    Details = new List<NotificationDetail>()
+                };
+
             if (seen == true)
             {
                 result.New = 0;
