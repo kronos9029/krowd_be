@@ -3,6 +3,7 @@ using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
@@ -73,6 +74,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (!investment.InvestorId.Equals(Guid.Parse(currentUser.investorId))) throw new InvalidFieldException("This is not your Investment!!!");
                 if (!investment.Status.Equals(TransactionStatusEnum.SUCCESS.ToString())) throw new UpdateObjectException("You can not cancel this Investment because its status is not 'SUCCESS'!!!");
+                int a = DateTime.Compare(DateTimePicker.GetDateTimeByTimeZone(), investment.CreateDate.Value.AddDays(1));
+                if (DateTime.Compare(DateTimePicker.GetDateTimeByTimeZone(), investment.CreateDate.Value.AddDays(1)) > 0) throw new UpdateObjectException("You can cancel an Investment within 24 hours only!!!");
 
                 result = await _investmentRepository.CancelInvestment(investmentId, Guid.Parse(currentUser.userId));
 
