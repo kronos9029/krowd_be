@@ -288,6 +288,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                    new Claim(ClaimTypes.SerialNumber, response.id.ToString()),
                    new Claim(ClaimTypes.Email, response.email),
+                   new Claim(ClaimTypes.Actor, response.fullName),
                    investorId,
                    roleClaim,
                 }),

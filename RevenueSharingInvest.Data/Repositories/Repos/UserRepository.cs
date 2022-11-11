@@ -846,10 +846,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", currentUserId, DbType.Guid);
                 parameters.Add("Id", userId, DbType.Guid);
 
-                using (var connection = CreateConnection())
-                {
-                    return await connection.ExecuteAsync(query, parameters);
-                }
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
             {
@@ -877,11 +875,10 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", currentUserId, DbType.Guid);
                 parameters.Add("Id", userId, DbType.Guid);
 
-                using (var connection = CreateConnection())
-                {
-                    return await connection.ExecuteAsync(query, parameters);
-                }
-            }catch(Exception e)
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
@@ -939,6 +936,36 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 return await connection.QueryFirstOrDefaultAsync<Guid>(query, parameters);
             }
             catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<List<Guid>> GetUsersIdByRoleIdAndBusinessId(Guid roleId, string businessId)
+        {
+            try
+            {
+                var query;
+                var parameters = new DynamicParameters();
+                if (businessId == null || businessId.Equals(""))
+                {
+                    query = "SELECT Id FROM [Users] WHERE RoleId = @RoleId ";
+                    parameters.Add("RoleId", roleId, DbType.Guid);
+                }
+                else
+                {
+                    query = "SELECT Id FROM [Users] WHERE RoleId = @RoleId AND BusinessId = @BusinessId";
+                    parameters.Add("RoleId", roleId, DbType.Guid);
+                    parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
+                }
+                    
+                
+                
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<Guid>(query, parameters)).ToList();
+            }
+            catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);

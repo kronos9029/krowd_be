@@ -102,7 +102,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }   
         }
 
-        public async Task<int> InvestorApproveWithdrawRequest(Guid userId, Guid requestId)
+        public async Task<int> UserApproveWithdrawRequest(Guid userId, Guid requestId)
         {
             try
             {

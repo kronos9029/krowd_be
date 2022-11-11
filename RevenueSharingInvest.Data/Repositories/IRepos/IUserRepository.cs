@@ -26,6 +26,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<User> ProjectManagerGetUserbyId(Guid managerId, Guid id);
         public Task<Guid> GetProjectIdByManagerEmail(string email);
         public Task<IntegrateInfo> GetIntegrateInfoByEmailAndProjectId(string email, Guid projectId);
+        public Task<List<Guid>> GetUsersIdByRoleIdAndBusinessId(Guid roleId, string businessId);
 
         //UPDATE
         public Task<int> UpdateUser(User userDTO, Guid userId);

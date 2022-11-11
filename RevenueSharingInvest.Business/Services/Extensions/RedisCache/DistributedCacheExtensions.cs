@@ -10,17 +10,17 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
     public static class DistributedCacheExtensions
     {
 
-        public static async Task<Notification> UpdateNotification(this IDistributedCache cache, string userId, NotificationDetailDTO newNoti)
+        public static async Task<Notification> UpdateNotification(this IDistributedCache cache, string toUserId, NotificationDetailDTO newNoti)
         {
-            NotificationDetail notification = new();
-            notification.Title = newNoti.Title;
-            notification.Description = newNoti.Description;
-            notification.Image = newNoti.Image;
-            notification.CreateDate ??= DateTimePicker.GetDateTimeByTimeZone().ToString();
-            notification.Seen = false;
-
-
-            Notification result = await GetRecordAsync<Notification>(cache, userId);
+            NotificationDetail notification = new()
+            {
+                Title = newNoti.Title ??= "",
+                Description = newNoti.Description??="",
+                Image = newNoti.Image ??="",
+                CreateDate = DateTimePicker.GetDateTimeByTimeZone().ToString(),
+                Seen = false
+            };
+            Notification result = await GetRecordAsync<Notification>(cache, toUserId);
             if (result == null)
             {
                 result = new Notification
@@ -43,7 +43,8 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
                 else
                     break;
             }
-            await SetRecordAsync(cache, userId, result);
+
+            await SetRecordAsync(cache, toUserId, result);
 
             return result;
         }

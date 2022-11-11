@@ -280,7 +280,7 @@ namespace RevenueSharingInvest.API.Controllers
                     {
                         var result = await _projectService.UpdateProject(projectDTO, id, currentUser);
                         return Ok(result);
-                    }   
+                    }
                 }               
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER can perform this action!!!");
