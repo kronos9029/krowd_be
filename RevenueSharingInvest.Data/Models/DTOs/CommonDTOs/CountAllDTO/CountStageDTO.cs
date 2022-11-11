@@ -8,6 +8,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs.CommonDTOs
 {
     public class CountStageDTO
     {
+        public int all { get; set; }
         public int inactive { get; set; }
         public int undue { get; set; }
         public int due { get; set; }

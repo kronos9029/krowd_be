@@ -8,6 +8,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs.CommonDTOs
 {
     public class CountWalletTransactionDTO
     {
+        public int all { get; set; }
         public int? i1 { get; set; }
         public int? i2 { get; set; }
         public int? i3 { get; set; }

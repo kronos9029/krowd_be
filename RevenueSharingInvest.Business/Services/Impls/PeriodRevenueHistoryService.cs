@@ -7,6 +7,7 @@ using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs.GetAllDTO;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -219,19 +220,33 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<List<PeriodRevenueHistoryDTO>> GetAllPeriodRevenueHistories(int pageIndex, int pageSize)
+        public async Task<AllPeriodRevenueHistoryDTO> GetAllPeriodRevenueHistories(int pageIndex, int pageSize, Guid projectId, ThisUserObj currentUser)
         {
             try
             {
-                List<PeriodRevenueHistory> periodRevenueHistoryList = await _periodRevenueHistoryRepository.GetAllPeriodRevenueHistories(pageIndex, pageSize);
-                List<PeriodRevenueHistoryDTO> list = _mapper.Map<List<PeriodRevenueHistoryDTO>>(periodRevenueHistoryList);
+                AllPeriodRevenueHistoryDTO result = new AllPeriodRevenueHistoryDTO();
+                result.listOfPeriodRevenueHistory = new List<PeriodRevenueHistoryDTO>();
 
-                foreach (PeriodRevenueHistoryDTO item in list)
+                Project project = await _projectRepository.GetProjectById(projectId);
+
+                if ((currentUser.roleId.Equals(currentUser.businessManagerRoleId)
+                    || currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+                    && !project.BusinessId.Equals(Guid.Parse(currentUser.businessId)))
+                    throw new InvalidFieldException("This project_id is not belong to your Business!!!");
+
+                if (currentUser.roleId.Equals(currentUser.projectManagerRoleId) && !project.ManagerId.Equals(Guid.Parse(currentUser.userId)))
+                    throw new InvalidFieldException("This is not your Project!!!");
+
+                List<PeriodRevenueHistory> periodRevenueHistoryList = await _periodRevenueHistoryRepository.GetAllPeriodRevenueHistories(pageIndex, pageSize, projectId);
+                result.listOfPeriodRevenueHistory = _mapper.Map<List<PeriodRevenueHistoryDTO>>(periodRevenueHistoryList);
+                result.numOfPeriodRevenueHistory = await _periodRevenueHistoryRepository.CountAllPeriodRevenueHistories(projectId);
+
+                foreach (PeriodRevenueHistoryDTO item in result.listOfPeriodRevenueHistory)
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                 }
 
-                return list;
+                return result;
             }
             catch (Exception e)
             {

@@ -33,6 +33,7 @@ namespace RevenueSharingInvest.API.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
+        //CREATE
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> CreatePeriodRevenueHistory([FromBody] CreatePeriodRevenueHistoryDTO createPeriodRevenueHistoryDTO)
@@ -49,12 +50,22 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER can perform this action!!!");
         }
 
+        //GET ALL
         [HttpGet]
-        public async Task<IActionResult> GetAllPeriodRevenueHistorys(int pageIndex, int pageSize)
+        [Route("project/{project_id}")]
+        public async Task<IActionResult> GetAllPeriodRevenueHistorys(int pageIndex, int pageSize, Guid project_id)
         {
-            var result = new List<PeriodRevenueHistoryDTO>();
-            result = await _periodRevenueHistoryService.GetAllPeriodRevenueHistories(pageIndex, pageSize);
-            return Ok(result);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+
+            //ADMIN, BUSINESS_MANAGER, PROJECT_MANAGER
+            if (currentUser.roleId.Equals(currentUser.adminRoleId)
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId)
+                || currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            {
+                var result = await _periodRevenueHistoryService.GetAllPeriodRevenueHistories(pageIndex, pageSize, project_id, currentUser);
+                return Ok(result);
+            }
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUSINESS_MANAGER or PROJECT_MANAGER can perform this action!!!");
         }
 
         [HttpGet]

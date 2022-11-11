@@ -110,6 +110,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 //Filter count
                 List<Stage> filterCountStageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0, null);
+                result.filterCount.all = filterCountStageList.Count;
                 result.filterCount.inactive = filterCountStageList.FindAll(x => x.Status.Equals(StageStatusEnum.INACTIVE.ToString())).Count;
                 result.filterCount.undue = filterCountStageList.FindAll(x => x.Status.Equals(StageStatusEnum.UNDUE.ToString())).Count;
                 result.filterCount.due = filterCountStageList.FindAll(x => x.Status.Equals(StageStatusEnum.DUE.ToString())).Count;

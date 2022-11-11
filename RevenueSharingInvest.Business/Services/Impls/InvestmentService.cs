@@ -404,6 +404,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     currentUser.roleId.Equals(currentUser.investorRoleId) ? investorId : null, 
                     null, Guid.Parse(currentUser.roleId));
 
+                result.filterCount.all = filterCountList.Count;
                 result.filterCount.waiting = filterCountList.FindAll(x => x.Status.Equals(TransactionStatusEnum.WAITING.ToString())).Count;
                 result.filterCount.success = filterCountList.FindAll(x => x.Status.Equals(TransactionStatusEnum.SUCCESS.ToString())).Count;
                 result.filterCount.failed = filterCountList.FindAll(x => x.Status.Equals(TransactionStatusEnum.FAILED.ToString())).Count;

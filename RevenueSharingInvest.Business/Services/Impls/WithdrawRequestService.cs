@@ -325,9 +325,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         Amount = withdrawRequest.Amount,
                         Status = withdrawRequest.Status,
                         RefusalReason = withdrawRequest.RefusalReason,
-                        CreateDate = withdrawRequest.CreateDate.ToString(),
+                        CreateDate = await _validationService.FormatDateOutput(withdrawRequest.CreateDate.ToString()),
                         CreateBy = withdrawRequest.CreateBy.ToString(),
-                        UpdateDate = withdrawRequest.UpdateBy.ToString(),
+                        UpdateDate = await _validationService.FormatDateOutput(withdrawRequest.UpdateDate.ToString()),
                         UpdateBy = withdrawRequest.UpdateBy.ToString()
                     };
                     result.listOfWithdrawRequest.Add(withdrawRequestDTO);
@@ -348,6 +348,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 WithdrawRequest withdrawRequest = await _withdrawRequestRepository.GetWithdrawRequestByRequestId(Guid.Parse(id));
                 GetWithdrawRequestDTO withdrawRequestDTO = _mapper.Map<GetWithdrawRequestDTO>(withdrawRequest);
+                withdrawRequestDTO.CreateDate = await _validationService.FormatDateOutput(withdrawRequestDTO.CreateDate);
+                withdrawRequestDTO.UpdateDate = await _validationService.FormatDateOutput(withdrawRequestDTO.UpdateDate);
                 return withdrawRequestDTO;
             }
             

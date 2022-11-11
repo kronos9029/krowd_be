@@ -20,6 +20,26 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
         }
 
+        //COUNT ALL
+        public async Task<int> CountAllPeriodRevenueHistories(Guid projectId)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+                var whereClause = " WHERE PR.ProjectId = @ProjectId ";
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+
+                var query = "SELECT COUNT(*) FROM (SELECT PRH.* FROM PeriodRevenueHistory PRH JOIN PeriodRevenue PR ON PRH.PeriodRevenueId = PR.Id " + whereClause + ") AS X";
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //COUNT BY PERIOD REVENUE ID
         public async Task<int> CountPeriodRevenueHistoryByPeriodRevenueId(Guid periodRevenueId)
         {
@@ -107,20 +127,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<PeriodRevenueHistory>> GetAllPeriodRevenueHistories(int pageIndex, int pageSize)
+        public async Task<List<PeriodRevenueHistory>> GetAllPeriodRevenueHistories(int pageIndex, int pageSize, Guid projectId)
         {
             try
             {
+                var parameters = new DynamicParameters();
+                var whereClause = " WHERE PR.ProjectId = @ProjectId ";
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+
                 if (pageIndex != 0 && pageSize != 0)
                 {
                     var query = "WITH X AS ( "
                     + "         SELECT "
                     + "             ROW_NUMBER() OVER ( "
                     + "                 ORDER BY "
-                    + "                     PeriodRevenueId, "
-                    + "                     Name ASC ) AS Num, "
-                    + "             * "
-                    + "         FROM PeriodRevenueHistory "
+                    + "                     PRH.CreateDate DESC ) AS Num, "
+                    + "             PRH.* "
+                    + "         FROM PeriodRevenueHistory PRH JOIN PeriodRevenue PR ON PRH.PeriodRevenueId = PR.Id "
+                    +           whereClause
                     + "         ) "
                     + "     SELECT "
                     + "         Id, "
@@ -135,7 +159,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     WHERE "
                     + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
                     + "         AND @PageIndex * @PageSize";
-                    var parameters = new DynamicParameters();
+                    
                     parameters.Add("PageIndex", pageIndex, DbType.Int16);
                     parameters.Add("PageSize", pageSize, DbType.Int16);
                     using var connection = CreateConnection();
@@ -144,9 +168,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 else
                 {
-                    var query = "SELECT * FROM PeriodRevenueHistory ORDER BY PeriodRevenueId, Name ASC";
+                    var query = "SELECT PRH.* FROM PeriodRevenueHistory PRH JOIN PeriodRevenue PR ON PRH.PeriodRevenueId = PR.Id " + whereClause + " ORDER BY PRH.CreateDate DESC";
                     using var connection = CreateConnection();
-                    return (await connection.QueryAsync<PeriodRevenueHistory>(query)).ToList();
+                    return (await connection.QueryAsync<PeriodRevenueHistory>(query, parameters)).ToList();
                 }              
             }
             catch (Exception e)

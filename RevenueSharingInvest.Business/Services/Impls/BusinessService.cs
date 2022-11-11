@@ -367,6 +367,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (business == null)
                     throw new InvalidFieldException("This businessId is not existed!!!");
 
+                if (currentUser.roleId.Equals(currentUser.businessManagerRoleId) && !businessId.Equals(Guid.Parse(currentUser.businessId)))
+                    throw new InvalidFieldException("This is not your Business!!!");
+
                 if (business.Status.Equals(BusinessStatusEnum.BLOCKED))
                 {
                     throw new UnauthorizedException("You Can Not Update This Business Because It Is Blocked!!");

@@ -261,6 +261,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 }
 
                 //Filter count
+                result.filterCount.all = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, null, null, null, null);
 
                 dynamic wallets = userRoleId.Equals(Guid.Parse(currentUser.investorRoleId))
                     ? await _investorWalletRepository.GetInvestorWalletsByInvestorId((await _investorRepository.GetInvestorByUserId((Guid)userId)).Id)

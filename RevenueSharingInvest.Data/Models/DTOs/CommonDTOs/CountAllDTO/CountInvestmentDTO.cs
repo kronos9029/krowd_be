@@ -8,6 +8,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs.CommonDTOs
 {
     public class CountInvestmentDTO
     {
+        public int all { get; set; }
         public int waiting { get; set; }
         public int success { get; set; }
         public int failed { get; set; }
