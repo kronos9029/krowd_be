@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using Google.Api.Gax.ResourceNames;
 using Hangfire;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.VisualBasic;
 using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
+using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 using RevenueSharingInvest.Business.Services.Extensions.Security;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
@@ -14,6 +16,7 @@ using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
+using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -21,6 +24,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DistributedCacheExtensions = RevenueSharingInvest.Business.Services.Extensions.RedisCache.DistributedCacheExtensions;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
@@ -50,6 +54,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IFileUploadService _fileUploadService;
         private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IMapper _mapper;
+        private readonly IDistributedCache _cache;
 
         public ProjectService(
             IProjectRepository projectRepository, 
@@ -75,7 +80,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IProjectTagService projectTagService,
             IFileUploadService fileUploadService,
             IBackgroundJobClient backgroundJobClient,
-            IMapper mapper)
+            IMapper mapper,
+            IDistributedCache cache)
         {
             _projectRepository = projectRepository;
             _fieldRepository = fieldRepository;
@@ -101,6 +107,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _fileUploadService = fileUploadService;
             _backgroundJobClient = backgroundJobClient;
             _mapper = mapper;
+            _cache = cache;
         }
 
         //COUNT PROJECTS
@@ -471,15 +478,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     User user = await _userRepository.GetUserById(Guid.Parse(projectDTO.managerId));
                     Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(entity.BusinessId);
 
-                    ProjectEntity extension = new ProjectEntity();
-
-                    extension.ProjectId = Guid.Parse(newId.id);
-                    extension.Type = ProjectEntityEnum.EXTENSION.ToString();
-                    extension.CreateBy = Guid.Parse(currentUser.userId);
-                    extension.Title = "Doanh nghiệp";
-                    extension.Content = business.Name;
-                    extension.Description = "Email: " + business.Email;
-                    extension.Priority = 1;
+                    ProjectEntity extension = new()
+                    {
+                        ProjectId = Guid.Parse(newId.id),
+                        Type = ProjectEntityEnum.EXTENSION.ToString(),
+                        CreateBy = Guid.Parse(currentUser.userId),
+                        Title = "Doanh nghiệp",
+                        Content = business.Name,
+                        Description = "Email: " + business.Email,
+                        Priority = 1
+                    };
                     await _projectEntityRepository.CreateProjectEntity(extension);
                     extension.Title = "Chủ dự án";
                     extension.Content = user.FirstName + " " + user.LastName;
@@ -498,13 +506,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     await _projectEntityRepository.CreateProjectEntity(extension);
 
                     //Tạo ABOUT ProjectEntity
-                    ProjectEntity about = new ProjectEntity();
-
-                    about.ProjectId = Guid.Parse(newId.id);
-                    about.Type = ProjectEntityEnum.ABOUT.ToString();
-                    about.CreateBy = Guid.Parse(currentUser.userId);
-                    about.Title = "Facebook";
-                    about.Priority = 1;
+                    ProjectEntity about = new()
+                    {
+                        ProjectId = Guid.Parse(newId.id),
+                        Type = ProjectEntityEnum.ABOUT.ToString(),
+                        CreateBy = Guid.Parse(currentUser.userId),
+                        Title = "Facebook",
+                        Priority = 1
+                    };
                     await _projectEntityRepository.CreateProjectEntity(about);
                     about.Title = "YouTube";
                     about.Priority = 2;
@@ -515,6 +524,22 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     //Update NumOfProject
                     await _businessRepository.UpdateBusinessNumOfProject(Guid.Parse(currentUser.businessId));
+
+
+                    NotificationDetailDTO noti = new()
+                    {
+                        Title = currentUser.fullName + " đã tạo dự án " + entity.Name,
+                        Description = newId.id
+                    };
+
+                    List<Guid> admins = await _userRepository.GetUsersIdByRoleIdAndBusinessId(Guid.Parse(currentUser.adminRoleId),"");
+                    List<Guid> businessManagers = await _userRepository.GetUsersIdByRoleIdAndBusinessId(Guid.Parse(currentUser.adminRoleId), currentUser.businessId);
+                    var combinedList = (List<Guid>)admins.Union(businessManagers);
+
+                    for (int i = 0; i < combinedList.Count; i++)
+                    {
+                        await DistributedCacheExtensions.UpdateNotification(_cache, combinedList[i].ToString(), noti);
+                    }
                 }
                 return newId;
             }
@@ -904,7 +929,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 GetProjectDTO getProject = _mapper.Map<GetProjectDTO>(await _projectRepository.GetProjectById(projectId));
                 if (getProject == null)
                     throw new NotFoundException("No Project Object Found!!!");
-                Project project = new Project();
+                Project project = new();
 
                 if (projectDTO.name != null)
                 {
@@ -1204,7 +1229,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             ProjectWallet projectWallet = await _projectWalletRepository
                                 .GetProjectWalletByProjectManagerIdAndType(project.ManagerId, WalletTypeEnum.P3.ToString(), projectId);
                             projectWallet.UpdateBy = Guid.Parse(currentUser.userId);
-                            WalletTransaction walletTransaction = new WalletTransaction();
+                            WalletTransaction walletTransaction = new();
 
                             foreach (Investment item in investmentList)
                             {
@@ -1352,24 +1377,58 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!await _validationService.CheckExistenceId("Project", projectId))
                     throw new NotFoundException("This projectId is not existed!!!");
 
+                NotificationDetailDTO notification = new();
+
+                
+
                 Project project = await _projectRepository.GetProjectById(projectId);
                 if (project.Status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
                 {
                     if (project.StartDate <= DateTimePicker.GetDateTimeByTimeZone() && project.ApprovedBy == null && project.ApprovedDate == null)
-                        return await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.DENIED.ToString(), Guid.Parse(currentUser.userId));
+                    {
+                        var result = await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.DENIED.ToString(), Guid.Parse(currentUser.userId));
+                        notification.Title = "Dự án "+project.Name+" của bạn đã bị từ chối vì ví do quá hạn.";
+                        notification.Description = projectId.ToString();
+                        notification.Image = project.Image;
+                        await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
+                        return result;
+                    }
+                        
                 }
                 else if (project.Status.Equals(ProjectStatusEnum.WAITING_TO_PUBLISH.ToString()))
                 {
                     if (project.StartDate <= DateTimePicker.GetDateTimeByTimeZone())
-                        return await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), Guid.Parse(currentUser.userId));
+                    {
+                        var result = await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), Guid.Parse(currentUser.userId));
+                        notification.Title = "Dự án " + project.Name + " của bạn đã được chấp thuận và đang chờ được góp vốn.";
+                        notification.Description = projectId.ToString();
+                        notification.Image = project.Image;
+                        await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
+                        return result;
+                    }
+                        
                 }
                 else if (project.Status.Equals(ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString()))
                 {
                     if (project.EndDate <= DateTimePicker.GetDateTimeByTimeZone() && project.InvestedCapital < project.InvestmentTargetCapital)
-                        return await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString(), Guid.Parse(currentUser.userId));
-
+                    {
+                        var result = await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString(), Guid.Parse(currentUser.userId));
+                        notification.Title = "Dự án " + project.Name + " của bạn đã hết thời gian gọi vốn.";
+                        notification.Description = projectId.ToString();
+                        notification.Image = project.Image;
+                        await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
+                        return result;
+                    }
+                        
                     else if (project.EndDate <= DateTimePicker.GetDateTimeByTimeZone() && project.InvestedCapital == project.InvestmentTargetCapital)
-                        return await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString(), Guid.Parse(currentUser.userId));
+                    {
+                        var result = await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString(), Guid.Parse(currentUser.userId));
+                        notification.Title = "Dự án " + project.Name + " của bạn đã gọi vốn thành công và đang chờ để triển khai.";
+                        notification.Description = projectId.ToString();
+                        notification.Image = project.Image;
+                        await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
+                        return result;
+                    }
                 }
                 return 0;
             }

@@ -86,7 +86,7 @@ namespace RevenueSharingInvest.API.Controllers
 
             if(currentUser.roleId.Equals(currentUser.investorRoleId))
             {
-                var result = await _withdrawRequestService.CreateInvestorWithdrawRequest(request, currentUser);
+                var result = await _withdrawRequestService.CreateWithdrawRequest(request, currentUser);
                 return Ok(result);
             }
 
@@ -100,8 +100,10 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> UpdateWithdrawRequest([FromForm] UpdateWithdrawRequest request, WithdrawAction action)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+
             var currentRequest = await _withdrawRequestService.GetWithdrawRequestByRequestIdAndUserId(request.requestId
                 , currentUser.roleId.Equals(currentUser.adminRoleId) ? (await _withdrawRequestService.GetWithdrawRequestById(request.requestId)).CreateBy : currentUser.userId);
+
             if (currentRequest == null)
                 throw new NotFoundException("No Such Request With This Request ID!!");
 
@@ -112,13 +114,13 @@ namespace RevenueSharingInvest.API.Controllers
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PENDING.ToString()))
                     {
                         string receiptLink = await _uploadService.UploadAdminTracsactionReceipt(request.requestId, request.receipt, currentUser.userId);
-                        var result = await _withdrawRequestService.AdminApproveWithdrawRequest(currentUser, currentRequest.Id, receiptLink);
+                        var result = await _withdrawRequestService.AdminApproveWithdrawRequest(currentUser, currentRequest, receiptLink);
                         return Ok(result);
                     } 
                     else if (currentRequest.Status.Equals(WithdrawRequestEnum.PARTIAL_ADMIN.ToString()))
                     {
                         string receiptLink = await _uploadService.UploadAdminTracsactionReceipt(request.requestId, request.receipt, currentUser.userId);
-                        var result = await _withdrawRequestService.AdminResponeToWithdrawRequest(currentUser, currentRequest.Id, receiptLink);
+                        var result = await _withdrawRequestService.AdminResponeToWithdrawRequest(currentUser, currentRequest, receiptLink);
                         return Ok(result);
                     }
                 } 
@@ -126,7 +128,7 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PENDING.ToString()))
                     {
-                        var result = await _withdrawRequestService.AdminRejectWithdrawRequest(currentUser.userId, currentRequest.Id, request.refusalReason);
+                        var result = await _withdrawRequestService.AdminRejectWithdrawRequest(currentUser.userId, currentRequest, request.refusalReason);
                         return Ok(result);
                     }
 
@@ -138,7 +140,7 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PARTIAL.ToString()))
                     {
-                        var result = await _withdrawRequestService.ReportWithdrawRequest(currentUser.userId, currentRequest.Id, request.reportMessage);
+                        var result = await _withdrawRequestService.ReportWithdrawRequest(currentUser, currentRequest, request.reportMessage);
                         return Ok(result);
                     }
                 }
@@ -146,7 +148,7 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PARTIAL.ToString()))
                     {
-                        var result = await _withdrawRequestService.ApproveWithdrawRequest(currentUser.userId, currentRequest.Id);
+                        var result = await _withdrawRequestService.ApproveWithdrawRequest(currentUser.userId, currentRequest);
                         return result;
                     }
                 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Firebase.Auth;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
 using RevenueSharingInvest.API;
@@ -7,12 +8,14 @@ using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
+using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using RevenueSharingInvest.Data.Repositories.Repos;
@@ -21,6 +24,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DistributedCacheExtensions = RevenueSharingInvest.Business.Services.Extensions.RedisCache.DistributedCacheExtensions;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
@@ -35,6 +39,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IMapper _mapper;
         private readonly IRoleService _roleService;
         private readonly IProjectWalletRepository _projectWalletRepository;
+        private readonly IDistributedCache _cache;
 
 
         public AccountTransactionService(IAccountTransactionRepository accountTransactionRepository, 
@@ -45,7 +50,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IInvestorRepository investorRepository,
             IWalletTransactionRepository walletTransactionRepository,
             IRoleService roleService,
-            IProjectWalletRepository projectWalletRepository)
+            IProjectWalletRepository projectWalletRepository,
+            IDistributedCache cache)
         {
             _accountTransactionRepository = accountTransactionRepository;
             _investorWalletRepository = investorWalletRepository;
@@ -56,6 +62,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _walletTransactionRepository = walletTransactionRepository;
             _roleService = roleService;
             _projectWalletRepository = projectWalletRepository;
+            _cache = cache;
         }
 
         //CREATE
@@ -103,6 +110,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 accountTransaction.FromUserId = accountTransaction.PartnerClientId;
                 accountTransaction.Type = "TOP-UP";
 
+                NotificationDetailDTO notification = new();
+
                 string id = await _accountTransactionRepository.CreateAccountTransaction(accountTransaction);
                 if (id.Equals(""))
                     throw new CreateObjectException("Can not create AccountTransaction Object!");
@@ -114,9 +123,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     {
                         Investor investor = await _investorRepository.GetInvestorByUserId((Guid)accountTransaction.PartnerClientId);
                         InvestorTopUp(accountTransaction, investor);
+                        notification.Title = "Bạn vừa nạp "+momoPaymentResult.amount+"VNĐ vào ví đầu tư chung.";
+                        await DistributedCacheExtensions.UpdateNotification(_cache, momoPaymentResult.partnerClientId, notification);
                     }
                     if (roleName.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
+                    {
                         ProjectOwnerTopUp(accountTransaction);
+                        notification.Title = "Bạn vừa nạp " + momoPaymentResult.amount + "VNĐ vào ví thanh toán chung.";
+                        await DistributedCacheExtensions.UpdateNotification(_cache, momoPaymentResult.partnerClientId, notification);
+                    }
+                        
                 }
 
                 return id;

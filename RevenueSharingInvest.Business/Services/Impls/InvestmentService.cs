@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Caching.Distributed;
 using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
+using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -16,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DistributedCacheExtensions = RevenueSharingInvest.Business.Services.Extensions.RedisCache.DistributedCacheExtensions;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
@@ -34,6 +38,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
+        private readonly IDistributedCache _cache;
 
         public InvestmentService(
             IInvestmentRepository investmentRepository, 
@@ -47,7 +52,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IWalletTypeRepository walletTypeRepository,
             IWalletTransactionRepository walletTransactionRepository,
             IValidationService validationService, 
-            IMapper mapper)
+            IMapper mapper,
+            IDistributedCache cache)
         {
             _investorRepository = investorRepository;
             _investmentRepository = investmentRepository;
@@ -62,6 +68,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             _validationService = validationService;
             _mapper = mapper;
+            _cache = cache;
         }
 
         //CANCEL
@@ -125,7 +132,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         //CREATE
         public async Task<InvestmentPaymentDTO> CreateInvestment(CreateInvestmentDTO investmentDTO, ThisUserObj currentUser)
         {
-            InvestmentPaymentDTO result = new InvestmentPaymentDTO();
+            InvestmentPaymentDTO result = new();
             string investmentId = "";
             try
             {
@@ -194,30 +201,43 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     result.investedQuantity = investmentDTO.quantity;
                     result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")))).Name;
                     result.fee = "0%";
+
+                    NotificationDetailDTO notification = new()
+                    {
+                        Title = "Đầu tư vào dự án " + project.Name + " không thành công, vui lòng thử lại hoặc liên hệ với Krowd Help Center.",
+                        Description = project.Id.ToString(),
+                        Image = project.Image
+                    };
+                    await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
                 }
                 else
                 {
                     //Create Payment
-                    Payment payment = new Payment();
+                    
                     User projectManager = await _userRepository.GetProjectManagerByProjectId(package.ProjectId);
-                    payment.InvestmentId = Guid.Parse(investmentId);
-                    payment.PackageId = package.Id;
-                    payment.Amount = investment.TotalPrice;
-                    payment.Description = "Đầu tư gói '" + package.Name + "' x" + investmentDTO.quantity + " của dự án '" + project.Name + "'";
-                    payment.Type = PaymentTypeEnum.INVESTMENT.ToString();
-                    payment.FromId = Guid.Parse(currentUser.userId);
-                    payment.ToId = projectManager.Id;
-                    payment.CreateBy = Guid.Parse(currentUser.userId);
-                    payment.Status = TransactionStatusEnum.SUCCESS.ToString();
+                    Payment payment = new()
+                    {
+                        InvestmentId = Guid.Parse(investmentId),
+                        PackageId = package.Id,
+                        Amount = investment.TotalPrice,
+                        Description = "Đầu tư gói '" + package.Name + "' x" + investmentDTO.quantity,
+                        Type = PaymentTypeEnum.INVESTMENT.ToString(),
+                        FromId = Guid.Parse(currentUser.userId),
+                        ToId = projectManager.Id,
+                        CreateBy = Guid.Parse(currentUser.userId),
+                        Status = TransactionStatusEnum.SUCCESS.ToString()
+                    };
 
                     string paymentId = await _paymentRepository.CreatePayment(payment);
                     if (paymentId != "")
                     {
                         //Update Investment Status
-                        investment = new Investment();
-                        investment.Id = Guid.Parse(investmentId);
-                        investment.UpdateBy = Guid.Parse(currentUser.userId);
-                        investment.Status = TransactionStatusEnum.SUCCESS.ToString();
+                        investment = new()
+                        {
+                            Id = Guid.Parse(investmentId),
+                            UpdateBy = Guid.Parse(currentUser.userId),
+                            Status = TransactionStatusEnum.SUCCESS.ToString()
+                        };
                         await _investmentRepository.UpdateInvestmentStatus(investment);
 
                         //Update Package Quantity
@@ -234,15 +254,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
 
                         //Create CASH_OUT WalletTransaction from I2 to I3
-                        WalletTransaction walletTransaction = new WalletTransaction();
-                        walletTransaction.PaymentId = Guid.Parse(paymentId);
-                        walletTransaction.Amount = payment.Amount;
-                        walletTransaction.Fee = 0;
-                        walletTransaction.Description = "Transfer money from I2 wallet to I3 wallet to invest";
-                        walletTransaction.FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString())).Id;
-                        walletTransaction.ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString())).Id;
-                        walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
-                        walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
+                        WalletTransaction walletTransaction = new()
+                        {
+                            PaymentId = Guid.Parse(paymentId),
+                            Amount = payment.Amount,
+                            Fee = 0,
+                            Description = "Transfer money from I2 wallet to I3 wallet to invest",
+                            FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString())).Id,
+                            ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString())).Id,
+                            Type = WalletTransactionTypeEnum.CASH_OUT.ToString(),
+                            CreateBy = Guid.Parse(currentUser.userId)
+                        };
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
                         //Add I3 balance
@@ -268,6 +290,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         result.investedQuantity = investmentDTO.quantity;
                         result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")))).Name;
                         result.fee = walletTransaction.Fee + "%";
+
+                        NotificationDetailDTO notification = new()
+                        {
+                            Title = "Đầu tư vào dự án " + project.Name + " thành công.",
+                            Description = project.Id.ToString(),
+                            Image = project.Image
+                        };
+                        await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
+
+                        notification.Title = currentUser.fullName+" vừa đầu tư vào dự án "+project.Name+" của bạn.";
+                        await DistributedCacheExtensions.UpdateNotification(_cache, projectManager.Id.ToString(), notification);
                     }
                     else
                     {
@@ -289,6 +322,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         investment.UpdateBy = Guid.Parse(currentUser.userId);
                         investment.Status = TransactionStatusEnum.FAILED.ToString();
                         await _investmentRepository.UpdateInvestmentStatus(investment);
+                        NotificationDetailDTO notification = new()
+                        {
+                            Title = "Đầu tư vào dự án " + project.Name + " không thành công, vui lòng thử lại hoặc liên hệ với Krowd Help Center.",
+                            Description = project.Id.ToString(),
+                            Image = project.Image
+                        };
+                        await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
                     }
                 }
 

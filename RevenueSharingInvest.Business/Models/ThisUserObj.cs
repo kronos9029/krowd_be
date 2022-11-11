@@ -18,6 +18,7 @@ namespace RevenueSharingInvest.API
         public string investorRoleId { get; set; }
         public string businessManagerRoleId { get; set; }
         public string projectManagerRoleId { get; set; }
+        public string fullName { get; set; }
 
     }
 }

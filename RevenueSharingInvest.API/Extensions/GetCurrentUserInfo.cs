@@ -24,6 +24,7 @@ namespace RevenueSharingInvest.API.Extensions
                 currentUser.email = "";
                 currentUser.investorId = "";
                 currentUser.roleName = "";
+                currentUser.fullName = "";
             }
             else
             {
@@ -31,6 +32,7 @@ namespace RevenueSharingInvest.API.Extensions
                 currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
                 currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
                 currentUser.roleName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                currentUser.fullName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Actor).Value;
             }
 
             List<RoleDTO> roleList = await _roleService.GetAllRoles();

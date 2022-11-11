@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Caching.Distributed;
 using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
@@ -8,14 +9,17 @@ using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
+using RevenueSharingInvest.Data.Repositories.Repos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DistributedCacheExtensions = RevenueSharingInvest.Business.Services.Extensions.RedisCache.DistributedCacheExtensions;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
@@ -30,17 +34,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IAccountTransactionService _accountTransactionService;
         private readonly IProjectWalletRepository _projectWalletRepository;
         private readonly IRoleRepository _roleRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IDistributedCache _cache;
 
 
         public WithdrawRequestService(IWithdrawRequestRepository withdrawRequestRepository, 
-            IValidationService validationService, 
-            IMapper mapper, 
-            IInvestorWalletRepository investorWalletRepository, 
+            IValidationService validationService,
+            IMapper mapper,
+            IInvestorWalletRepository investorWalletRepository,
             IWalletTransactionService walletTransactionService,
             IAccountTransactionService accountTransactionService,
             IProjectWalletRepository projectWalletRepository,
             IInvestorRepository investorRepository,
-            IRoleRepository roleRepository)
+            IRoleRepository roleRepository,
+            IUserRepository userRepository,
+            IDistributedCache cache)
         {
             _withdrawRequestRepository = withdrawRequestRepository;
             _validationService = validationService;
@@ -51,16 +59,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _projectWalletRepository = projectWalletRepository;
             _roleRepository = roleRepository;
             _investorRepository = investorRepository;
+            _userRepository = userRepository;
+            _cache = cache;
         }
 
 
-        public async Task<GetWithdrawRequestDTO> CreateInvestorWithdrawRequest(WithdrawRequestDTO request, ThisUserObj currentUser)
+        public async Task<GetWithdrawRequestDTO> CreateWithdrawRequest(WithdrawRequestDTO request, ThisUserObj currentUser)
         {
             try
             {
                 string newRequestId;
                 WithdrawRequest withdrawRequest = new();
-                GetWithdrawRequestDTO getWithdrawRequestDTO = new();                
+                GetWithdrawRequestDTO getWithdrawRequestDTO = new();
+                List<Guid> admins = await _userRepository.GetUsersIdByRoleIdAndBusinessId(Guid.Parse(currentUser.adminRoleId), "");
 
                 if (currentUser.roleId.Equals(currentUser.investorRoleId)){
 
@@ -109,6 +120,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     };
                     _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
 
+                    NotificationDetailDTO notification = new()
+                    {
+                        Title = "Investor "+currentUser.fullName+" vừa tạo yêu cầu rút tiền.",
+                        Description = newRequestId
+                    };
+                    foreach (var admin in admins)
+                    {
+                        await DistributedCacheExtensions.UpdateNotification(_cache, admin.ToString(), notification);
+                    }
+                    
+                    
+
                 } else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
                 {
                     ProjectWallet fromWallet = await _projectWalletRepository.GetProjectWalletById(Guid.Parse(request.FromWalletId));
@@ -154,6 +177,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         CreateBy = withdrawRequest.CreateBy.ToString()
                     };
                     _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
+
+                    NotificationDetailDTO notification = new()
+                    {
+                        Title = "Project Owner " + currentUser.fullName + " vừa tạo yêu cầu rút tiền.",
+                        Description = newRequestId
+                    };
+                    
+                    foreach (var admin in admins)
+                    {
+                        await DistributedCacheExtensions.UpdateNotification(_cache, admin.ToString(), notification);
+                    }
                 }
                 return getWithdrawRequestDTO;
             }
@@ -164,14 +198,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> AdminApproveWithdrawRequest(ThisUserObj currentUser, string requestId, string receipt)
+        public async Task<dynamic> AdminApproveWithdrawRequest(ThisUserObj currentUser, GetWithdrawRequestDTO request, string receipt)
         {
             try
             {
                 var resultString = "";
-                dynamic result = await _withdrawRequestRepository.AdminApproveWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(requestId), receipt);
-                WithdrawRequest withdrawRequest = await _withdrawRequestRepository.GetWithdrawRequestByRequestId(Guid.Parse(requestId));
 
+                dynamic result = await _withdrawRequestRepository.AdminApproveWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(request.Id), receipt);
+                WithdrawRequest withdrawRequest = await _withdrawRequestRepository.GetWithdrawRequestByRequestId(Guid.Parse(request.Id));
+                NotificationDetailDTO notification = new()
+                {
+                    Title = "Yêu cầu rút tiền của bạn đã được duyệt, xin hãy kiểm tra tài khoản và xác nhận.",
+                    Description = withdrawRequest.Id.ToString()
+                };
                 string roleName = await _roleRepository.GetRoleNameByUserId((Guid)withdrawRequest.CreateBy);
                 if (roleName == null || roleName.Equals(""))
                     throw new NotFoundException("User not Exits!!");
@@ -180,11 +219,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     Investor investor = await _investorRepository.GetInvestorByUserId((Guid)withdrawRequest.CreateBy);
                     InvestorWallet wallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(investor.Id, "I1");
                     resultString = await _accountTransactionService.CreateWithdrawAccountTransaction(wallet, withdrawRequest, currentUser.userId, roleName);
+
+                    await DistributedCacheExtensions.UpdateNotification(_cache, withdrawRequest.CreateBy.ToString(), notification);
                 }
                 else if (roleName.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
                 {
                     ProjectWallet wallet = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType((Guid)withdrawRequest.CreateBy, "P1", null);
                     resultString = await _accountTransactionService.CreateWithdrawAccountTransaction(wallet, withdrawRequest, currentUser.userId, roleName);
+
+                    await DistributedCacheExtensions.UpdateNotification(_cache, withdrawRequest.CreateBy.ToString(), notification);
                 }
                     
                 return resultString;
@@ -195,11 +238,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> AdminResponeToWithdrawRequest(ThisUserObj currentUser, string requestId, string receipt)
+        public async Task<dynamic> AdminResponeToWithdrawRequest(ThisUserObj currentUser, GetWithdrawRequestDTO request, string receipt)
         {
             try
             {
-                dynamic result = await _withdrawRequestRepository.AdminApproveWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(requestId), receipt);
+                dynamic result = await _withdrawRequestRepository.AdminApproveWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(request.Id), receipt);
+                NotificationDetailDTO notification = new()
+                {
+                    Title = "Bạn có phản hồi của Admin từ yêu cầu rút tiền.",
+                    Description = request.Id
+                };
+                await DistributedCacheExtensions.UpdateNotification(_cache, request.CreateDate.ToString(), notification);
                 return result;
             }catch(Exception e)
             {
@@ -208,11 +257,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> ApproveWithdrawRequest(string userId, string requestId)
+        public async Task<dynamic> ApproveWithdrawRequest(string userId, GetWithdrawRequestDTO request)
         {
             try
             {
-                dynamic result = await _withdrawRequestRepository.InvestorApproveWithdrawRequest(Guid.Parse(userId), Guid.Parse(requestId));
+                dynamic result = await _withdrawRequestRepository.UserApproveWithdrawRequest(Guid.Parse(userId), Guid.Parse(request.Id));
 
                 return result;
             }catch(Exception e)
@@ -222,11 +271,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> AdminRejectWithdrawRequest(string userId, string requestId, string RefusalReason)
+        public async Task<dynamic> AdminRejectWithdrawRequest(string userId, GetWithdrawRequestDTO currentRequest, string RefusalReason)
         {
             try
             {
-                dynamic result = await _withdrawRequestRepository.AdminRejectWithdrawRequest(Guid.Parse(userId), Guid.Parse(requestId), RefusalReason);
+                dynamic result = await _withdrawRequestRepository.AdminRejectWithdrawRequest(Guid.Parse(userId), Guid.Parse(currentRequest.Id), RefusalReason);
+                NotificationDetailDTO notification = new()
+                {
+                    Title = "Yêu cầu rút tiền của bạn đã bị từ chối, vui lòng liên hệ Krowd Help Center để biết thêm chi tiết.",
+                    Description = currentRequest.Id
+                };
+                await DistributedCacheExtensions.UpdateNotification(_cache, currentRequest.CreateBy.ToString(), notification);
 
                 return result;
             }catch(Exception e)
@@ -236,11 +291,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> ReportWithdrawRequest(string userId, string requestId, string reportMessage)
+        public async Task<dynamic> ReportWithdrawRequest(ThisUserObj currentUser, GetWithdrawRequestDTO request, string reportMessage)
         {
             try
             {
-                dynamic result = await _withdrawRequestRepository.ReportWithdrawRequest(Guid.Parse(userId), Guid.Parse(requestId), reportMessage);
+                dynamic result = await _withdrawRequestRepository.ReportWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(request.Id), reportMessage);
+                NotificationDetailDTO notification = new()
+                {
+                    Title = "Bạn có phản hồi của "+currentUser.fullName+" từ yêu cầu rút tiền.",
+                    Description = request.Id
+                };
+                await DistributedCacheExtensions.UpdateNotification(_cache, request.UpdateBy.ToString(), notification);
                 return result;
             }
             catch (Exception e)

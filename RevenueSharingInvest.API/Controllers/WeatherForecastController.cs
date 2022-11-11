@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Firebase.Storage;
+using FirebaseAdmin.Messaging;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RevenueSharingInvest.API.Extensions;
@@ -6,17 +9,23 @@ using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Business.Services.Extensions.iText;
 using RevenueSharingInvest.Business.Services.Impls;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
+using DistributedCacheExtensions = RevenueSharingInvest.Business.Services.Extensions.RedisCache.DistributedCacheExtensions;
+using Notification = RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs.Notification;
 
 namespace RevenueSharingInvest.API.Controllers
 {
@@ -27,35 +36,65 @@ namespace RevenueSharingInvest.API.Controllers
         private readonly IITextService _iTextService;
         private readonly IRoleService _roleService;
         private readonly IUserService _userService;
+        private readonly IDistributedCache _distributedCache;
 
-        public WeatherForecastController(IITextService iTextService, IRoleService roleService, IUserService userService)
+        public WeatherForecastController(IITextService iTextService, IRoleService roleService, IUserService userService, IDistributedCache distributedCache)
         {
             _iTextService = iTextService;
             _roleService = roleService;
             _userService = userService;
+            _distributedCache = distributedCache;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Getokok(string projectId, decimal amount)
+        public async Task<IActionResult> UpdateNoti(string userId, NotificationDetailDTO newNoti)
         {
-            string accessKey = GenerateAccessKey();
-            string secretKey = GenerateSecretKey();
+           var result = await DistributedCacheExtensions.UpdateNotification(_distributedCache, userId, newNoti);
 
-
-            //IntegrateInfo info = await _projectService.GetIntegrateInfoByUserEmail(request.projectId);
-
-            //string userMessage = "projectId=" + request.projectId + "&accessKey=" + request.accessKey;
-            //string systemMessage = "projectId=" + info.ProjectId + "&accessKey=" + info.AccessKey;
-
-            //string userSignature = CreateSignature(userMessage, info.SecretKey);
-            //string systemSignature = CreateSignature(systemMessage, info.SecretKey);
-
-            //bool check = userSignature.Equals(systemMessage);
-
-            return Ok(0);
+            return Ok(result);
         }
 
-        private string CreateSignature(string message, string key)
+        [HttpGet]
+        public async Task<IActionResult> GetNoti(string userId, bool seen)
+        {
+            var result = await DistributedCacheExtensions.GetNotification(_distributedCache, userId, seen);
+            return Ok(result);
+        }
+
+/*        [HttpPost]
+        public async Task<IActionResult> Getokok()
+        {
+            var registrationToken = "dNixyIUcTbK6xix5M898n1:APA91bESs3aJM2xR0I-uTWUnAVvhadd3oRVxqqI7OnssXhD7GkR6bEOPJtI-WfOgxeE1tSiyp_PSeAkUHgnfd86rNKtQgSTe4D06LPfaW5fMdE158APDccruowYZJXYYducQCBf4GuQR";
+            // Create a list containing up to 500 messages.
+            var messages = new List<Message>()
+            {
+                new Message()
+                {
+                    Notification = new Notification()
+                    {
+                        Title = "Price drop",
+                        Body = "5% off all electronics",
+                    },
+                    Token = registrationToken,
+                },
+                new Message()
+                {
+                    Notification = new Notification()
+                    {
+                        Title = "Price drop",
+                        Body = "2% off all books",
+                    },
+                    Topic = "readers-club",
+                },
+            };
+
+            var response = await FirebaseMessaging.DefaultInstance.SendAllAsync(messages);
+            // See the BatchResponse reference documentation
+            // for the contents of response.
+            return Ok(response);
+        }*/
+
+/*        private string CreateSignature(string message, string key)
         {
             try
             {
@@ -103,7 +142,8 @@ namespace RevenueSharingInvest.API.Controllers
 
             var resultString = new String(Charsarr);
             return resultString;
-        }
+        }*/
 
     }
+
 }
