@@ -15,7 +15,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs
     public class NotificationDetail
     {
         public string Title { get; set; }
-        public string Description { get; set; }
+        public string EntityId { get; set; }
         public string Image { get; set; }
         public string CreateDate { get; set; }
         public bool Seen { get; set; }
@@ -23,7 +23,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs
     public class NotificationDetailDTO
     {
         public string Title { get; set; }
-        public string Description { get; set; }
+        public string EntityId { get; set; }
         public string Image { get; set; }
     }
 

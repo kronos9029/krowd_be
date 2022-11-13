@@ -15,7 +15,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
             NotificationDetail notification = new()
             {
                 Title = newNoti.Title ??= "",
-                Description = newNoti.Description??="",
+                EntityId = newNoti.EntityId ??= "",
                 Image = newNoti.Image ??="",
                 CreateDate = DateTimePicker.GetDateTimeByTimeZone().ToString(),
                 Seen = false

@@ -205,7 +205,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     NotificationDetailDTO notification = new()
                     {
                         Title = "Đầu tư vào dự án " + project.Name + " không thành công, vui lòng thử lại hoặc liên hệ với Krowd Help Center.",
-                        Description = project.Id.ToString(),
+                        EntityId = project.Id.ToString(),
                         Image = project.Image
                     };
                     await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
@@ -294,7 +294,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         NotificationDetailDTO notification = new()
                         {
                             Title = "Đầu tư vào dự án " + project.Name + " thành công.",
-                            Description = project.Id.ToString(),
+                            EntityId = project.Id.ToString(),
                             Image = project.Image
                         };
                         await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
@@ -325,7 +325,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         NotificationDetailDTO notification = new()
                         {
                             Title = "Đầu tư vào dự án " + project.Name + " không thành công, vui lòng thử lại hoặc liên hệ với Krowd Help Center.",
-                            Description = project.Id.ToString(),
+                            EntityId = project.Id.ToString(),
                             Image = project.Image
                         };
                         await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);

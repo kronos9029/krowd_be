@@ -123,7 +123,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     NotificationDetailDTO notification = new()
                     {
                         Title = "Investor "+currentUser.fullName+" vừa tạo yêu cầu rút tiền.",
-                        Description = newRequestId
+                        EntityId = newRequestId
                     };
                     foreach (var admin in admins)
                     {
@@ -181,7 +181,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     NotificationDetailDTO notification = new()
                     {
                         Title = "Project Owner " + currentUser.fullName + " vừa tạo yêu cầu rút tiền.",
-                        Description = newRequestId
+                        EntityId = newRequestId
                     };
                     
                     foreach (var admin in admins)
@@ -209,7 +209,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 NotificationDetailDTO notification = new()
                 {
                     Title = "Yêu cầu rút tiền của bạn đã được duyệt, xin hãy kiểm tra tài khoản và xác nhận.",
-                    Description = withdrawRequest.Id.ToString()
+                    EntityId = withdrawRequest.Id.ToString()
                 };
                 string roleName = await _roleRepository.GetRoleNameByUserId((Guid)withdrawRequest.CreateBy);
                 if (roleName == null || roleName.Equals(""))
@@ -246,7 +246,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 NotificationDetailDTO notification = new()
                 {
                     Title = "Bạn có phản hồi của Admin từ yêu cầu rút tiền.",
-                    Description = request.Id
+                    EntityId = request.Id
                 };
                 await DistributedCacheExtensions.UpdateNotification(_cache, request.CreateDate.ToString(), notification);
                 return result;
@@ -279,7 +279,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 NotificationDetailDTO notification = new()
                 {
                     Title = "Yêu cầu rút tiền của bạn đã bị từ chối, vui lòng liên hệ Krowd Help Center để biết thêm chi tiết.",
-                    Description = currentRequest.Id
+                    EntityId = currentRequest.Id
                 };
                 await DistributedCacheExtensions.UpdateNotification(_cache, currentRequest.CreateBy.ToString(), notification);
 
@@ -299,7 +299,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 NotificationDetailDTO notification = new()
                 {
                     Title = "Bạn có phản hồi của "+currentUser.fullName+" từ yêu cầu rút tiền.",
-                    Description = request.Id
+                    EntityId = request.Id
                 };
                 await DistributedCacheExtensions.UpdateNotification(_cache, request.UpdateBy.ToString(), notification);
                 return result;

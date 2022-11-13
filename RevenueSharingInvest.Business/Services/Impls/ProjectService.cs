@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FirebaseAdmin.Messaging;
 using Google.Api.Gax.ResourceNames;
 using Hangfire;
 using Microsoft.Extensions.Caching.Distributed;
@@ -528,8 +529,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     NotificationDetailDTO noti = new()
                     {
-                        Title = currentUser.fullName + " đã tạo dự án " + entity.Name,
-                        Description = newId.id
+                        Title = currentUser.fullName + " đã tạo dự án mới: " + entity.Name,
+                        EntityId = newId.id
                     };
 
                     List<Guid> admins = await _userRepository.GetUsersIdByRoleIdAndBusinessId(Guid.Parse(currentUser.adminRoleId),"");
@@ -1207,6 +1208,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     {
                         if (status.Equals(ProjectStatusEnum.WAITING_TO_PUBLISH.ToString()))
                         {
+
                             //Tạo Schedule chuyển status WAITING_TO_PUBLISH to CALLING_FOR_INVESTMENT
                             _backgroundJobClient.Schedule<ProjectService>(
                                 projectService => projectService
@@ -1221,15 +1223,30 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             //_backgroundJobClient.Schedule<ProjectService>(
                             //    projectService => projectService
                             //    .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(project.EndDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+                            NotificationDetailDTO notification = new()
+                            {
+                                Title = "Dự án " + project.Name + " của bạn đã được duyệt và đang chờ đến ngày gọi vốn và sẽ được công bố/ công khai khi đến ngày.",
+                                EntityId = projectId.ToString(),
+                                Image = project.Image
+                            };                        
+                            await DistributedCacheExtensions.UpdateNotification(_cache, project.CreateBy.ToString(), notification);
                         }
                         else if (status.Equals(ProjectStatusEnum.ACTIVE.ToString()))
                         {
-                            List<Investment> investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, projectId.ToString(), null, TransactionStatusEnum.SUCCESS.ToString(), Guid.Parse(currentUser.roleId));
-                            InvestorWallet investorWallet = new InvestorWallet();
+                            InvestorWallet investorWallet = new();
+                            WalletTransaction walletTransaction = new();
+                            NotificationDetailDTO notiForInvestor = new()
+                            {
+                                Title = "Dự án " + project.Name + " mà bạn góp vốn đã được đưa vào hoạt động.",
+                                EntityId = projectId.ToString(),
+                                Image = project.Image
+                            };
+                            
+                            List<Investment> investmentList = await _investmentRepository
+                                .GetAllInvestments(0, 0, null, null, projectId.ToString(), null, TransactionStatusEnum.SUCCESS.ToString(), Guid.Parse(currentUser.roleId));
                             ProjectWallet projectWallet = await _projectWalletRepository
                                 .GetProjectWalletByProjectManagerIdAndType(project.ManagerId, WalletTypeEnum.P3.ToString(), projectId);
                             projectWallet.UpdateBy = Guid.Parse(currentUser.userId);
-                            WalletTransaction walletTransaction = new();
 
                             foreach (Investment item in investmentList)
                             {
@@ -1240,16 +1257,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
 
                                 //Create CASH_OUT WalletTransaction from I3 to P3
-                                walletTransaction = new WalletTransaction();
-                                walletTransaction.Amount = item.TotalPrice;
-                                walletTransaction.Fee = 0;
-                                walletTransaction.Description = "Transfer money from I3 wallet to P3 wallet to prepare for activation";
-                                walletTransaction.FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.InvestorId, WalletTypeEnum.I3.ToString())).Id;
+                                walletTransaction = new WalletTransaction
+                                {
+                                    Amount = item.TotalPrice,
+                                    Fee = 0,
+                                    Description = "Transfer money from I3 wallet to P3 wallet to prepare for activation",
+                                    FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.InvestorId, WalletTypeEnum.I3.ToString())).Id,
+                                    CreateBy = Guid.Parse(currentUser.userId),
+                                    Type = WalletTransactionTypeEnum.CASH_OUT.ToString()
+
+                                };
                                 walletTransaction.InvestorWalletId = walletTransaction.FromWalletId;
                                 walletTransaction.ToWalletId = (await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(project.ManagerId, WalletTypeEnum.P3.ToString(), projectId)).Id;
                                 walletTransaction.ProjectWalletId = walletTransaction.ToWalletId;
-                                walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
-                                walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
                                 await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
                                 //Add P3 balance
@@ -1260,12 +1280,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 walletTransaction.Description = "Receive money from I3 wallet to P3 wallet to prepare for activation";
                                 walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                                 await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+
+                                await DistributedCacheExtensions.UpdateNotification(_cache, investorWallet.CreateBy.ToString(), notiForInvestor);
+
                             }
 
+                            NotificationDetailDTO notification = new()
+                            {
+                                Title = "Dự án " + project.Name + " của bạn đã gọi vốn thành công và đang hoạt động.",
+                                EntityId = projectId.ToString(),
+                                Image = project.Image
+                            };
+                            await DistributedCacheExtensions.UpdateNotification(_cache, project.CreateBy.ToString(), notification);
+
                             //Create DailyReports
-                            DailyReport dailyReport = new DailyReport();
-                            dailyReport.CreateDate = DateTimePicker.GetDateTimeByTimeZone();
-                            dailyReport.CreateBy = Guid.Parse(currentUser.userId);
+                            DailyReport dailyReport = new()
+                            {
+                                CreateDate = DateTimePicker.GetDateTimeByTimeZone(),
+                                CreateBy = Guid.Parse(currentUser.userId)
+                            };
                             List<Stage> stageList = await _stageRepository.GetAllStagesByProjectId(projectId, 0, 0, null);
                             int numOfReport;
                             foreach (Stage stage in stageList)
@@ -1379,8 +1412,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 NotificationDetailDTO notification = new();
 
-                
-
                 Project project = await _projectRepository.GetProjectById(projectId);
                 if (project.Status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
                 {
@@ -1388,7 +1419,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     {
                         var result = await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.DENIED.ToString(), Guid.Parse(currentUser.userId));
                         notification.Title = "Dự án "+project.Name+" của bạn đã bị từ chối vì ví do quá hạn.";
-                        notification.Description = projectId.ToString();
+                        notification.EntityId = projectId.ToString();
                         notification.Image = project.Image;
                         await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
                         return result;
@@ -1401,7 +1432,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     {
                         var result = await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), Guid.Parse(currentUser.userId));
                         notification.Title = "Dự án " + project.Name + " của bạn đã được chấp thuận và đang chờ được góp vốn.";
-                        notification.Description = projectId.ToString();
+                        notification.EntityId = projectId.ToString();
                         notification.Image = project.Image;
                         await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
                         return result;
@@ -1414,7 +1445,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     {
                         var result = await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString(), Guid.Parse(currentUser.userId));
                         notification.Title = "Dự án " + project.Name + " của bạn đã hết thời gian gọi vốn.";
-                        notification.Description = projectId.ToString();
+                        notification.EntityId = projectId.ToString();
                         notification.Image = project.Image;
                         await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
                         return result;
@@ -1424,7 +1455,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     {
                         var result = await _projectRepository.UpdateProjectStatus(projectId, ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString(), Guid.Parse(currentUser.userId));
                         notification.Title = "Dự án " + project.Name + " của bạn đã gọi vốn thành công và đang chờ để triển khai.";
-                        notification.Description = projectId.ToString();
+                        notification.EntityId = projectId.ToString();
                         notification.Image = project.Image;
                         await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
                         return result;
