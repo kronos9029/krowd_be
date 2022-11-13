@@ -15,7 +15,8 @@ namespace RevenueSharingInvest.Business.Helpers
         public string PartnerCode { get; set; }
         public string AccessKey { get; set; }
         public string SecretKey { get; set; }
-        public string ReturnUrl { get; set; }
+        public string InvestorReturnUrl { get; set; }
+        public string ProjectManagerReturnUrl { get; set; }
         public string NotifyUrl { get; set; }
     }
 }
