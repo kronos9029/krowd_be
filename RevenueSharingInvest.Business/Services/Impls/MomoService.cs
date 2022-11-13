@@ -16,6 +16,7 @@ using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using static Google.Apis.Requests.BatchRequest;
+using RevenueSharingInvest.Business.Models.Constant;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
@@ -37,7 +38,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 string accessKey = _momoSettings.AccessKey;
                 string serectkey = _momoSettings.SecretKey;
                 string orderInfo = "test";
-                string returnUrl = _momoSettings.ReturnUrl;
+                
                 string notifyurl = _momoSettings.NotifyUrl; //lưu ý: notifyurl không được sử dụng localhost, có thể sử dụng ngrok để public localhost trong quá trình test
 
                 long amount = request.amount;
@@ -50,6 +51,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 userInfoJson.Add("phoneNumber", "");
                 userInfoJson.Add("email", request.email);
 
+                string returnUrl = "";
+                if (request.role.Equals(RoleEnum.INVESTOR.ToString()))
+                    returnUrl = _momoSettings.InvestorReturnUrl;                
+                if (request.role.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
+                    returnUrl = _momoSettings.ProjectManagerReturnUrl;
 
                 //Before sign HMAC SHA256 signature
                 string rawHash = "accessKey=" + accessKey +
@@ -122,10 +128,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 long amount = request.amount;
                 string orderid = Guid.NewGuid().ToString(); //mã đơn hàng
                 string notifyurl = _momoSettings.NotifyUrl; //lưu ý: notifyurl không được sử dụng localhost, có thể sử dụng ngrok để public localhost trong quá trình test
-                string returnUrl = _momoSettings.ReturnUrl;
                 string extraData = "";
                 string requestType = "linkWallet";
                 string orderInfo = "test Link and Pay";
+
+                string returnUrl = "";
+                if (request.role.Equals(RoleEnum.INVESTOR.ToString()))
+                    returnUrl = _momoSettings.InvestorReturnUrl;
+                if (request.role.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
+                    returnUrl = _momoSettings.ProjectManagerReturnUrl;
 
                 string rawHash = "accessKey=" + accessKey +
                                 "&amount=" + amount +
