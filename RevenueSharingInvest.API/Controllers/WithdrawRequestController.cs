@@ -103,7 +103,7 @@ namespace RevenueSharingInvest.API.Controllers
                 return Ok(result);
             }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role Investor or Project Manager can perform this action!!!");
         }
 
 

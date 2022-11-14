@@ -248,7 +248,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     Title = "Bạn có phản hồi của Admin từ yêu cầu rút tiền.",
                     EntityId = request.Id
                 };
-                await DistributedCacheExtensions.UpdateNotification(_cache, request.CreateDate.ToString(), notification);
+                await DistributedCacheExtensions.UpdateNotification(_cache, request.CreateBy.ToString(), notification);
                 return result;
             }catch(Exception e)
             {
