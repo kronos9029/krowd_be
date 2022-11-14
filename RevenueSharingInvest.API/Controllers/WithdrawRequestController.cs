@@ -88,7 +88,7 @@ namespace RevenueSharingInvest.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
-            if(currentUser.roleId.Equals(currentUser.investorRoleId))
+            if(currentUser.roleId.Equals(currentUser.investorRoleId) || currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
                 var result = await _withdrawRequestService.CreateWithdrawRequest(request, currentUser);
                 return Ok(result);

@@ -950,12 +950,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 if (businessId == null || businessId.Equals(""))
                 {
-                    query = "SELECT Id FROM [Users] WHERE RoleId = @RoleId ";
+                    query = "SELECT Id FROM [User] WHERE RoleId = @RoleId ";
                     parameters.Add("RoleId", roleId, DbType.Guid);
                 }
                 else
                 {
-                    query = "SELECT Id FROM [Users] WHERE RoleId = @RoleId AND BusinessId = @BusinessId";
+                    query = "SELECT Id FROM [User] WHERE RoleId = @RoleId AND BusinessId = @BusinessId";
                     parameters.Add("RoleId", roleId, DbType.Guid);
                     parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
                 }

@@ -137,8 +137,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 //Subtract  balance
                 from.Balance = -amount;
                 from.UpdateBy = Guid.Parse(userId);
-                if (await _investorWalletRepository.UpdateInvestorWalletBalance(from) < 1)
-                    throw new UpdateObjectException("Update Investor Wallet "+fromType+" Balance Failed!!");
+                if (fromType.Contains("I"))
+                {
+                    if (await _investorWalletRepository.UpdateInvestorWalletBalance(from) < 1)
+                        throw new UpdateObjectException("Update Investor Wallet " + fromType + " Balance Failed!!");
+                } else
+                {
+                    if (await _projectWalletRepository.UpdateProjectWalletBalance(from) < 1)
+                        throw new UpdateObjectException("Update Project Wallet " + fromType + " Balance Failed!!");
+                }
+
 
                 //Create CASH_OUT WalletTransaction
                 WalletTransaction walletTransaction = new()
@@ -157,8 +165,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 //Add to balance
                 to.Balance = amount;
-                if (await _investorWalletRepository.UpdateInvestorWalletBalance(to) < 1)
-                    throw new UpdateObjectException("Update Investor Wallet " + toType + " Balance Failed!!");
+                if (fromType.Contains("I"))
+                {
+                    if (await _investorWalletRepository.UpdateInvestorWalletBalance(to) < 1)
+                        throw new UpdateObjectException("Update Investor Wallet " + toType + " Balance Failed!!");
+                }
+                else
+                {
+                    if (await _projectWalletRepository.UpdateProjectWalletBalance(to) < 1)
+                        throw new UpdateObjectException("Update Project Wallet " + toType + " Balance Failed!!");
+                }
+
 
                 //Create CASH_IN WalletTransaction
                 walletTransaction.Description = "Receive money from " + fromType + " wallet to " + toType + " wallet";

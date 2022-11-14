@@ -153,7 +153,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 InvestorWallet I1 = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(investor.Id, WalletTypeEnum.I1.ToString());
                 I1.Balance += realAmount;
                 I1.UpdateDate = DateTimePicker.GetDateTimeByTimeZone();
-                I1.UpdateBy = accountTransaction.FromUserId;
+                I1.UpdateBy = (Guid)accountTransaction.FromUserId;
 
                 if ((await _investorWalletRepository.UpdateWalletBalance(I1)) == 0)
                     throw new CreateObjectException("Investor Top Up Failed!!");
@@ -178,7 +178,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new NotFoundException("I2 Wallet Not Found!!");
 
                 I1.Balance -= realAmount;
-                I1.UpdateBy = accountTransaction.FromUserId;
+                I1.UpdateBy = (Guid)accountTransaction.FromUserId;
                 if ((await _investorWalletRepository.UpdateWalletBalance(I1)) == 0)
                     throw new CreateObjectException("Update I1 Wallet Balance Failed!!");
                 
