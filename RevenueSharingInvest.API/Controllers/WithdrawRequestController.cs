@@ -76,9 +76,18 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> GetWithdrawRequestById(string id)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
-
-            var result = await _withdrawRequestService.GetWithdrawRequestByRequestIdAndUserId(id, currentUser.userId);
-            return Ok(result);
+            if (currentUser.roleId.Equals(currentUser.adminRoleId))
+            {
+                var result = await _withdrawRequestService.GetWithdrawRequestById(id);
+                return Ok(result);
+            }
+            else
+            {
+                var result = await _withdrawRequestService.GetWithdrawRequestByRequestIdAndUserId(id, currentUser.userId);
+                return Ok(result);
+            }
+            
+            
         }
 
         //CREATE

@@ -45,7 +45,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         ExtraData, "
                     + "         Signature, " 
                     + "         CreateDate," 
-                    + "         Type  ) "
+                    + "         Type," 
+                    + "         WithdrawRequestId ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -68,7 +69,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @ExtraData, "
                     + "         @Signature, " 
                     + "         @CreateDate," 
-                    + "         @Type) ";
+                    + "         @Type," 
+                    + "         @WithdrawRequestId) ";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("FromUserId", accountTransactionDTO.FromUserId, DbType.Guid);
@@ -91,6 +93,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Signature", accountTransactionDTO.Signature, DbType.String);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("Type", accountTransactionDTO.Type, DbType.String);
+                parameters.Add("WithdrawRequestId", accountTransactionDTO.WithdrawRequestId, DbType.Guid);
 
 
                 using var connection = CreateConnection();

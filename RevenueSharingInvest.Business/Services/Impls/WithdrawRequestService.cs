@@ -409,6 +409,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 WithdrawRequest withdrawRequest = await _withdrawRequestRepository.GetWithdrawRequestByRequestId(Guid.Parse(id));
                 GetWithdrawRequestDTO withdrawRequestDTO = _mapper.Map<GetWithdrawRequestDTO>(withdrawRequest);
+                if (withdrawRequestDTO == null)
+                    throw new NotFoundException("Withdraw Request Not Found!!");
+
                 withdrawRequestDTO.CreateDate = await _validationService.FormatDateOutput(withdrawRequestDTO.CreateDate);
                 withdrawRequestDTO.UpdateDate = await _validationService.FormatDateOutput(withdrawRequestDTO.UpdateDate);
                 return withdrawRequestDTO;
