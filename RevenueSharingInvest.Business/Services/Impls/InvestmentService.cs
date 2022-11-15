@@ -117,6 +117,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     walletTransaction.Description = "Receive money from I3 wallet to I2 wallet due to investment cancellation";
                     walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                     await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+
+                    //Update Project Amount
+                    await _projectRepository.UpdateProjectInvestedCapital(investment.ProjectId, (double)-investment.TotalPrice, Guid.Parse(currentUser.userId));
                 }
                 else throw new UpdateObjectException("Cancel failed!!!");
 
