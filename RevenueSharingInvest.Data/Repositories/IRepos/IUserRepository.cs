@@ -14,14 +14,23 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<string> CreateUser(User userDTO);
 
         //READ
-        public Task<List<User>> GetAllUsers(int pageIndex, int pageSize, string businessId, string projectManagerId, string roleId, string status, string thisUserRoleId);
+        //public Task<List<User>> GetAllUsers(int pageIndex, int pageSize, string businessId, string projectManagerId, string projectId, string roleId, string status, string thisUserRoleId);
+        public Task<List<User>> GetAllAdmins();
+        public Task<int> CountAllAdmins();
+        public Task<List<User>> GetAllBusinesManagers(int pageIndex, int pageSize, Guid? businessId, string status);
+        public Task<int> CountAllBusinesManagers(Guid? businessId, string status);
+        public Task<List<User>> GetAllProjectManagers(int pageIndex, int pageSize, Guid? businessId, Guid? projectId, string status);
+        public Task<int> CountAllProjectManagers(Guid? businessId, Guid? projectId, string status);
+        public Task<List<User>> GetAllInvestors(int pageIndex, int pageSize, Guid? projectId, string status);
+        public Task<int> CountAllInvestors(Guid? projectId, string status);
+
         public Task<User> GetUserById(Guid userId);
         public Task<User> GetUserByEmail(string email);
         public Task<User> GetBusinessManagerByBusinessId(Guid businessId);
         public Task<User> GetProjectManagerByProjectId(Guid projectId);
         public Task<List<User>> GetProjectMembers(Guid projectId);
         public Task<List<User>> GetUserByBusinessId(Guid businessId);
-        public Task<int> CountUser(string businessId, string projectManagerId, string roleId, string status, string thisUserRoleId);
+        //public Task<int> CountUser(string businessId, string projectManagerId, string projectId, string roleId, string status, string thisUserRoleId);
         public Task<User> BusinessManagerGetUserById(Guid businessId, Guid userid);
         public Task<User> ProjectManagerGetUserbyId(Guid managerId, Guid id);
         public Task<Guid> GetProjectIdByManagerEmail(string email);

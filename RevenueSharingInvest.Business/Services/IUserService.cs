@@ -17,7 +17,12 @@ namespace RevenueSharingInvest.Business.Services
         public Task<IdDTO> CreateUser(CreateUserDTO userDTO, ThisUserObj currentUser);
 
         //READ
-        public Task<AllUserDTO> GetAllUsers(int pageIndex, int pageSize, string businessId, string role, string status, ThisUserObj currentUser);
+        //public Task<AllUserDTO> GetAllUsers(int pageIndex, int pageSize, string businessId, string projectId, string role, string status, ThisUserObj currentUser);
+        public Task<AllUserDTO> GetAllAdmins(ThisUserObj currentUser);
+        public Task<AllUserDTO> GetAllBusinesManagers(int pageIndex, int pageSize, Guid? businessId, string status, ThisUserObj currentUser);
+        public Task<AllUserDTO> GetAllProjectManagers(int pageIndex, int pageSize, Guid? businessId, Guid? projectId, string status, ThisUserObj currentUser);
+        public Task<AllUserDTO> GetAllInvestors(int pageIndex, int pageSize, Guid? projectId, string status, ThisUserObj currentUser);
+
         public Task<GetUserDTO> GetUserById(Guid userId);
         public Task<GetUserDTO> GetUserByEmail(String email);
         //public Task<List<User>> GetUserByBusinessId(Guid businessId);

@@ -389,10 +389,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new NotFoundException("This investorId is not existed!!!");
                 }
                 if (status != null && !Enum.IsDefined(typeof(TransactionStatusEnum), status)) throw new InvalidFieldException("status must be WAITING or SUCCESS or FAILED or CANCELED!!!");
-
-                if (currentUser.roleId.Equals(currentUser.businessManagerRoleId, StringComparison.InvariantCultureIgnoreCase) 
+                
+                if (currentUser.roleId.Equals(currentUser.adminRoleId, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    if (businessId != null && projectId != null)
+                    {
+                        Project project = await _projectRepository.GetProjectById(Guid.Parse(projectId));
+                        if (!project.BusinessId.Equals(Guid.Parse(businessId))) throw new InvalidFieldException("This Project's projectId is not belong to this Business's businessId!!!");
+                    }
+                }
+                else if (currentUser.roleId.Equals(currentUser.businessManagerRoleId, StringComparison.InvariantCultureIgnoreCase) 
                     || currentUser.roleId.Equals(currentUser.projectManagerRoleId, StringComparison.InvariantCultureIgnoreCase))
                 {
+                    if (currentUser.roleId.Equals(currentUser.projectManagerRoleId, StringComparison.InvariantCultureIgnoreCase) && projectId == null)
+                        throw new InvalidFieldException("projectId can not be empty!!!");
+
                     if (businessId != null && !currentUser.businessId.Equals(businessId, StringComparison.InvariantCultureIgnoreCase))
                         throw new InvalidFieldException("This businessId is not match with your businessId!!!");
 
