@@ -27,5 +27,12 @@ namespace RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs
         public string Image { get; set; }
     }
 
+    public class PushNotification
+    {
+        public string Title { get; set; }
+        public string Body { get; set; }
+        public string ImageUrl { get; set; }
+    }
+
 
 }

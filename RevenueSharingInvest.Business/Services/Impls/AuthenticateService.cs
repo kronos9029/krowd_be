@@ -45,7 +45,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
-        public async Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken)
+        public async Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken, string deviceToken)
         {
             FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
             string uid = decryptedToken.Uid;
@@ -68,14 +68,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 Guid roleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.INVESTOR.ToString()));
 
                 Investor investor = new();
-                User newInvestorUser = new();
-
-                newInvestorUser.Email = email;
-                //newInvestorUser.CreateDate = createdDate;
-                newInvestorUser.Image = ImageUrl;
-                newInvestorUser.RoleId = roleId;
-                newInvestorUser.LastName = lastName;
-                newInvestorUser.Status = ObjectStatusEnum.ACTIVE.ToString();
+                User newInvestorUser = new()
+                {
+                    Email = email,
+                    //newInvestorUser.CreateDate = createdDate;
+                    Image = ImageUrl,
+                    RoleId = roleId,
+                    LastName = lastName,
+                    Status = ObjectStatusEnum.ACTIVE.ToString(),
+                    DeviceToken = deviceToken ?? ""
+                };
 
                 //Tạo User object Role INVESTOR
                 string newUserID = await _userRepository.CreateUser(newInvestorUser);

@@ -40,7 +40,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateBy, "
                     + "         UpdateDate, "
                     + "         UpdateBy," 
-                    + "         SecretKey ) "
+                    + "         SecretKey," 
+                    + "         DeviceToken) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -55,7 +56,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
                     + "         @UpdateBy," 
-                    + "         @SecretKey )";
+                    + "         @SecretKey," 
+                    + "         @DeviceToken)";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("RoleId", userDTO.RoleId, DbType.Guid);
@@ -70,6 +72,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", userDTO.CreateBy, DbType.Guid);
                 parameters.Add("SecretKey", userDTO.SecretKey??="", DbType.String);
+                parameters.Add("DeviceToken", userDTO.DeviceToken??="", DbType.String);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();

@@ -41,9 +41,9 @@ namespace RevenueSharingInvest.API.Controllers
 
         [HttpPost]
         [Route("investor")]
-        public async Task<IActionResult> GetTokenInvestor([FromQuery] string token)
+        public async Task<IActionResult> GetTokenInvestor([FromQuery] string token, string deviceToken)
         {
-            var result = await _authenticateService.GetTokenInvestor(token);
+            var result = await _authenticateService.GetTokenInvestor(token, deviceToken);
             return Ok(result);
         }
 
