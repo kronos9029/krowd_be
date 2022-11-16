@@ -1448,6 +1448,64 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         notification.EntityId = projectId.ToString();
                         notification.Image = project.Image;
                         await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
+
+                        //REFUND
+                        //Chuyển lại tiền cho Investor
+                        List<Investment> investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, project.Id.ToString(), null, TransactionStatusEnum.SUCCESS.ToString(), Guid.Parse(currentUser.roleId));
+                        List<PaidInvestorDTO> paidInvestorList = new List<PaidInvestorDTO>();
+                        PaidInvestorDTO paidInvestor = new PaidInvestorDTO();
+                        InvestorWallet investorWallet = new InvestorWallet();
+                        WalletTransaction walletTransaction = new WalletTransaction();
+
+                        foreach (Investment item in investmentList)
+                        {
+                            if (paidInvestorList.Find(x => x.investorId.Equals(item.InvestorId)) == null)
+                                paidInvestorList.Add(new PaidInvestorDTO(item.InvestorId, (double)item.TotalPrice));
+                            else
+                            {
+                                var foundInvestor = paidInvestorList.ToDictionary(x => x.investorId);
+                                paidInvestor = paidInvestorList.Find(x => x.investorId.Equals(item.InvestorId));
+                                if (foundInvestor.TryGetValue(paidInvestor.investorId, out paidInvestor))
+                                    paidInvestor.amount = paidInvestor.amount + (double)item.TotalPrice;
+                            }
+                        }                       
+
+                        foreach (PaidInvestorDTO item in paidInvestorList)
+                        {
+                            //Subtract I3 balance
+                            investorWallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.investorId, WalletTypeEnum.I3.ToString());
+                            investorWallet.Balance = -item.amount;
+                            investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
+                            await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
+
+                            //Create CASH_OUT WalletTransaction from I3 to I2
+                            walletTransaction = new WalletTransaction();
+                            walletTransaction.Amount = item.amount;
+                            walletTransaction.Fee = 0;
+                            walletTransaction.Description = "Transfer money from I3 wallet to I2 wallet due to unsuccessful project calling for investment";
+                            walletTransaction.FromWalletId = investorWallet.Id;
+                            walletTransaction.ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.investorId, WalletTypeEnum.I2.ToString())).Id;
+                            walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
+                            walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
+                            await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+
+                            //Add I2 balance
+                            investorWallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.investorId, WalletTypeEnum.I2.ToString());
+                            investorWallet.Balance = item.amount;
+                            investorWallet.UpdateBy = Guid.Parse(currentUser.userId);
+                            await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
+
+                            //Create CASH_IN WalletTransaction from I3 to I2
+                            walletTransaction.Description = "Receive money from I3 wallet to I2 wallet due to unsuccessful project calling for investment";
+                            walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
+                            await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+
+                            //Notification
+                            notification.Title = "Nhận lại tiền từ dự án " + project.Name + " do gọi vốn không thành công.";
+                            notification.EntityId = projectId.ToString();
+                            notification.Image = project.Image;
+                            await DistributedCacheExtensions.UpdateNotification(_cache, (await _userRepository.GetUserByInvestorId(item.investorId)).Id.ToString(), notification);
+                        }
                         return result;
                     }
                         
