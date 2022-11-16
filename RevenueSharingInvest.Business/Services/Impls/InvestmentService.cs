@@ -81,7 +81,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (!investment.InvestorId.Equals(Guid.Parse(currentUser.investorId))) throw new InvalidFieldException("This is not your Investment!!!");
                 if (!investment.Status.Equals(TransactionStatusEnum.SUCCESS.ToString())) throw new UpdateObjectException("You can not cancel this Investment because its status is not 'SUCCESS'!!!");
-                int a = DateTime.Compare(DateTimePicker.GetDateTimeByTimeZone(), investment.CreateDate.Value.AddDays(1));
                 if (DateTime.Compare(DateTimePicker.GetDateTimeByTimeZone(), investment.CreateDate.Value.AddDays(1)) > 0) throw new UpdateObjectException("You can cancel an Investment within 24 hours only!!!");
 
                 result = await _investmentRepository.CancelInvestment(investmentId, Guid.Parse(currentUser.userId));
