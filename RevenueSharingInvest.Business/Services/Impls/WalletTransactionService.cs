@@ -139,12 +139,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 from.UpdateBy = Guid.Parse(userId);
                 if (fromType.Contains("I"))
                 {
-                    if (await _investorWalletRepository.UpdateInvestorWalletBalance(from) < 1)
-                        throw new UpdateObjectException("Update Investor Wallet " + fromType + " Balance Failed!!");
+                    await _investorWalletRepository.UpdateInvestorWalletBalance(from);
                 } else
                 {
-                    if (await _projectWalletRepository.UpdateProjectWalletBalance(from) < 1)
-                        throw new UpdateObjectException("Update Project Wallet " + fromType + " Balance Failed!!");
+                    await _projectWalletRepository.UpdateProjectWalletBalance(from);
                 }
 
 
@@ -165,15 +163,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 //Add to balance
                 to.Balance = amount;
-                if (fromType.Contains("I"))
+                if (toType.Contains("I"))
                 {
-                    if (await _investorWalletRepository.UpdateInvestorWalletBalance(to) < 1)
-                        throw new UpdateObjectException("Update Investor Wallet " + toType + " Balance Failed!!");
+                    await _investorWalletRepository.UpdateInvestorWalletBalance(to);
                 }
                 else
                 {
-                    if (await _projectWalletRepository.UpdateProjectWalletBalance(to) < 1)
-                        throw new UpdateObjectException("Update Project Wallet " + toType + " Balance Failed!!");
+                    await _projectWalletRepository.UpdateProjectWalletBalance(to);
                 }
 
 
