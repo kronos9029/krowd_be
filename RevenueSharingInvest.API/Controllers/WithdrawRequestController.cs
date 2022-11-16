@@ -141,7 +141,7 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     if (currentRequest.Status.Equals(WithdrawRequestEnum.PENDING.ToString()))
                     {
-                        var result = await _withdrawRequestService.AdminRejectWithdrawRequest(currentUser.userId, currentRequest, request.refusalReason);
+                        var result = await _withdrawRequestService.AdminRejectWithdrawRequest(currentUser, currentRequest, request.refusalReason);
                         return Ok(result);
                     }
 

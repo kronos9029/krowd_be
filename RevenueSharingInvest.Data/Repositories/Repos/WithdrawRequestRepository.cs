@@ -37,7 +37,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                             + "         CreateDate, "
                             + "         CreateBy, "
                             + "         UpdateDate, "
-                            + "         UpdateBy ) "
+                            + "         UpdateBy," 
+                            + "         FromWalletId ) "
                             + "     OUTPUT "
                             + "         INSERTED.Id "
                             + "     VALUES ( "
@@ -51,7 +52,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                             + "         @CreateDate, "
                             + "         @CreateBy, "
                             + "         @UpdateDate, "
-                            + "         @UpdateBy )";
+                            + "         @UpdateBy," 
+                            + "         @FromWalletId )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("BankName", request.BankName, DbType.String);
@@ -65,6 +67,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("CreateBy", request.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", request.UpdateBy, DbType.Guid);
+                parameters.Add("FromWalletId", request.FromWalletId, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();

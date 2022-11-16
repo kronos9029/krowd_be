@@ -26,7 +26,7 @@ namespace RevenueSharingInvest.Business.Services
         //UPDATE
         public Task<dynamic> ApproveWithdrawRequest(string userId, GetWithdrawRequestDTO request);
 
-        public Task<dynamic> AdminRejectWithdrawRequest(string userId, GetWithdrawRequestDTO request, string RefusalReason);
+        public Task<dynamic> AdminRejectWithdrawRequest(ThisUserObj userId, GetWithdrawRequestDTO request, string RefusalReason);
 
         public Task<dynamic> ReportWithdrawRequest(ThisUserObj currentUser, GetWithdrawRequestDTO request, string reportMessage);
         public Task<dynamic> AdminResponeToWithdrawRequest(ThisUserObj currentUser, GetWithdrawRequestDTO request, string receipt);

@@ -96,7 +96,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         CreateBy = Guid.Parse(currentUser.userId),
                         Status = WithdrawRequestEnum.PENDING.ToString(),
                         Description = "Withdraw Money",
-                        CreateDate = DateTimePicker.GetDateTimeByTimeZone()
+                        CreateDate = DateTimePicker.GetDateTimeByTimeZone(),
+                        FromWalletId = fromWallet.Id
                     };
 
                     newRequestId = await _withdrawRequestRepository.CreateWithdrawRequest(withdrawRequest);
@@ -154,7 +155,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         CreateBy = Guid.Parse(currentUser.userId),
                         Status = WithdrawRequestEnum.PENDING.ToString(),
                         Description = "Withdraw Money",
-                        CreateDate = DateTimePicker.GetDateTimeByTimeZone()
+                        CreateDate = DateTimePicker.GetDateTimeByTimeZone(),
+                        FromWalletId = fromWallet.Id
                     };
 
                     newRequestId = await _withdrawRequestRepository.CreateWithdrawRequest(withdrawRequest);
@@ -271,11 +273,27 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<dynamic> AdminRejectWithdrawRequest(string userId, GetWithdrawRequestDTO currentRequest, string RefusalReason)
+        public async Task<dynamic> AdminRejectWithdrawRequest(ThisUserObj currentUser, GetWithdrawRequestDTO currentRequest, string RefusalReason)
         {
             try
             {
-                dynamic result = await _withdrawRequestRepository.AdminRejectWithdrawRequest(Guid.Parse(userId), Guid.Parse(currentRequest.Id), RefusalReason);
+                if (currentUser.roleId.Equals(currentUser.investorRoleId))
+                {
+                    InvestorWallet fromWallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I1.ToString());
+
+                    InvestorWallet refundWallet = await _investorWalletRepository.GetInvestorWalletById(Guid.Parse(currentRequest.FromWalletId));
+
+                    _walletTransactionService.TransferMoney(fromWallet, refundWallet, currentRequest.Amount, currentUser.userId);
+                } else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+                {
+                    ProjectWallet refundWallet = await _projectWalletRepository.GetProjectWalletById(Guid.Parse(currentRequest.FromWalletId));
+
+                    ProjectWallet fromWallet = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(Guid.Parse(currentUser.userId), WalletTypeEnum.P1.ToString(), refundWallet.ProjectId);
+
+                    _walletTransactionService.TransferMoney(fromWallet, refundWallet, currentRequest.Amount, currentUser.userId);
+                }
+
+                dynamic result = await _withdrawRequestRepository.AdminRejectWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(currentRequest.Id), RefusalReason);
                 NotificationDetailDTO notification = new()
                 {
                     Title = "Yêu cầu rút tiền của bạn đã bị từ chối, vui lòng liên hệ Krowd Help Center để biết thêm chi tiết.",
