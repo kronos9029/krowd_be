@@ -1,5 +1,7 @@
 ﻿using Firebase.Storage;
 using FirebaseAdmin.Messaging;
+using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
@@ -7,6 +9,7 @@ using Microsoft.Extensions.Options;
 using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.iText;
 using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Extensions;
@@ -14,6 +17,8 @@ using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
+using RevenueSharingInvest.Data.Models.Entities;
+using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,13 +42,27 @@ namespace RevenueSharingInvest.API.Controllers
         private readonly IRoleService _roleService;
         private readonly IUserService _userService;
         private readonly IDistributedCache _distributedCache;
+        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly IProjectRepository _projectRepository;
+        private readonly IValidationService _validationService;
 
-        public WeatherForecastController(IITextService iTextService, IRoleService roleService, IUserService userService, IDistributedCache distributedCache)
+
+        public WeatherForecastController(IITextService iTextService, 
+            IRoleService roleService, 
+            IUserService userService, 
+            IDistributedCache distributedCache, 
+            IBackgroundJobClient backgroundJobClient, 
+            IProjectRepository projectRepository,
+            IValidationService validationService)
         {
+
             _iTextService = iTextService;
             _roleService = roleService;
             _userService = userService;
             _distributedCache = distributedCache;
+            _backgroundJobClient = backgroundJobClient;
+            _projectRepository = projectRepository;
+            _validationService = validationService;
         }
 
         [HttpPost]
@@ -61,88 +80,103 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
-/*        [HttpPost]
-        public async Task<IActionResult> Getokok()
-        {
-            var registrationToken = "dNixyIUcTbK6xix5M898n1:APA91bESs3aJM2xR0I-uTWUnAVvhadd3oRVxqqI7OnssXhD7GkR6bEOPJtI-WfOgxeE1tSiyp_PSeAkUHgnfd86rNKtQgSTe4D06LPfaW5fMdE158APDccruowYZJXYYducQCBf4GuQR";
-            // Create a list containing up to 500 messages.
-            var messages = new List<Message>()
-            {
-                new Message()
+        //[HttpPut]
+        //[Authorize]
+        //public async Task<IActionResult> UpdateProjectSchedule(Guid projectId)
+        //{
+        //    Project project = await _projectRepository.GetProjectById(projectId);
+        //    DateTime endDate = DateTime.ParseExact("17/11/2022 20:05:00", "dd/MM/yyyy HH:mm:ss", null);
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+        //    _backgroundJobClient.Schedule<ProjectService>(
+        //                        projectService => projectService
+        //                        .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(endDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+        //    return Ok();
+        //}
+
+
+
+        /*        [HttpPost]
+                public async Task<IActionResult> Getokok()
                 {
-                    Notification = new Notification()
+                    var registrationToken = "dNixyIUcTbK6xix5M898n1:APA91bESs3aJM2xR0I-uTWUnAVvhadd3oRVxqqI7OnssXhD7GkR6bEOPJtI-WfOgxeE1tSiyp_PSeAkUHgnfd86rNKtQgSTe4D06LPfaW5fMdE158APDccruowYZJXYYducQCBf4GuQR";
+                    // Create a list containing up to 500 messages.
+                    var messages = new List<Message>()
                     {
-                        Title = "Price drop",
-                        Body = "5% off all electronics",
-                    },
-                    Token = registrationToken,
-                },
-                new Message()
+                        new Message()
+                        {
+                            Notification = new Notification()
+                            {
+                                Title = "Price drop",
+                                Body = "5% off all electronics",
+                            },
+                            Token = registrationToken,
+                        },
+                        new Message()
+                        {
+                            Notification = new Notification()
+                            {
+                                Title = "Price drop",
+                                Body = "2% off all books",
+                            },
+                            Topic = "readers-club",
+                        },
+                    };
+
+                    var response = await FirebaseMessaging.DefaultInstance.SendAllAsync(messages);
+                    // See the BatchResponse reference documentation
+                    // for the contents of response.
+                    return Ok(response);
+                }*/
+
+        /*        private string CreateSignature(string message, string key)
                 {
-                    Notification = new Notification()
+                    try
                     {
-                        Title = "Price drop",
-                        Body = "2% off all books",
-                    },
-                    Topic = "readers-club",
-                },
-            };
+                        byte[] keyByte = Encoding.UTF8.GetBytes(key);
+                        byte[] messageBytes = Encoding.UTF8.GetBytes(message);
+                        using var hmacsha256 = new HMACSHA256(keyByte);
+                        byte[] hashmessage = hmacsha256.ComputeHash(messageBytes);
+                        string hex = BitConverter.ToString(hashmessage);
+                        hex = hex.Replace("-", "").ToLower();
+                        return hex;
+                    }
+                    catch (Exception e)
+                    {
+                        LoggerService.Logger(e.ToString());
+                        throw new Exception(e.Message);
+                    }
 
-            var response = await FirebaseMessaging.DefaultInstance.SendAllAsync(messages);
-            // See the BatchResponse reference documentation
-            // for the contents of response.
-            return Ok(response);
-        }*/
+                }
 
-/*        private string CreateSignature(string message, string key)
-        {
-            try
-            {
-                byte[] keyByte = Encoding.UTF8.GetBytes(key);
-                byte[] messageBytes = Encoding.UTF8.GetBytes(message);
-                using var hmacsha256 = new HMACSHA256(keyByte);
-                byte[] hashmessage = hmacsha256.ComputeHash(messageBytes);
-                string hex = BitConverter.ToString(hashmessage);
-                hex = hex.Replace("-", "").ToLower();
-                return hex;
-            }
-            catch (Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
-            }
+                private string GenerateAccessKey()
+                {
+                    var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                    var Charsarr = new char[16];
+                    var random = new Random();
 
-        }
+                    for (int i = 0; i < Charsarr.Length; i++)
+                    {
+                        Charsarr[i] = characters[random.Next(characters.Length)];
+                    }
 
-        private string GenerateAccessKey()
-        {
-            var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            var Charsarr = new char[16];
-            var random = new Random();
+                    var resultString = new String(Charsarr);
+                    return resultString;
+                }
 
-            for (int i = 0; i < Charsarr.Length; i++)
-            {
-                Charsarr[i] = characters[random.Next(characters.Length)];
-            }
+                private string GenerateSecretKey()
+                {
+                    var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                    var Charsarr = new char[32];
+                    var random = new Random();
 
-            var resultString = new String(Charsarr);
-            return resultString;
-        }
+                    for (int i = 0; i < Charsarr.Length; i++)
+                    {
+                        Charsarr[i] = characters[random.Next(characters.Length)];
+                    }
 
-        private string GenerateSecretKey()
-        {
-            var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            var Charsarr = new char[32];
-            var random = new Random();
-
-            for (int i = 0; i < Charsarr.Length; i++)
-            {
-                Charsarr[i] = characters[random.Next(characters.Length)];
-            }
-
-            var resultString = new String(Charsarr);
-            return resultString;
-        }*/
+                    var resultString = new String(Charsarr);
+                    return resultString;
+                }*/
 
     }
 
