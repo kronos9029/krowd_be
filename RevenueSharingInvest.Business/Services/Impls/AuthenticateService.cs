@@ -6,6 +6,7 @@ using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
@@ -53,7 +54,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
             string email = userRecord.Email;
             string lastName = userRecord.DisplayName;
-            //DateTime createdDate = DateTime.UtcNow;
             string ImageUrl = userRecord.PhotoUrl.ToString();
 
             User userObject = await _userRepository.GetUserByEmail(email);
@@ -71,7 +71,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 User newInvestorUser = new()
                 {
                     Email = email,
-                    //newInvestorUser.CreateDate = createdDate;
                     Image = ImageUrl,
                     RoleId = roleId,
                     LastName = lastName,
@@ -128,7 +127,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
         public async Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken)
         {
-                FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
+            FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
             string uid = decryptedToken.Uid;
 
             UserRecord userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
@@ -220,15 +219,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 throw new UnauthorizedAccessException("You Are Not Using An Admin Account!!");
             }
 
-            AuthenticateResponse response = new();
-            
-
-            
-            response.email = email;
-            response.uid = uid;
-            response.id = userObject.Id;
-            response.image = userObject.Image ?? ImageUrl;
-            response.fullName = (userObject.FirstName + " " + userObject.LastName) ?? userRecord.DisplayName;
+            AuthenticateResponse response = new()
+            {
+                email = email,
+                uid = uid,
+                id = userObject.Id,
+                image = userObject.Image ?? ImageUrl,
+                fullName = (userObject.FirstName + " " + userObject.LastName) ?? userRecord.DisplayName
+            };
             response = await GenerateTokenAsync(response, RoleEnum.ADMIN.ToString());
 
 
@@ -307,7 +305,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
             response.token = tokenHandler.WriteToken(token);
             return response;
         }
-
-
     }
+
 }
