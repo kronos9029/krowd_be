@@ -103,22 +103,22 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
         }
 
-        //REFUND
-        [HttpPut]
-        [Route("refund/{id}")]
-        [Authorize]
-        public async Task<IActionResult> RefundInvestment(Guid id)
-        {
-            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+        ////REFUND
+        //[HttpPut]
+        //[Route("refund/{id}")]
+        //[Authorize]
+        //public async Task<IActionResult> RefundInvestment(Guid id)
+        //{
+        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
-            //INVESTOR
-            if (currentUser.roleId.Equals(currentUser.investorRoleId))
-            {
-                var result = await _investmentService.CancelInvestment(id, currentUser);
-                return Ok(result);
-            }
-            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
-        }
+        //    //INVESTOR
+        //    if (currentUser.roleId.Equals(currentUser.investorRoleId))
+        //    {
+        //        var result = await _investmentService.CancelInvestment(id, currentUser);
+        //        return Ok(result);
+        //    }
+        //    return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
+        //}
 
         //[HttpGet]
         //[Route("wallet/{walletType}")]

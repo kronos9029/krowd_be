@@ -534,8 +534,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     };
 
                     List<Guid> admins = await _userRepository.GetUsersIdByRoleIdAndBusinessId(Guid.Parse(currentUser.adminRoleId),"");
-                    List<Guid> businessManagers = await _userRepository.GetUsersIdByRoleIdAndBusinessId(Guid.Parse(currentUser.adminRoleId), currentUser.businessId);
-                    var combinedList = (List<Guid>)admins.Union(businessManagers);
+                    List<Guid> businessManagers = await _userRepository.GetUsersIdByRoleIdAndBusinessId(Guid.Parse(currentUser.businessManagerRoleId), currentUser.businessId);
+                    var combinedList = (List<Guid>)admins.Union(businessManagers).ToList();
 
                     for (int i = 0; i < combinedList.Count; i++)
                     {
