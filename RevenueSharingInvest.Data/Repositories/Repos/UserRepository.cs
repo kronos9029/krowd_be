@@ -246,6 +246,29 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             try
             {
                 var parameters = new DynamicParameters();
+                var selectClause = " U.Id, "
+                    + "         U.BusinessId, "
+                    + "         U.RoleId, "
+                    + "         U.Description, "
+                    + "         U.LastName, "
+                    + "         U.FirstName, "
+                    + "         U.PhoneNum, "
+                    + "         U.Image, "
+                    + "         U.IdCard, "
+                    + "         U.Email, "
+                    + "         U.Gender, "
+                    + "         U.DateOfBirth, "
+                    + "         U.TaxIdentificationNumber, "
+                    + "         U.City, "
+                    + "         U.District, "
+                    + "         U.Address, "
+                    + "         U.BankName, "
+                    + "         U.BankAccount, "
+                    + "         U.Status, "
+                    + "         U.CreateDate, "
+                    + "         U.CreateBy, "
+                    + "         U.UpdateDate, "
+                    + "         U.UpdateBy ";
                 var whereClause = " AND U.RoleId = @Project_Manager ";
                 parameters.Add("Project_Manager", Guid.Parse(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")), DbType.Guid);
                 var businessIdCondtion = " AND U.BusinessId = @BusinessId ";
@@ -279,9 +302,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "             ROW_NUMBER() OVER ( "
                     + "                 ORDER BY "
                     + "                     U.CreateDate DESC ) AS Num, "
-                    + "             U.* "
+                    +           selectClause
                     + "         FROM [User] U JOIN Project P ON U.Id = P.ManagerId "
-                    + whereClause + " ) "
+                    +           whereClause
+                    + "         GROUP BY "
+                    +               selectClause
+                    + "         ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         BusinessId, "
@@ -319,7 +345,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT U.* FROM [User] U JOIN Project P ON U.Id = P.ManagerId " + whereClause + " ORDER BY U.CreateDate DESC";
+                    var query = "SELECT " + selectClause + " FROM [User] U JOIN Project P ON U.Id = P.ManagerId " + whereClause + " GROUP BY " + selectClause + " ORDER BY U.CreateDate DESC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<User>(query, parameters)).ToList();
                 }
@@ -337,6 +363,29 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             try
             {
                 var parameters = new DynamicParameters();
+                var selectClause = " U.Id, "
+                    + "         U.BusinessId, "
+                    + "         U.RoleId, "
+                    + "         U.Description, "
+                    + "         U.LastName, "
+                    + "         U.FirstName, "
+                    + "         U.PhoneNum, "
+                    + "         U.Image, "
+                    + "         U.IdCard, "
+                    + "         U.Email, "
+                    + "         U.Gender, "
+                    + "         U.DateOfBirth, "
+                    + "         U.TaxIdentificationNumber, "
+                    + "         U.City, "
+                    + "         U.District, "
+                    + "         U.Address, "
+                    + "         U.BankName, "
+                    + "         U.BankAccount, "
+                    + "         U.Status, "
+                    + "         U.CreateDate, "
+                    + "         U.CreateBy, "
+                    + "         U.UpdateDate, "
+                    + "         U.UpdateBy ";
                 var whereClause = " AND U.RoleId = @Project_Manager ";
                 parameters.Add("Project_Manager", Guid.Parse(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER")), DbType.Guid);
                 var businessIdCondtion = " AND U.BusinessId = @BusinessId ";
@@ -363,7 +412,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 whereClause = "WHERE " + whereClause.Substring(4, whereClause.Length - 4);
 
-                var query = "SELECT COUNT(*) FROM (SELECT U.* FROM [User] U JOIN Project P ON U.Id = P.ManagerId " + whereClause + ") AS X";
+                var query = "SELECT COUNT(*) FROM (SELECT " + selectClause + " FROM [User] U JOIN Project P ON U.Id = P.ManagerId " + whereClause + " GROUP BY " + selectClause + " ) AS X";
                 using var connection = CreateConnection();
                 return (int)connection.ExecuteScalar(query, parameters);
             }
@@ -380,6 +429,29 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             try
             {
                 var parameters = new DynamicParameters();
+                var selectClause = " U.Id, "
+                    + "         U.BusinessId, "
+                    + "         U.RoleId, "
+                    + "         U.Description, "
+                    + "         U.LastName, "
+                    + "         U.FirstName, "
+                    + "         U.PhoneNum, "
+                    + "         U.Image, "
+                    + "         U.IdCard, "
+                    + "         U.Email, "
+                    + "         U.Gender, "
+                    + "         U.DateOfBirth, "
+                    + "         U.TaxIdentificationNumber, "
+                    + "         U.City, "
+                    + "         U.District, "
+                    + "         U.Address, "
+                    + "         U.BankName, "
+                    + "         U.BankAccount, "
+                    + "         U.Status, "
+                    + "         U.CreateDate, "
+                    + "         U.CreateBy, "
+                    + "         U.UpdateDate, "
+                    + "         U.UpdateBy ";
                 var whereClause = " AND U.RoleId = @Investor ";
                 parameters.Add("Investor", Guid.Parse(RoleDictionary.role.GetValueOrDefault("INVESTOR")), DbType.Guid);
                 var projectIdCondtion = " AND INM.ProjectId = @ProjectId ";
@@ -406,9 +478,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "             ROW_NUMBER() OVER ( "
                     + "                 ORDER BY "
                     + "                     U.CreateDate DESC ) AS Num, "
-                    + "             U.* "
+                    +           selectClause
                     + "         FROM [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId "
-                    +       whereClause + " ) "
+                    +           whereClause 
+                    + "         GROUP BY " 
+                    +               selectClause
+                    + "         ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         BusinessId, "
@@ -446,7 +521,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT U.* FROM [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId " + whereClause + " ORDER BY CreateDate DESC";
+                    var query = "SELECT " + selectClause + " FROM [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId " + whereClause + " GROUP BY " + selectClause + " ORDER BY CreateDate DESC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<User>(query, parameters)).ToList();
                 }
@@ -464,6 +539,29 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             try
             {
                 var parameters = new DynamicParameters();
+                var selectClause = " U.Id, "
+                    + "         U.BusinessId, "
+                    + "         U.RoleId, "
+                    + "         U.Description, "
+                    + "         U.LastName, "
+                    + "         U.FirstName, "
+                    + "         U.PhoneNum, "
+                    + "         U.Image, "
+                    + "         U.IdCard, "
+                    + "         U.Email, "
+                    + "         U.Gender, "
+                    + "         U.DateOfBirth, "
+                    + "         U.TaxIdentificationNumber, "
+                    + "         U.City, "
+                    + "         U.District, "
+                    + "         U.Address, "
+                    + "         U.BankName, "
+                    + "         U.BankAccount, "
+                    + "         U.Status, "
+                    + "         U.CreateDate, "
+                    + "         U.CreateBy, "
+                    + "         U.UpdateDate, "
+                    + "         U.UpdateBy ";
                 var whereClause = " AND U.RoleId = @Investor ";
                 parameters.Add("Investor", Guid.Parse(RoleDictionary.role.GetValueOrDefault("INVESTOR")), DbType.Guid);
                 var projectIdCondtion = " AND INM.ProjectId = @ProjectId ";
@@ -483,7 +581,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 whereClause = "WHERE " + whereClause.Substring(4, whereClause.Length - 4);
 
-                var query = "SELECT COUNT(*) FROM (SELECT U.* FROM [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId " + whereClause + " ) AS X";
+                var query = "SELECT COUNT(*) FROM (SELECT " + selectClause + " FROM [User] U JOIN Investor INS ON U.Id = INS.UserId JOIN Investment INM ON INS.Id = INM.InvestorId " + whereClause + " GROUP BY " + selectClause + " ) AS X";
                 using var connection = CreateConnection();
                 return (int)connection.ExecuteScalar(query, parameters);
             }
