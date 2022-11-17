@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Business.Services.Extensions.iText;
 using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Extensions;
@@ -49,7 +50,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateNoti(string userId, NotificationDetailDTO newNoti)
         {
-           var result = await DistributedCacheExtensions.UpdateNotification(_distributedCache, userId, newNoti);
+            var result = await DistributedCacheExtensions.UpdateNotification(_distributedCache, userId, newNoti);
 
             return Ok(result);
         }
@@ -58,6 +59,14 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> GetNoti(string userId, bool seen)
         {
             var result = await DistributedCacheExtensions.GetNotification(_distributedCache, userId, seen);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("test-push")]
+        public async Task<IActionResult> ValidateDeviceToken(string deviceToken)
+        {
+            var result = await FirebasePushNotification.ValidateToken(deviceToken);
             return Ok(result);
         }
 

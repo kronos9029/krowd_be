@@ -64,7 +64,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             if (userObject == null)
             {
-
                 Guid roleId = Guid.Parse(RoleDictionary.role.GetValueOrDefault(RoleEnum.INVESTOR.ToString()));
 
                 Investor investor = new();
@@ -113,6 +112,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 if (!userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.INVESTOR.ToString())))
                     throw new RegisterException("This Is Not An Investor Email!!");
+                if(deviceToken != null || !deviceToken.Equals(""))
+                {
+                    if (!userObject.DeviceToken.Equals(deviceToken))
+                    {
+                        await _userRepository.UpdateDeviceToken(deviceToken, userObject.Id);
+                    }
+                }
 
                 response.email = email;
                 response.id = userObject.Id;

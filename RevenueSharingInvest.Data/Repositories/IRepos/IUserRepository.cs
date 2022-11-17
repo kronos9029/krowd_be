@@ -44,6 +44,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> UpdateUserImage(string url, Guid userId);
         public Task<int> UpdateUserStatus(Guid userId, string status, Guid currentUserId);
         public Task<int> UpdateUserEmail(Guid userId, string email, Guid currentUserId);
+        public Task<int> UpdateDeviceToken(string deviceToken, Guid userId);
 
         //DELETE
         //public Task<int> DeleteUserById(Guid userId);

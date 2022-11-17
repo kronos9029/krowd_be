@@ -1478,9 +1478,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     parameters.Add("RoleId", roleId, DbType.Guid);
                     parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
                 }
-                    
-                
-                
+
                 using var connection = CreateConnection();
                 return (await connection.QueryAsync<Guid>(query, parameters)).ToList();
             }
@@ -1495,13 +1493,32 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT U.* FROM Investor I JOIN [User] U ON I.UserId = U.Id WHERE I.Id = @InvestorId";
+                var query = "SELECT U.* FROM Investor I JOIN [User] U ON I.UserId = U.Id WHERE I.Id = @InvestorId";
                 var parameters = new DynamicParameters();
                 parameters.Add("InvestorId", investorId, DbType.Guid);
                 using var connection = CreateConnection();
                 return await connection.QueryFirstOrDefaultAsync<User>(query, parameters);
             }
             catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<int> UpdateDeviceToken(string deviceToken, Guid userId)
+        {
+            try
+            {
+                var query = "UPDATE [User] SET DeviceToken = @DeviceToken WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("DeviceToken", deviceToken, DbType.String);
+                parameters.Add("Id", userId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
+
+            }
+            catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);

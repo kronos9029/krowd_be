@@ -63,7 +63,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
             await FirebaseMessaging.DefaultInstance.SendAsync(message);;
         }
         
-        public static async Task SendPushNotificationToTopic(string deviceToken,string topic, PushNotification notification)
+        public static async Task SendPushNotificationToTopic(string topic, PushNotification notification)
         {
 
             var message = new Message()
@@ -78,6 +78,22 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
             };
 
             await FirebaseMessaging.DefaultInstance.SendAsync(message);;
+        }        
+
+        public static async Task<dynamic> ValidateToken(string deviceToken)
+        {
+
+            var message = new Message()
+            {
+                Token = deviceToken,
+                Notification = new()
+                {
+                    Title = "test back end",
+                    Body = "alo"
+                }
+            };
+
+            return await FirebaseMessaging.DefaultInstance.SendAsync(message);
         }
     }
 }
