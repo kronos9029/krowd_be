@@ -282,5 +282,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        public async Task<string> GetInvertorWalletNamebyWalletId(Guid walletId)
+        {
+            try
+            {
+                string query = "SELECT WT.Name FROM InvestorWallet IW JOIN WalletType WT ON IW.WalletTypeId = WT.Id WHERE IW.Id = @WalletId";
+                var parameters = new DynamicParameters();
+                parameters.Add("WalletId", walletId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<string>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

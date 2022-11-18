@@ -4,6 +4,7 @@ using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
+using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -230,6 +231,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<string> GetProjectWalletNameById(Guid walletId)
+        {
+            try
+            {
+                var query = "select WT.Name from ProjectWallet PW JOIN WalletType WT on PW.WalletTypeId = WT.Id where PW.Id = @WalletId";
+                var parameters = new DynamicParameters();
+                parameters.Add("WalletId", walletId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<string>(query, parameters);
+            }
+            catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);

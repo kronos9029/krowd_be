@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DistributedCacheExtensions = RevenueSharingInvest.Business.Services.Extensions.RedisCache.DistributedCacheExtensions;
+using System.Data;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
@@ -69,8 +70,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
             try
             {
                 string newRequestId;
+                string walletName = "";
                 WithdrawRequest withdrawRequest = new();
                 GetWithdrawRequestDTO getWithdrawRequestDTO = new();
+
+                if (currentUser.roleId.Equals(currentUser.investorRoleId))
+                    walletName = await _investorWalletRepository.GetInvertorWalletNamebyWalletId(withdrawRequest.FromWalletId);
+                else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+                    walletName = await _projectWalletRepository.GetProjectWalletNameById(withdrawRequest.FromWalletId);
+
                 List<Guid> admins = await _userRepository.GetUsersIdByRoleIdAndBusinessId(Guid.Parse(currentUser.adminRoleId), "");
 
                 if (currentUser.roleId.Equals(currentUser.investorRoleId)){
@@ -118,8 +126,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         RefusalReason = withdrawRequest.RefusalReason,
                         CreateDate = withdrawRequest.CreateDate.ToString(),
                         CreateBy = withdrawRequest.CreateBy.ToString(),
-                        FromWalletId = withdrawRequest.FromWalletId.ToString()
-                };
+                        FromWalletId = withdrawRequest.FromWalletId.ToString(),
+                        FromWalletName = walletName
+                    };
                     _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
 
                     NotificationDetailDTO notification = new()
@@ -178,7 +187,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         RefusalReason = withdrawRequest.RefusalReason,
                         CreateDate = withdrawRequest.CreateDate.ToString(),
                         CreateBy = withdrawRequest.CreateBy.ToString(),
-                        FromWalletId = withdrawRequest.FromWalletId.ToString()
+                        FromWalletId = withdrawRequest.FromWalletId.ToString(),
+                        FromWalletName = walletName
                 };
                     _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
 
@@ -351,26 +361,35 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             try
             {
+                string walletName = "";
                 List<WithdrawRequest> withdrawRequestList = await _withdrawRequestRepository.GetWithdrawRequestByUserId(Guid.Parse(userId));
                 //List<GetWithdrawRequestDTO> withdrawRequestDTOList = _mapper.Map<List<GetWithdrawRequestDTO>>(withdrawRequestList);
                 List<GetWithdrawRequestDTO> withdrawRequestDTOList = new();
-                
 
+                Role role = await _roleRepository.GetRoleByUserId(Guid.Parse(userId));
                 foreach (WithdrawRequest withdrawRequest in withdrawRequestList)
                 {
-                    GetWithdrawRequestDTO withdrawRequestDTO = new();
-                    withdrawRequestDTO.Id = withdrawRequest.Id.ToString();
-                    withdrawRequestDTO.BankName = withdrawRequest.BankName;
-                    withdrawRequestDTO.AccountName = withdrawRequest.AccountName;
-                    withdrawRequestDTO.BankAccount = withdrawRequest.BankAccount;
-                    withdrawRequestDTO.Description = withdrawRequest.Description;
-                    withdrawRequestDTO.Amount = withdrawRequest.Amount;
-                    withdrawRequestDTO.Status = withdrawRequest.Status;
-                    withdrawRequestDTO.RefusalReason = withdrawRequest.RefusalReason;
-                    withdrawRequestDTO.CreateDate = withdrawRequest.CreateDate.ToString();
-                    withdrawRequestDTO.CreateBy = withdrawRequest.CreateBy.ToString();
-                    withdrawRequestDTO.UpdateDate = withdrawRequest.UpdateBy.ToString();
-                    withdrawRequestDTO.UpdateBy = withdrawRequest.UpdateBy.ToString();
+                    if (role.Name.Equals(RoleEnum.INVESTOR.ToString()))
+                        walletName = await _investorWalletRepository.GetInvertorWalletNamebyWalletId(withdrawRequest.FromWalletId);
+                    if(role.Name.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
+                        walletName = await _projectWalletRepository.GetProjectWalletNameById(withdrawRequest.FromWalletId);
+                    GetWithdrawRequestDTO withdrawRequestDTO = new()
+                    {
+                        Id = withdrawRequest.Id.ToString(),
+                        BankName = withdrawRequest.BankName,
+                        AccountName = withdrawRequest.AccountName,
+                        BankAccount = withdrawRequest.BankAccount,
+                        Description = withdrawRequest.Description,
+                        Amount = withdrawRequest.Amount,
+                        Status = withdrawRequest.Status,
+                        RefusalReason = withdrawRequest.RefusalReason,
+                        CreateDate = withdrawRequest.CreateDate.ToString(),
+                        CreateBy = withdrawRequest.CreateBy.ToString(),
+                        UpdateDate = withdrawRequest.UpdateBy.ToString(),
+                        UpdateBy = withdrawRequest.UpdateBy.ToString(),
+                        FromWalletId = withdrawRequest.FromWalletId.ToString(),
+                        FromWalletName = walletName
+                    };
                     withdrawRequestDTOList.Add(withdrawRequestDTO);
                 }
 
@@ -388,16 +407,23 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             try
             {
-                AllWithdrawRequestDTO result = new AllWithdrawRequestDTO();
-                result.listOfWithdrawRequest = new List<GetWithdrawRequestDTO>();
+                AllWithdrawRequestDTO result = new()
+                {
+                    listOfWithdrawRequest = new List<GetWithdrawRequestDTO>()
+                };
 
                 if (!Enum.IsDefined(typeof(WithdrawRequestEnum), filter)) throw new InvalidFieldException("filter must be ALL or PENDING or PARTIAL or PARTIAL_ADMIN or REJECTED or APPROVED!!!");
 
                 List<WithdrawRequest> withdrawRequests = await _withdrawRequestRepository.GetAllWithdrawRequest(pageIndex, pageSize, userId, filter);
                 result.numOfWithdrawRequest = await _withdrawRequestRepository.CountAllWithdrawRequest(userId, filter);
-
+                Role role = await _roleRepository.GetRoleByUserId(Guid.Parse(userId));
+                string walletName = "";
                 foreach (WithdrawRequest withdrawRequest in withdrawRequests)
                 {
+                    if (role.Name.Equals(RoleEnum.INVESTOR.ToString()))
+                        walletName = await _investorWalletRepository.GetInvertorWalletNamebyWalletId(withdrawRequest.FromWalletId);
+                    if (role.Name.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
+                        walletName = await _projectWalletRepository.GetProjectWalletNameById(withdrawRequest.FromWalletId);
                     GetWithdrawRequestDTO withdrawRequestDTO = new()
                     {
                         Id = withdrawRequest.Id.ToString(),
@@ -412,7 +438,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         CreateBy = withdrawRequest.CreateBy.ToString(),
                         UpdateDate = await _validationService.FormatDateOutput(withdrawRequest.UpdateDate.ToString()),
                         UpdateBy = withdrawRequest.UpdateBy.ToString(),
-                        FromWalletId = withdrawRequest.FromWalletId.ToString()
+                        FromWalletId = withdrawRequest.FromWalletId.ToString(),
+                        FromWalletName = walletName
                     };
                     result.listOfWithdrawRequest.Add(withdrawRequestDTO);
                 }
@@ -434,9 +461,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 GetWithdrawRequestDTO withdrawRequestDTO = _mapper.Map<GetWithdrawRequestDTO>(withdrawRequest);
                 if (withdrawRequestDTO == null)
                     throw new NotFoundException("Withdraw Request Not Found!!");
-
                 withdrawRequestDTO.CreateDate = await _validationService.FormatDateOutput(withdrawRequestDTO.CreateDate);
                 withdrawRequestDTO.UpdateDate = await _validationService.FormatDateOutput(withdrawRequestDTO.UpdateDate);
+
+                string walletName = "";
+                Role role = await _roleRepository.GetRoleByUserId((Guid)withdrawRequest.CreateBy);
+                if (role.Name.Equals(RoleEnum.INVESTOR.ToString()))
+                    walletName = await _investorWalletRepository.GetInvertorWalletNamebyWalletId(withdrawRequest.FromWalletId);
+                if (role.Name.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
+                    walletName = await _projectWalletRepository.GetProjectWalletNameById(withdrawRequest.FromWalletId);
+
+                withdrawRequestDTO.FromWalletName = walletName;
+
                 return withdrawRequestDTO;
             }
             
