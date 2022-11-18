@@ -24,20 +24,19 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public string AccountName { get; set; }
         [Required]
         public string BankAccount { get; set; }
-        [Required]
         public string Description { get; set; }
-        public string ReportMessage { get; set; }
         public double Amount { get; set; }
         [Required]
         public string Status { get; set; }
         public string RefusalReason { get; set; }
-        public Guid FromWalletId { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
+        public string ReportMessage { get; set; }
+        public Guid FromWalletId { get; set; }
 
         [ForeignKey(nameof(CreateBy))]
         [InverseProperty(nameof(User.WithdrawRequestCreateByNavigations))]

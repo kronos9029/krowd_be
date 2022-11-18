@@ -3,6 +3,7 @@ using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
@@ -79,11 +80,23 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (createPeriodRevenueHistoryDTO.stageId == null || !await _validationService.CheckUUIDFormat(createPeriodRevenueHistoryDTO.stageId)) throw new InvalidFieldException("Invalid stageId!!!");
 
                 Stage stage = await _stageRepository.GetStageById(Guid.Parse(createPeriodRevenueHistoryDTO.stageId));
-                if (stage == null) throw new InvalidFieldException("stageId is not existed!!!");
-                //if (!stage.Status.Equals(StageStatusEnum.DUE.ToString())) throw new InvalidFieldException("The Stage's status is not DUE!!!");
+                if (stage == null) throw new InvalidFieldException("stageId is not existed!!!");                
 
                 Project project = await _projectRepository.GetProjectById(stage.ProjectId);
-                if (!project.ManagerId.Equals(Guid.Parse(currentUser.userId))) throw new InvalidFieldException("This stageId is not belong to your Projects!!!");
+                
+                if (!project.ManagerId.Equals(Guid.Parse(currentUser.userId))) 
+                    throw new InvalidFieldException("This stageId is not belong to your Projects!!!");
+                
+                if (!project.Status.Equals(ProjectStatusEnum.ACTIVE.ToString())) 
+                    throw new InvalidFieldException("This Project is not ACTIVE!!!");
+                
+                if (stage.Status.Equals(StageStatusEnum.UNDUE.ToString())) 
+                    throw new InvalidFieldException("You can not pay for this Stage now!!!");
+
+                Stage lastStage = await _stageRepository.GetLastStageByProjectId(stage.ProjectId);
+                if (DateTime.Compare(DateTimePicker.GetDateTimeByTimeZone(), lastStage.EndDate.AddDays(3)) > 0 && !stage.Id.Equals(lastStage.Id)) 
+                    throw new InvalidFieldException("You can only pay for Repayment Stage from now!!!");
+
                 if (createPeriodRevenueHistoryDTO.amount > (double)Math.Round(project.InvestmentTargetCapital * project.Multiplier) - project.PaidAmount) throw new InvalidFieldException("amount can not greater than " + (double)(Math.Round(project.InvestmentTargetCapital * project.Multiplier) - project.PaidAmount) + "!!!");
 
                 ProjectWallet projectWallet = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(Guid.Parse(currentUser.userId), WalletTypeEnum.P4.ToString(), project.Id);

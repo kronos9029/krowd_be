@@ -12,6 +12,7 @@ namespace RevenueSharingInvest.Business.Services
     public interface IStageService
     {
         //CREATE
+        public Task<string> CreateRepaymentStage(Guid projectId, ThisUserObj currentUser);
 
         //READ
         public Task<AllStageDTO> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pageSize, string status, ThisUserObj currentUser);

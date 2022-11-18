@@ -154,6 +154,18 @@ namespace RevenueSharingInvest.Data.Helpers
             modelBuilder.Entity<Investment>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+
+                entity.HasOne(d => d.Investor)
+                    .WithMany(p => p.Investments)
+                    .HasForeignKey(d => d.InvestorId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Investment_Investor");
+
+                entity.HasOne(d => d.Package)
+                    .WithMany(p => p.Investments)
+                    .HasForeignKey(d => d.PackageId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Investment_Package");
             });
 
             modelBuilder.Entity<Investor>(entity =>
@@ -230,8 +242,6 @@ namespace RevenueSharingInvest.Data.Helpers
             modelBuilder.Entity<PeriodRevenue>(entity =>
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
-
-                entity.Property(e => e.PaidAmount).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.Status)
                     .IsUnicode(false)
@@ -342,7 +352,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
                 entity.Property(e => e.Status)
                     .IsUnicode(false)
-                    .HasComputedColumnSql("(case when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())<[EndDate] then 'UNDUE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND (dateadd(hour,(7),getdate())>=[EndDate] AND dateadd(hour,(7),getdate())<=dateadd(day,(3),[EndDate])) then 'DUE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())>dateadd(day,(3),[EndDate]) then 'DONE' else 'INACTIVE' end)", false);
+                    .HasComputedColumnSql("(case when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND [Name]=N'Giai đoạn thanh toán nợ' AND [dbo].[Get_Period_Revenue_Shared_Amount]([Id])>[dbo].[Get_Period_Revenue_Paid_Amount]([Id]) then 'DUE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND [Name]=N'Giai đoạn thanh toán nợ' AND [dbo].[Get_Period_Revenue_Shared_Amount]([Id])<=[dbo].[Get_Period_Revenue_Paid_Amount]([Id]) then 'DONE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())<[EndDate] then 'UNDUE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND (dateadd(hour,(7),getdate())>=[EndDate] AND dateadd(hour,(7),getdate())<=dateadd(day,(3),[EndDate])) then 'DUE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())>dateadd(day,(3),[EndDate]) then 'DONE' else 'INACTIVE' end)", false);
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Stages)

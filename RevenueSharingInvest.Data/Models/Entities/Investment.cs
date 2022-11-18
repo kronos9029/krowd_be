@@ -32,6 +32,12 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid? UpdateBy { get; set; }
         public string Status { get; set; }
 
+        [ForeignKey(nameof(InvestorId))]
+        [InverseProperty("Investments")]
+        public virtual Investor Investor { get; set; }
+        [ForeignKey(nameof(PackageId))]
+        [InverseProperty("Investments")]
+        public virtual Package Package { get; set; }
         [InverseProperty(nameof(Payment.Investment))]
         public virtual ICollection<Payment> Payments { get; set; }
         [InverseProperty(nameof(VoucherItem.Investment))]

@@ -14,6 +14,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
     {
         public Investor()
         {
+            Investments = new HashSet<Investment>();
             InvestorWallets = new HashSet<InvestorWallet>();
         }
 
@@ -32,6 +33,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [ForeignKey(nameof(UserId))]
         [InverseProperty("Investors")]
         public virtual User User { get; set; }
+        [InverseProperty(nameof(Investment.Investor))]
+        public virtual ICollection<Investment> Investments { get; set; }
         [InverseProperty(nameof(InvestorWallet.Investor))]
         public virtual ICollection<InvestorWallet> InvestorWallets { get; set; }
     }
