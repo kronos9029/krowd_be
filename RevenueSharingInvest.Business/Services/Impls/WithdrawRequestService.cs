@@ -117,8 +117,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         Status = withdrawRequest.Status,
                         RefusalReason = withdrawRequest.RefusalReason,
                         CreateDate = withdrawRequest.CreateDate.ToString(),
-                        CreateBy = withdrawRequest.CreateBy.ToString()
-                    };
+                        CreateBy = withdrawRequest.CreateBy.ToString(),
+                        FromWalletId = withdrawRequest.FromWalletId.ToString()
+                };
                     _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
 
                     NotificationDetailDTO notification = new()
@@ -176,8 +177,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         Status = withdrawRequest.Status,
                         RefusalReason = withdrawRequest.RefusalReason,
                         CreateDate = withdrawRequest.CreateDate.ToString(),
-                        CreateBy = withdrawRequest.CreateBy.ToString()
-                    };
+                        CreateBy = withdrawRequest.CreateBy.ToString(),
+                        FromWalletId = withdrawRequest.FromWalletId.ToString()
+                };
                     _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
 
                     NotificationDetailDTO notification = new()
@@ -407,7 +409,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         CreateDate = await _validationService.FormatDateOutput(withdrawRequest.CreateDate.ToString()),
                         CreateBy = withdrawRequest.CreateBy.ToString(),
                         UpdateDate = await _validationService.FormatDateOutput(withdrawRequest.UpdateDate.ToString()),
-                        UpdateBy = withdrawRequest.UpdateBy.ToString()
+                        UpdateBy = withdrawRequest.UpdateBy.ToString(),
+                        FromWalletId = withdrawRequest.FromWalletId.ToString()
                     };
                     result.listOfWithdrawRequest.Add(withdrawRequestDTO);
                 }
