@@ -279,18 +279,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             try
             {
-                if (currentUser.roleId.Equals(currentUser.investorRoleId))
+                Role requestCreatorRole = await _roleRepository.GetRoleByUserId(Guid.Parse(currentRequest.CreateBy));
+
+                if (requestCreatorRole.Id.Equals(Guid.Parse(currentUser.investorRoleId)))
                 {
-                    InvestorWallet fromWallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I1.ToString());
+                    InvestorWallet fromWallet = await _investorWalletRepository.GetInvestorWalletByUserIdAndWalletTypeId(Guid.Parse(currentRequest.CreateBy), Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I1")));
 
                     InvestorWallet refundWallet = await _investorWalletRepository.GetInvestorWalletById(Guid.Parse(currentRequest.FromWalletId));
 
                     _walletTransactionService.TransferMoney(fromWallet, refundWallet, currentRequest.Amount, currentUser.userId);
-                } else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+                } else if (requestCreatorRole.Id.Equals(Guid.Parse(currentUser.projectManagerRoleId)))
                 {
                     ProjectWallet refundWallet = await _projectWalletRepository.GetProjectWalletById(Guid.Parse(currentRequest.FromWalletId));
 
-                    ProjectWallet fromWallet = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(Guid.Parse(currentUser.userId), WalletTypeEnum.P1.ToString(), refundWallet.ProjectId);
+                    ProjectWallet fromWallet = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(Guid.Parse(currentRequest.CreateBy), WalletTypeEnum.P1.ToString(), refundWallet.ProjectId);
 
                     _walletTransactionService.TransferMoney(fromWallet, refundWallet, currentRequest.Amount, currentUser.userId);
                 }

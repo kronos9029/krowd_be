@@ -264,5 +264,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        public async Task<InvestorWallet> GetInvestorWalletByUserIdAndWalletTypeId(Guid userId, Guid walletTypeId)
+        {
+            try
+            {
+                string query = "select IW.* from InvestorWallet IW JOIN Investor I ON IW.InvestorId = I.Id where UserId = @UserId and IW.WalletTypeId = @WalletTypeId";
+                var parameters = new DynamicParameters();
+                parameters.Add("UserId", userId, DbType.Guid);
+                parameters.Add("WalletTypeId", walletTypeId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<InvestorWallet>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }
