@@ -9,6 +9,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string? link { get; set; }
         public string? content { get; set; }
         public string? description { get; set; }             
+        public string? updateDate { get; set; }             
     }
 
     public class ProjectComponentProjectEntityDTO : ProjectEntityDTO

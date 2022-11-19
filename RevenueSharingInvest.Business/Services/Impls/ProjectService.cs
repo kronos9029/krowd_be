@@ -882,11 +882,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 projectDTO.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByProjectId(Guid.Parse(projectDTO.id)));
                 if (projectDTO.business != null)
                 {
+                    projectDTO.business.createDate = await _validationService.FormatDateOutput(projectDTO.business.createDate);
+                    projectDTO.business.updateDate = await _validationService.FormatDateOutput(projectDTO.business.updateDate);
                     projectDTO.business.manager = _mapper.Map<BusinessManagerUserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(projectDTO.business.id)));
+                    projectDTO.business.manager.createDate = await _validationService.FormatDateOutput(projectDTO.business.manager.createDate);
+                    projectDTO.business.manager.updateDate = await _validationService.FormatDateOutput(projectDTO.business.manager.updateDate);
                     projectDTO.business.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(projectDTO.business.id)));
+                    foreach (FieldDTO item in projectDTO.business.fieldList)
+                    {
+                        item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                        item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                    }
                 }
                 projectDTO.manager = _mapper.Map<ProjectManagerUserDTO>(await _userRepository.GetProjectManagerByProjectId(Guid.Parse(projectDTO.id)));
+                projectDTO.manager.createDate = await _validationService.FormatDateOutput(projectDTO.manager.createDate);
+                projectDTO.manager.updateDate = await _validationService.FormatDateOutput(projectDTO.manager.updateDate);
                 projectDTO.field = _mapper.Map<FieldDTO>(await _fieldRepository.GetProjectFieldByProjectId(Guid.Parse(projectDTO.id)));
+                projectDTO.field.createDate = await _validationService.FormatDateOutput(projectDTO.field.createDate);
+                projectDTO.field.updateDate = await _validationService.FormatDateOutput(projectDTO.field.updateDate);
                 projectDTO.area = _mapper.Map<AreaDTO>(await _areaRepository.GetAreaByProjectId(Guid.Parse(projectDTO.id)));
                 projectDTO.projectEntity = new List<TypeProjectEntityDTO>();
                 for (int type = 0; type < Enum.GetNames(typeof(ProjectEntityEnum)).Length; type++)
@@ -894,6 +907,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     TypeProjectEntityDTO typeProjectEntityDTO = new TypeProjectEntityDTO();
                     typeProjectEntityDTO.type = Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(type);
                     typeProjectEntityDTO.typeItemList = _mapper.Map<List<ProjectComponentProjectEntityDTO>>(await _projectEntityRepository.GetProjectEntityByProjectIdAndType(Guid.Parse(projectDTO.id), Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(type)));
+                    foreach (ProjectComponentProjectEntityDTO item in typeProjectEntityDTO.typeItemList)
+                    { 
+                        item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                    }
                     projectDTO.projectEntity.Add(typeProjectEntityDTO);
                 }
                 projectDTO.memberList = _mapper.Map<List<ProjectMemberUserDTO>>(await _userRepository.GetProjectMembers(Guid.Parse(projectDTO.id)));
