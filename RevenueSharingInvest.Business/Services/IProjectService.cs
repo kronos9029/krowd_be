@@ -48,6 +48,7 @@ namespace RevenueSharingInvest.Business.Services
         public Task<int> UpdateProject(UpdateProjectDTO projectDTO, Guid projectId, ThisUserObj thisUserObj);
         public Task<int> UpdateProjectStatus(Guid projectId, string status, ThisUserObj currentUser);
         public Task<int> UpdateProjectStatusByHangfire(Guid projectId, ThisUserObj currentUser);
+        public Task<bool> CreateRepaymentStageCheck(Guid projectId, ThisUserObj currentUser);
 
         //DELETE
         public Task<int> DeleteProjectById(Guid projectId);

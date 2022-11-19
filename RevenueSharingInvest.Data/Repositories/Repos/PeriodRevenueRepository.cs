@@ -372,7 +372,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT SUM(SharedAmount) FROM PeriodRevenue WHERE ProjectId = @ProjectId AND SharedAmount IS NOT NULL";
+                string query = "SELECT CAST(ISNULL(0, SUM(SharedAmount)) AS FLOAT) FROM PeriodRevenue WHERE ProjectId = @ProjectId AND SharedAmount IS NOT NULL";
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", projectId, DbType.Guid);
                 using var connection = CreateConnection();

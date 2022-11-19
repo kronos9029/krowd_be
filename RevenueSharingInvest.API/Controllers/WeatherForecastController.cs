@@ -41,6 +41,7 @@ namespace RevenueSharingInvest.API.Controllers
         private readonly IITextService _iTextService;
         private readonly IRoleService _roleService;
         private readonly IUserService _userService;
+        private readonly IProjectService _projectService;
         private readonly IDistributedCache _distributedCache;
         private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IProjectRepository _projectRepository;
@@ -49,7 +50,8 @@ namespace RevenueSharingInvest.API.Controllers
 
         public WeatherForecastController(IITextService iTextService, 
             IRoleService roleService, 
-            IUserService userService, 
+            IUserService userService,
+            IProjectService projectService,
             IDistributedCache distributedCache, 
             IBackgroundJobClient backgroundJobClient, 
             IProjectRepository projectRepository,
@@ -59,6 +61,7 @@ namespace RevenueSharingInvest.API.Controllers
             _iTextService = iTextService;
             _roleService = roleService;
             _userService = userService;
+            _projectService = projectService;
             _distributedCache = distributedCache;
             _backgroundJobClient = backgroundJobClient;
             _projectRepository = projectRepository;
@@ -85,11 +88,17 @@ namespace RevenueSharingInvest.API.Controllers
         //public async Task<IActionResult> UpdateProjectSchedule(Guid projectId)
         //{
         //    Project project = await _projectRepository.GetProjectById(projectId);
-        //    DateTime endDate = DateTime.ParseExact("17/11/2022 20:05:00", "dd/MM/yyyy HH:mm:ss", null);
+        //    DateTime endDate = DateTime.ParseExact("19/11/2022 23:59:59", "dd/MM/yyyy HH:mm:ss", null);
         //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
-        //    _backgroundJobClient.Schedule<ProjectService>(
-        //                        projectService => projectService
-        //                        .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(endDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+        //    //_backgroundJobClient.Schedule<ProjectService>(
+        //    //                    projectService => projectService
+        //    //                    .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(endDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+
+        //    //_backgroundJobClient.Schedule<ProjectService>(
+        //    //                    projectService => projectService
+        //    //                    .CreateRepaymentStageCheck(projectId, currentUser), TimeSpan.FromTicks(endDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+        //    await _projectService.CreateRepaymentStageCheck(projectId, currentUser);
+
         //    return Ok();
         //}
 
