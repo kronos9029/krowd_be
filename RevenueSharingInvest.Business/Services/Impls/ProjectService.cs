@@ -1057,6 +1057,19 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         projectDTO.endDate = await _validationService.FormatDateOutput(getProject.endDate);
                         projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
                     }
+                    else
+                    {
+                        if (projectDTO.startDate == null)
+                        {
+                            projectDTO.startDate = await _validationService.FormatDateOutput(getProject.startDate);
+                            projectDTO.startDate = projectDTO.startDate.Remove(projectDTO.startDate.Length - 8) + "00:00:00";
+                        }
+                        if (projectDTO.startDate == null)
+                        {
+                            projectDTO.endDate = await _validationService.FormatDateOutput(getProject.endDate);
+                            projectDTO.endDate = projectDTO.endDate.Remove(projectDTO.endDate.Length - 8) + "23:59:59";
+                        }
+                    }
 
                     //Xóa [Stage] và [PeriodRevenue] cũ
                     await _periodRevenueRepository.DeletePeriodRevenueByProjectId(projectId);
