@@ -239,6 +239,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
+                userId ??= "";
                 var parameters = new DynamicParameters();
                 var whereClause = "";
                 if (!userId.Equals(""))
@@ -318,6 +319,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
+                userId ??= "";
                 var parameters = new DynamicParameters();
                 var whereClause = "";
                 if (!userId.Equals(""))

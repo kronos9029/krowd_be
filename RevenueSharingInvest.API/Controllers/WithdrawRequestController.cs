@@ -46,7 +46,7 @@ namespace RevenueSharingInvest.API.Controllers
         //GET ALL
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetWithdrawRequestByUserId(int pageIndex, int pageSize, Guid? userId, WithdrawRequestEnum filter)
+        public async Task<IActionResult> GetWithdrawRequestByUserId(int pageIndex, int pageSize, string userId, WithdrawRequestEnum filter)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             if (currentUser.roleId.Equals(currentUser.investorRoleId))
@@ -59,11 +59,11 @@ namespace RevenueSharingInvest.API.Controllers
             {
                 if (userId != null)
                 {
-                    GetUserDTO user = await _userService.GetUserById((Guid)userId);
+                    GetUserDTO user = await _userService.GetUserById(Guid.Parse(userId));
                     if (!Guid.Parse(user.role.id).Equals(Guid.Parse(RoleDictionary.role.GetValueOrDefault("INVESTOR")))) throw new InvalidFieldException("userId must belong to an INVESTOR!!!");
                 }                    
 
-                var result = await _withdrawRequestService.GetAllWithdrawRequest(pageIndex, pageSize, userId.ToString(), filter.ToString());
+                var result = await _withdrawRequestService.GetAllWithdrawRequest(pageIndex, pageSize, userId, filter.ToString());
                 return Ok(result);
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or INVESTOR can perform this action!!!");
