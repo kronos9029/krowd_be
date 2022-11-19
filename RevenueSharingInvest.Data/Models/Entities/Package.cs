@@ -14,6 +14,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
     {
         public Package()
         {
+            Investments = new HashSet<Investment>();
             PackageVouchers = new HashSet<PackageVoucher>();
         }
 
@@ -40,6 +41,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("Packages")]
         public virtual Project Project { get; set; }
+        [InverseProperty(nameof(Investment.Package))]
+        public virtual ICollection<Investment> Investments { get; set; }
         [InverseProperty(nameof(PackageVoucher.Package))]
         public virtual ICollection<PackageVoucher> PackageVouchers { get; set; }
     }

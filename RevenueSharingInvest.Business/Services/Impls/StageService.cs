@@ -49,6 +49,61 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _mapper = mapper;
         }
 
+        //CREATE REPAYMENT STAGE
+        public async Task<string> CreateRepaymentStage(Guid projectId, ThisUserObj currentUser)
+        {
+            try
+            {
+                Project project = await _projectRepository.GetProjectById(projectId);
+                Stage lastStage = await _stageRepository.GetLastStageByProjectId(project.Id);
+                lastStage.EndDate = lastStage.EndDate.AddDays(1);
+                GetStageDTO lastStageDTO = _mapper.Map<GetStageDTO>(lastStage);
+                string newStartDate = await _validationService.FormatDateOutput(lastStageDTO.endDate);
+                string newEndDate = "31/12/2099 23:59:59";
+
+                GetStageDTO stageDTO = new GetStageDTO();
+                stageDTO.name = "Giai đoạn thanh toán nợ";
+                stageDTO.projectId = project.Id.ToString();
+                stageDTO.startDate = await _validationService.FormatDateInput(newStartDate.Remove(newStartDate.Length - 8) + "00:00:00");
+                stageDTO.endDate = await _validationService.FormatDateInput(newEndDate);
+                stageDTO.createBy = currentUser.userId;
+
+                var result = await _stageRepository.CreateStage(_mapper.Map<Stage>(stageDTO));
+
+                if (result.Equals(""))
+                    throw new CreateObjectException("Create Repayment Stage failed!!!");
+                else
+                {
+                    double sumSharedAmount = await _periodRevenueRepository.SumSharedAmount(projectId);
+                    PeriodRevenue periodRevenue = new PeriodRevenue();
+                    periodRevenue.ProjectId = project.Id;
+                    periodRevenue.StageId = Guid.Parse(result);
+                    periodRevenue.ActualAmount = 0;
+
+                    if (sumSharedAmount < project.InvestmentTargetCapital)
+                        periodRevenue.SharedAmount = project.InvestmentTargetCapital - project.PaidAmount;
+                    else if (sumSharedAmount > project.InvestmentTargetCapital && sumSharedAmount <= (double)Math.Round(project.InvestmentTargetCapital * project.Multiplier))
+                        periodRevenue.SharedAmount = sumSharedAmount - project.PaidAmount;
+                    else if (sumSharedAmount > (double)Math.Round(project.InvestmentTargetCapital * project.Multiplier))
+                        periodRevenue.SharedAmount = (double)Math.Round(project.InvestmentTargetCapital * project.Multiplier) - project.PaidAmount;
+                    else
+                        periodRevenue.SharedAmount = 0;
+
+                    periodRevenue.PaidAmount = 0;
+                    periodRevenue.CreateBy = Guid.Parse(currentUser.userId);
+
+                    await _periodRevenueRepository.CreateRepaymentPeriodRevenue(periodRevenue);
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
         //GET ALL
         public async Task<AllStageDTO> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pageSize, string status, ThisUserObj currentUser)
         {

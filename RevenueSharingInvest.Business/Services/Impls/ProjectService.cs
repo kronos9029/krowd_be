@@ -53,6 +53,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IValidationService _validationService;
         private readonly IProjectTagService _projectTagService;
         private readonly IFileUploadService _fileUploadService;
+        private readonly IStageService _stageService;
         private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IMapper _mapper;
         private readonly IDistributedCache _cache;
@@ -80,6 +81,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IValidationService validationService,
             IProjectTagService projectTagService,
             IFileUploadService fileUploadService,
+            IStageService stageService,
             IBackgroundJobClient backgroundJobClient,
             IMapper mapper,
             IDistributedCache cache)
@@ -106,6 +108,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _validationService = validationService;
             _projectTagService = projectTagService;
             _fileUploadService = fileUploadService;
+            _stageService = stageService;
             _backgroundJobClient = backgroundJobClient;
             _mapper = mapper;
             _cache = cache;
@@ -879,11 +882,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 projectDTO.business = _mapper.Map<GetBusinessDTO>(await _businessRepository.GetBusinessByProjectId(Guid.Parse(projectDTO.id)));
                 if (projectDTO.business != null)
                 {
+                    projectDTO.business.createDate = await _validationService.FormatDateOutput(projectDTO.business.createDate);
+                    projectDTO.business.updateDate = await _validationService.FormatDateOutput(projectDTO.business.updateDate);
                     projectDTO.business.manager = _mapper.Map<BusinessManagerUserDTO>(await _userRepository.GetBusinessManagerByBusinessId(Guid.Parse(projectDTO.business.id)));
+                    projectDTO.business.manager.createDate = await _validationService.FormatDateOutput(projectDTO.business.manager.createDate);
+                    projectDTO.business.manager.updateDate = await _validationService.FormatDateOutput(projectDTO.business.manager.updateDate);
                     projectDTO.business.fieldList = _mapper.Map<List<FieldDTO>>(await _fieldRepository.GetCompanyFields(Guid.Parse(projectDTO.business.id)));
+                    foreach (FieldDTO item in projectDTO.business.fieldList)
+                    {
+                        item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                        item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                    }
                 }
                 projectDTO.manager = _mapper.Map<ProjectManagerUserDTO>(await _userRepository.GetProjectManagerByProjectId(Guid.Parse(projectDTO.id)));
+                projectDTO.manager.createDate = await _validationService.FormatDateOutput(projectDTO.manager.createDate);
+                projectDTO.manager.updateDate = await _validationService.FormatDateOutput(projectDTO.manager.updateDate);
                 projectDTO.field = _mapper.Map<FieldDTO>(await _fieldRepository.GetProjectFieldByProjectId(Guid.Parse(projectDTO.id)));
+                projectDTO.field.createDate = await _validationService.FormatDateOutput(projectDTO.field.createDate);
+                projectDTO.field.updateDate = await _validationService.FormatDateOutput(projectDTO.field.updateDate);
                 projectDTO.area = _mapper.Map<AreaDTO>(await _areaRepository.GetAreaByProjectId(Guid.Parse(projectDTO.id)));
                 projectDTO.projectEntity = new List<TypeProjectEntityDTO>();
                 for (int type = 0; type < Enum.GetNames(typeof(ProjectEntityEnum)).Length; type++)
@@ -891,6 +907,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     TypeProjectEntityDTO typeProjectEntityDTO = new TypeProjectEntityDTO();
                     typeProjectEntityDTO.type = Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(type);
                     typeProjectEntityDTO.typeItemList = _mapper.Map<List<ProjectComponentProjectEntityDTO>>(await _projectEntityRepository.GetProjectEntityByProjectIdAndType(Guid.Parse(projectDTO.id), Enum.GetNames(typeof(ProjectEntityEnum)).ElementAt(type)));
+                    foreach (ProjectComponentProjectEntityDTO item in typeProjectEntityDTO.typeItemList)
+                    { 
+                        item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+                    }
                     projectDTO.projectEntity.Add(typeProjectEntityDTO);
                 }
                 projectDTO.memberList = _mapper.Map<List<ProjectMemberUserDTO>>(await _userRepository.GetProjectMembers(Guid.Parse(projectDTO.id)));
@@ -1171,6 +1191,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     {
                         if (!status.Equals(ProjectStatusEnum.CLOSED.ToString()))
                             throw new InvalidFieldException("ADMIN can update Project's status from ACTIVE to CLOSED!!!");
+
+                        Stage lastStage = await _stageRepository.GetLastStageByProjectId(project.Id);
+                        if (DateTime.Compare(DateTimePicker.GetDateTimeByTimeZone(), lastStage.EndDate.AddDays(3)) < 0)
+                            throw new InvalidFieldException("You can not close this Project because all Stages have not DONE yet!!!");
+
+                        if (project.PaidAmount < project.InvestmentTargetCapital)
+                            throw new InvalidFieldException("You can not close this Project because the debt has not been paid in full!!!");
                     }
                     else
                         throw new InvalidFieldException("ADMIN can update if Project's status is WAITING_FOR_APPROVAL or CALLING_TIME_IS_OVER or WAITING_TO_ACTIVATE or ACTIVE!!!");
@@ -1190,11 +1217,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     else
                         throw new InvalidFieldException("PROJECT_MANAGER can update if Project's status is DRAFT or DENIED!!!");
                 }
-
-                //if (status.Equals(ProjectStatusEnum.WAITING_TO_PUBLISH.ToString()))
-                //    result = await _projectRepository.ApproveProject(projectId, Guid.Parse(currentUser.userId));
-                //else
-                //    result = await _projectRepository.UpdateProjectStatus(projectId, status, Guid.Parse(currentUser.userId));
 
                 result = status.Equals(ProjectStatusEnum.WAITING_TO_PUBLISH.ToString()) 
                     ? await _projectRepository.ApproveProject(projectId, Guid.Parse(currentUser.userId)) 
@@ -1310,6 +1332,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                                 await _dailyReportRepository.CreateDailyReports(dailyReport, numOfReport);
                             }
+
+                            Stage lastStage = await _stageRepository.GetLastStageByProjectId(projectId);
+                            _backgroundJobClient.Schedule<ProjectService>(
+                                projectService => projectService
+                                .CreateRepaymentStageCheck(projectId, currentUser), TimeSpan.FromTicks(lastStage.EndDate.AddDays(3).Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
                         }
 
                     }
@@ -1561,5 +1588,24 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
+        public async Task<bool> CreateRepaymentStageCheck(Guid projectId, ThisUserObj currentUser)
+        {
+            try
+            {
+                Project project = await _projectRepository.GetProjectById(projectId);
+                Stage lastStage = await _stageRepository.GetLastStageByProjectId(projectId);
+                if (DateTime.Compare(DateTimePicker.GetDateTimeByTimeZone(), lastStage.EndDate.AddDays(3)) > 0 && project.PaidAmount < project.InvestmentTargetCapital)
+                {
+                    await _stageService.CreateRepaymentStage(projectId, currentUser);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

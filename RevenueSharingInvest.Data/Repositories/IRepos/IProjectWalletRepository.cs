@@ -16,6 +16,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<List<ProjectWallet>> GetProjectWalletsByProjectManagerId(Guid projectManagerId);
         public Task<ProjectWallet> GetProjectWalletById(Guid id);
         public Task<ProjectWallet> GetProjectWalletByProjectManagerIdAndType(Guid projectOwnerId, string walletType, Guid? projectId);
+        public Task<string> GetProjectWalletNameById(Guid walletId);
 
         //UPDATE
         public Task<int> UpdateProjectWallet(ProjectWallet projectWalletDTO, Guid projectWalletId);

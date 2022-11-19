@@ -22,6 +22,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string UpdateDate { get; set; }
         public string UpdateBy { get; set; }
         public string FromWalletId { get; set; }
+        public string FromWalletName { get; set; }
     }
 
     public class WithdrawRequestDTO

@@ -64,7 +64,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 //Kiểm tra projectId có thuộc về business của PM không
                 Project project = await _projectRepository.GetProjectById(Guid.Parse(packageDTO.projectId));
-                if (!project.BusinessId.ToString().Equals(currentUser.businessId))
+                if (!project.BusinessId.Equals(Guid.Parse(currentUser.businessId)))
                 {
                     throw new NotFoundException("This projectId is not belong to your's Business!!!");
                 }    

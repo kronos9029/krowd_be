@@ -299,5 +299,90 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        //COUNT NOT PAID ENOUGH
+        public async Task<int> CountNotPaidEnoughPeriodRevenue(Guid projectId)
+        {
+            try
+            {
+                var query = "SELECT COUNT(*) FROM PeriodRevenue WHERE ProjectId = @ProjectId AND (Status IS NULL OR Status = 'NOT_PAID_ENOUGH') ";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //CREATE REPAYMENT PERIOD REVENUE
+        public async Task<string> CreateRepaymentPeriodRevenue(PeriodRevenue periodRevenueDTO)
+        {
+            try
+            {
+                var query = "INSERT INTO PeriodRevenue ("
+                    + "         ProjectId, "
+                    + "         StageId, "
+                    + "         ActualAmount, "
+                    + "         SharedAmount, "
+                    + "         PaidAmount, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
+                    + "     VALUES ( "
+                    + "         @ProjectId, "
+                    + "         @StageId, "
+                    + "         @ActualAmount, "
+                    + "         @SharedAmount, "
+                    + "         @PaidAmount, "
+                    + "         @CreateDate, "
+                    + "         @CreateBy, "
+                    + "         @UpdateDate, "
+                    + "         @UpdateBy )";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", periodRevenueDTO.ProjectId, DbType.Guid);
+                parameters.Add("StageId", periodRevenueDTO.StageId, DbType.Guid);
+                parameters.Add("ActualAmount", periodRevenueDTO.ActualAmount, DbType.Double);
+                parameters.Add("SharedAmount", periodRevenueDTO.SharedAmount, DbType.Double);
+                parameters.Add("PaidAmount", periodRevenueDTO.PaidAmount, DbType.Double);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                parameters.Add("CreateBy", periodRevenueDTO.CreateBy, DbType.Guid);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                parameters.Add("UpdateBy", periodRevenueDTO.CreateBy, DbType.Guid);
+
+                using var connection = CreateConnection();
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //SUM SHARED AMOUNT
+        public async Task<double> SumSharedAmount(Guid projectId)
+        {
+            try
+            {
+                string query = "SELECT SUM(SharedAmount) FROM PeriodRevenue WHERE ProjectId = @ProjectId AND SharedAmount IS NOT NULL";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (double)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

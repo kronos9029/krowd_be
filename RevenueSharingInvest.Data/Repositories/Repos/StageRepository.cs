@@ -237,7 +237,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "             JOIN ( "
                     + "                 SELECT MAX(EndDate) 'EndDate' "
                     + "                 FROM Stage "
-                    + "                 WHERE ProjectId = @ProjectId) AS X ON S.EndDate = X.EndDate "
+                    + "                 WHERE ProjectId = @ProjectId AND Name != N'Giai đoạn thanh toán nợ') AS X ON S.EndDate = X.EndDate "
                     + "         WHERE " 
                     + "             S.ProjectId = @ProjectId ";
                 var parameters = new DynamicParameters();
