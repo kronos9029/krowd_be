@@ -366,12 +366,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 //List<GetWithdrawRequestDTO> withdrawRequestDTOList = _mapper.Map<List<GetWithdrawRequestDTO>>(withdrawRequestList);
                 List<GetWithdrawRequestDTO> withdrawRequestDTOList = new();
 
-                Role role = await _roleRepository.GetRoleByUserId(Guid.Parse(userId));
+                string roleName = await _roleRepository.GetRoleNameByUserId(Guid.Parse(userId));
                 foreach (WithdrawRequest withdrawRequest in withdrawRequestList)
                 {
-                    if (role.Name.Equals(RoleEnum.INVESTOR.ToString()))
+                    if (roleName.Equals(RoleEnum.INVESTOR.ToString()))
                         walletName = await _investorWalletRepository.GetInvertorWalletNamebyWalletId(withdrawRequest.FromWalletId);
-                    if(role.Name.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
+                    if(roleName.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
                         walletName = await _projectWalletRepository.GetProjectWalletNameById(withdrawRequest.FromWalletId);
                     GetWithdrawRequestDTO withdrawRequestDTO = new()
                     {
@@ -416,14 +416,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 List<WithdrawRequest> withdrawRequests = await _withdrawRequestRepository.GetAllWithdrawRequest(pageIndex, pageSize, userId, filter);
                 result.numOfWithdrawRequest = await _withdrawRequestRepository.CountAllWithdrawRequest(userId, filter);
-                Role role = await _roleRepository.GetRoleByUserId(Guid.Parse(userId));
+                
                 string walletName = "";
                 foreach (WithdrawRequest withdrawRequest in withdrawRequests)
                 {
-                    if (role.Name.Equals(RoleEnum.INVESTOR.ToString()))
-                        walletName = await _investorWalletRepository.GetInvertorWalletNamebyWalletId(withdrawRequest.FromWalletId);
-                    if (role.Name.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
-                        walletName = await _projectWalletRepository.GetProjectWalletNameById(withdrawRequest.FromWalletId);
                     GetWithdrawRequestDTO withdrawRequestDTO = new()
                     {
                         Id = withdrawRequest.Id.ToString(),
@@ -438,9 +434,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         CreateBy = withdrawRequest.CreateBy.ToString(),
                         UpdateDate = await _validationService.FormatDateOutput(withdrawRequest.UpdateDate.ToString()),
                         UpdateBy = withdrawRequest.UpdateBy.ToString(),
-                        FromWalletId = withdrawRequest.FromWalletId.ToString(),
-                        FromWalletName = walletName
+                        FromWalletId = withdrawRequest.FromWalletId.ToString()
                     };
+                    string roleName = await _roleRepository.GetRoleNameByUserId(Guid.Parse(withdrawRequestDTO.CreateBy));
+                    if (roleName.Equals(RoleEnum.INVESTOR.ToString()))
+                        walletName = await _investorWalletRepository.GetInvertorWalletNamebyWalletId(withdrawRequest.FromWalletId);
+                    if (roleName.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
+                        walletName = await _projectWalletRepository.GetProjectWalletNameById(withdrawRequest.FromWalletId);
+
+                    withdrawRequestDTO.FromWalletName = walletName;
                     result.listOfWithdrawRequest.Add(withdrawRequestDTO);
                 }
                 return result;
@@ -465,10 +467,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 withdrawRequestDTO.UpdateDate = await _validationService.FormatDateOutput(withdrawRequestDTO.UpdateDate);
 
                 string walletName = "";
-                Role role = await _roleRepository.GetRoleByUserId((Guid)withdrawRequest.CreateBy);
-                if (role.Name.Equals(RoleEnum.INVESTOR.ToString()))
+                string roleName = await _roleRepository.GetRoleNameByUserId((Guid)withdrawRequest.CreateBy);
+                if (roleName.Equals(RoleEnum.INVESTOR.ToString()))
                     walletName = await _investorWalletRepository.GetInvertorWalletNamebyWalletId(withdrawRequest.FromWalletId);
-                if (role.Name.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
+                if (roleName.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
                     walletName = await _projectWalletRepository.GetProjectWalletNameById(withdrawRequest.FromWalletId);
 
                 withdrawRequestDTO.FromWalletName = walletName;
