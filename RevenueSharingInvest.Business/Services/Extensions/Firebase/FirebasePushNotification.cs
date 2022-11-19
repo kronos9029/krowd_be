@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
@@ -32,7 +33,6 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
             var failedTokens = new List<string>();
             if (response.FailureCount > 0)
             {
-                
                 for (var i = 0; i < response.Responses.Count; i++)
                 {
                     if (!response.Responses[i].IsSuccess)
@@ -93,7 +93,8 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
                 }
             };
 
-            return await FirebaseMessaging.DefaultInstance.SendAsync(message);
+            var result = (JsonObject)await FirebaseMessaging.DefaultInstance.SendAsync(message, true);
+            result.;
         }
     }
 }

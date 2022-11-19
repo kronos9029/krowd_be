@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Business.Services.Extensions.iText;
 using RevenueSharingInvest.Business.Services.Impls;
