@@ -113,7 +113,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async void TransferMoney(dynamic from, dynamic to, double amount, string userId)
+        public async void TransferMoney(dynamic from, dynamic to, double amount, string userId, string action)
         {
             try
             {
@@ -157,6 +157,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     Type = WalletTransactionTypeEnum.CASH_OUT.ToString(),
                     CreateBy = Guid.Parse(userId)
                 };
+                if (action.Equals("REFUND"))
+                {
+                    walletTransaction.Description = "Refund money from withdraw request";
+                }
                 string newWalletTransactionId = await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
                 if (newWalletTransactionId == null || newWalletTransactionId.Equals(""))
                     throw new CreateObjectException("Create Wallet Transaction Failed!!");

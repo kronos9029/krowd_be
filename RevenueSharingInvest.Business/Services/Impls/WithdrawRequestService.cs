@@ -129,7 +129,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         FromWalletId = withdrawRequest.FromWalletId.ToString(),
                         FromWalletName = walletName
                     };
-                    _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
+                    _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId, "");
 
                     NotificationDetailDTO notification = new()
                     {
@@ -190,7 +190,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         FromWalletId = withdrawRequest.FromWalletId.ToString(),
                         FromWalletName = walletName
                 };
-                    _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId);
+                    _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId, "");
 
                     NotificationDetailDTO notification = new()
                     {
@@ -297,14 +297,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     InvestorWallet refundWallet = await _investorWalletRepository.GetInvestorWalletById(Guid.Parse(currentRequest.FromWalletId));
 
-                    _walletTransactionService.TransferMoney(fromWallet, refundWallet, currentRequest.Amount, currentUser.userId);
+                    _walletTransactionService.TransferMoney(fromWallet, refundWallet, currentRequest.Amount, currentUser.userId, "");
                 } else if (requestCreatorRole.Id.Equals(Guid.Parse(currentUser.projectManagerRoleId)))
                 {
                     ProjectWallet refundWallet = await _projectWalletRepository.GetProjectWalletById(Guid.Parse(currentRequest.FromWalletId));
 
                     ProjectWallet fromWallet = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(Guid.Parse(currentRequest.CreateBy), WalletTypeEnum.P1.ToString(), refundWallet.ProjectId);
 
-                    _walletTransactionService.TransferMoney(fromWallet, refundWallet, currentRequest.Amount, currentUser.userId);
+                    _walletTransactionService.TransferMoney(fromWallet, refundWallet, currentRequest.Amount, currentUser.userId, "REFUND");
                 }
 
                 dynamic result = await _withdrawRequestRepository.AdminRejectWithdrawRequest(Guid.Parse(currentUser.userId), Guid.Parse(currentRequest.Id), RefusalReason);
