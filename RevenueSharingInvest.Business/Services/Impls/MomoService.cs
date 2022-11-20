@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static Google.Apis.Requests.BatchRequest;
 using RevenueSharingInvest.Business.Models.Constant;
+using RevenueSharingInvest.Business.Exceptions;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
@@ -32,6 +33,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             try
             {
+                if (request.amount > 50000000)
+                    throw new AmountExcessException("Maximum amount is 50000000 VND");
                 //request params need to request to MoMo system
                 string partnerCode = _momoSettings.PartnerCode;
                 string apiEndpoint = _momoSettings.ApiEndpoint;

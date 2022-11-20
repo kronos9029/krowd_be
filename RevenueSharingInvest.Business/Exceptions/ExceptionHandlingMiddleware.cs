@@ -76,6 +76,10 @@ namespace RevenueSharingInvest.Business.Exceptions
                     errorMessageObject.Code = "L001";
                     statusCode= (int)HttpStatusCode.BadRequest;
                     break;
+                case AmountExcessException:
+                    errorMessageObject.Code = "A001";
+                    statusCode=(int)HttpStatusCode.BadRequest;
+                    break;
 
             }
 
