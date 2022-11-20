@@ -74,7 +74,17 @@ namespace RevenueSharingInvest.API.Controllers
             var result = await _userService.GetIntegrateInfoByEmailAndProjectId(currentUser.email, projectId);
             return Ok(result);
         }
-
+        
+        [HttpPost]
+        [Route("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout([FromQuery] string deviceToken)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            await _authenticateService.Logout(currentUser.userId, deviceToken);
+            return Ok(0);
+        }
+/*
         [HttpPost]
         [Route("test")]
         public async Task<IActionResult> UploadFile()
@@ -89,7 +99,7 @@ namespace RevenueSharingInvest.API.Controllers
             string timeString = dateTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
             DateTime now = DateTime.Parse(timeString);
             return Ok(now);
-        }
+        }*/
 
 
     }

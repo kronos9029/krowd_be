@@ -30,6 +30,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<User> GetProjectManagerByProjectId(Guid projectId);
         public Task<List<User>> GetProjectMembers(Guid projectId);
         public Task<List<User>> GetUserByBusinessId(Guid businessId);
+        public Task<string> GetDeviceTokenByUserId(Guid userId);
         //public Task<int> CountUser(string businessId, string projectManagerId, string projectId, string roleId, string status, string thisUserRoleId);
         public Task<User> BusinessManagerGetUserById(Guid businessId, Guid userid);
         public Task<User> ProjectManagerGetUserbyId(Guid managerId, Guid id);
@@ -44,6 +45,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<int> UpdateUserImage(string url, Guid userId);
         public Task<int> UpdateUserStatus(Guid userId, string status, Guid currentUserId);
         public Task<int> UpdateUserEmail(Guid userId, string email, Guid currentUserId);
+        public Task<int> UpdateDeviceToken(string deviceToken, Guid userId);
 
         //DELETE
         //public Task<int> DeleteUserById(Guid userId);

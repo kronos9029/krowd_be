@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
+using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 using System.Collections.Generic;
@@ -25,9 +26,11 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
             {
                 result = new Notification
                 {
-                    Details = new List<NotificationDetail>()
+                    Details = new()
+                    {
+                        notification
+                    }
                 };
-                result.Details.Insert(0, notification);
             }
             else
             {
@@ -54,11 +57,11 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
             Notification result = await GetRecordAsync<Notification>(cache, userId);
 
             result ??= new()
-                {
-                    Total = 0,
-                    New = 0,
-                    Details = new List<NotificationDetail>()
-                };
+            {
+                Total = 0,
+                New = 0,
+                Details = new List<NotificationDetail>()
+            };
 
             if (seen == true)
             {
