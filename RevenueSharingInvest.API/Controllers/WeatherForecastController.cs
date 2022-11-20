@@ -12,6 +12,7 @@ using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Business.Services.Extensions.iText;
+using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
@@ -85,8 +86,12 @@ namespace RevenueSharingInvest.API.Controllers
         [Route("test-push")]
         public async Task<IActionResult> ValidateDeviceToken(string deviceToken)
         {
-            var result = await FirebasePushNotification.ValidateToken(deviceToken);
-            return Ok(result);
+            List<string> newtokens = new()
+            {
+                deviceToken
+            };
+            newtokens = await DeviceTokenCache.ValidateDeviceToken(newtokens);
+            return Ok(newtokens.First());
         }
 
 /*        [HttpPost]

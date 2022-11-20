@@ -40,8 +40,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         CreateBy, "
                     + "         UpdateDate, "
                     + "         UpdateBy," 
-                    + "         SecretKey," 
-                    + "         DeviceToken) "
+                    + "         SecretKey) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -56,8 +55,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
                     + "         @UpdateBy," 
-                    + "         @SecretKey," 
-                    + "         @DeviceToken)";
+                    + "         @SecretKey)";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("RoleId", userDTO.RoleId, DbType.Guid);
@@ -72,7 +70,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", userDTO.CreateBy, DbType.Guid);
                 parameters.Add("SecretKey", userDTO.SecretKey??="", DbType.String);
-                parameters.Add("DeviceToken", userDTO.DeviceToken??="", DbType.String);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
@@ -1517,6 +1514,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
 
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<string> GetDeviceTokenByUserId(Guid userId)
+        {
+            try
+            {
+                var query = "SELECT DeviceToken FROM [User] WHERE Id = @Id ";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", userId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<string>(query, parameters);
             }
             catch(Exception e)
             {

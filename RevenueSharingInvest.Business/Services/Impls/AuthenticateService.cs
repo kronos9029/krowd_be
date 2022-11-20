@@ -1,14 +1,19 @@
 ﻿using AutoMapper;
 using FirebaseAdmin.Auth;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
+using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -18,6 +23,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using DistributedCacheExtensions = RevenueSharingInvest.Business.Services.Extensions.RedisCache.DistributedCacheExtensions;
 using UnauthorizedAccessException = RevenueSharingInvest.Business.Exceptions.UnauthorizedAccessException;
 
 namespace RevenueSharingInvest.Business.Services.Impls
@@ -30,13 +36,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IInvestorWalletRepository _investorWalletRepository;
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
+        private readonly IDistributedCache _cache;
 
         public AuthenticateService(IOptions<AppSettings> appSettings, 
             IUserRepository userRepository, 
             IInvestorRepository investorRepository,
             IInvestorWalletRepository investorWalletRepository,
             IValidationService validationService,
-            IMapper mapper)
+            IMapper mapper,
+            IDistributedCache cache)
         {
             _appSettings = appSettings.Value;
             _userRepository = userRepository;
@@ -44,6 +52,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _investorWalletRepository = investorWalletRepository;
             _validationService = validationService;
             _mapper = mapper;
+            _cache = cache;
         }
 
         public async Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken, string deviceToken)
@@ -73,8 +82,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     Image = ImageUrl,
                     RoleId = roleId,
                     LastName = lastName,
-                    Status = ObjectStatusEnum.ACTIVE.ToString(),
-                    DeviceToken = deviceToken ?? ""
+                    Status = ObjectStatusEnum.ACTIVE.ToString()
                 };
 
                 //Tạo User object Role INVESTOR
@@ -83,6 +91,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     throw new RegisterException("Register Fail!!");
                 }
+
+                if(deviceToken != null || !deviceToken.Equals(""))
+                {
+                    List<string> newtokens = new()
+                    {
+                        deviceToken
+                    };
+
+                    newtokens = await DeviceTokenCache.ValidateDeviceToken(newtokens);
+                    if (newtokens.Count > 0)
+                        await DeviceTokenCache.UpdateDeviceToken(_cache, newUserID, newtokens.Last());
+                }
+
+                
+                
 
                 //Tạo Investor object
                 investor.UserId = Guid.Parse(newUserID);
@@ -112,12 +135,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
             {
                 if (!userObject.RoleId.ToString().Equals(RoleDictionary.role.GetValueOrDefault(RoleEnum.INVESTOR.ToString())))
                     throw new RegisterException("This Is Not An Investor Email!!");
-                if(deviceToken != null || !deviceToken.Equals(""))
+
+
+                if (deviceToken != null || !deviceToken.Equals(""))
                 {
-                    if (!userObject.DeviceToken.Equals(deviceToken))
+                    List<string> newtokens = new()
                     {
-                        await _userRepository.UpdateDeviceToken(deviceToken, userObject.Id);
-                    }
+                        deviceToken
+                    };
+
+                    newtokens = await DeviceTokenCache.ValidateDeviceToken(newtokens);
+                    if (newtokens.Count > 0)
+                        await DeviceTokenCache.UpdateDeviceToken(_cache, userObject.Id.ToString(), newtokens.Last());
                 }
 
                 response.email = email;
@@ -310,6 +339,23 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             response.token = tokenHandler.WriteToken(token);
             return response;
+        }
+
+        public async Task Logout(string userId, string deviceToken)
+        {
+            try
+            {
+                DeviceToken result = await DeviceTokenCache.GetAvailableDevice(_cache, userId);
+                string key = "Device-"+userId;
+                if(result.Tokens.Remove(deviceToken))
+                    await DistributedCacheExtensions.SetRecordAsync(_cache, key, result);
+
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
         }
     }
 

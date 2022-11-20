@@ -1286,12 +1286,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                     Description = "Transfer money from I3 wallet to P3 wallet to prepare for activation",
                                     FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.InvestorId, WalletTypeEnum.I3.ToString())).Id,
                                     CreateBy = Guid.Parse(currentUser.userId),
-                                    Type = WalletTransactionTypeEnum.CASH_OUT.ToString()
-
+                                    Type = WalletTransactionTypeEnum.CASH_OUT.ToString(),
+                                    InvestorWalletId = walletTransaction.FromWalletId,
+                                    ToWalletId = (await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(project.ManagerId, WalletTypeEnum.P3.ToString(), projectId)).Id,
+                                    ProjectWalletId = walletTransaction.ToWalletId
                                 };
-                                walletTransaction.InvestorWalletId = walletTransaction.FromWalletId;
-                                walletTransaction.ToWalletId = (await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType(project.ManagerId, WalletTypeEnum.P3.ToString(), projectId)).Id;
-                                walletTransaction.ProjectWalletId = walletTransaction.ToWalletId;
                                 await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
                                 //Add P3 balance

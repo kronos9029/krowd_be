@@ -1,4 +1,6 @@
 ﻿using FirebaseAdmin.Messaging;
+using Google.Protobuf.WellKnownTypes;
+using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 using System;
 using System.Collections.Generic;
@@ -13,7 +15,6 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
     {
         public static async Task<List<string>> SendMultiDevicePushNotification(List<string> deviceTokens, PushNotification notification)
         {
-
             // Create a list containing up to 500 registration tokens.
             // These registration tokens come from the client FCM SDKs.
             var message = new MulticastMessage()
@@ -48,19 +49,63 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
         
         public static async Task SendPushNotification(string deviceToken, PushNotification notification)
         {
-
-            var message = new Message()
+            if (notification.ImageUrl.Equals(""))
             {
-                Token = deviceToken,
-                Notification = new()
+                var message = new Message()
                 {
-                    Title = notification.Title,
-                    Body = notification.Body,
-                    ImageUrl = notification.ImageUrl
-                },
-            };
+                    Token = deviceToken,
+                    Notification = new()
+                    {
+                        Title = notification.Title,
+                        Body = notification.Body
+                    },
+                    Android = new AndroidConfig()
+                    {
+                        Notification = new AndroidNotification()
+                        {
+                            Icon = "stock_ticker_update",
+                            Color = "#f45342",
+                        },
+                    },
+                    Apns = new ApnsConfig()
+                    {
+                        Aps = new Aps()
+                        {
+                            Badge = 42,
+                        },
+                    },
+                };
+                await FirebaseMessaging.DefaultInstance.SendAsync(message);
+            } else
+            {
+                var message = new Message()
+                {
+                    Token = deviceToken,
+                    Notification = new()
+                    {
+                        Title = notification.Title,
+                        Body = notification.Body,
+                        ImageUrl = notification.ImageUrl
+                    },
+                    Android = new AndroidConfig()
+                    {
+                        Notification = new AndroidNotification()
+                        {
+                            Icon = "stock_ticker_update",
+                            Color = "#f45342",
+                        },
+                    },
+                    Apns = new ApnsConfig()
+                    {
+                        Aps = new Aps()
+                        {
+                            Badge = 42,
+                        },
+                    },
+                };
 
-            await FirebaseMessaging.DefaultInstance.SendAsync(message);;
+                await FirebaseMessaging.DefaultInstance.SendAsync(message);
+            }
         }
         
         public static async Task SendPushNotificationToTopic(string topic, PushNotification notification)
@@ -82,19 +127,18 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
 
         public static async Task<dynamic> ValidateToken(string deviceToken)
         {
-
-            var message = new Message()
-            {
-                Token = deviceToken,
-                Notification = new()
+                var message = new Message()
                 {
-                    Title = "test back end",
-                    Body = "alo"
-                }
-            };
+                    Token = deviceToken,
+                    Notification = new()
+                    {
+                        Title = "test back end",
+                        Body = "alo"
+                    }
+                };
 
-            var result = (JsonObject)await FirebaseMessaging.DefaultInstance.SendAsync(message, true);
-            result.;
+                var result = (JsonObject)await FirebaseMessaging.DefaultInstance.SendAsync(message, true);
+                return result;
         }
     }
 }

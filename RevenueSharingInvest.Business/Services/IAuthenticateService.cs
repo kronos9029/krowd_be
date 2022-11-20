@@ -13,5 +13,6 @@ namespace RevenueSharingInvest.Business.Services
         public Task<AuthenticateResponse> GetTokenWebBusiness(string firebaseToken);
         public Task<AuthenticateResponse> GetTokenAdmin(string firebaseToken);
         public Task<AuthenticateResponse> GetTokenProjectManager(string firebaseToken);
+        public Task Logout(string userId, string deviceToken);
     }
 }

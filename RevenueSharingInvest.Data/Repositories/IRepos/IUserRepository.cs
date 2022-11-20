@@ -30,6 +30,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<User> GetProjectManagerByProjectId(Guid projectId);
         public Task<List<User>> GetProjectMembers(Guid projectId);
         public Task<List<User>> GetUserByBusinessId(Guid businessId);
+        public Task<string> GetDeviceTokenByUserId(Guid userId);
         //public Task<int> CountUser(string businessId, string projectManagerId, string projectId, string roleId, string status, string thisUserRoleId);
         public Task<User> BusinessManagerGetUserById(Guid businessId, Guid userid);
         public Task<User> ProjectManagerGetUserbyId(Guid managerId, Guid id);
