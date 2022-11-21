@@ -1503,40 +1503,5 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        public async Task<int> UpdateDeviceToken(string deviceToken, Guid userId)
-        {
-            try
-            {
-                var query = "UPDATE [User] SET DeviceToken = @DeviceToken WHERE Id = @Id";
-                var parameters = new DynamicParameters();
-                parameters.Add("DeviceToken", deviceToken, DbType.String);
-                parameters.Add("Id", userId, DbType.Guid);
-                using var connection = CreateConnection();
-                return await connection.ExecuteAsync(query, parameters);
-
-            }
-            catch(Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message, e);
-            }
-        }
-
-        public async Task<string> GetDeviceTokenByUserId(Guid userId)
-        {
-            try
-            {
-                var query = "SELECT DeviceToken FROM [User] WHERE Id = @Id ";
-                var parameters = new DynamicParameters();
-                parameters.Add("Id", userId, DbType.Guid);
-                using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<string>(query, parameters);
-            }
-            catch(Exception e)
-            {
-                LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message, e);
-            }
-        }
     }
 }

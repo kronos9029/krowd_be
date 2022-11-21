@@ -133,7 +133,9 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
                 }
                 else
                 {
-                    userIdList.Add(userId);
+                    if (userIdList.Find(x => x.Equals(userId)).Equals(userId))
+                        userIdList.Add(userId);
+
                 }
 
                 await DistributedCacheExtensions.SetRecordAsync(cache, topic, userIdList);

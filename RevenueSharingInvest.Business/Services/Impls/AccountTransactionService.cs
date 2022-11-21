@@ -131,13 +131,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         notification.Title = "Bạn vừa nạp "+momoPaymentResult.amount+"VNĐ vào ví đầu tư chung.";
                         await NotificationCache.UpdateNotification(_cache, momoPaymentResult.partnerClientId, notification);
 
-                        string deviceToken = await _userRepository.GetDeviceTokenByUserId((Guid)accountTransaction.PartnerClientId);
+                        DeviceToken deviceToken = await DeviceTokenCache.GetAvailableDevice(_cache, accountTransaction.PartnerClientId.ToString());
                         PushNotification pushNotification = new()
                         {
                             Title = "Tiền về ví Krowd!!",
                             Body = notification.Title
                         };
-                        await FirebasePushNotification.SendPushNotification(deviceToken, pushNotification);
+                        await FirebasePushNotification.SendMultiDevicePushNotification(deviceToken.Tokens, pushNotification);
                     }
                     if (roleName.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
                     {
