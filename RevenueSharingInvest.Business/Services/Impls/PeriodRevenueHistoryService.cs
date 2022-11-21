@@ -1,14 +1,18 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Caching.Distributed;
 using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Business.Services.Extensions.Firebase;
+using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs.GetAllDTO;
+using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -36,6 +40,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
+        private readonly IDistributedCache _cache;
 
 
         public PeriodRevenueHistoryService(
@@ -52,7 +57,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IPaymentRepository paymentRepository,
             IInvestorRepository investorRepository,
 
-            IValidationService validationService, IMapper mapper)
+            IValidationService validationService, 
+            IMapper mapper,
+            IDistributedCache cache)
         {
             _periodRevenueHistoryRepository = periodRevenueHistoryRepository;
             _periodRevenueRepository = periodRevenueRepository;
@@ -69,6 +76,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             _validationService = validationService;
             _mapper = mapper;
+            _cache = cache;
         }
 
         //CREATE
@@ -153,7 +161,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 var foundInvestor = paidInvestorList.ToDictionary(x => x.investorId);
                                 paidInvestor = paidInvestorList.Find(x => x.investorId.Equals(investment.InvestorId));
                                 if (foundInvestor.TryGetValue(paidInvestor.investorId, out paidInvestor)) 
-                                    paidInvestor.amount = paidInvestor.amount + Math.Floor((int)investment.Quantity * packagePercent.paidPerInvestment);
+                                    paidInvestor.amount += Math.Floor((int)investment.Quantity * packagePercent.paidPerInvestment);
                             }                    
                         }              
                     }
@@ -162,7 +170,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     InvestorWallet investorWallet = new InvestorWallet();
 
-                    WalletTransaction walletTransaction = new WalletTransaction();
+                    WalletTransaction walletTransaction = new();
+                    NotificationDetailDTO notificationForInvestor = new();
+                    PushNotification pushNotification = new();
 
                     foreach (PaidInvestorDTO item in paidInvestorList)
                     {
@@ -207,6 +217,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         payment.Status = TransactionStatusEnum.SUCCESS.ToString();
 
                         string paymentId = await _paymentRepository.CreatePayment(payment);
+
+                        //Notification cho investor
+                        notificationForInvestor.Title = payment.Description;
+                        notificationForInvestor.EntityId = paymentId;
+                        notificationForInvestor.Image = project.Image;
+                        await NotificationCache.UpdateNotification(_cache, payment.ToId.ToString(), notificationForInvestor);
+
+                        pushNotification.Title = "Tiền về ví!!!";
+                        pushNotification.Body = payment.Description;
+                        pushNotification.ImageUrl = project.Image;
+                        await FirebasePushNotification.SendPushNotificationToUpdateProjectTopics(project.Id.ToString(), pushNotification);
                     }
 
                     //Update PeriodRevenue
