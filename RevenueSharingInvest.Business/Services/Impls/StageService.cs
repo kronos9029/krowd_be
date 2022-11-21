@@ -27,7 +27,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
-
+        private readonly string REPAYMENT_STAGE_NAME = "Giai đoạn thanh toán nợ";
 
         public StageService(
             IStageRepository stageRepository, 
@@ -62,7 +62,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 string newEndDate = "31/12/2099 23:59:59";
 
                 GetStageDTO stageDTO = new GetStageDTO();
-                stageDTO.name = "Giai đoạn thanh toán nợ";
+                stageDTO.name = REPAYMENT_STAGE_NAME;
                 stageDTO.projectId = project.Id.ToString();
                 stageDTO.startDate = await _validationService.FormatDateInput(newStartDate.Remove(newStartDate.Length - 8) + "00:00:00");
                 stageDTO.endDate = await _validationService.FormatDateInput(newEndDate);
