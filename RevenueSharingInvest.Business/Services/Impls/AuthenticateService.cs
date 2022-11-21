@@ -57,6 +57,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
         public async Task<AuthenticateResponse> GetTokenInvestor(string firebaseToken, string deviceToken)
         {
+            deviceToken ??= "";
             FirebaseToken decryptedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(firebaseToken);
             string uid = decryptedToken.Uid;
 
