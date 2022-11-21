@@ -70,7 +70,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateNoti(string userId, NotificationDetailDTO newNoti)
         {
-            var result = await DistributedCacheExtensions.UpdateNotification(_distributedCache, userId, newNoti);
+            var result = await NotificationCache.UpdateNotification(_distributedCache, userId, newNoti);
 
             return Ok(result);
         }
@@ -78,21 +78,17 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetNoti(string userId, bool seen)
         {
-            var result = await DistributedCacheExtensions.GetNotification(_distributedCache, userId, seen);
+            var result = await NotificationCache.GetNotification(_distributedCache, userId, seen);
             return Ok(result);
         }
 
-        [HttpPost]
+/*        [HttpPost]
         [Route("test-push")]
         public async Task<IActionResult> ValidateDeviceToken(string deviceToken)
         {
-            List<string> newtokens = new()
-            {
-                deviceToken
-            };
-            newtokens = await DeviceTokenCache.ValidateDeviceToken(newtokens);
-            return Ok(newtokens.First());
-        }
+*//*            await DistributedCacheExtensions.DeleteKey(_distributedCache, deviceToken);
+            return Ok(0);*//*
+        }*/
 
 /*        [HttpPost]
         public async Task<IActionResult> Getokok()

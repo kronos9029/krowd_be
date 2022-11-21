@@ -1095,12 +1095,27 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", projectDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", projectDTO.Id, DbType.Guid);
 
-                using (var connection = CreateConnection())
-                {
-                    return await connection.ExecuteAsync(query, parameters);
-                }
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<string> GetPrjectImageByProjectId(Guid projectId)
+        {
+            try
+            {
+                var query = "SELECT Image FROM Project WHERE Id = @Id";
+                var parameters = new DynamicParameters();
+                parameters.Add("Id", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<string>(query, parameters);
+            }
+            catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);

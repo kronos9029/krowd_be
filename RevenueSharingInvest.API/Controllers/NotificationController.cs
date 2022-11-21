@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using RevenueSharingInvest.Business.Services;
+using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 using System.Threading.Tasks;
 using DistributedCacheExtensions = RevenueSharingInvest.Business.Services.Extensions.RedisCache.DistributedCacheExtensions;
@@ -27,14 +28,14 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateNoti(string userId, NotificationDetailDTO newNoti)
         {
-            var result = await DistributedCacheExtensions.UpdateNotification(_distributedCache, userId, newNoti);
+            var result = await NotificationCache.UpdateNotification(_distributedCache, userId, newNoti);
             return Ok(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetNoti(string userId, bool seen)
         {
-            var result = await DistributedCacheExtensions.GetNotification(_distributedCache, userId, seen);
+            var result = await NotificationCache.GetNotification(_distributedCache, userId, seen);
             return Ok(result);
         }
     }

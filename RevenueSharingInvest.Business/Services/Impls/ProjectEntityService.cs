@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Caching.Distributed;
 using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
+using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -23,19 +26,22 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IValidationService _validationService;
         private readonly IFileUploadService _fileUploadService;
         private readonly IMapper _mapper;
+        private readonly IDistributedCache _cache;
 
 
         public ProjectEntityService(IProjectEntityRepository projectEntityRepository,
             IProjectRepository projectRepository,
             IValidationService validationService,
             IFileUploadService fileUploadService,
-            IMapper mapper)
+            IMapper mapper,
+            IDistributedCache cache)
         {
             _projectEntityRepository = projectEntityRepository;
             _projectRepository = projectRepository;
             _validationService = validationService;
             _fileUploadService = fileUploadService;
             _mapper = mapper;
+            _cache = cache;
         }
 
         //CLEAR DATA
@@ -109,6 +115,32 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 newId.id = await _projectEntityRepository.CreateProjectEntity(entity);
                 if (newId.id.Equals(""))
                     throw new CreateObjectException("Can not create ProjectEntity Object!");
+
+                if (projectEntityDTO.type.Equals("UPDATE"))
+                {
+                    PushNotification pushNotification = new()
+                    {
+                        Title = "Tin tức mới từ dự án " + project.Name+"!!!",
+                        Body = "Chủ đầu tư vừa cập nhật tiến độ của dự án "+project.Name,
+                        ImageUrl = project.Image
+                    };
+                    string topic = await FirebasePushNotification.SendPushNotificationToUpdateProjectTopics(project.Id.ToString(), pushNotification);
+                    List<string> userIdList = await DeviceTokenCache.GetSubcribedUserFromTopic(_cache, topic);
+
+                    NotificationDetailDTO notification = new()
+                    {
+                        Title = "Chủ đầu tư vừa cập nhật tiến độ của dự án " + project.Name,
+                        EntityId = project.Id.ToString(),
+                        Image = project.Image
+                    };
+                    for(int i =0; i < userIdList.Count; i++)
+                    {
+                        await NotificationCache.UpdateNotification(_cache, userIdList[i], notification);
+                    }
+                    
+                }
+
+
                 return newId;
             }
             catch (Exception e)
