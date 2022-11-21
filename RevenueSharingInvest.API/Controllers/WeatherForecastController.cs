@@ -10,7 +10,9 @@ using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Business.Services.Extensions.iText;
+using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
@@ -71,7 +73,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateNoti(string userId, NotificationDetailDTO newNoti)
         {
-           var result = await DistributedCacheExtensions.UpdateNotification(_distributedCache, userId, newNoti);
+            var result = await NotificationCache.UpdateNotification(_distributedCache, userId, newNoti);
 
             return Ok(result);
         }
@@ -79,7 +81,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetNoti(string userId, bool seen)
         {
-            var result = await DistributedCacheExtensions.GetNotification(_distributedCache, userId, seen);
+            var result = await NotificationCache.GetNotification(_distributedCache, userId, seen);
             return Ok(result);
         }
 
@@ -104,32 +106,32 @@ namespace RevenueSharingInvest.API.Controllers
 
 
 
-        /*        [HttpPost]
-                public async Task<IActionResult> Getokok()
+/*        [HttpPost]
+        public async Task<IActionResult> Getokok()
+        {
+            var registrationToken = "dNixyIUcTbK6xix5M898n1:APA91bESs3aJM2xR0I-uTWUnAVvhadd3oRVxqqI7OnssXhD7GkR6bEOPJtI-WfOgxeE1tSiyp_PSeAkUHgnfd86rNKtQgSTe4D06LPfaW5fMdE158APDccruowYZJXYYducQCBf4GuQR";
+            // Create a list containing up to 500 messages.
+            var messages = new List<Message>()
+            {
+                new Message()
                 {
-                    var registrationToken = "dNixyIUcTbK6xix5M898n1:APA91bESs3aJM2xR0I-uTWUnAVvhadd3oRVxqqI7OnssXhD7GkR6bEOPJtI-WfOgxeE1tSiyp_PSeAkUHgnfd86rNKtQgSTe4D06LPfaW5fMdE158APDccruowYZJXYYducQCBf4GuQR";
-                    // Create a list containing up to 500 messages.
-                    var messages = new List<Message>()
+                    Notification = new Notification()
                     {
-                        new Message()
-                        {
-                            Notification = new Notification()
-                            {
-                                Title = "Price drop",
-                                Body = "5% off all electronics",
-                            },
-                            Token = registrationToken,
-                        },
-                        new Message()
-                        {
-                            Notification = new Notification()
-                            {
-                                Title = "Price drop",
-                                Body = "2% off all books",
-                            },
-                            Topic = "readers-club",
-                        },
-                    };
+                        Title = "Price drop",
+                        Body = "5% off all electronics",
+                    },
+                    Token = registrationToken,
+                },
+                new Message()
+                {
+                    Notification = new Notification()
+                    {
+                        Title = "Price drop",
+                        Body = "2% off all books",
+                    },
+                    Topic = "readers-club",
+                },
+            };
 
                     var response = await FirebaseMessaging.DefaultInstance.SendAllAsync(messages);
                     // See the BatchResponse reference documentation

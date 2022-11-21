@@ -8,6 +8,7 @@ using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
@@ -40,6 +41,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IRoleService _roleService;
         private readonly IProjectWalletRepository _projectWalletRepository;
         private readonly IDistributedCache _cache;
+        private readonly IUserRepository _userRepository;
 
 
         public AccountTransactionService(IAccountTransactionRepository accountTransactionRepository, 
@@ -51,7 +53,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IWalletTransactionRepository walletTransactionRepository,
             IRoleService roleService,
             IProjectWalletRepository projectWalletRepository,
-            IDistributedCache cache)
+            IDistributedCache cache,
+            IUserRepository userRepository)
         {
             _accountTransactionRepository = accountTransactionRepository;
             _investorWalletRepository = investorWalletRepository;
@@ -63,6 +66,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _roleService = roleService;
             _projectWalletRepository = projectWalletRepository;
             _cache = cache;
+            _userRepository = userRepository;
         }
 
         //CREATE
@@ -111,6 +115,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 accountTransaction.Type = "TOP-UP";
 
                 NotificationDetailDTO notification = new();
+                
 
                 string id = await _accountTransactionRepository.CreateAccountTransaction(accountTransaction);
                 if (id.Equals(""))
@@ -124,13 +129,21 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         Investor investor = await _investorRepository.GetInvestorByUserId((Guid)accountTransaction.PartnerClientId);
                         InvestorTopUp(accountTransaction, investor);
                         notification.Title = "Bạn vừa nạp "+momoPaymentResult.amount+"VNĐ vào ví đầu tư chung.";
-                        await DistributedCacheExtensions.UpdateNotification(_cache, momoPaymentResult.partnerClientId, notification);
+                        await NotificationCache.UpdateNotification(_cache, momoPaymentResult.partnerClientId, notification);
+
+                        string deviceToken = await _userRepository.GetDeviceTokenByUserId((Guid)accountTransaction.PartnerClientId);
+                        PushNotification pushNotification = new()
+                        {
+                            Title = "Tiền về ví Krowd!!",
+                            Body = notification.Title
+                        };
+                        await FirebasePushNotification.SendPushNotification(deviceToken, pushNotification);
                     }
                     if (roleName.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
                     {
                         ProjectOwnerTopUp(accountTransaction);
                         notification.Title = "Bạn vừa nạp " + momoPaymentResult.amount + "VNĐ vào ví thanh toán chung.";
-                        await DistributedCacheExtensions.UpdateNotification(_cache, momoPaymentResult.partnerClientId, notification);
+                        await NotificationCache.UpdateNotification(_cache, momoPaymentResult.partnerClientId, notification);
                     }
                         
                 }

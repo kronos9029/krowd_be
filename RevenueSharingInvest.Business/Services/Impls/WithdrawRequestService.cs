@@ -21,6 +21,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DistributedCacheExtensions = RevenueSharingInvest.Business.Services.Extensions.RedisCache.DistributedCacheExtensions;
 using System.Data;
+using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
@@ -138,7 +139,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     };
                     foreach (var admin in admins)
                     {
-                        await DistributedCacheExtensions.UpdateNotification(_cache, admin.ToString(), notification);
+                        await NotificationCache.UpdateNotification(_cache, admin.ToString(), notification);
                     }
                     
                     
@@ -200,7 +201,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     
                     foreach (var admin in admins)
                     {
-                        await DistributedCacheExtensions.UpdateNotification(_cache, admin.ToString(), notification);
+                        await NotificationCache.UpdateNotification(_cache, admin.ToString(), notification);
                     }
                 }
                 return getWithdrawRequestDTO;
@@ -234,14 +235,14 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     InvestorWallet wallet = await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(investor.Id, "I1");
                     resultString = await _accountTransactionService.CreateWithdrawAccountTransaction(wallet, withdrawRequest, currentUser.userId, roleName);
 
-                    await DistributedCacheExtensions.UpdateNotification(_cache, withdrawRequest.CreateBy.ToString(), notification);
+                    await NotificationCache.UpdateNotification(_cache, withdrawRequest.CreateBy.ToString(), notification);
                 }
                 else if (roleName.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
                 {
                     ProjectWallet wallet = await _projectWalletRepository.GetProjectWalletByProjectManagerIdAndType((Guid)withdrawRequest.CreateBy, "P1", null);
                     resultString = await _accountTransactionService.CreateWithdrawAccountTransaction(wallet, withdrawRequest, currentUser.userId, roleName);
 
-                    await DistributedCacheExtensions.UpdateNotification(_cache, withdrawRequest.CreateBy.ToString(), notification);
+                    await NotificationCache.UpdateNotification(_cache, withdrawRequest.CreateBy.ToString(), notification);
                 }
                     
                 return resultString;
@@ -262,7 +263,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     Title = "Bạn có phản hồi của Admin từ yêu cầu rút tiền.",
                     EntityId = request.Id
                 };
-                await DistributedCacheExtensions.UpdateNotification(_cache, request.CreateBy.ToString(), notification);
+                await NotificationCache.UpdateNotification(_cache, request.CreateBy.ToString(), notification);
                 return result;
             }catch(Exception e)
             {
@@ -313,7 +314,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     Title = "Yêu cầu rút tiền của bạn đã bị từ chối, vui lòng liên hệ Krowd Help Center để biết thêm chi tiết.",
                     EntityId = currentRequest.Id
                 };
-                await DistributedCacheExtensions.UpdateNotification(_cache, currentRequest.CreateBy.ToString(), notification);
+                await NotificationCache.UpdateNotification(_cache, currentRequest.CreateBy.ToString(), notification);
 
                 return result;
             }catch(Exception e)
@@ -333,7 +334,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     Title = "Bạn có phản hồi của "+currentUser.fullName+" từ yêu cầu rút tiền.",
                     EntityId = request.Id
                 };
-                await DistributedCacheExtensions.UpdateNotification(_cache, request.UpdateBy.ToString(), notification);
+                await NotificationCache.UpdateNotification(_cache, request.UpdateBy.ToString(), notification);
                 return result;
             }
             catch (Exception e)

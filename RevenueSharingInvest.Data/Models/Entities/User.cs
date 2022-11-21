@@ -64,7 +64,6 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid? UpdateBy { get; set; }
         [StringLength(32)]
         public string SecretKey { get; set; }
-        public string DeviceToken { get; set; }
 
         [ForeignKey(nameof(BusinessId))]
         [InverseProperty("Users")]
