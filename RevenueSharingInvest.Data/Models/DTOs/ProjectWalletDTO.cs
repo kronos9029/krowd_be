@@ -33,5 +33,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public GetWalletTypeForWalletDTO walletType { get; set; }
         public string projectName { get; set; }
         public string projectImage { get; set; }
+        public string projectStatus { get; set; }
     }
 }

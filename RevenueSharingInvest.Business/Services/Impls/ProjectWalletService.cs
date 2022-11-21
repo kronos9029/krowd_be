@@ -68,6 +68,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     project = dto.projectId == null ? null : await _projectRepository.GetProjectById(Guid.Parse(dto.projectId));
                     dto.projectName = project == null ? null : project.Name;
                     dto.projectImage = project == null ? null : project.Image;
+                    dto.projectStatus = project == null ? null : project.Status;
 
                     result.totalAsset += (float)item.balance;
 
@@ -110,6 +111,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 project = result.projectId == null ? null : await _projectRepository.GetProjectById(Guid.Parse(result.projectId));
                 result.projectName = project == null ? null : project.Name;
                 result.projectImage = project == null ? null : project.Image;
+                result.projectStatus = project == null ? null : project.Status;
 
                 result.createDate = await _validationService.FormatDateOutput(result.createDate);
                 result.updateDate = await _validationService.FormatDateOutput(result.updateDate);
