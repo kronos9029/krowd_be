@@ -83,24 +83,24 @@ namespace RevenueSharingInvest.API.Controllers
             return Ok(result);
         }
 
-        //[HttpPut]
-        //[Authorize]
-        //public async Task<IActionResult> UpdateProjectSchedule(Guid projectId)
-        //{
-        //    Project project = await _projectRepository.GetProjectById(projectId);
-        //    DateTime endDate = DateTime.ParseExact("19/11/2022 23:59:59", "dd/MM/yyyy HH:mm:ss", null);
-        //    ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
-        //    //_backgroundJobClient.Schedule<ProjectService>(
-        //    //                    projectService => projectService
-        //    //                    .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(endDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> UpdateProjectSchedule(Guid projectId)
+        {
+            Project project = await _projectRepository.GetProjectById(projectId);
+            DateTime endDate = DateTime.ParseExact("19/11/2022 23:59:59", "dd/MM/yyyy HH:mm:ss", null);
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            //_backgroundJobClient.Schedule<ProjectService>(
+            //                    projectService => projectService
+            //                    .UpdateProjectStatusByHangfire(projectId, currentUser), TimeSpan.FromTicks(endDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
 
-        //    //_backgroundJobClient.Schedule<ProjectService>(
-        //    //                    projectService => projectService
-        //    //                    .CreateRepaymentStageCheck(projectId, currentUser), TimeSpan.FromTicks(endDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
-        //    await _projectService.CreateRepaymentStageCheck(projectId, currentUser);
+            _backgroundJobClient.Schedule<ProjectService>(
+                                projectService => projectService
+                                .CreateRepaymentStageCheck(projectId, currentUser), TimeSpan.FromTicks(endDate.Ticks - DateTimePicker.GetDateTimeByTimeZone().Ticks));
+            //await _projectService.CreateRepaymentStageCheck(projectId, currentUser);
 
-        //    return Ok();
-        //}
+            return Ok();
+        }
 
 
 
