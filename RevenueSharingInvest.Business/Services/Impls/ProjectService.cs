@@ -1593,33 +1593,39 @@ namespace RevenueSharingInvest.Business.Services.Impls
             }
         }
 
-        public async Task<InvestedProjectDetailWithInvestment> GetInvestedProjectDetail(string projectId, string investorId)
+        //GET INVESTED PROJECT DETAILS
+        public async Task<InvestedProjectDetailWithInvestment> GetInvestedProjectDetail(string projectId, ThisUserObj currentUser)
         {
             try
             {
-                Guid project = Guid.Parse(projectId);
-                Guid investor = Guid.Parse(investorId);
+                InvestedProjectDetail detail = await _projectRepository.GetInvestedProjectDetail(Guid.Parse(projectId), Guid.Parse(currentUser.investorId));
+                List<InvestedRecord> investedRecords = await _investmentRepository.GetInvestmentRecord(Guid.Parse(projectId), Guid.Parse(currentUser.investorId));
+                NumOfPaidStageAndLastPaymentDate numOfPaidStageAndLastPaymentDate = await _projectRepository.GetNumOfPaidStageAndLastPaymentDate(Guid.Parse(projectId));
 
-                InvestedProjectDetail detail = await _projectRepository.GetInvestedProjectDetail(project, investor);
-                List<InvestedRecord> investedRecords = await _investmentRepository.GetInvestmentRecord(project, investor);
+                InvestedProjectDetailWithInvestment detailWithInvestment = new InvestedProjectDetailWithInvestment();
+                detailWithInvestment.ProjectImage = detail.ProjectImage;
+                detailWithInvestment.ProjectName = detail.ProjectName;
+                detailWithInvestment.ProjectStatus = detail.ProjectStatus;
+                detailWithInvestment.ExpectedReturn = detail.ExpectedReturn;
+                detailWithInvestment.ReturnedAmount = await _projectRepository.GetReturnedDeptOfOneInvestor(Guid.Parse(projectId), Guid.Parse(currentUser.userId));
+                detailWithInvestment.DeptRemain = detail.InvestedAmount - detailWithInvestment.ReturnedAmount;
+                detailWithInvestment.InvestedAmount = detail.InvestedAmount;
+                detailWithInvestment.NumOfStage = detail.NumOfStage;
+                detailWithInvestment.NumOfPayedStage = numOfPaidStageAndLastPaymentDate.NumOfPaidStage;
 
-
-                InvestedProjectDetailWithInvestment detailWithInvestment = new()
-                {
-                    ProjectImage = detail.ProjectImage,
-                    ProjectName = detail.ProjectName,
-                    ProjectStatus = detail.ProjectStatus,
-                    ExpectedReturn = detail.ExpectedReturn,
-                    ReturnedAmount = await _projectRepository.GetReturnedDeptOfOneInvestor(project,investor),
-                    InvestedAmount = detail.InvestedAmount,
-                    NumOfStage = detail.NumOfStage,
-                    InvestmentRecords = investedRecords
-                };
                 detailWithInvestment.MustPaidDept = detail.InvestedAmount - detailWithInvestment.ReturnedAmount;
                 detailWithInvestment.ProfitableDebt = detail.ExpectedReturn - detailWithInvestment.ReturnedAmount;
+                //detailWithInvestment.PaidStage = 0;
+                detailWithInvestment.LatestPayment = await _validationService.FormatDateOutput(numOfPaidStageAndLastPaymentDate.LastPaymentDate.ToString());
+                detailWithInvestment.InvestmentRecords = investedRecords;
+                foreach (InvestedRecord item in detailWithInvestment.InvestmentRecords)
+                {
+                    item.CreateDate = await _validationService.FormatDateOutput(item.CreateDate);
+                }
 
                 return detailWithInvestment;
-            }catch(Exception e)
+            }
+            catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);

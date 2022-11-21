@@ -24,15 +24,21 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string PackageName { get; set; }
         public int Quantity { get; set; }
         public double TotalPrice { get; set; }
-        public DateTime CreateDate  { get; set; }
+        public string CreateDate { get; set; }
     }
 
     public class InvestedProjectDetailWithInvestment : InvestedProjectDetail
     {
         public double MustPaidDept { get; set; }
         public double ProfitableDebt { get; set; }
-        public int PaidStage { get; set; }
-        public DateTime LatestPayment { get; set; }
+        //public int PaidStage { get; set; }
+        public string LatestPayment { get; set; }
         public List<InvestedRecord> InvestmentRecords { get; set; }
+    }
+
+    public class NumOfPaidStageAndLastPaymentDate
+    {
+        public int NumOfPaidStage { get; set; }
+        public DateTime LastPaymentDate { get; set; }
     }
 }
