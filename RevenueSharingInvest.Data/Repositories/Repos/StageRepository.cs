@@ -17,6 +17,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 {
     public class StageRepository : BaseRepository, IStageRepository
     {
+        private readonly string REPAYMENT_STAGE_NAME = "Giai đoạn thanh toán nợ";
+
         public StageRepository(IConfiguration configuration) : base(configuration)
         {
         }
@@ -237,11 +239,12 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "             JOIN ( "
                     + "                 SELECT MAX(EndDate) 'EndDate' "
                     + "                 FROM Stage "
-                    + "                 WHERE ProjectId = @ProjectId AND Name != N'Giai đoạn thanh toán nợ') AS X ON S.EndDate = X.EndDate "
+                    + "                 WHERE ProjectId = @ProjectId AND Name != @Name) AS X ON S.EndDate = X.EndDate "
                     + "         WHERE " 
                     + "             S.ProjectId = @ProjectId ";
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", projectId, DbType.Guid);
+                parameters.Add("Name", REPAYMENT_STAGE_NAME, DbType.String);
                 using var connection = CreateConnection();
                 return await connection.QueryFirstOrDefaultAsync<Stage>(query, parameters);
             }

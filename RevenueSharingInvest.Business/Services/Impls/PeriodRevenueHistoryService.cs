@@ -41,6 +41,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
         private readonly IDistributedCache _cache;
+        private readonly string REPAYMENT_STAGE_NAME = "Giai đoạn thanh toán nợ";
 
 
         public PeriodRevenueHistoryService(
@@ -102,7 +103,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new InvalidFieldException("You can not pay for this Stage now!!!");
 
                 Stage lastStage = await _stageRepository.GetLastStageByProjectId(stage.ProjectId);
-                if (DateTime.Compare(DateTimePicker.GetDateTimeByTimeZone(), lastStage.EndDate.AddDays(3)) > 0 && !stage.Id.Equals(lastStage.Id)) 
+                if (DateTime.Compare(DateTimePicker.GetDateTimeByTimeZone(), lastStage.EndDate.AddDays(3)) > 0 && !stage.Name.Equals(REPAYMENT_STAGE_NAME)) 
                     throw new InvalidFieldException("You can only pay for Repayment Stage from now!!!");
 
                 if (createPeriodRevenueHistoryDTO.amount > (double)Math.Round(project.InvestmentTargetCapital * project.Multiplier) - project.PaidAmount) throw new InvalidFieldException("amount can not greater than " + (double)(Math.Round(project.InvestmentTargetCapital * project.Multiplier) - project.PaidAmount) + "!!!");
