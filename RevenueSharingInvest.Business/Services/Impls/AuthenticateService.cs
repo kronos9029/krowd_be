@@ -93,7 +93,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new RegisterException("Register Fail!!");
                 }
 
-                if(deviceToken != null || !deviceToken.Equals(""))
+                if(!deviceToken.Equals(""))
                 {
                     List<string> newtokens = new()
                     {
@@ -138,7 +138,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     throw new RegisterException("This Is Not An Investor Email!!");
 
 
-                if (deviceToken != null || !deviceToken.Equals(""))
+                if (!deviceToken.Equals(""))
                 {
                     List<string> newtokens = new()
                     {
