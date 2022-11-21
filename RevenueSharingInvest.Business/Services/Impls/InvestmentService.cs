@@ -300,9 +300,11 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             EntityId = project.Id.ToString(),
                             Image = project.Image
                         };
+                        //noti cho Investor
                         await NotificationCache.UpdateNotification(_cache, currentUser.userId, notification);
                         notification.Title = currentUser.fullName+" vừa đầu tư vào dự án "+project.Name+" của bạn.";
 
+                        //Noti cho manager
                         await NotificationCache.UpdateNotification(_cache, projectManager.Id.ToString(), notification);
                         DeviceToken tokens = await DeviceTokenCache.GetAvailableDevice(_cache, currentUser.userId);
                         if (tokens.Tokens.Count > 0)

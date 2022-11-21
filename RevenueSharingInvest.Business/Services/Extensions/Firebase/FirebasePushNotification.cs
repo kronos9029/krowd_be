@@ -133,8 +133,9 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
         {
             var registrationTokens = tokens.Tokens;
             string topic = "UpdateProject-" + projectId;
-            
-            await FirebaseMessaging.DefaultInstance.SubscribeToTopicAsync(registrationTokens, topic);
+            if(registrationTokens.Count > 0)
+                await FirebaseMessaging.DefaultInstance.SubscribeToTopicAsync(registrationTokens, topic);
+
             await DeviceTokenCache.SubcribeUserToTopic(cache, topic, userId);
 
             return topic;

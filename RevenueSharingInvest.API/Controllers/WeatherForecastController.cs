@@ -1,8 +1,10 @@
-﻿using Firebase.Storage;
+﻿using Firebase.Auth;
+using Firebase.Storage;
 using FirebaseAdmin.Messaging;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -33,6 +35,7 @@ using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
 using DistributedCacheExtensions = RevenueSharingInvest.Business.Services.Extensions.RedisCache.DistributedCacheExtensions;
 using Notification = RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs.Notification;
+using Project = RevenueSharingInvest.Data.Models.Entities.Project;
 
 namespace RevenueSharingInvest.API.Controllers
 {
@@ -48,6 +51,8 @@ namespace RevenueSharingInvest.API.Controllers
         private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IProjectRepository _projectRepository;
         private readonly IValidationService _validationService;
+        private readonly IDistributedCache _cache;
+        private readonly IProjectEntityService _projectEntityService;
 
 
         public WeatherForecastController(IITextService iTextService, 
@@ -57,7 +62,9 @@ namespace RevenueSharingInvest.API.Controllers
             IDistributedCache distributedCache, 
             IBackgroundJobClient backgroundJobClient, 
             IProjectRepository projectRepository,
-            IValidationService validationService)
+            IValidationService validationService,
+            IDistributedCache cache,
+            IProjectEntityService projectEntityService)
         {
 
             _iTextService = iTextService;
@@ -68,14 +75,23 @@ namespace RevenueSharingInvest.API.Controllers
             _backgroundJobClient = backgroundJobClient;
             _projectRepository = projectRepository;
             _validationService = validationService;
+            _cache = cache;
+            _projectEntityService = projectEntityService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateNoti(string userId, NotificationDetailDTO newNoti)
+        public async Task<IActionResult> UpdateNoti(string dv, string projectId)
         {
-            var result = await NotificationCache.UpdateNotification(_distributedCache, userId, newNoti);
+            List<string> registrationTokens = new()
+            {
+                dv
+            };
+            
+            string topic = "UpdateProject-" + projectId;
 
-            return Ok(result);
+            var response = await FirebaseMessaging.DefaultInstance.SubscribeToTopicAsync(registrationTokens, topic);
+
+            return Ok(response);
         }
 
         [HttpGet]

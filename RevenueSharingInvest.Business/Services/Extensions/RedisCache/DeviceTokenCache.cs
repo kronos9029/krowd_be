@@ -133,7 +133,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
                 }
                 else
                 {
-                    if (userIdList.Find(x => x.Equals(userId)).Equals(userId))
+                    if (!userIdList.Find(x => x.Equals(userId)).Equals(userId))
                         userIdList.Add(userId);
 
                 }
