@@ -5,6 +5,7 @@ using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
+using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -1058,14 +1059,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                var query = "SELECT ISNULL(SUM(Amount),0) AS ReturnedDept " +
-                    "FROM Payment P JOIN PeriodRevenue PR ON P.PeriodRevenueId = PR.Id WHERE ToId = @UserId AND Type = 'PERIOD_REVENUE' AND PR.ProjectId = @ProjectId";
+                var query = "SELECT " 
+                    + "         CAST(ISNULL(SUM(Amount),0) AS FLOAT) AS ReturnedDept " 
+                    + "     FROM " 
+                    + "         Payment P " 
+                    + "         JOIN PeriodRevenue PR ON P.PeriodRevenueId = PR.Id " 
+                    + "     WHERE " 
+                    + "         ToId = @UserId " 
+                    + "         AND Type = @Type " 
+                    + "         AND PR.ProjectId = @ProjectId";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("UserId", userId, DbType.Guid);
                 parameters.Add("ProjectId", projectId, DbType.Guid);
+                parameters.Add("Type", PaymentTypeEnum.PERIOD_REVENUE.ToString(), DbType.String);
                 using var connection = CreateConnection();
-                return await connection.QueryFirstOrDefaultAsync<double>(query, parameters);
+                return (double)connection.ExecuteScalar(query, parameters);
             }
             catch(Exception e)
             {
@@ -1116,6 +1125,30 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 return await connection.QueryFirstOrDefaultAsync<string>(query, parameters);
             }
             catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //GET NUM OF PAID STAGES AND LAST PAYMENT DATE
+        public async Task<NumOfPaidStageAndLastPaymentDate> GetNumOfPaidStageAndLastPaymentDate(Guid projectId)
+        {
+            try
+            {
+                string query = "SELECT "
+                    + "             COUNT(*) AS NumOfPaidStage, MAX(UpdateDate) AS LastPaymentDate "
+                    + "         FROM "
+                    + "             PeriodRevenue "
+                    + "         WHERE "
+                    + "             ProjectId = @ProjectId " 
+                    + "             AND PaidAmount IS NOT NULL";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<NumOfPaidStageAndLastPaymentDate>(query, parameters);
+            }
+            catch (Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);
