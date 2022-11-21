@@ -53,7 +53,10 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
                 DeviceToken result = await DistributedCacheExtensions.GetRecordAsync<DeviceToken>(cache, key);
                 if(result == null)
                 {
-                    return result = new();
+                    return result = new()
+                    {
+                        Tokens = new()
+                    };
                 }
                 var message = new MulticastMessage()
                 {
