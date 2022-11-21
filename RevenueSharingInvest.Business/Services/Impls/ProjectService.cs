@@ -542,7 +542,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     for (int i = 0; i < combinedList.Count; i++)
                     {
-                        await DistributedCacheExtensions.UpdateNotification(_cache, combinedList[i].ToString(), noti);
+                        await NotificationCache.UpdateNotification(_cache, combinedList[i].ToString(), noti);
                     }
                 }
                 return newId;
@@ -1264,7 +1264,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 EntityId = projectId.ToString(),
                                 Image = project.Image
                             };                        
-                            await DistributedCacheExtensions.UpdateNotification(_cache, project.CreateBy.ToString(), notification);
+                            await NotificationCache.UpdateNotification(_cache, project.CreateBy.ToString(), notification);
                         }
                         else if (status.Equals(ProjectStatusEnum.ACTIVE.ToString()))
                         {
@@ -1275,6 +1275,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 Title = "Dự án " + project.Name + " mà bạn góp vốn đã được đưa vào hoạt động.",
                                 EntityId = projectId.ToString(),
                                 Image = project.Image
+                            };
+                            PushNotification pushNotification = new()
+                            {
+                                Title = "Gọi vốn thành công!!!",
+                                Body = "Dự án " + project.Name + " mà bạn góp vốn đã được đưa vào hoạt động.",
+                                ImageUrl = await _projectRepository.GetPrjectImageByProjectId(projectId)
                             };
                             
                             List<Investment> investmentList = await _investmentRepository
@@ -1315,8 +1321,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
                                 await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
-                                await DistributedCacheExtensions.UpdateNotification(_cache, investorWallet.CreateBy.ToString(), notiForInvestor);
+                                await NotificationCache.UpdateNotification(_cache, investorWallet.CreateBy.ToString(), notiForInvestor);
 
+                                DeviceToken tokens = await DeviceTokenCache.GetAvailableDevice(_cache, investorWallet.CreateBy.ToString());
+                                await FirebasePushNotification.SendMultiDevicePushNotification(tokens.Tokens, pushNotification);
                             }
 
                             NotificationDetailDTO notification = new()
@@ -1325,7 +1333,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 EntityId = projectId.ToString(),
                                 Image = project.Image
                             };
-                            await DistributedCacheExtensions.UpdateNotification(_cache, project.CreateBy.ToString(), notification);
+                            await NotificationCache.UpdateNotification(_cache, project.CreateBy.ToString(), notification);
 
                             //Create DailyReports
                             DailyReport dailyReport = new()
@@ -1460,7 +1468,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         notification.Title = "Dự án "+project.Name+" của bạn đã bị từ chối vì ví do quá hạn.";
                         notification.EntityId = projectId.ToString();
                         notification.Image = project.Image;
-                        await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
+                        await NotificationCache.UpdateNotification(_cache, currentUser.userId, notification);
                         return result;
                     }
                         
@@ -1473,7 +1481,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         notification.Title = "Dự án " + project.Name + " của bạn đã được chấp thuận và đang chờ được góp vốn.";
                         notification.EntityId = projectId.ToString();
                         notification.Image = project.Image;
-                        await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
+                        await NotificationCache.UpdateNotification(_cache, currentUser.userId, notification);
                         return result;
                     }
                         
@@ -1486,7 +1494,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         notification.Title = "Dự án " + project.Name + " của bạn đã hết thời gian gọi vốn.";
                         notification.EntityId = projectId.ToString();
                         notification.Image = project.Image;
-                        await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
+                        await NotificationCache.UpdateNotification(_cache, currentUser.userId, notification);
 
                         //REFUND
                         //Chuyển lại tiền cho Investor
@@ -1505,7 +1513,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 var foundInvestor = paidInvestorList.ToDictionary(x => x.investorId);
                                 paidInvestor = paidInvestorList.Find(x => x.investorId.Equals(item.InvestorId));
                                 if (foundInvestor.TryGetValue(paidInvestor.investorId, out paidInvestor))
-                                    paidInvestor.amount = paidInvestor.amount + (double)item.TotalPrice;
+                                    paidInvestor.amount += (double)item.TotalPrice;
                             }
                         }                       
 
@@ -1518,14 +1526,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
 
                             //Create CASH_OUT WalletTransaction from I3 to I2
-                            walletTransaction = new WalletTransaction();
-                            walletTransaction.Amount = item.amount;
-                            walletTransaction.Fee = 0;
-                            walletTransaction.Description = "Transfer money from I3 wallet to I2 wallet due to unsuccessful project calling for investment";
-                            walletTransaction.FromWalletId = investorWallet.Id;
-                            walletTransaction.ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.investorId, WalletTypeEnum.I2.ToString())).Id;
-                            walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
-                            walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
+                            walletTransaction = new WalletTransaction
+                            {
+                                Amount = item.amount,
+                                Fee = 0,
+                                Description = "Transfer money from I3 wallet to I2 wallet due to unsuccessful project calling for investment",
+                                FromWalletId = investorWallet.Id,
+                                ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(item.investorId, WalletTypeEnum.I2.ToString())).Id,
+                                Type = WalletTransactionTypeEnum.CASH_OUT.ToString(),
+                                CreateBy = Guid.Parse(currentUser.userId)
+                            };
                             await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
                             //Add I2 balance
@@ -1543,8 +1553,22 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             notification.Title = "Nhận lại tiền từ dự án " + project.Name + " do gọi vốn không thành công.";
                             notification.EntityId = projectId.ToString();
                             notification.Image = project.Image;
-                            await DistributedCacheExtensions.UpdateNotification(_cache, (await _userRepository.GetUserByInvestorId(item.investorId)).Id.ToString(), notification);
+                            await NotificationCache.UpdateNotification(_cache, investorWallet.CreateBy.ToString(), notification);
+
+                            PushNotification pushNotification = new()
+                            {
+                                Title = "Krowd hoàn tiền!!!",
+                                Body = "Nhận lại tiền từ dự án " + project.Name + " do gọi vốn không thành công.",
+                                ImageUrl = project.Image
+                            };
+
+                            await FirebasePushNotification.SendPushNotificationToUpdateProjectTopics(project.Id.ToString(), pushNotification);
+                            DeviceToken tokens = await DeviceTokenCache.GetAvailableDevice(_cache, investorWallet.CreateBy.ToString());
+                            await FirebasePushNotification.UnsubcribeTokensToUpdateProjectTopics(_cache, tokens, projectId.ToString(), investorWallet.CreateBy.ToString());
+                            
                         }
+                        string topic = "UpdateProject-" + project.Id.ToString();
+                        await DistributedCacheExtensions.DeleteKeyAsync(_cache, topic);
                         return result;
                     }
                         
@@ -1554,7 +1578,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         notification.Title = "Dự án " + project.Name + " của bạn đã gọi vốn thành công và đang chờ để triển khai.";
                         notification.EntityId = projectId.ToString();
                         notification.Image = project.Image;
-                        await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
+                        await NotificationCache.UpdateNotification(_cache, currentUser.userId, notification);
                         return result;
                     }
                 }

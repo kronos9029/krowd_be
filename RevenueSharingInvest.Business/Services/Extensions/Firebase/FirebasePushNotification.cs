@@ -1,5 +1,7 @@
 ﻿using FirebaseAdmin.Messaging;
 using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.Caching.Distributed;
+using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 using System;
@@ -8,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using DistributedCacheExtensions = RevenueSharingInvest.Business.Services.Extensions.RedisCache.DistributedCacheExtensions;
 
 namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
 {
@@ -107,9 +110,9 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
             }
         }
         
-        public static async Task SendPushNotificationToTopic(string topic, PushNotification notification)
+        public static async Task<string> SendPushNotificationToUpdateProjectTopics(string projectId, PushNotification notification)
         {
-
+            string topic = "UpdateProject-" + projectId;
             var message = new Message()
             {
                 Notification = new()
@@ -122,22 +125,30 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
             };
 
             await FirebaseMessaging.DefaultInstance.SendAsync(message);;
+            return topic;
         }        
 
-        public static async Task<dynamic> ValidateToken(string deviceToken)
-        {
-                var message = new Message()
-                {
-                    Token = deviceToken,
-                    Notification = new()
-                    {
-                        Title = "test back end",
-                        Body = "alo"
-                    }
-                };
 
-                var result = (JsonObject)await FirebaseMessaging.DefaultInstance.SendAsync(message, true);
-                return result;
+        public static async Task<string> SubcribeTokensToUpdateProjectTopics(this IDistributedCache cache,DeviceToken tokens,string projectId,string userId)
+        {
+            var registrationTokens = tokens.Tokens;
+            string topic = "UpdateProject-" + projectId;
+            
+            await FirebaseMessaging.DefaultInstance.SubscribeToTopicAsync(registrationTokens, topic);
+            await DeviceTokenCache.SubcribeUserToTopic(cache, topic, userId);
+
+            return topic;
+        }
+
+        public static async Task<string> UnsubcribeTokensToUpdateProjectTopics(this IDistributedCache cache , DeviceToken tokens, string projectId, string userId)
+        {
+            var registrationTokens = tokens.Tokens;
+            string topic = "UpdateProject-" + projectId;
+            
+            await FirebaseMessaging.DefaultInstance.UnsubscribeFromTopicAsync(registrationTokens, topic);
+            await DeviceTokenCache.UnsubcribeUserToTopic(cache, topic, userId);
+
+            return topic;
         }
     }
 }

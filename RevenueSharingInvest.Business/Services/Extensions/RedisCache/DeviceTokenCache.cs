@@ -1,5 +1,6 @@
 ﻿using FirebaseAdmin.Messaging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.Extensions.Caching.Distributed;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
@@ -63,7 +64,6 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
                     {
                         if (!response.Responses[i].IsSuccess)
                         {
-                            // The order of responses corresponds to the order of the registration tokens.
                             failedTokens.Add(result.Tokens[i]);
                         }
                     }
@@ -105,6 +105,70 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
                 return newTokens.Except(failedTokens).ToList();
             }
             catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
+        public static async Task<List<string>> SubcribeUserToTopic(this IDistributedCache cache, string topic,string userId)
+        {
+            try
+            {
+                List<string> userIdList = await DistributedCacheExtensions.GetRecordAsync<List<string>>(cache, topic);
+                if(userIdList == null)
+                {
+                    userIdList = new()
+                    {
+                        userId
+                    };
+                }
+                else
+                {
+                    userIdList.Add(userId);
+                }
+
+                await DistributedCacheExtensions.SetRecordAsync(cache, topic, userIdList);
+                
+                return userIdList;
+                
+            }catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
+        public static async Task<List<string>> GetSubcribedUserFromTopic(this IDistributedCache cache, string topic)
+        {
+            try
+            {
+                List<string> userIdList = await DistributedCacheExtensions.GetRecordAsync<List<string>>(cache, topic);
+                if (userIdList != null)
+                    return userIdList;
+                else
+                    return userIdList = new();
+            }catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
+        public static async Task<List<string>> UnsubcribeUserToTopic(this IDistributedCache cache, string topic,string userId)
+        {
+            try
+            {
+                List<string> userIdList = await DistributedCacheExtensions.GetRecordAsync<List<string>>(cache, topic);
+                if(userIdList != null)
+                {
+                    if(userIdList.Remove(userId))
+                        return userIdList;
+                }
+
+                await DistributedCacheExtensions.SetRecordAsync(cache, topic, userIdList);
+                return userIdList;
+            }catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);

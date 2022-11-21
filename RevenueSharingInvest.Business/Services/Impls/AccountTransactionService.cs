@@ -129,7 +129,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         Investor investor = await _investorRepository.GetInvestorByUserId((Guid)accountTransaction.PartnerClientId);
                         InvestorTopUp(accountTransaction, investor);
                         notification.Title = "Bạn vừa nạp "+momoPaymentResult.amount+"VNĐ vào ví đầu tư chung.";
-                        await DistributedCacheExtensions.UpdateNotification(_cache, momoPaymentResult.partnerClientId, notification);
+                        await NotificationCache.UpdateNotification(_cache, momoPaymentResult.partnerClientId, notification);
 
                         string deviceToken = await _userRepository.GetDeviceTokenByUserId((Guid)accountTransaction.PartnerClientId);
                         PushNotification pushNotification = new()
@@ -143,7 +143,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     {
                         ProjectOwnerTopUp(accountTransaction);
                         notification.Title = "Bạn vừa nạp " + momoPaymentResult.amount + "VNĐ vào ví thanh toán chung.";
-                        await DistributedCacheExtensions.UpdateNotification(_cache, momoPaymentResult.partnerClientId, notification);
+                        await NotificationCache.UpdateNotification(_cache, momoPaymentResult.partnerClientId, notification);
                     }
                         
                 }

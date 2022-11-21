@@ -4,6 +4,7 @@ using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
@@ -210,7 +211,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         EntityId = project.Id.ToString(),
                         Image = project.Image
                     };
-                    await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
+                    await NotificationCache.UpdateNotification(_cache, currentUser.userId, notification);
                 }
                 else
                 {
@@ -295,14 +296,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                         NotificationDetailDTO notification = new()
                         {
-                            Title = "Đầu tư vào dự án " + project.Name + " thành công.",
+                            Title = "Đầu tư vào dự án " + project.Name + " thành công, từ giờ bạn sẽ nhận được những cập nhật mới nhất của dự án.",
                             EntityId = project.Id.ToString(),
                             Image = project.Image
                         };
-                        await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
+                        await NotificationCache.UpdateNotification(_cache, currentUser.userId, notification);
+                        DeviceToken tokens = await DeviceTokenCache.GetAvailableDevice(_cache, currentUser.userId);
+                        await FirebasePushNotification.SubcribeTokensToUpdateProjectTopics(_cache, tokens, project.Id.ToString(), currentUser.userId);
 
                         notification.Title = currentUser.fullName+" vừa đầu tư vào dự án "+project.Name+" của bạn.";
-                        await DistributedCacheExtensions.UpdateNotification(_cache, projectManager.Id.ToString(), notification);
+                        await NotificationCache.UpdateNotification(_cache, projectManager.Id.ToString(), notification);
                     }
                     else
                     {
@@ -330,7 +333,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             EntityId = project.Id.ToString(),
                             Image = project.Image
                         };
-                        await DistributedCacheExtensions.UpdateNotification(_cache, currentUser.userId, notification);
+                        await NotificationCache.UpdateNotification(_cache, currentUser.userId, notification);
                     }
                 }
 
