@@ -1324,7 +1324,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 await NotificationCache.UpdateNotification(_cache, investorWallet.CreateBy.ToString(), notiForInvestor);
 
                                 DeviceToken tokens = await DeviceTokenCache.GetAvailableDevice(_cache, investorWallet.CreateBy.ToString());
-                                await FirebasePushNotification.SendMultiDevicePushNotification(tokens.Tokens, pushNotification);
+                                if(tokens.Tokens.Count > 0)
+                                    await FirebasePushNotification.SendMultiDevicePushNotification(tokens.Tokens, pushNotification);
                             }
 
                             NotificationDetailDTO notification = new()
@@ -1564,7 +1565,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                             await FirebasePushNotification.SendPushNotificationToUpdateProjectTopics(project.Id.ToString(), pushNotification);
                             DeviceToken tokens = await DeviceTokenCache.GetAvailableDevice(_cache, investorWallet.CreateBy.ToString());
-                            await FirebasePushNotification.UnsubcribeTokensToUpdateProjectTopics(_cache, tokens, projectId.ToString(), investorWallet.CreateBy.ToString());
+                            if(tokens.Tokens.Count > 0)
+                                await FirebasePushNotification.UnsubcribeTokensToUpdateProjectTopics(_cache, tokens, projectId.ToString(), investorWallet.CreateBy.ToString());
                             
                         }
                         string topic = "UpdateProject-" + project.Id.ToString();

@@ -33,7 +33,8 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
                 }
                 else
                 {
-                    result.Tokens.Add(token);
+                    if(!result.Tokens.Find(x => x.Equals(token)).Equals(token))
+                        result.Tokens.Add(token);
                 }
                 await DistributedCacheExtensions.SetRecordAsync(cache, key, result);
             }
