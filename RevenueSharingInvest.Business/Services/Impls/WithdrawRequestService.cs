@@ -76,9 +76,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 GetWithdrawRequestDTO getWithdrawRequestDTO = new();
 
                 if (currentUser.roleId.Equals(currentUser.investorRoleId))
-                    walletName = await _investorWalletRepository.GetInvertorWalletNamebyWalletId(withdrawRequest.FromWalletId);
+                    walletName = await _investorWalletRepository.GetInvertorWalletNamebyWalletId(Guid.Parse(request.FromWalletId));
                 else if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
-                    walletName = await _projectWalletRepository.GetProjectWalletNameById(withdrawRequest.FromWalletId);
+                    walletName = await _projectWalletRepository.GetProjectWalletNameById(Guid.Parse(request.FromWalletId));
 
                 List<Guid> admins = await _userRepository.GetUsersIdByRoleIdAndBusinessId(Guid.Parse(currentUser.adminRoleId), "");
 
@@ -190,7 +190,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         CreateBy = withdrawRequest.CreateBy.ToString(),
                         FromWalletId = withdrawRequest.FromWalletId.ToString(),
                         FromWalletName = walletName
-                };
+                    };
                     _walletTransactionService.TransferMoney(fromWallet, toWallet, request.Amount, currentUser.userId, "");
 
                     NotificationDetailDTO notification = new()
