@@ -22,6 +22,56 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
         }
 
+        //COUNT
+        public async Task<int> CountAllPayments(string type, Guid roleId, Guid userId)
+        {
+            try
+            {
+                string whereCondition = "";
+                string typeCondition = "";
+
+                var parameters = new DynamicParameters();
+
+                if (roleId.Equals(Guid.Parse(RoleDictionary.role.GetValueOrDefault("PROJECT_MANAGER"))))
+                {
+                    if (type.Equals(PaymentTypeEnum.INVESTMENT.ToString()))
+                    {
+                        whereCondition = whereCondition + " AND ToId = @ToId ";
+                        parameters.Add("ToId", userId, DbType.Guid);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + " AND FromId = @FromId ";
+                        parameters.Add("FromId", userId, DbType.Guid);
+                    }
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
+                }
+                else if (roleId.Equals(Guid.Parse(RoleDictionary.role.GetValueOrDefault("INVESTOR"))))
+                {
+                    if (type.Equals(PaymentTypeEnum.INVESTMENT.ToString()))
+                    {
+                        whereCondition = whereCondition + " AND FromId = @FromId ";
+                        parameters.Add("FromId", userId, DbType.Guid);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + " AND ToId = @ToId ";
+                        parameters.Add("ToId", userId, DbType.Guid);
+                    }
+                    whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
+                }
+
+                var query = "SELECT COUNT(*) FROM (SELECT * FROM Payment " + whereCondition + ") AS X";
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //CREATE
         public async Task<string> CreatePayment(Payment paymentDTO)
         {

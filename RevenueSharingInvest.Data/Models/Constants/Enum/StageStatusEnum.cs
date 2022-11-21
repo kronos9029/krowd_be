@@ -8,9 +8,9 @@ namespace RevenueSharingInvest.Data.Models.Constants.Enum
 {
     public enum StageStatusEnum
     {
+        INACTIVE,
         UNDUE,
         DUE,
-        PAID,
-        OVERDUE
+        DONE
     }
 }

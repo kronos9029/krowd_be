@@ -38,11 +38,15 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string startDate { get; set; }
         public string endDate { get; set; }
         public string status { get; set; }
+        public string isOverDue { get; set; }
         public string createDate { get; set; }
         public string createBy { get; set; }
         public string updateDate { get; set; }
         public string updateBy { get; set; }
-        public bool isDeleted { get; set; }
+        public double? actualAmount { get; set; }
+        public double? sharedAmount { get; set; }
+        public double? paidAmount { get; set; }
+        public double? receivableAmount { get; set; }
         public double pessimisticExpectedAmount { get; set; }
         public double normalExpectedAmount { get; set; }
         public double optimisticExpectedAmount { get; set; }

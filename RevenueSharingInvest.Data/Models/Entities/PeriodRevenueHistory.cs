@@ -17,15 +17,11 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [StringLength(50)]
         public string Name { get; set; }
         public Guid? PeriodRevenueId { get; set; }
+        public double? Amount { get; set; }
         public string Description { get; set; }
-        [StringLength(20)]
-        public string Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime? UpdateDate { get; set; }
-        public Guid? UpdateBy { get; set; }
 
         [ForeignKey(nameof(PeriodRevenueId))]
         [InverseProperty("PeriodRevenueHistories")]

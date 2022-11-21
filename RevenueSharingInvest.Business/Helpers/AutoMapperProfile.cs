@@ -16,8 +16,10 @@ namespace RevenueSharingInvest.Business.Helpers
         {
             CreateMap<AccountTransaction, AccountTransactionDTO>().ReverseMap();
             CreateMap<Area, AreaDTO>().ReverseMap();
+            CreateMap<Bill, BillDTO>().ReverseMap();
             CreateMap<BusinessField, BusinessFieldDTO>().ReverseMap();
             CreateMap<RevenueSharingInvest.Data.Models.Entities.Business, BusinessDTO>().ReverseMap();            
+            CreateMap<DailyReport, DailyReportDTO>().ReverseMap();            
             CreateMap<Field, FieldDTO>().ReverseMap();
             CreateMap<Investment, InvestmentDTO>().ReverseMap();
             CreateMap<Investor, InvestorDTO>().ReverseMap();
@@ -104,6 +106,15 @@ namespace RevenueSharingInvest.Business.Helpers
 
             CreateMap<Payment, InvestmentPaymentDTO>().ReverseMap();
             CreateMap<Payment, PeriodRevenuePaymentDTO>().ReverseMap();
+
+            CreateMap<WalletType, WalletTypeDTO>().ReverseMap();
+
+            CreateMap<Bill, GetBillDTO>().ReverseMap();
+            CreateMap<BillDTO, GetBillDTO>().ReverseMap();
+
+            CreateMap<InvestedProjectDetailWithInvestment, InvestedProjectDetail>().ReverseMap();
+            CreateMap<WithdrawRequest, GetWithdrawRequestDTO>().ReverseMap();
+
         }
     }
 }

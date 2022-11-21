@@ -17,6 +17,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 {
     public class StageRepository : BaseRepository, IStageRepository
     {
+        private readonly string REPAYMENT_STAGE_NAME = "Giai đoạn thanh toán nợ";
+
         public StageRepository(IConfiguration configuration) : base(configuration)
         {
         }
@@ -31,7 +33,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         ProjectId, "
                     + "         StartDate, "
                     + "         EndDate, "
-                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -43,7 +44,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @ProjectId, "
                     + "         @StartDate, "
                     + "         @EndDate, "
-                    + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -54,7 +54,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("ProjectId", stageDTO.ProjectId, DbType.Guid);
                 parameters.Add("StartDate", stageDTO.StartDate, DbType.DateTime);
                 parameters.Add("EndDate", stageDTO.EndDate, DbType.DateTime);
-                parameters.Add("Status", stageDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", stageDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
@@ -71,11 +70,20 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Stage>> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pageSize)
+        public async Task<List<Stage>> GetAllStagesByProjectId(Guid projectId, int pageIndex, int pageSize, string? status)
         {
             try
             {
                 var parameters = new DynamicParameters();
+
+                string whereClause = " WHERE ProjectId = @ProjectId ";
+
+                if (status != null)
+                {
+                    whereClause = whereClause + " AND Status = @Status ";
+                    parameters.Add("Status", status, DbType.String);
+                }
+
                 if (pageIndex != 0 && pageSize != 0)
                 {
                     var query = "WITH X AS ( "
@@ -85,14 +93,15 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "                     CreateDate ASC ) AS Num, "
                     + "             * "
                     + "         FROM Stage "
-                    + "         WHERE "
-                    + "             ProjectId = @ProjectId ) "
+                    +           whereClause
+                    + "          ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         Name, "
                     + "         ProjectId, "
                     + "         Description, "
                     + "         Status, "
+                    + "         IsOverDue, "
                     + "         StartDate, "
                     + "         EndDate, "
                     + "         CreateDate, "
@@ -113,7 +122,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM Stage WHERE ProjectId = @ProjectId ORDER BY CreateDate ASC";
+                    var query = "SELECT * FROM Stage " + whereClause + " ORDER BY CreateDate ASC";
                     parameters.Add("ProjectId", projectId, DbType.Guid);
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<Stage>(query, parameters)).ToList();
@@ -193,6 +202,83 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
+            }
+        }
+
+        //GET BY PROJECT ID AND DATE
+        public async Task<Stage> GetStageByProjectIdAndDate(Guid projectId, string date)
+        {
+            try
+            {
+                string query = "SELECT * " 
+                    + "         FROM Stage " 
+                    + "         WHERE " 
+                    + "             ProjectId = @ProjectId " 
+                    + "             AND @Date BETWEEN StartDate AND EndDate ";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                parameters.Add("Date", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Stage>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<Stage> GetLastStageByProjectId(Guid projectId)
+        {
+            try
+            {
+                string query = "SELECT "
+                    + "             S.* "
+                    + "         FROM "
+                    + "             Stage S "
+                    + "             JOIN ( "
+                    + "                 SELECT MAX(EndDate) 'EndDate' "
+                    + "                 FROM Stage "
+                    + "                 WHERE ProjectId = @ProjectId AND Name != @Name) AS X ON S.EndDate = X.EndDate "
+                    + "         WHERE " 
+                    + "             S.ProjectId = @ProjectId ";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                parameters.Add("Name", REPAYMENT_STAGE_NAME, DbType.String);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<Stage>(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //COUNT
+        public async Task<int> CountAllStagesByProjectId(Guid projectId, string? status)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+
+                string whereClause = " WHERE ProjectId = @ProjectId ";
+
+                if (status != null)
+                {
+                    whereClause = whereClause + " AND Status = @Status ";
+                    parameters.Add("Status", status, DbType.String);
+                }
+
+                var query = "SELECT COUNT(*) FROM Stage " + whereClause;
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
             }
         }
     }

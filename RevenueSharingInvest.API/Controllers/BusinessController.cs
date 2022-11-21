@@ -96,12 +96,10 @@ namespace RevenueSharingInvest.API.Controllers
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
-            if (currentUser.roleId.Equals(currentUser.businessManagerRoleId))
+            //ADMIN, BUSINESS_MANAGER
+            if (currentUser.roleId.Equals(currentUser.adminRoleId)
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId))
             {
-                if (currentUser.businessId.Equals(""))
-                {
-                    throw new System.UnauthorizedAccessException("You Have To Create Business First!!");
-                }
                 var result = await _businessService.UpdateBusiness(businessDTO, id, currentUser);
                 return Ok(result);
             }

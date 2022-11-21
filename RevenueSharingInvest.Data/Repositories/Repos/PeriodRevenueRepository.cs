@@ -28,7 +28,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "INSERT INTO PeriodRevenue ("
                     + "         ProjectId, "
                     + "         StageId, "
-                    + "         Status, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -38,7 +37,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     VALUES ( "
                     + "         @ProjectId, "
                     + "         @StageId, "
-                    + "         @Status, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
@@ -47,7 +45,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectId", periodRevenueDTO.ProjectId, DbType.Guid);
                 parameters.Add("StageId", periodRevenueDTO.StageId, DbType.Guid);
-                parameters.Add("Status", periodRevenueDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", periodRevenueDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
@@ -103,6 +100,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         ProjectId, "
                     + "         StageId, "
                     + "         ActualAmount, "
+                    + "         SharedAmount, "
+                    + "         PaidAmount, "
                     + "         PessimisticExpectedAmount, "
                     + "         NormalExpectedAmount, "
                     + "         OptimisticExpectedAmount, "
@@ -158,27 +157,23 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //UPDATE
-        public async Task<int> UpdatePeriodRevenue(PeriodRevenue periodRevenueDTO, Guid periodRevenueId)
+        public async Task<int> UpdatePeriodRevenue(PeriodRevenue periodRevenueDTO)
         {
             try
             {
                 var query = "UPDATE PeriodRevenue "
                     + "     SET "
-                    + "         ProjectId = @ProjectId, "
-                    + "         StageId = @StageId, "
-                    + "         Status = @Status, "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy "
+                    + "         ActualAmount = ISNULL(ROUND(@ActualAmount, 0), ActualAmount), "
+                    + "         SharedAmount = ISNULL(ROUND(@SharedAmount, 0), SharedAmount), "
+                    + "         UpdateDate = @UpdateDate "
                     + "     WHERE "
                     + "         Id = @Id";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("ProjectId", periodRevenueDTO.ProjectId, DbType.Guid);
-                parameters.Add("StageId", periodRevenueDTO.StageId, DbType.Guid);
-                parameters.Add("Status", periodRevenueDTO.Status, DbType.String);
+                parameters.Add("ActualAmount", periodRevenueDTO.ActualAmount, DbType.Double);
+                parameters.Add("SharedAmount", periodRevenueDTO.SharedAmount, DbType.Double);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                parameters.Add("UpdateBy", periodRevenueDTO.UpdateBy, DbType.Guid);
-                parameters.Add("Id", periodRevenueId, DbType.Guid);
+                parameters.Add("Id", periodRevenueDTO.Id, DbType.Guid);
 
                 using (var connection = CreateConnection())
                 {
@@ -268,6 +263,125 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
+            }
+        }
+
+        //UPDATE PAID AMOUNT
+        public async Task<int> UpdatePeriodRevenueByPaidAmount(PeriodRevenue periodRevenueDTO)
+        {
+            try
+            {
+                var query = "UPDATE PeriodRevenue "
+                    + "     SET "
+                    + "         PaidAmount = CASE " 
+                    + "                         WHEN PaidAmount IS NULL THEN 0 + @PaidAmount " 
+                    + "                         WHEN PaidAmount IS NOT NULL THEN PaidAmount + @PaidAmount " 
+                    + "                      END, "
+                    + "         UpdateDate = @UpdateDate, "
+                    + "         UpdateBy = @UpdateBy "
+                    + "     WHERE "
+                    + "         Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("PaidAmount", periodRevenueDTO.PaidAmount, DbType.Double);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                parameters.Add("UpdateBy", periodRevenueDTO.UpdateBy, DbType.Guid);
+                parameters.Add("Id", periodRevenueDTO.Id, DbType.Guid);
+
+                using (var connection = CreateConnection())
+                {
+                    return await connection.ExecuteAsync(query, parameters);
+                }
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //COUNT NOT PAID ENOUGH
+        public async Task<int> CountNotPaidEnoughPeriodRevenue(Guid projectId)
+        {
+            try
+            {
+                var query = "SELECT COUNT(*) FROM PeriodRevenue WHERE ProjectId = @ProjectId AND (Status IS NULL OR Status = 'NOT_PAID_ENOUGH') ";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //CREATE REPAYMENT PERIOD REVENUE
+        public async Task<string> CreateRepaymentPeriodRevenue(PeriodRevenue periodRevenueDTO)
+        {
+            try
+            {
+                var query = "INSERT INTO PeriodRevenue ("
+                    + "         ProjectId, "
+                    + "         StageId, "
+                    + "         ActualAmount, "
+                    + "         SharedAmount, "
+                    + "         PaidAmount, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy ) "
+                    + "     OUTPUT "
+                    + "         INSERTED.Id "
+                    + "     VALUES ( "
+                    + "         @ProjectId, "
+                    + "         @StageId, "
+                    + "         @ActualAmount, "
+                    + "         @SharedAmount, "
+                    + "         @PaidAmount, "
+                    + "         @CreateDate, "
+                    + "         @CreateBy, "
+                    + "         @UpdateDate, "
+                    + "         @UpdateBy )";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", periodRevenueDTO.ProjectId, DbType.Guid);
+                parameters.Add("StageId", periodRevenueDTO.StageId, DbType.Guid);
+                parameters.Add("ActualAmount", periodRevenueDTO.ActualAmount, DbType.Double);
+                parameters.Add("SharedAmount", periodRevenueDTO.SharedAmount, DbType.Double);
+                parameters.Add("PaidAmount", periodRevenueDTO.PaidAmount, DbType.Double);
+                parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                parameters.Add("CreateBy", periodRevenueDTO.CreateBy, DbType.Guid);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                parameters.Add("UpdateBy", periodRevenueDTO.CreateBy, DbType.Guid);
+
+                using var connection = CreateConnection();
+                return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //SUM SHARED AMOUNT
+        public async Task<double> SumSharedAmount(Guid projectId)
+        {
+            try
+            {
+                string query = "SELECT CAST(ISNULL(0, SUM(SharedAmount)) AS FLOAT) FROM PeriodRevenue WHERE ProjectId = @ProjectId AND SharedAmount IS NOT NULL";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (double)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
             }
         }
     }

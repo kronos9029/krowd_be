@@ -61,7 +61,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string createBy { get; set; }
         public string updateDate { get; set; }
         public string updateBy { get; set; }
-        public bool isDeleted { get; set; }
     }
 
     public class ProjectMemberUserDTO : UserDTO
@@ -91,7 +90,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string createBy { get; set; }
         public string updateDate { get; set; }
         public string updateBy { get; set; }
-        public bool isDeleted { get; set; }
     }
 
     public class ProjectManagerUserDTO : UserDTO
@@ -115,6 +113,21 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string createBy { get; set; }
         public string updateDate { get; set; }
         public string updateBy { get; set; }
-        public bool isDeleted { get; set; }
     }
+
+    public class PaidInvestorDTO
+    {
+        public PaidInvestorDTO()
+        {
+        }
+
+        public PaidInvestorDTO(Guid investorId, double amount)
+        {
+            this.investorId = investorId;
+            this.amount = amount;
+        }
+
+        public Guid investorId { get; set; }
+        public double amount { get; set; }
+    }    
 }

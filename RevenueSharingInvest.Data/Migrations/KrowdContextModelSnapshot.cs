@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RevenueSharingInvest.Data.Models.Entities;
+using RevenueSharingInvest.Data.Helpers;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
@@ -28,13 +28,17 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasDefaultValueSql("(newid())");
 
                     b.Property<long>("Amount")
-                        .HasColumnType("bigint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValueSql("(CONVERT([bigint],(0)))");
 
                     b.Property<string>("CallbackToken")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("('0001-01-01T00:00:00.000')");
 
                     b.Property<string>("ExtraData")
                         .HasColumnType("nvarchar(max)");
@@ -70,7 +74,9 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("ResponseTime")
-                        .HasColumnType("bigint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValueSql("(CONVERT([bigint],(0)))");
 
                     b.Property<int>("ResultCode")
                         .HasColumnType("int");
@@ -82,12 +88,19 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<long>("TransId")
-                        .HasColumnType("bigint");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValueSql("(CONVERT([bigint],(0)))");
 
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("WithdrawRequestId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("WithdrawRequestId");
 
                     b.HasIndex(new[] { "FromUserId" }, "IX_AccountTransaction_FromUserId");
 
@@ -128,6 +141,40 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.ToTable("Area");
                 });
 
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Bill", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("(newid())");
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<string>("CreateBy")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<Guid>("DailyReportId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InvoiceId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DailyReportId");
+
+                    b.ToTable("Bill");
+                });
+
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Business", b =>
                 {
                     b.Property<Guid>("Id")
@@ -165,8 +212,8 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("PhoneNum")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
@@ -213,6 +260,50 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasIndex(new[] { "FieldId" }, "IX_BusinessField_FieldId");
 
                     b.ToTable("BusinessField");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.DailyReport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("(newid())");
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime>("ReportDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("('0001-01-01T00:00:00.000')");
+
+                    b.Property<Guid>("StageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasMaxLength(12)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(12)")
+                        .HasComputedColumnSql("(case when dateadd(hour,(7),getdate())<[ReportDate] then 'UNDUE' when dateadd(hour,(7),getdate())>=[ReportDate] AND dateadd(hour,(7),getdate())<=dateadd(day,(1),[ReportDate]) AND [UpdateDate] IS NULL AND [UpdateBy] IS NULL then 'DUE' when [UpdateDate] IS NOT NULL AND [UpdateBy] IS NOT NULL then 'REPORTED' when dateadd(hour,(7),getdate())>dateadd(day,(1),[ReportDate]) AND [UpdateDate] IS NULL AND [UpdateBy] IS NULL then 'NOT_REPORTED'  end)", false);
+
+                    b.Property<string>("UpdateBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StageId");
+
+                    b.ToTable("DailyReport");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Field", b =>
@@ -284,6 +375,10 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("datetime");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InvestorId");
+
+                    b.HasIndex("PackageId");
 
                     b.ToTable("Investment");
                 });
@@ -427,7 +522,12 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasMaxLength(12)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(12)")
+                        .HasComputedColumnSql("(case when [dbo].[Get_Project_Status]([ProjectId])<>'CALLING_FOR_INVESTMENT' then 'INACTIVE' when [dbo].[Get_Project_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND ([dbo].[Get_Project_InvestedCapital]([ProjectId])+[Price])<[dbo].[Get_Project_InvestmentTargetCapital]([ProjectId]) AND [RemainingQuantity]>(0) then 'IN_STOCK' when [dbo].[Get_Project_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND ([dbo].[Get_Project_InvestedCapital]([ProjectId])+[Price])<[dbo].[Get_Project_InvestmentTargetCapital]([ProjectId]) AND [RemainingQuantity]=(0) then 'OUT_OF_STOCK' when [dbo].[Get_Project_Status]([ProjectId])='CALLING_FOR_INVESTMENT' AND ([dbo].[Get_Project_InvestedCapital]([ProjectId])+[Price])>[dbo].[Get_Project_InvestmentTargetCapital]([ProjectId]) then 'BLOCKED' else 'INACTIVE' end)", false);
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -556,6 +656,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<double?>("OptimisticExpectedRatio")
                         .HasColumnType("float");
 
+                    b.Property<double?>("PaidAmount")
+                        .HasColumnType("float");
+
                     b.Property<double?>("PessimisticExpectedAmount")
                         .HasColumnType("float");
 
@@ -565,12 +668,18 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<double?>("SharedAmount")
+                        .HasColumnType("float");
+
                     b.Property<Guid>("StageId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasMaxLength(15)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(15)")
+                        .HasComputedColumnSql("(case when [ActualAmount] IS NOT NULL AND [SharedAmount] IS NOT NULL AND [PaidAmount] IS NOT NULL AND [PaidAmount]>=[SharedAmount] then 'PAID_ENOUGH' when [ActualAmount] IS NOT NULL AND [SharedAmount] IS NOT NULL AND [PaidAmount] IS NOT NULL AND [PaidAmount]<[SharedAmount] then 'NOT_PAID_ENOUGH'  end)", false);
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -594,6 +703,9 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("(newid())");
 
+                    b.Property<double?>("Amount")
+                        .HasColumnType("float");
+
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -610,16 +722,6 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<Guid?>("PeriodRevenueId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Status")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<Guid?>("UpdateBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime");
-
                     b.HasKey("Id");
 
                     b.HasIndex(new[] { "PeriodRevenueId" }, "IX_PeriodRevenueHistory_PeriodRevenueId");
@@ -633,6 +735,10 @@ namespace RevenueSharingInvest.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("(newid())");
+
+                    b.Property<string>("AccessKey")
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
 
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
@@ -687,13 +793,16 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("NumOfStage")
                         .HasColumnType("int");
 
-                    b.Property<double>("RemainAmount")
+                    b.Property<double>("PaidAmount")
+                        .HasColumnType("float");
+
+                    b.Property<double>("RemainingPayableAmount")
                         .HasColumnType("float");
 
                     b.Property<double>("SharedRevenue")
@@ -787,7 +896,10 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("ProjectManagerId")
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProjectManagerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("UpdateBy")
@@ -796,7 +908,7 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime");
 
-                    b.Property<Guid?>("WalletTypeId")
+                    b.Property<Guid>("WalletTypeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -930,6 +1042,13 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime");
 
+                    b.Property<string>("IsOverDue")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasMaxLength(5)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(5)")
+                        .HasComputedColumnSql("(case when [dbo].[Get_Period_Revenue_History]([Id])<>(0) AND (dateadd(hour,(7),getdate())>=[EndDate] AND dateadd(hour,(7),getdate())<=dateadd(day,(3),[EndDate])) then 'FALSE' when [dbo].[Get_Period_Revenue_History]([Id])=(0) AND dateadd(hour,(7),getdate())>dateadd(day,(3),[EndDate]) then 'TRUE' when dateadd(hour,(7),getdate())<[EndDate] then NULL  end)", false);
+
                     b.Property<string>("Name")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -941,8 +1060,12 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("Status")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasMaxLength(8)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(8)")
+                        .HasComputedColumnSql("(case when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND [Name]=N'Giai đoạn thanh toán nợ' AND [dbo].[Get_Period_Revenue_Shared_Amount]([Id])>[dbo].[Get_Period_Revenue_Paid_Amount]([Id]) then 'DUE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND [Name]=N'Giai đoạn thanh toán nợ' AND [dbo].[Get_Period_Revenue_Shared_Amount]([Id])<=[dbo].[Get_Period_Revenue_Paid_Amount]([Id]) then 'DONE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())<[EndDate] then 'UNDUE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND (dateadd(hour,(7),getdate())>=[EndDate] AND dateadd(hour,(7),getdate())<=dateadd(day,(3),[EndDate])) then 'DUE' when [dbo].[Get_Project_Status]([ProjectId])='ACTIVE' AND dateadd(hour,(7),getdate())>dateadd(day,(3),[EndDate]) then 'DONE' else 'INACTIVE' end)", false);
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -1030,6 +1153,9 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DeviceToken")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("District")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -1063,6 +1189,10 @@ namespace RevenueSharingInvest.Data.Migrations
 
                     b.Property<Guid?>("RoleId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SecretKey")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
@@ -1262,8 +1392,8 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Mode")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
@@ -1284,6 +1414,65 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.ToTable("WalletType");
                 });
 
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.WithdrawRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("(newid())");
+
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<string>("BankAccount")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BankName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("FromWalletId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RefusalReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReportMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UpdateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreateBy");
+
+                    b.HasIndex("UpdateBy");
+
+                    b.ToTable("WithdrawRequest");
+                });
+
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.AccountTransaction", b =>
                 {
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "FromUser")
@@ -1296,9 +1485,27 @@ namespace RevenueSharingInvest.Data.Migrations
                         .HasForeignKey("ToUserId")
                         .HasConstraintName("FK_AccountTransaction_User1");
 
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.WithdrawRequest", "WithdrawRequest")
+                        .WithMany("AccountTransactions")
+                        .HasForeignKey("WithdrawRequestId")
+                        .HasConstraintName("FK_AccountTransaction_WithdrawRequest");
+
                     b.Navigation("FromUser");
 
                     b.Navigation("ToUser");
+
+                    b.Navigation("WithdrawRequest");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Bill", b =>
+                {
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.DailyReport", "DailyReport")
+                        .WithMany("Bills")
+                        .HasForeignKey("DailyReportId")
+                        .HasConstraintName("FK_Bill_DailyReport")
+                        .IsRequired();
+
+                    b.Navigation("DailyReport");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.BusinessField", b =>
@@ -1318,6 +1525,36 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("Business");
 
                     b.Navigation("Field");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.DailyReport", b =>
+                {
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Stage", "Stage")
+                        .WithMany("DailyReports")
+                        .HasForeignKey("StageId")
+                        .HasConstraintName("FK_DailyReport_Stage")
+                        .IsRequired();
+
+                    b.Navigation("Stage");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investment", b =>
+                {
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Investor", "Investor")
+                        .WithMany("Investments")
+                        .HasForeignKey("InvestorId")
+                        .HasConstraintName("FK_Investment_Investor")
+                        .IsRequired();
+
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.Package", "Package")
+                        .WithMany("Investments")
+                        .HasForeignKey("PackageId")
+                        .HasConstraintName("FK_Investment_Package")
+                        .IsRequired();
+
+                    b.Navigation("Investor");
+
+                    b.Navigation("Package");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investor", b =>
@@ -1400,13 +1637,11 @@ namespace RevenueSharingInvest.Data.Migrations
                         .WithMany("PeriodRevenues")
                         .HasForeignKey("ProjectId")
                         .HasConstraintName("FK_PeriodRevenue_Project")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.Stage", "Stage")
                         .WithMany("PeriodRevenues")
                         .HasForeignKey("StageId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -1437,7 +1672,6 @@ namespace RevenueSharingInvest.Data.Migrations
                         .WithMany("Projects")
                         .HasForeignKey("BusinessId")
                         .HasConstraintName("FK_Project_Business")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "Manager")
@@ -1471,12 +1705,14 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "ProjectManager")
                         .WithMany("ProjectWallets")
                         .HasForeignKey("ProjectManagerId")
-                        .HasConstraintName("FK_ProjectWallet_User");
+                        .HasConstraintName("FK_ProjectWallet_User")
+                        .IsRequired();
 
                     b.HasOne("RevenueSharingInvest.Data.Models.Entities.WalletType", "WalletType")
                         .WithMany("ProjectWallets")
                         .HasForeignKey("WalletTypeId")
-                        .HasConstraintName("FK_BusinessWallet_WalletType");
+                        .HasConstraintName("FK_BusinessWallet_WalletType")
+                        .IsRequired();
 
                     b.Navigation("ProjectManager");
 
@@ -1506,7 +1742,6 @@ namespace RevenueSharingInvest.Data.Migrations
                         .WithMany("Stages")
                         .HasForeignKey("ProjectId")
                         .HasConstraintName("FK_Stage_Project")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -1595,6 +1830,23 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("SystemWallet");
                 });
 
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.WithdrawRequest", b =>
+                {
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "CreateByNavigation")
+                        .WithMany("WithdrawRequestCreateByNavigations")
+                        .HasForeignKey("CreateBy")
+                        .HasConstraintName("FK_WithdrawRequest_User");
+
+                    b.HasOne("RevenueSharingInvest.Data.Models.Entities.User", "UpdateByNavigation")
+                        .WithMany("WithdrawRequestUpdateByNavigations")
+                        .HasForeignKey("UpdateBy")
+                        .HasConstraintName("FK_WithdrawRequest_User1");
+
+                    b.Navigation("CreateByNavigation");
+
+                    b.Navigation("UpdateByNavigation");
+                });
+
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Area", b =>
                 {
                     b.Navigation("Projects");
@@ -1607,6 +1859,11 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("Projects");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.DailyReport", b =>
+                {
+                    b.Navigation("Bills");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Field", b =>
@@ -1623,6 +1880,8 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Investor", b =>
                 {
+                    b.Navigation("Investments");
+
                     b.Navigation("InvestorWallets");
                 });
 
@@ -1633,6 +1892,8 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Package", b =>
                 {
+                    b.Navigation("Investments");
+
                     b.Navigation("PackageVouchers");
                 });
 
@@ -1680,6 +1941,8 @@ namespace RevenueSharingInvest.Data.Migrations
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Stage", b =>
                 {
+                    b.Navigation("DailyReports");
+
                     b.Navigation("PeriodRevenues");
                 });
 
@@ -1699,6 +1962,10 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("Projects");
 
                     b.Navigation("ProjectWallets");
+
+                    b.Navigation("WithdrawRequestCreateByNavigations");
+
+                    b.Navigation("WithdrawRequestUpdateByNavigations");
                 });
 
             modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.Voucher", b =>
@@ -1715,6 +1982,11 @@ namespace RevenueSharingInvest.Data.Migrations
                     b.Navigation("ProjectWallets");
 
                     b.Navigation("SystemWallets");
+                });
+
+            modelBuilder.Entity("RevenueSharingInvest.Data.Models.Entities.WithdrawRequest", b =>
+                {
+                    b.Navigation("AccountTransactions");
                 });
 #pragma warning restore 612, 618
         }

@@ -6,6 +6,7 @@ using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -53,15 +54,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<dynamic> GetAllPayments(int pageIndex, int pageSize, string type, ThisUserObj currentUser)
+        public async Task<AllPaymentDTO> GetAllPayments(int pageIndex, int pageSize, string type, ThisUserObj currentUser)
         {
-            dynamic result;
+            AllPaymentDTO result = new AllPaymentDTO();
             try
             {
                 if (!type.Equals(PaymentTypeEnum.INVESTMENT.ToString()) && !type.Equals(PaymentTypeEnum.PERIOD_REVENUE.ToString()))
                     throw new InvalidFieldException("Invalid type!!!");
 
                 List<Payment> paymentList = await _paymentRepository.GetAllPayments(pageIndex, pageSize, type, Guid.Parse(currentUser.roleId), Guid.Parse(currentUser.userId));
+                result.numOfPayment = await _paymentRepository.CountAllPayments(type, Guid.Parse(currentUser.roleId), Guid.Parse(currentUser.userId));
                 Project project = new Project();
                 
 
@@ -72,16 +74,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     foreach (InvestmentPaymentDTO item in list)
                     {                  
                         package = await _packageRepository.GetPackageById(Guid.Parse(item.packageId));
-                        project = await _projectRepository.GetProjectById(package.ProjectId);
+                        if (package != null)
+                            project = await _projectRepository.GetProjectById(package.ProjectId);
                         item.createDate = await _validationService.FormatDateOutput(item.createDate);
-                        item.projectId = project.Id.ToString();
-                        item.projectName = project.Name;
-                        item.packageId = package.Id.ToString();
-                        item.packageName = package.Name;                   
-                        item.investedQuantity = (int)(item.amount / package.Price);
+                        item.projectId = package == null ? "Dự án không còn tồn tại" : project.Id.ToString();
+                        item.projectName = package == null ? "Dự án không còn tồn tại" : project.Name;
+                        item.packageId = package == null ? "Gói không còn tồn tại" : package.Id.ToString();
+                        item.packageName = package == null ? "Gói không còn tồn tại" : package.Name;
+                        item.investedQuantity = (int)(await _investmentRepository.GetInvestmentById(Guid.Parse(item.investmentId))).Quantity;
                         item.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")))).Name;
                     }
-                    result = list;
+                    result.listOfInvestmentPayment = list;                    
                 }
                 else
                 {
@@ -91,15 +94,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     foreach (PeriodRevenuePaymentDTO item in list)
                     {
                         stage = await _stageRepository.GetStageById(Guid.Parse(item.stageId));
-                        project = await _projectRepository.GetProjectById(stage.ProjectId);                       
+                        if (stage != null)
+                            project = await _projectRepository.GetProjectById(stage.ProjectId);                       
                         item.createDate = await _validationService.FormatDateOutput(item.createDate);
-                        item.projectId = project.Id.ToString();
-                        item.projectName = project.Name;
-                        item.stageId = stage.Id.ToString();
-                        item.stageName = stage.Name;
-                        item.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B1")))).Name;
+                        item.projectId = stage == null ? "Dự án không còn tồn tại" : project.Id.ToString();
+                        item.projectName = stage == null ? "Dự án không còn tồn tại" : project.Name.ToString();
+                        item.stageId = stage == null ? "Gói không còn tồn tại" : stage.Id.ToString();
+                        item.stageName = stage == null ? "Gói không còn tồn tại" : stage.Name;
+                        item.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2")))).Name;
                     }
-                    result = list;
+                    result.listOfPeriodRevenuePayment = list;
                 }
                 return result;
             }
@@ -126,26 +130,30 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     result = _mapper.Map<InvestmentPaymentDTO>(payment);
                     Package package = await _packageRepository.GetPackageById(Guid.Parse(result.packageId));
-                    Project project = await _projectRepository.GetProjectById(package.ProjectId);
+                    Project project = new Project();
+                    if (package != null)
+                        project = await _projectRepository.GetProjectById(package.ProjectId);
                     result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                    result.projectId = project.Id.ToString();
-                    result.projectName = project.Name;
-                    result.packageId = package.Id.ToString();
-                    result.packageName = package.Name;
-                    result.investedQuantity = (int)(result.amount / package.Price);
+                    result.projectId = package == null ? "Dự án không còn tồn tại" : project.Id.ToString();
+                    result.projectName = package == null ? "Dự án không còn tồn tại" : project.Name;
+                    result.packageId = package == null ? "Gói không còn tồn tại" : package.Id.ToString();
+                    result.packageName = package == null ? "Gói không còn tồn tại" : package.Name;
+                    result.investedQuantity = (int)(await _investmentRepository.GetInvestmentById(Guid.Parse(result.investmentId))).Quantity;
                     result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")))).Name;
                 }
                 else
                 {
                     result = _mapper.Map<PeriodRevenuePaymentDTO>(payment);
                     Stage stage = await _stageRepository.GetStageById(Guid.Parse(result.stageId));
-                    Project project = await _projectRepository.GetProjectById(stage.ProjectId);
+                    Project project = new Project();
+                    if (stage != null)
+                        project = await _projectRepository.GetProjectById(stage.ProjectId);
                     result.createDate = await _validationService.FormatDateOutput(result.createDate);
-                    result.projectId = project.Id.ToString();
-                    result.projectName = project.Name;
-                    result.stageId = stage.Id.ToString();
-                    result.stageName = stage.Name;
-                    result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B1")))).Name;
+                    result.projectId = stage == null ? "Dự án không còn tồn tại" : project.Id.ToString();
+                    result.projectName = stage == null ? "Dự án không còn tồn tại" : project.Name.ToString();
+                    result.stageId = stage == null ? "Gói không còn tồn tại" : stage.Id.ToString();
+                    result.stageName = stage == null ? "Gói không còn tồn tại" : stage.Name;
+                    result.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2")))).Name;
                 }
                 return result;
             }

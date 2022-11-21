@@ -6,10 +6,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RevenueSharingInvest.Data.Models.Entities;
+using RevenueSharingInvest.Data.Helpers;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
-    [DbContext(typeof(KrowdContext))]
+    [DbContext(typeof(Helpers.KrowdContext))]
     [Migration("20220908114145_Krowd_v1.0.1")]
     partial class Krowd_v101
     {
@@ -1066,9 +1067,9 @@ namespace RevenueSharingInvest.Data.Migrations
                         {
                             Id = new Guid("2d80393a-3a3d-495d-8dd7-f9261f85cc8f"),
                             CreateDate = new DateTime(2022, 9, 8, 18, 41, 44, 420, DateTimeKind.Local).AddTicks(4908),
-                            Description = "Project owner",
+                            Description = "Project manager",
                             IsDeleted = false,
-                            Name = "PROJECT_OWNER"
+                            Name = "PROJECT_MANAGER"
                         },
                         new
                         {

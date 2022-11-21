@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using RevenueSharingInvest.Data.Models.Entities;
 using System.Data;
 using System.Data.SqlClient;
+using StackExchange.Redis;
 
 namespace RevenueSharingInvest.API.Extensions
 {
@@ -19,7 +19,12 @@ namespace RevenueSharingInvest.API.Extensions
             services.AddTransient<IDbConnection>((sp) => new SqlConnection(dbConnectionString));
 
             //Register DBcontext for migration
-            services.AddDbContext<KrowdContext>(options => options.UseSqlServer(dbConnectionString));
+            services.AddDbContext<Data.Helpers.KrowdContext>(options => options.UseSqlServer(dbConnectionString));
+
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = configuration.GetConnectionString("RedisCache");
+            });
         }
 
     }

@@ -20,6 +20,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
             Investors = new HashSet<Investor>();
             ProjectWallets = new HashSet<ProjectWallet>();
             Projects = new HashSet<Project>();
+            WithdrawRequestCreateByNavigations = new HashSet<WithdrawRequest>();
+            WithdrawRequestUpdateByNavigations = new HashSet<WithdrawRequest>();
         }
 
         [Key]
@@ -60,6 +62,8 @@ namespace RevenueSharingInvest.Data.Models.Entities
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
+        [StringLength(32)]
+        public string SecretKey { get; set; }
 
         [ForeignKey(nameof(BusinessId))]
         [InverseProperty("Users")]
@@ -77,5 +81,9 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public virtual ICollection<ProjectWallet> ProjectWallets { get; set; }
         [InverseProperty(nameof(Project.Manager))]
         public virtual ICollection<Project> Projects { get; set; }
+        [InverseProperty(nameof(WithdrawRequest.CreateByNavigation))]
+        public virtual ICollection<WithdrawRequest> WithdrawRequestCreateByNavigations { get; set; }
+        [InverseProperty(nameof(WithdrawRequest.UpdateByNavigation))]
+        public virtual ICollection<WithdrawRequest> WithdrawRequestUpdateByNavigations { get; set; }
     }
 }

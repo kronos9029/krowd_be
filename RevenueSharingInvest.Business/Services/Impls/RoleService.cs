@@ -54,8 +54,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("Invalid updateBy!!!");
                 }
 
-                roleDTO.isDeleted = false;
-
                 Role dto = _mapper.Map<Role>(roleDTO);
                 newId.id = await _roleRepository.CreateRole(dto);
                 if (newId.id.Equals(""))
@@ -109,6 +107,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 return list;
             }
             catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<string> GetRoleNameByUserId(string userId)
+        {
+            try
+            {
+                string roleName = await _roleRepository.GetRoleNameByUserId(Guid.Parse(userId));
+
+                return roleName;
+            }catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);

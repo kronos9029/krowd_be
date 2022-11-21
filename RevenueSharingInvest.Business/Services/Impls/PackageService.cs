@@ -64,7 +64,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 //Kiểm tra projectId có thuộc về business của PM không
                 Project project = await _projectRepository.GetProjectById(Guid.Parse(packageDTO.projectId));
-                if (!project.BusinessId.ToString().Equals(currentUser.businessId))
+                if (!project.BusinessId.Equals(Guid.Parse(currentUser.businessId)))
                 {
                     throw new NotFoundException("This projectId is not belong to your's Business!!!");
                 }    
@@ -79,10 +79,13 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (packageDTO.quantity <= 0)
                     throw new InvalidFieldException("quantity must be greater than 0!!!");
 
+                if (packageDTO.description == null || packageDTO.description.Trim().Length == 0)
+                    throw new InvalidFieldException("description can not be null!!!");
+
                 Package entity = _mapper.Map<Package>(packageDTO);
 
                 entity.RemainingQuantity = entity.Quantity;
-                entity.Status = Enum.GetNames(typeof(PackageStatusEnum)).ElementAt(0); //IN_STOCK
+                entity.Status = PackageStatusEnum.INACTIVE.ToString(); //INACTIVE
                 entity.CreateBy = Guid.Parse(currentUser.userId);
                 entity.UpdateBy = Guid.Parse(currentUser.userId);
 
@@ -160,11 +163,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     dto.createDate = await _validationService.FormatDateOutput(dto.createDate);
                     dto.updateDate = await _validationService.FormatDateOutput(dto.updateDate);
-                    string[] split = item.Description.Split("\\li", StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string descriptionItem in split)
+
+                    if (item.Description != null)
                     {
-                        dto.descriptionList.Add(descriptionItem);
+                        string[] split = item.Description.Split("\\li", StringSplitOptions.RemoveEmptyEntries);
+                        foreach (string descriptionItem in split)
+                        {
+                            dto.descriptionList.Add(descriptionItem);
+                        }
                     }
+                    else
+                        dto.descriptionList = null;
 
                     result.listOfPackage.Add(dto);
                 }
@@ -203,11 +212,18 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 dto.createDate = await _validationService.FormatDateOutput(dto.createDate);
                 dto.updateDate = await _validationService.FormatDateOutput(dto.updateDate);
-                string[] split = package.Description.Split("\\li", StringSplitOptions.RemoveEmptyEntries);
-                foreach (string descriptionItem in split)
+                if (package.Description != null)
                 {
-                    dto.descriptionList.Add(descriptionItem);
+                    string[] split = package.Description.Split("\\li", StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string descriptionItem in split)
+                    {
+                        dto.descriptionList.Add(descriptionItem);
+                    }
                 }
+                else
+                    dto.descriptionList = null;
+
+
 
                 return dto;
             }

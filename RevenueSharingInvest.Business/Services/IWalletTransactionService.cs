@@ -1,5 +1,6 @@
 ﻿using RevenueSharingInvest.API;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,9 @@ namespace RevenueSharingInvest.Business.Services
         //CREATE
 
         //READ
-        public Task<List<WalletTransactionDTO>> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, Guid? walletId, string fromDate, string toDate, string type, string order, ThisUserObj currentUser);
+        public Task<AllWalletTransactionDTO> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, Guid? walletId, string fromDate, string toDate, string type, string order, ThisUserObj currentUser);
+        public Task<string> TransferFromI1ToI2(ThisUserObj currentUser, double amount);
+        public void TransferMoney(dynamic from, dynamic to, double amount, string userId, string action);
         //public Task<WalletTransactionDTO> GetWalletTransactionById(Guid walletTransactionId);
 
         //UPDATE

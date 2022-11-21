@@ -8,6 +8,7 @@ using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -27,9 +28,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IWalletTypeRepository _walletTypeRepository;
         private readonly IUserRepository _userRepository;
         private readonly IProjectWalletRepository _projectWalletRepository;
-
+        private readonly IInvestorRepository _investorRepository;
         private readonly IMapper _mapper;
-
 
         public WalletTransactionService(
             IWalletTransactionRepository walletTransactionRepository,
@@ -37,8 +37,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IWalletTypeRepository walletTypeRepository,
             IUserRepository userRepository,
             IProjectWalletRepository projectWalletRepository, 
-
-            IValidationService validationService, 
+            IValidationService validationService,
+            IInvestorRepository investorRepository,
             IMapper mapper
             )
         {
@@ -47,7 +47,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _walletTypeRepository = walletTypeRepository;
             _userRepository = userRepository;
             _projectWalletRepository = projectWalletRepository;
-
+            _investorRepository = investorRepository;
             _validationService = validationService;
             _mapper = mapper;           
         }
@@ -111,43 +111,109 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
             }
+        }
+
+        public async void TransferMoney(dynamic from, dynamic to, double amount, string userId, string action)
+        {
+            try
+            {
+                if (amount < 0 || amount > from.Balance)
+                    throw new WalletBalanceException("Invalid Amount!!");
+                var arrayOfAllKeys = WalletTypeDictionary.walletTypes.Keys.ToArray();
+
+                string fromType = "";
+                string toType = "";
+
+                foreach (var key in arrayOfAllKeys)
+                {
+                    if (from.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault(key))))
+                        fromType = key;
+                    if (to.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault(key))))
+                        toType = key;
+                    if (!fromType.Equals("") && !toType.Equals(""))
+                        break;
+                }
+
+                //Subtract  balance
+                from.Balance = -amount;
+                from.UpdateBy = Guid.Parse(userId);
+                if (fromType.Contains("I"))
+                {
+                    await _investorWalletRepository.UpdateInvestorWalletBalance(from);
+                } else
+                {
+                    await _projectWalletRepository.UpdateProjectWalletBalance(from);
+                }
 
 
+                //Create CASH_OUT WalletTransaction
+                WalletTransaction walletTransaction = new()
+                {
+                    Amount = amount,
+                    Fee = 0,
+                    Description = "Transfer money from " + fromType + " wallet to " + toType + " wallet",
+                    FromWalletId = from.Id,
+                    ToWalletId = to.Id,
+                    Type = WalletTransactionTypeEnum.CASH_OUT.ToString(),
+                    CreateBy = Guid.Parse(userId)
+                };
+                if (action.Equals("REFUND"))
+                {
+                    walletTransaction.Description = "Refund money from withdraw request";
+                }
+                string newWalletTransactionId = await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+                if (newWalletTransactionId == null || newWalletTransactionId.Equals(""))
+                    throw new CreateObjectException("Create Wallet Transaction Failed!!");
 
+                //Add to balance
+                to.Balance = amount;
+                if (toType.Contains("I"))
+                {
+                    await _investorWalletRepository.UpdateInvestorWalletBalance(to);
+                }
+                else
+                {
+                    await _projectWalletRepository.UpdateProjectWalletBalance(to);
+                }
+
+
+                //Create CASH_IN WalletTransaction
+                walletTransaction.Description = "Receive money from " + fromType + " wallet to " + toType + " wallet";
+                walletTransaction.Type = WalletTransactionTypeEnum.CASH_IN.ToString();
+                newWalletTransactionId = "";
+                newWalletTransactionId = await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
+                if (newWalletTransactionId == null || newWalletTransactionId.Equals(""))
+                    throw new CreateObjectException("Create Wallet Transaction Failed!!");
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
         }
 
         //GET ALL
-        public async Task<List<WalletTransactionDTO>> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, Guid? walletId, string fromDate, string toDate, string type, string order, ThisUserObj currentUser)
+        public async Task<AllWalletTransactionDTO> GetAllWalletTransactions(int pageIndex, int pageSize, Guid? userId, Guid? walletId, string fromDate, string toDate, string type, string order, ThisUserObj currentUser)
         {
-            //fromDate ??= "";
-            //toDate ??= "";
-            //walletId ??= "";
+            AllWalletTransactionDTO result = new AllWalletTransactionDTO();
+            result.listOfWalletTransaction = new List<WalletTransactionDTO>();
+            result.filterCount = new CountWalletTransactionDTO();
             Guid? userRoleId = null;
             try
             {
-                //if(!fromDate.Equals("") || !toDate.Equals(""))
-                //{
-                //    fromDate += " 00:00:00";
-                //    toDate += " 23:59:59";
-                //}
-
-                //List<WalletTransaction> walletTransactionList = await _walletTransactionRepository.GetAllWalletTransactions(pageIndex, pageSize,userId,sort, fromDate, toDate, walletId);
-                //List<WalletTransactionDTO> list = _mapper.Map<List<WalletTransactionDTO>>(walletTransactionList);
-
-                //foreach (WalletTransactionDTO item in list)
-                //{
-                //    item.createDate = await _validationService.FormatDateOutput(item.createDate);
-                //}
-
-                //return list;
-                if (userId != null)
+                if (userId == null)
+                {
+                    if (currentUser.roleId.Equals(currentUser.adminRoleId))
+                        throw new InvalidFieldException("userId can not be null!!!");
+                }  
+                else
                 {
                     if (!await _validationService.CheckExistenceId("[User]", (Guid)userId))
                         throw new NotFoundException("This userId is not existed!!!");
 
                     User user = await _userRepository.GetUserById((Guid)userId);
                     if (!user.RoleId.Equals(Guid.Parse(currentUser.projectManagerRoleId)) && !user.RoleId.Equals(Guid.Parse(currentUser.investorRoleId)))
-                        throw new InvalidFieldException("You can view WalletTransaction of PROJECT_OWNER or INVESTOR only!!!");
+                        throw new InvalidFieldException("You can view WalletTransaction of PROJECT_MANAGER or INVESTOR only!!!");
 
                     if ((currentUser.roleId.Equals(currentUser.projectManagerRoleId) || currentUser.roleId.Equals(currentUser.investorRoleId)) && !userId.Equals(Guid.Parse(currentUser.userId)))
                         throw new InvalidFieldException("This userId is not your userId!!!");
@@ -200,15 +266,67 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (order != null && !order.Equals(OrderEnum.ASC.ToString()) && !order.Equals(OrderEnum.DESC.ToString()))
                     throw new InvalidFieldException("order must be ASC or DESC!!!");
 
-                userId = ((currentUser.roleId.Equals(currentUser.projectManagerRoleId) || currentUser.roleId.Equals(currentUser.investorRoleId))) ? Guid.Parse(currentUser.userId) : userId;
-                userRoleId = userId == null ? null : (await _userRepository.GetUserById((Guid)userId)).RoleId;
+                userId = (currentUser.roleId.Equals(currentUser.adminRoleId)) ? userId : Guid.Parse(currentUser.userId);
+                userRoleId = (await _userRepository.GetUserById((Guid)userId)).RoleId;
 
                 List<WalletTransaction> walletTransactionsEntityList = await _walletTransactionRepository.GetAllWalletTransactions(pageIndex, pageSize, userId, userRoleId, walletId, fromDate, toDate, type, order);
-                List<WalletTransactionDTO> result = _mapper.Map<List<WalletTransactionDTO>>(walletTransactionsEntityList);
-                foreach (WalletTransactionDTO item in result)
+                result.listOfWalletTransaction = _mapper.Map<List<WalletTransactionDTO>>(walletTransactionsEntityList);
+                result.numOfWalletTransaction = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, walletId, fromDate, toDate, type);
+                foreach (WalletTransactionDTO item in result.listOfWalletTransaction)
                 {
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                 }
+
+                //Filter count
+                result.filterCount.all = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, null, null, null, null);
+
+                dynamic wallets = userRoleId.Equals(Guid.Parse(currentUser.investorRoleId))
+                    ? await _investorWalletRepository.GetInvestorWalletsByInvestorId((await _investorRepository.GetInvestorByUserId((Guid)userId)).Id)
+                    : await _projectWalletRepository.GetProjectWalletsByProjectManagerId((Guid)userId);
+
+                foreach (dynamic item in wallets)
+                {
+                    if (userRoleId.Equals(Guid.Parse(currentUser.investorRoleId)))
+                    {
+                        if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I1"))))
+                            result.filterCount.i1 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+                        
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2"))))
+                            result.filterCount.i2 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+                        
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"))))
+                            result.filterCount.i3 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+                        
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I4"))))
+                            result.filterCount.i4 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+                        
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I5"))))
+                            result.filterCount.i5 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+                    }
+                    else if (userRoleId.Equals(Guid.Parse(currentUser.projectManagerRoleId)))
+                    {
+                        if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P1"))))
+                            result.filterCount.p1 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P2"))))
+                            result.filterCount.p2 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P3"))))
+                            result.filterCount.p3 = result.filterCount.p3 == null ? 0 : result.filterCount.p3 + await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P4"))))
+                            result.filterCount.p4 = result.filterCount.p4 == null ? 0 : result.filterCount.p4 + await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+
+                        else if (item.WalletTypeId.Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P5"))))
+                            result.filterCount.p5 = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, item.Id, null, null, null);
+                    }
+                }
+
+                result.filterCount.cashIn = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, null, null, null, WalletTransactionTypeEnum.CASH_IN.ToString());
+                result.filterCount.cashOut = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, null, null, null, WalletTransactionTypeEnum.CASH_OUT.ToString());
+                result.filterCount.deposit = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, null, null, null, WalletTransactionTypeEnum.DEPOSIT.ToString());
+                result.filterCount.withdraw = await _walletTransactionRepository.CountAllWalletTransactions(userId, userRoleId, null, null, null, WalletTransactionTypeEnum.WITHDRAW.ToString());
+
                 return result;
             }
             catch (Exception e)

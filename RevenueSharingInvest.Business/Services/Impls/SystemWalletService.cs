@@ -73,8 +73,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         throw new InvalidFieldException("Invalid updateBy!!!");
                 }
 
-                systemWalletDTO.isDeleted = false;
-
                 SystemWallet dto = _mapper.Map<SystemWallet>(systemWalletDTO);
                 newId.id = await _systemWalletRepository.CreateSystemWallet(dto);
                 if (newId.id.Equals(""))

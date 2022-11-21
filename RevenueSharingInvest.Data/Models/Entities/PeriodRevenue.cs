@@ -24,20 +24,22 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public Guid ProjectId { get; set; }
         public Guid StageId { get; set; }
         public double? ActualAmount { get; set; }
+        public double? SharedAmount { get; set; }
+        public double? PaidAmount { get; set; }
         public double? PessimisticExpectedAmount { get; set; }
         public double? OptimisticExpectedAmount { get; set; }
         public double? NormalExpectedAmount { get; set; }
         public double? PessimisticExpectedRatio { get; set; }
         public double? OptimisticExpectedRatio { get; set; }
         public double? NormalExpectedRatio { get; set; }
-        [StringLength(20)]
-        public string Status { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDate { get; set; }
         public Guid? CreateBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
+        [StringLength(15)]
+        public string Status { get; set; }
 
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("PeriodRevenues")]

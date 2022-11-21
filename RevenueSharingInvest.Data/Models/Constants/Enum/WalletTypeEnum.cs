@@ -22,9 +22,10 @@ namespace RevenueSharingInvest.Business.Models.Constant
         I3,
         I4,
         I5,
-        B1,
-        B2,
-        B3,
-        B4,
+        P1,
+        P2,
+        P3,
+        P4,
+        P5
     }
 }

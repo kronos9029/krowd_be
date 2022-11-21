@@ -52,21 +52,84 @@ namespace RevenueSharingInvest.API.Controllers
 
         }
 
-        //GET ALL
+        //GET ADMIN
         [HttpGet]
+        [Route("admin")]
         [Authorize]
-        public async Task<IActionResult> GetAllUsers(int pageIndex, int pageSize, string businessId, string role, string status)
+        public async Task<IActionResult> GetAllAdmins()
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             var result = new AllUserDTO();
 
-            if (currentUser.roleId.Equals(currentUser.adminRoleId) || currentUser.roleId.Equals(currentUser.businessManagerRoleId) || currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            if (currentUser.roleId.Equals(currentUser.adminRoleId) 
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId) 
+                || currentUser.roleId.Equals(currentUser.projectManagerRoleId)
+                || currentUser.roleId.Equals(currentUser.investorRoleId))
             {
-                result = await _userService.GetAllUsers(pageIndex, pageSize, businessId, role, status, currentUser);
+                result = await _userService.GetAllAdmins(currentUser);
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or BUSINESS_MANAGER or PROJECT_MANAGER can perform this action!!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Perform This Action!!!");
+        }
 
+        //GET BUSINESS_MANAGERS
+        [HttpGet]
+        [Route("business_manager")]
+        [Authorize]
+        public async Task<IActionResult> GetAllBusinessManagers(int pageIndex, int pageSize, Guid? businessId, string status)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            var result = new AllUserDTO();
+
+            if (currentUser.roleId.Equals(currentUser.adminRoleId)
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId)
+                || currentUser.roleId.Equals(currentUser.projectManagerRoleId)
+                || currentUser.roleId.Equals(currentUser.investorRoleId))
+            {
+                result = await _userService.GetAllBusinesManagers(pageIndex, pageSize, businessId, status, currentUser);
+                return Ok(result);
+            }
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Perform This Action!!!");
+        }
+
+        //GET PROJECT_MANAGERS
+        [HttpGet]
+        [Route("project_manager")]
+        [Authorize]
+        public async Task<IActionResult> GetAllProjectManagers(int pageIndex, int pageSize, Guid? businessId, Guid? projectId, string status)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            var result = new AllUserDTO();
+
+            if (currentUser.roleId.Equals(currentUser.adminRoleId)
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId)
+                || currentUser.roleId.Equals(currentUser.projectManagerRoleId)
+                || currentUser.roleId.Equals(currentUser.investorRoleId))
+            {
+                result = await _userService.GetAllProjectManagers(pageIndex, pageSize, businessId, projectId, status, currentUser);
+                return Ok(result);
+            }
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Perform This Action!!!");
+        }
+
+        //GET INVESTORS
+        [HttpGet]
+        [Route("investor")]
+        [Authorize]
+        public async Task<IActionResult> GetAllInvestors(int pageIndex, int pageSize, Guid? projectId, string status)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            var result = new AllUserDTO();
+
+            if (currentUser.roleId.Equals(currentUser.adminRoleId)
+                || currentUser.roleId.Equals(currentUser.businessManagerRoleId)
+                || currentUser.roleId.Equals(currentUser.projectManagerRoleId)
+                || currentUser.roleId.Equals(currentUser.investorRoleId))
+            {
+                result = await _userService.GetAllInvestors(pageIndex, pageSize, projectId, status, currentUser);
+                return Ok(result);
+            }
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Perform This Action!!!");
         }
 
         //GET BY ID
@@ -127,7 +190,7 @@ namespace RevenueSharingInvest.API.Controllers
 
             }
 
-            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This Business!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "You Do Not Have Permission To Access This User!!");
         }
 
         //UPDATE

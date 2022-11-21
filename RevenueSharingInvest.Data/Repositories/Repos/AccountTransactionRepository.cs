@@ -45,7 +45,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         ExtraData, "
                     + "         Signature, " 
                     + "         CreateDate," 
-                    + "         Type  ) "
+                    + "         Type," 
+                    + "         WithdrawRequestId ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
@@ -68,7 +69,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @ExtraData, "
                     + "         @Signature, " 
                     + "         @CreateDate," 
-                    + "         @Type) ";
+                    + "         @Type," 
+                    + "         @WithdrawRequestId) ";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("FromUserId", accountTransactionDTO.FromUserId, DbType.Guid);
@@ -91,6 +93,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Signature", accountTransactionDTO.Signature, DbType.String);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("Type", accountTransactionDTO.Type, DbType.String);
+                parameters.Add("WithdrawRequestId", accountTransactionDTO.WithdrawRequestId, DbType.Guid);
 
 
                 using var connection = CreateConnection();
@@ -209,14 +212,19 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
+                var parameters = new DynamicParameters();
                 string whereClause;
                 if (userId.Equals("") || userId == null)
                 {
-                    whereClause = "FROM AccountTransaction WHERE CreateDate >= '"+fromDate+"' AND CreateDate <= '"+toDate+"'";
+                    whereClause = "FROM AccountTransaction WHERE CreateDate BETWEEN @FromDate AND @ToDate";
+                    parameters.Add("FromDate", DateTime.ParseExact(fromDate, "dd/MM/yyyy HH:mm:ss", null), DbType.DateTime);
+                    parameters.Add("ToDate", DateTime.ParseExact(toDate, "dd/MM/yyyy HH:mm:ss", null), DbType.DateTime);
                 }
                 else
                 {
-                    whereClause = "FROM AccountTransaction WHERE PartnerClientId = '" + userId + "'" + "AND CreateDate >= '" + fromDate + "' AND CreateDate <= '" + toDate + "'";
+                    whereClause = "FROM AccountTransaction WHERE PartnerClientId = '" + userId + "'" + "AND CreateDate BETWEEN @FromDate AND @ToDate";
+                    parameters.Add("FromDate", DateTime.ParseExact(fromDate, "dd/MM/yyyy HH:mm:ss", null), DbType.DateTime);
+                    parameters.Add("ToDate", DateTime.ParseExact(toDate, "dd/MM/yyyy HH:mm:ss", null), DbType.DateTime);
                 }
                 sort ??= "";
                 if (sort.Equals(""))
@@ -262,7 +270,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     WHERE "
                     + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
                     + "         AND @PageIndex * @PageSize";
-                    var parameters = new DynamicParameters();
                     parameters.Add("PageIndex", pageIndex, DbType.Int32);
                     parameters.Add("PageSize", pageSize, DbType.Int32);
                     using var connection = CreateConnection();
@@ -271,9 +278,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 else
                 {
                     var query = "SELECT * " + whereClause + " ORDER BY CreateDate " + sort;
-                    var parameters = new DynamicParameters();
                     using var connection = CreateConnection();
-                    return (await connection.QueryAsync<AccountTransaction>(query)).ToList();
+                    return (await connection.QueryAsync<AccountTransaction>(query, parameters)).ToList();
                 }
             }
             catch (Exception e)
@@ -350,6 +356,61 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message);
+            }
+        }
+
+        //COUNT ALL
+        public async Task<int> CountAllAccountTransactions(string userId)
+        {
+            try
+            {
+                string whereClause;
+                if (userId.Equals("") || userId == null)
+                {
+                    whereClause = "FROM AccountTransaction";
+                }
+                else
+                {
+                    whereClause = "FROM AccountTransaction WHERE PartnerClientId = '" + userId + "'";
+                }
+
+                var query = "SELECT COUNT(*)s " + whereClause;
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.ToString());
+            }
+        }
+
+        //COUNT ALL BY DATE
+        public async Task<int> CountAccountTransactionsByDate(string fromDate, string toDate, string userId)
+        {
+            try
+            {
+                string whereClause;
+                if (userId.Equals("") || userId == null)
+                {
+                    whereClause = "FROM AccountTransaction WHERE CreateDate BETWEEN @FromDate AND @ToDate";
+                }
+                else
+                {
+                    whereClause = "FROM AccountTransaction WHERE PartnerClientId = '" + userId + "'" + " AND CreateDate BETWEEN @FromDate AND @ToDate";
+                }
+
+                var query = "SELECT COUNT(*) " + whereClause;
+                var parameters = new DynamicParameters();
+                parameters.Add("FromDate", DateTime.ParseExact(fromDate, "dd/MM/yyyy HH:mm:ss", null), DbType.DateTime);
+                parameters.Add("ToDate", DateTime.ParseExact(toDate, "dd/MM/yyyy HH:mm:ss", null), DbType.DateTime);
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.ToString());
             }
         }
     }

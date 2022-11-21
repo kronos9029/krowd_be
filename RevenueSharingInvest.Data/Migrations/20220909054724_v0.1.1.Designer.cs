@@ -5,11 +5,12 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Models.Entities;
 
 namespace RevenueSharingInvest.Data.Migrations
 {
-    [DbContext(typeof(KrowdContext))]
+    [DbContext(typeof(Helpers.KrowdContext))]
     [Migration("20220909054724_v0.1.1")]
     partial class v011
     {
@@ -1069,9 +1070,9 @@ namespace RevenueSharingInvest.Data.Migrations
                         {
                             Id = new Guid("2d80393a-3a3d-495d-8dd7-f9261f85cc8f"),
                             CreateDate = new DateTime(2022, 9, 9, 12, 47, 23, 609, DateTimeKind.Local).AddTicks(6260),
-                            Description = "Project owner",
+                            Description = "Project manager",
                             IsDeleted = false,
-                            Name = "PROJECT_OWNER"
+                            Name = "PROJECT_MANAGER"
                         },
                         new
                         {

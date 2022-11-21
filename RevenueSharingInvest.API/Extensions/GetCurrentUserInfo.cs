@@ -23,32 +23,36 @@ namespace RevenueSharingInvest.API.Extensions
                 currentUser.userId = "";
                 currentUser.email = "";
                 currentUser.investorId = "";
+                currentUser.roleName = "";
+                currentUser.fullName = "";
             }
             else
             {
                 currentUser.userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.SerialNumber).Value;
                 currentUser.email = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
                 currentUser.investorId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GroupSid).Value;
+                currentUser.roleName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                currentUser.fullName = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Actor).Value;
             }
 
             List<RoleDTO> roleList = await _roleService.GetAllRoles();
             GetUserDTO? userDTO = await _userService.GetUserByEmail(currentUser.email);
+
             if (userDTO == null)
             {
                 currentUser.roleId = "";
                 currentUser.businessId = "";
-
             }
             else
             {
+                currentUser.roleId = userDTO.role.id;
+                
                 if (userDTO.business != null)
                 {
-                    currentUser.roleId = userDTO.role.id;
                     currentUser.businessId = userDTO.business.id;
                 }
                 else
                 {
-                    currentUser.roleId = userDTO.role.id;
                     currentUser.businessId = "";
                 }
             }
@@ -71,6 +75,13 @@ namespace RevenueSharingInvest.API.Extensions
                 {
                     currentUser.projectManagerRoleId = role.id;
                 }
+            }
+
+            if (currentUser.roleId.Equals(currentUser.projectManagerRoleId))
+            {
+                //currentUser.projectId = await _userService.GetProjectIdByManagerEmail(currentUser.email);
+                //currentUser.projectId??="";
+
             }
 
             return currentUser;

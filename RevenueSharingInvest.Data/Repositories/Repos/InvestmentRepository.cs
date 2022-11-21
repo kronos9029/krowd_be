@@ -4,6 +4,8 @@ using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
+using RevenueSharingInvest.Data.Models.Constants;
+using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
@@ -74,33 +76,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //DELETE
-        //public async Task<int> DeleteInvestmentById(Guid investmentId)
-        //{
-        //    try
-        //    {
-        //        var query = "UPDATE Investment "
-        //            + "     SET "
-        //            + "         UpdateDate = @UpdateDate, "
-        //            //+ "         UpdateBy = @UpdateBy "
-        //            + "     WHERE "
-        //            + "         Id=@Id";
-        //        using var connection = CreateConnection();
-        //        var parameters = new DynamicParameters();
-        //        parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-        //        //parameters.Add("UpdateBy", areaDTO.UpdateBy, DbType.Guid);
-        //        parameters.Add("Id", investmentId, DbType.Guid);
-
-        //        return await connection.ExecuteAsync(query, parameters);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
-
         //GET ALL
-        public async Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize, string projectStatus, string businessId, string projectId, string investorId, Guid roleId)
+        public async Task<List<Investment>> GetAllInvestments(int pageIndex, int pageSize, string walletTypeId, string businessId, string projectId, string investorId, string status, Guid roleId)
         {
             try
             {
@@ -112,17 +89,30 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var businessIdCondition = " AND P.BusinessId = @BusinessId ";
                 var projectIdCondition = " AND I.ProjectId = @ProjectId ";
                 var investorIdCondition = " AND I.InvestorId = @InvestorId ";
+                var statusCondition = " AND I.Status = @Status ";
 
-                if (projectStatus != null)
+                if (walletTypeId != null)
                 {
-                    whereCondition = whereCondition + projectStatusCondition;
-                    parameters.Add("Status", projectStatus, DbType.String);
+                    if (Guid.Parse(walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"))))
+                    {
+                        whereCondition = whereCondition + " AND (P.Status = @CALLING_FOR_INVESTMENT OR P.Status = @CALLING_TIME_IS_OVER OR P.Status = @WAITING_TO_ACTIVATE) ";
+                        parameters.Add("CALLING_FOR_INVESTMENT", ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), DbType.String);
+                        parameters.Add("CALLING_TIME_IS_OVER", ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString(), DbType.String);
+                        parameters.Add("WAITING_TO_ACTIVATE", ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString(), DbType.String);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + projectStatusCondition;
+                        parameters.Add("Status", ProjectStatusEnum.ACTIVE.ToString(), DbType.String);
+                    }              
                 }
                 else
                 {
-                    whereCondition = whereCondition + " AND (P.Status = @I3 OR P.Status = @I4) ";
-                    parameters.Add("I3", ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), DbType.String);
-                    parameters.Add("I4", ProjectStatusEnum.ACTIVE.ToString(), DbType.String);
+                    whereCondition = whereCondition + " AND (P.Status = @CALLING_FOR_INVESTMENT OR P.Status = @CALLING_TIME_IS_OVER OR P.Status = @WAITING_TO_ACTIVATE OR P.Status = @ACTIVE) ";
+                    parameters.Add("CALLING_FOR_INVESTMENT", ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), DbType.String);
+                    parameters.Add("CALLING_TIME_IS_OVER", ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString(), DbType.String);
+                    parameters.Add("WAITING_TO_ACTIVATE", ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString(), DbType.String);
+                    parameters.Add("ACTIVE", ProjectStatusEnum.ACTIVE.ToString(), DbType.String);
                 }
                 if (businessId != null)
                 {
@@ -139,6 +129,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     whereCondition = whereCondition + investorIdCondition;
                     parameters.Add("InvestorId", Guid.Parse(investorId), DbType.Guid);
                 }
+                if (status != null)
+                {
+                    whereCondition = whereCondition + statusCondition;
+                    parameters.Add("Status", status, DbType.String);
+                }
                 whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
 
                 if (pageIndex != 0 && pageSize != 0)
@@ -148,24 +143,24 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "             ROW_NUMBER() OVER ( "
                     + "                 ORDER BY "
                     + "                     I.CreateDate DESC ) AS Num, "
-                    + "             * "
+                    + "             I.* "
                     + "         FROM " 
                     + "             Investment I " 
                     + "                 JOIN Project P ON I.ProjectId = P.Id "
                     +           whereCondition
                     + "         ) "
                     + "     SELECT "
-                    + "         I.Id, "
-                    + "         I.InvestorId, "
-                    + "         I.ProjectId, "
-                    + "         I.PackageId, "
-                    + "         I.Quantity, "
-                    + "         I.TotalPrice, "
-                    + "         I.Status, "
-                    + "         I.CreateDate, "
-                    + "         I.CreateBy, "
-                    + "         I.UpdateDate, "
-                    + "         I.UpdateBy "
+                    + "         Id, "
+                    + "         InvestorId, "
+                    + "         ProjectId, "
+                    + "         PackageId, "
+                    + "         Quantity, "
+                    + "         TotalPrice, "
+                    + "         Status, "
+                    + "         CreateDate, "
+                    + "         CreateBy, "
+                    + "         UpdateDate, "
+                    + "         UpdateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
@@ -316,10 +311,152 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("UpdateBy", investmentDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", investmentDTO.Id, DbType.Guid);
 
-                using (var connection = CreateConnection())
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<List<InvestedRecord>> GetInvestmentRecord(Guid projectId, Guid investorId)
+        {
+            try
+            {
+                var query = "SELECT PA.Name AS PackageName, IV.Quantity, IV.TotalPrice, IV.CreateDate FROM Investment IV JOIN Package PA ON IV.PackageId = PA.Id WHERE IV.ProjectId = @ProjectId AND IV.InvestorId = @InvestorId";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                parameters.Add("InvestorId", investorId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<InvestedRecord>(query, parameters)).ToList();
+
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //COUNT BY PROJECT ID AND INVESTOR ID
+        public async Task<int> CountInvestmentByProjectAndInvestor(Guid projectId, Guid investorId)
+        {
+            try
+            {
+                string query = "SELECT COUNT(*) FROM Investment WHERE ProjectId = @ProjectId AND InvestorId = @InvestorId";
+                var parameters = new DynamicParameters();
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+                parameters.Add("InvestorId", investorId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+
+        //COUNT ALL
+        public async Task<int> CountAllInvestments(string walletTypeId, string businessId, string projectId, string investorId, string status, Guid roleId)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+
+                var whereCondition = "";
+
+                var projectStatusCondition = " AND P.Status = @Status ";
+                var businessIdCondition = " AND P.BusinessId = @BusinessId ";
+                var projectIdCondition = " AND I.ProjectId = @ProjectId ";
+                var investorIdCondition = " AND I.InvestorId = @InvestorId ";
+                var statusCondition = " AND I.Status = @Status ";
+
+                if (walletTypeId != null)
                 {
-                    return await connection.ExecuteAsync(query, parameters);
+                    if (Guid.Parse(walletTypeId).Equals(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I3"))))
+                    {
+                        whereCondition = whereCondition + " AND (P.Status = @CALLING_FOR_INVESTMENT OR P.Status = @CALLING_TIME_IS_OVER OR P.Status = @WAITING_TO_ACTIVATE) ";
+                        parameters.Add("CALLING_FOR_INVESTMENT", ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), DbType.String);
+                        parameters.Add("CALLING_TIME_IS_OVER", ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString(), DbType.String);
+                        parameters.Add("WAITING_TO_ACTIVATE", ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString(), DbType.String);
+                    }
+                    else
+                    {
+                        whereCondition = whereCondition + projectStatusCondition;
+                        parameters.Add("Status", ProjectStatusEnum.ACTIVE.ToString(), DbType.String);
+                    }
                 }
+                else
+                {
+                    whereCondition = whereCondition + " AND (P.Status = @CALLING_FOR_INVESTMENT OR P.Status = @CALLING_TIME_IS_OVER OR P.Status = @WAITING_TO_ACTIVATE OR P.Status = @ACTIVE) ";
+                    parameters.Add("CALLING_FOR_INVESTMENT", ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString(), DbType.String);
+                    parameters.Add("CALLING_TIME_IS_OVER", ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString(), DbType.String);
+                    parameters.Add("WAITING_TO_ACTIVATE", ProjectStatusEnum.WAITING_TO_ACTIVATE.ToString(), DbType.String);
+                    parameters.Add("ACTIVE", ProjectStatusEnum.ACTIVE.ToString(), DbType.String);
+                }
+                if (businessId != null)
+                {
+                    whereCondition = whereCondition + businessIdCondition;
+                    parameters.Add("BusinessId", Guid.Parse(businessId), DbType.Guid);
+                }
+                if (projectId != null)
+                {
+                    whereCondition = whereCondition + projectIdCondition;
+                    parameters.Add("ProjectId", Guid.Parse(projectId), DbType.Guid);
+                }
+                if (investorId != null)
+                {
+                    whereCondition = whereCondition + investorIdCondition;
+                    parameters.Add("InvestorId", Guid.Parse(investorId), DbType.Guid);
+                }
+                if (status != null)
+                {
+                    whereCondition = whereCondition + statusCondition;
+                    parameters.Add("Status", status, DbType.String);
+                }
+                whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
+
+                var query = " SELECT COUNT(*) FROM (SELECT "
+                + "                                     I.* "
+                + "                                 FROM "
+                + "                                     Investment I JOIN Project P ON I.ProjectId = P.Id "
+                +                                   whereCondition
+                + "                                 ) AS X";
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //CANCEL
+        public async Task<int> CancelInvestment(Guid investmentId, Guid updateBy)
+        {
+            try
+            {
+                var query = "UPDATE Investment "
+                    + "     SET "
+                    + "         Status = @Status, "
+                    + "         UpdateDate = @UpdateDate, "
+                    + "         UpdateBy = @UpdateBy "
+                    + "     WHERE "
+                    + "         Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Status", TransactionStatusEnum.CANCELED.ToString(), DbType.String);
+                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
+                parameters.Add("UpdateBy", updateBy, DbType.Guid);
+                parameters.Add("Id", investmentId, DbType.Guid);
+
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
             {

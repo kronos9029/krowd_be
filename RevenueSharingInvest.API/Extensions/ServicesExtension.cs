@@ -23,6 +23,7 @@ using System.Linq;
 using Google.Cloud.Firestore;
 using RevenueSharingInvest.Data.Helpers;
 using System.Text.Json;
+using RevenueSharingInvest.Business.Services.Extensions.iText;
 
 namespace RevenueSharingInvest.API.Extensions
 {
@@ -44,6 +45,10 @@ namespace RevenueSharingInvest.API.Extensions
             services.AddScoped<IAreaService, AreaService>();
             services.AddScoped<IAreaRepository, AreaRepository>();
 
+            // BILL
+            services.AddScoped<IBillRepository, BillRepository>();
+            services.AddScoped<IBillService, BillService>();
+
             //BUSINESS
             services.AddScoped<IBusinessService, BusinessService>();
             services.AddScoped<IBusinessRepository, BusinessRepository>();
@@ -51,6 +56,10 @@ namespace RevenueSharingInvest.API.Extensions
             //BUSINESS FIELD
             services.AddScoped<IBusinessFieldService, BusinessFieldService>();
             services.AddScoped<IBusinessFieldRepository, BusinessFieldRepository>();
+
+            //DAILY REPORT
+            services.AddScoped<IDailyReportService, DailyReportService>();
+            services.AddScoped<IDailyReportRepository, DailyReportRepository>();
 
             //FIELD
             services.AddScoped<IFieldService, FieldService>();
@@ -144,6 +153,10 @@ namespace RevenueSharingInvest.API.Extensions
             services.AddScoped<IWalletTypeRepository, WalletTypeRepository>();
             services.AddScoped<IWalletTypeService, WalletTypeService>();
 
+            // WITHDRAW REQUEST
+            services.AddScoped<IWithdrawRequestRepository, WithdrawRequestRepository>();
+            services.AddScoped<IWithdrawRequestService, WithdrawRequestService>();
+
             //MOMO
             services.AddScoped<IMomoService, MomoService>();
 
@@ -158,6 +171,9 @@ namespace RevenueSharingInvest.API.Extensions
             ///
             //Upload File To Firebase
             services.AddScoped<IFileUploadService, FileUploadService>();
+
+            // iText
+            services.AddScoped<IITextService, ITextService>();
         }
 
         public static void AddSafeListAnnotation(this IServiceCollection services, IConfiguration configuration)

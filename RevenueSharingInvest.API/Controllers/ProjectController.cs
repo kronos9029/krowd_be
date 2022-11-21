@@ -71,7 +71,8 @@ namespace RevenueSharingInvest.API.Controllers
             int pageSize,
             string businessId,
             string areaId,
-            string fieldId,
+            [FromQuery] List<string> listFieldId,
+            double investmentTargetCapital,
             string name,
             string status
             )
@@ -83,11 +84,11 @@ namespace RevenueSharingInvest.API.Controllers
                 if(!currentUser.roleId.Equals(""))
                 {
                     RoleDTO roleDTO = await _roleService.GetRoleById(Guid.Parse(currentUser.roleId));
-                    countResult = await _projectService.CountProjects(businessId, areaId, fieldId, name, status, currentUser);
+                    countResult = await _projectService.CountProjects(businessId, areaId, listFieldId, investmentTargetCapital, name, status, currentUser);
                     return Ok(countResult);
                 } else
                 {
-                    countResult = await _projectService.CountProjects(businessId, areaId, fieldId, name, status, currentUser);
+                    countResult = await _projectService.CountProjects(businessId, areaId, listFieldId, investmentTargetCapital, name, status, currentUser);
                     return Ok(countResult);
                 }
             }
@@ -98,11 +99,11 @@ namespace RevenueSharingInvest.API.Controllers
                 {
                     RoleDTO roleDTO = await _roleService.GetRoleById(Guid.Parse(currentUser.roleId));
 
-                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, fieldId, name, status, currentUser);
+                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, listFieldId, investmentTargetCapital, name, status, currentUser);
                     return Ok(resultProjectList);
                 } else
                 {
-                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, fieldId, name, status, currentUser);
+                    resultProjectList = await _projectService.GetAllProjects(pageIndex, pageSize, businessId, areaId, listFieldId, investmentTargetCapital, name, status, currentUser);
                     return Ok(resultProjectList);
                 }
             }           
@@ -242,6 +243,19 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
         }
 
+        //GET DETAILED INVESTED PROJECT
+        [HttpGet]
+        [Route("investedProject/{projectId}")]
+        [Authorize]
+        public async Task<IActionResult> GetInvestedProjectsDetail(string projectId)
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+            var result = await _projectService.GetInvestedProjectDetail(projectId, currentUser.investorId);
+
+            return Ok(result);
+            //return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
+        }
+
         //UPDATE
         [HttpPut]
         [Route("{id}")]
@@ -266,7 +280,7 @@ namespace RevenueSharingInvest.API.Controllers
                     {
                         var result = await _projectService.UpdateProject(projectDTO, id, currentUser);
                         return Ok(result);
-                    }   
+                    }
                 }               
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER can perform this action!!!");

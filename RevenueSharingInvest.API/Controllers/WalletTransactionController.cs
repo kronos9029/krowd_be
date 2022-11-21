@@ -70,7 +70,7 @@ namespace RevenueSharingInvest.API.Controllers
                 var result = await _walletTransactionService.GetAllWalletTransactions(pageIndex, pageSize, userId, walletId, fromDate, toDate, type, order, currentUser);
                 return Ok(result);
             }
-            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or PROJECT_OWNER or INVESTOR can perform this action!!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or PROJECT_MANAGER or INVESTOR can perform this action!!!");
         }
 
         //[HttpGet]

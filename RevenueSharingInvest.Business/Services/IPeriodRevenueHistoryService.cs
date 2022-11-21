@@ -1,4 +1,6 @@
-﻿using RevenueSharingInvest.Data.Models.DTOs;
+﻿using RevenueSharingInvest.API;
+using RevenueSharingInvest.Data.Models.DTOs;
+using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs.GetAllDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +12,14 @@ namespace RevenueSharingInvest.Business.Services
     public interface IPeriodRevenueHistoryService
     {
         //CREATE
-        public Task<IdDTO> CreatePeriodRevenueHistory(PeriodRevenueHistoryDTO periodRevenueHistoryDTO);
+        public Task<PeriodRevenueHistoryDTO> CreatePeriodRevenueHistory(CreatePeriodRevenueHistoryDTO createPeriodRevenueHistoryDTO, ThisUserObj currentUser);
 
         //READ
-        public Task<List<PeriodRevenueHistoryDTO>> GetAllPeriodRevenueHistories(int pageIndex, int pageSize);
+        public Task<AllPeriodRevenueHistoryDTO> GetAllPeriodRevenueHistories(int pageIndex, int pageSize, Guid projectId, ThisUserObj currentUser);
         public Task<PeriodRevenueHistoryDTO> GetPeriodRevenueHistoryById(Guid periodRevenueHistoryId);
 
         //UPDATE
-        public Task<int> UpdatePeriodRevenueHistory(PeriodRevenueHistoryDTO periodRevenueHistoryDTO, Guid periodRevenueHistoryId);
+        //public Task<int> UpdatePeriodRevenueHistory(PeriodRevenueHistoryDTO periodRevenueHistoryDTO, Guid periodRevenueHistoryId);
 
         //DELETE
         //public Task<int> DeletePeriodRevenueHistoryById(Guid periodRevenueHistoryId);

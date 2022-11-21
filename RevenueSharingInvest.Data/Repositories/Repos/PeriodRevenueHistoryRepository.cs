@@ -20,6 +20,44 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
         }
 
+        //COUNT ALL
+        public async Task<int> CountAllPeriodRevenueHistories(Guid projectId)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+                var whereClause = " WHERE PR.ProjectId = @ProjectId ";
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+
+                var query = "SELECT COUNT(*) FROM (SELECT PRH.* FROM PeriodRevenueHistory PRH JOIN PeriodRevenue PR ON PRH.PeriodRevenueId = PR.Id " + whereClause + ") AS X";
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        //COUNT BY PERIOD REVENUE ID
+        public async Task<int> CountPeriodRevenueHistoryByPeriodRevenueId(Guid periodRevenueId)
+        {
+            try
+            {
+                string query = "SELECT COUNT(*) FROM PeriodRevenueHistory WHERE PeriodRevenueId = @PeriodRevenueId";
+                var parameters = new DynamicParameters();
+                parameters.Add("PeriodRevenueId", periodRevenueId, DbType.Guid);
+                using var connection = CreateConnection();
+                return (int)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
         //CREATE
         public async Task<string> CreatePeriodRevenueHistory(PeriodRevenueHistory periodRevenueHistoryDTO)
         {
@@ -28,33 +66,27 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 var query = "INSERT INTO PeriodRevenueHistory ("
                     + "         Name, "
                     + "         PeriodRevenueId, "
+                    + "         Amount, "
                     + "         Description, "
-                    + "         Status, "
                     + "         CreateDate, "
-                    + "         CreateBy, "
-                    + "         UpdateDate, "
-                    + "         UpdateBy ) "
+                    + "         CreateBy ) "
                     + "     OUTPUT "
                     + "         INSERTED.Id "
                     + "     VALUES ( "
                     + "         @Name, "
                     + "         @PeriodRevenueId, "
+                    + "         @Amount, "
                     + "         @Description, "
-                    + "         @Status, "
                     + "         @CreateDate, "
-                    + "         @CreateBy, "
-                    + "         @UpdateDate, "
-                    + "         @UpdateBy )";
+                    + "         @CreateBy )";
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Name", periodRevenueHistoryDTO.Name, DbType.String);
                 parameters.Add("PeriodRevenueId", periodRevenueHistoryDTO.PeriodRevenueId, DbType.Guid);
+                parameters.Add("Amount", periodRevenueHistoryDTO.Amount, DbType.Double);
                 parameters.Add("Description", periodRevenueHistoryDTO.Description, DbType.String);
-                parameters.Add("Status", periodRevenueHistoryDTO.Status, DbType.String);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("CreateBy", periodRevenueHistoryDTO.CreateBy, DbType.Guid);
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                parameters.Add("UpdateBy", periodRevenueHistoryDTO.UpdateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
@@ -95,37 +127,39 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<PeriodRevenueHistory>> GetAllPeriodRevenueHistories(int pageIndex, int pageSize)
+        public async Task<List<PeriodRevenueHistory>> GetAllPeriodRevenueHistories(int pageIndex, int pageSize, Guid projectId)
         {
             try
             {
+                var parameters = new DynamicParameters();
+                var whereClause = " WHERE PR.ProjectId = @ProjectId ";
+                parameters.Add("ProjectId", projectId, DbType.Guid);
+
                 if (pageIndex != 0 && pageSize != 0)
                 {
                     var query = "WITH X AS ( "
                     + "         SELECT "
                     + "             ROW_NUMBER() OVER ( "
                     + "                 ORDER BY "
-                    + "                     PeriodRevenueId, "
-                    + "                     Name ASC ) AS Num, "
-                    + "             * "
-                    + "         FROM PeriodRevenueHistory "
+                    + "                     PRH.CreateDate DESC ) AS Num, "
+                    + "             PRH.* "
+                    + "         FROM PeriodRevenueHistory PRH JOIN PeriodRevenue PR ON PRH.PeriodRevenueId = PR.Id "
+                    +           whereClause
                     + "         ) "
                     + "     SELECT "
                     + "         Id, "
                     + "         Name, "
                     + "         PeriodRevenueId, "
+                    + "         Amount, "
                     + "         Description, "
-                    + "         Status, "
                     + "         CreateDate, "
-                    + "         CreateBy, "
-                    + "         UpdateDate, "
-                    + "         UpdateBy "
+                    + "         CreateBy "
                     + "     FROM "
                     + "         X "
                     + "     WHERE "
                     + "         Num BETWEEN @PageIndex * @PageSize - (@PageSize - 1) "
                     + "         AND @PageIndex * @PageSize";
-                    var parameters = new DynamicParameters();
+                    
                     parameters.Add("PageIndex", pageIndex, DbType.Int16);
                     parameters.Add("PageSize", pageSize, DbType.Int16);
                     using var connection = CreateConnection();
@@ -134,9 +168,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 else
                 {
-                    var query = "SELECT * FROM PeriodRevenueHistory ORDER BY PeriodRevenueId, Name ASC";
+                    var query = "SELECT PRH.* FROM PeriodRevenueHistory PRH JOIN PeriodRevenue PR ON PRH.PeriodRevenueId = PR.Id " + whereClause + " ORDER BY PRH.CreateDate DESC";
                     using var connection = CreateConnection();
-                    return (await connection.QueryAsync<PeriodRevenueHistory>(query)).ToList();
+                    return (await connection.QueryAsync<PeriodRevenueHistory>(query, parameters)).ToList();
                 }              
             }
             catch (Exception e)
@@ -173,10 +207,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "     SET "
                     + "         Name = @Name, "
                     + "         PeriodRevenueId = @PeriodRevenueId, "
-                    + "         Description = @Description, "
-                    + "         Status = @Status, "
-                    + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy"
+                    + "         Description = @Description "
                     + "     WHERE "
                     + "         Id = @Id";
 
@@ -184,9 +215,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 parameters.Add("Name", periodRevenueHistoryDTO.Name, DbType.String);
                 parameters.Add("PeriodRevenueId", periodRevenueHistoryDTO.PeriodRevenueId, DbType.Guid);
                 parameters.Add("Description", periodRevenueHistoryDTO.Description, DbType.String);
-                parameters.Add("Status", periodRevenueHistoryDTO.Status, DbType.String);
-                parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                parameters.Add("UpdateBy", periodRevenueHistoryDTO.UpdateBy, DbType.Guid);
                 parameters.Add("Id", periodRevenueHistoryId, DbType.Guid);
 
                 using (var connection = CreateConnection())

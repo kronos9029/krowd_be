@@ -4,6 +4,7 @@ using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants;
+using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -22,7 +23,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //CREATE
-        public async Task<string> CreateProjectWallet(Guid projectManagerId, Guid walletTypeId, Guid currentUserId)
+        public async Task<string> CreateProjectWallet(ProjectWallet projectWalletDTO)
         {
             try
             {
@@ -30,6 +31,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         ProjectManagerId, "
                     + "         Balance, "
                     + "         WalletTypeId, "
+                    + "         ProjectId, "
                     + "         CreateDate, "
                     + "         CreateBy, "
                     + "         UpdateDate, "
@@ -40,18 +42,20 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         @ProjectManagerId, "
                     + "         0, "
                     + "         @WalletTypeId, "
+                    + "         @ProjectId, "
                     + "         @CreateDate, "
                     + "         @CreateBy, "
                     + "         @UpdateDate, "
                     + "         @UpdateBy )";
 
                 var parameters = new DynamicParameters();
-                parameters.Add("ProjectManagerId", projectManagerId, DbType.Guid);
-                parameters.Add("WalletTypeId", walletTypeId, DbType.Guid);
+                parameters.Add("ProjectManagerId", projectWalletDTO.ProjectManagerId, DbType.Guid);
+                parameters.Add("WalletTypeId", projectWalletDTO.WalletTypeId, DbType.Guid);
+                parameters.Add("ProjectId", projectWalletDTO.ProjectId, DbType.Guid);
                 parameters.Add("CreateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                parameters.Add("CreateBy", currentUserId, DbType.Guid);
+                parameters.Add("CreateBy", projectWalletDTO.CreateBy, DbType.Guid);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
-                parameters.Add("UpdateBy", currentUserId, DbType.Guid);
+                parameters.Add("UpdateBy", projectWalletDTO.CreateBy, DbType.Guid);
 
                 using var connection = CreateConnection();
                 return ((Guid)connection.ExecuteScalar(query, parameters)).ToString();
@@ -75,7 +79,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         JOIN WalletType WT ON PW.WalletTypeId = WT.Id "
                     + "     WHERE " 
                     + "         PW.ProjectManagerId = @ProjectManagerId "
-                    + "     ORDER BY WT.Type ASC ";
+                    + "     ORDER BY WT.Type ASC, PW.CreateDate DESC ";
                 var parameters = new DynamicParameters();
                 parameters.Add("ProjectManagerId", projectManagerId, DbType.Guid);
                 using var connection = CreateConnection();
@@ -150,8 +154,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 using var connection = CreateConnection();
                 var parameters = new DynamicParameters();
                 parameters.Add("BusinessId", businessId, DbType.Guid);
-                //parameters.Add("B2", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B2")), DbType.Guid);
-                //parameters.Add("B3", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("B3")), DbType.Guid);
+                //parameters.Add("B2", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P3")), DbType.Guid);
+                //parameters.Add("B3", Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("P4")), DbType.Guid);
 
                 return await connection.ExecuteAsync(query, parameters);
             }
@@ -162,11 +166,22 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
-        //GET BY PROJECT OWNER ID AND TYPE
-        public async Task<ProjectWallet> GetProjectWalletByProjectOwnerIdAndType(Guid projectOwnerId, string walletType)
+        //GET BY PROJECT OWNER ID, TYPE AND PROJECT ID
+        public async Task<ProjectWallet> GetProjectWalletByProjectManagerIdAndType(Guid projectOwnerId, string walletType, Guid? projectId)
         {
             try
             {
+                var parameters = new DynamicParameters();
+                var whereClause = " WHERE "
+                    + "             WT.Type = @Type "
+                    + "             AND PW.ProjectManagerId = @ProjectManagerId ";
+
+                if (projectId != null)
+                {
+                    whereClause += " AND PW.ProjectId = @ProjectId ";
+                    parameters.Add("ProjectId", projectId, DbType.Guid);
+                }
+
                 string query = "SELECT "
                     + "             PW.Id, "
                     + "             PW.ProjectManagerId, "
@@ -175,10 +190,8 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         FROM "
                     + "             ProjectWallet PW "
                     + "             JOIN WalletType WT ON PW.WalletTypeId = WT.Id "
-                    + "         WHERE "
-                    + "             WT.Type = @Type "
-                    + "             AND PW.ProjectManagerId = @ProjectManagerId ";
-                var parameters = new DynamicParameters();
+                    +           whereClause;
+                
                 parameters.Add("ProjectManagerId", projectOwnerId, DbType.Guid);
                 parameters.Add("Type", walletType, DbType.String);
                 using var connection = CreateConnection();
@@ -196,28 +209,45 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
+                var parameters = new DynamicParameters();
+                string projectIdCondition = " AND ProjectId = @ProjectId ";
+                if (projectWalletDTO.ProjectId != null) parameters.Add("ProjectId", projectWalletDTO.ProjectId, DbType.Guid);
+
                 var query = "UPDATE ProjectWallet "
                     + "     SET "
                     + "         Balance = Balance + @Balance, "
                     + "         UpdateDate = @UpdateDate, "
-                    + "         UpdateBy = @UpdateBy"
+                    + "         UpdateBy = @UpdateBy "
                     + "     WHERE "
-                    + "         ProjectManagerId = @ProjectManagerId"
-                    + "         AND WalletTypeId = @WalletTypeId";
+                    + "         Id = @Id ";
 
-                var parameters = new DynamicParameters();
+                
                 parameters.Add("Balance", projectWalletDTO.Balance, DbType.Double);
                 parameters.Add("UpdateDate", DateTimePicker.GetDateTimeByTimeZone(), DbType.DateTime);
                 parameters.Add("UpdateBy", projectWalletDTO.UpdateBy, DbType.Guid);
-                parameters.Add("ProjectManagerId", projectWalletDTO.ProjectManagerId, DbType.Guid);
-                parameters.Add("WalletTypeId", projectWalletDTO.WalletTypeId, DbType.Guid);
+                parameters.Add("Id", projectWalletDTO.Id, DbType.Guid);                
 
-                using (var connection = CreateConnection())
-                {
-                    return await connection.ExecuteAsync(query, parameters);
-                }
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
             }
             catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
+
+        public async Task<string> GetProjectWalletNameById(Guid walletId)
+        {
+            try
+            {
+                var query = "select WT.Name from ProjectWallet PW JOIN WalletType WT on PW.WalletTypeId = WT.Id where PW.Id = @WalletId";
+                var parameters = new DynamicParameters();
+                parameters.Add("WalletId", walletId, DbType.Guid);
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<string>(query, parameters);
+            }
+            catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
                 throw new Exception(e.Message, e);

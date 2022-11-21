@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace RevenueSharingInvest.Data.Models.DTOs.CommonDTOs
 {
-    public class AllStageDTO
+    public class AllBillDTO
     {
-        public int numOfStage { get; set; }
-        public List<GetStageDTO> listOfStage { get; set; }
+        public int numOfBill { get; set; }
+        public List<GetBillDTO> listOfBill { get; set; }
     }
 }

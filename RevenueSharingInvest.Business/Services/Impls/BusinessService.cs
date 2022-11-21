@@ -25,6 +25,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IUserRepository _userRepository;
         private readonly IProjectRepository _projectRepository;
         private readonly IProjectWalletRepository _projectWalletRepository;
+        private readonly IProjectEntityRepository _projectEntityRepository;
 
         private readonly IValidationService _validationService;
         private readonly IFileUploadService _fileUploadService;
@@ -38,6 +39,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IFieldRepository fieldRepository,
             IProjectRepository projectRepository,
             IProjectWalletRepository projectWalletRepository,
+            IProjectEntityRepository projectEntityRepository,
             IFileUploadService fileUploadService,
             IProjectService projectService,
             IMapper mapper)
@@ -48,6 +50,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _userRepository = userRepository;
             _projectRepository = projectRepository;
             _projectWalletRepository = projectWalletRepository;
+            _projectEntityRepository = projectEntityRepository;
 
             _validationService = validationService;
             _fileUploadService = fileUploadService;
@@ -160,7 +163,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 {
                     if (business.Status.Equals(BusinessStatusEnum.INACTIVE.ToString()))
                     {
-                        List<Project> projectList = await _projectRepository.GetAllProjects(0, 0, businessId.ToString(), null, null , null, null, null, currentUser.roleId);
+                        List<Project> projectList = await _projectRepository.GetAllProjects(0, 0, businessId.ToString(), null, null , null, 0, null, null, currentUser.roleId);
                         foreach (Project item in projectList)
                         {
                             await _projectService.DeleteProjectById(item.Id);                           
@@ -360,7 +363,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
             int result;
             try
             {
-                Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(Guid.Parse(currentUser.businessId));
+                Data.Models.Entities.Business business = await _businessRepository.GetBusinessById(businessId);
+                if (business == null)
+                    throw new InvalidFieldException("This businessId is not existed!!!");
+
+                if (currentUser.roleId.Equals(currentUser.businessManagerRoleId) && !businessId.Equals(Guid.Parse(currentUser.businessId)))
+                    throw new InvalidFieldException("This is not your Business!!!");
 
                 if (business.Status.Equals(BusinessStatusEnum.BLOCKED))
                 {
@@ -407,13 +415,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 if (businessDTO.image != null)
                 {
-                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, currentUser.businessId);
+                    entity.Image = await _fileUploadService.UploadImageToFirebaseBusiness(businessDTO.image, businessId.ToString());
                 }
                 entity.UpdateBy = Guid.Parse(currentUser.userId);
 
                 result = await _businessRepository.UpdateBusiness(entity, businessId);
                 if (result == 0)
                     throw new UpdateObjectException("Can not update Business Object!");
+                else
+                {
+                    if (businessDTO.email != null && !businessDTO.email.Equals(business.Email.ToString()))
+                    {
+                        await _projectEntityRepository.UpdateBusinessEmailExtension(businessId, businessDTO.email);
+                    }
+                }
                 return result;
             }
             catch (Exception e)
