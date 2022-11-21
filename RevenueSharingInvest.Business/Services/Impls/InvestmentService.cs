@@ -301,12 +301,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             Image = project.Image
                         };
                         await NotificationCache.UpdateNotification(_cache, currentUser.userId, notification);
-                        DeviceToken tokens = await DeviceTokenCache.GetAvailableDevice(_cache, currentUser.userId);
-                        if(tokens.Tokens.Count > 0)
-                            await FirebasePushNotification.SubcribeTokensToUpdateProjectTopics(_cache, tokens, project.Id.ToString(), currentUser.userId);
-
                         notification.Title = currentUser.fullName+" vừa đầu tư vào dự án "+project.Name+" của bạn.";
+
                         await NotificationCache.UpdateNotification(_cache, projectManager.Id.ToString(), notification);
+                        DeviceToken tokens = await DeviceTokenCache.GetAvailableDevice(_cache, currentUser.userId);
+                        if (tokens.Tokens.Count > 0)
+                            await FirebasePushNotification.SubcribeTokensToUpdateProjectTopics(_cache, tokens, project.Id.ToString(), currentUser.userId);
                     }
                     else
                     {
