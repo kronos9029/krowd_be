@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using DistributedCacheExtensions = RevenueSharingInvest.Business.Services.Extensions.RedisCache.DistributedCacheExtensions;
 using System.Data;
 using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
+using FormatException = RevenueSharingInvest.Business.Exceptions.FormatException;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
@@ -70,6 +71,15 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             try
             {
+                if (!double.TryParse(request.Amount.ToString(), out _) || !double.TryParse(request.BankAccount.ToString(), out _))
+                {
+                    throw new FormatException("Amount Or Bank Account Must Be Numeric!!");
+                }
+                if (request.BankName.Any(char.IsDigit))
+                {
+                    throw new FormatException("Bank Name Must Not Contain Any Numeric Characters!!");
+                }
+
                 string newRequestId;
                 string walletName = "";
                 WithdrawRequest withdrawRequest = new();

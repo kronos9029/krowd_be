@@ -82,16 +82,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateNoti(string number)
         {
-            List<string> test = new()
-            {
-                "1",
-                "2",
-                "3",
-                "4",
-            };
-            string result = test.Find(x => x.Equals(number));
-            result ??= "";
-            return Ok(false);
+            return Ok(DateTime.Now.ToString("dd/MM/yyyy"));
         }
 
         [HttpGet]

@@ -1,12 +1,16 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.VisualBasic;
 using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Business.Services.Extensions.Firebase;
+using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Constants.Enum;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.DTOs.CommonDTOs;
+using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using System;
@@ -27,6 +31,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
+        private readonly IDistributedCache  _cache;
         public BillService(
             IBillRepository billRepository,
             IProjectRepository projectRepository,
@@ -35,7 +40,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IPeriodRevenueRepository periodRevenueRepository,
 
             IValidationService validationService,
-            IMapper mapper)
+            IMapper mapper,
+            IDistributedCache cache)
         {
             _billRepository = billRepository;
             _projectRepository = projectRepository;
@@ -46,6 +52,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _validationService = validationService;
 
             _mapper = mapper;
+            _cache = cache;
         }
 
         //CREATE
@@ -104,6 +111,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result.createDate = result.createDate == null ? null : await _validationService.FormatDateOutput(result.createDate);
                 result.updateDate = result.updateDate == null ? null : await _validationService.FormatDateOutput(result.updateDate);
 
+                PushNotification pushNotification = new()
+                {
+                    Title = "Có cập nhật mới về dự án "+project.Name,
+                    Body = "Quản lý dự án " + project.Name + " vừa cập nhật doanh thu cho ngày " + dailyReport.ReportDate.ToString("dd/MM/yyyy"),
+                    ImageUrl = project.Image
+                };
+                string topic = await FirebasePushNotification.SendPushNotificationToUpdateProjectTopics(projectId, pushNotification);
+                NotificationDetailDTO notificationDetailDTO = new()
+                {
+                    Title = "Quản lý dự án " + project.Name + " vừa cập nhật doanh thu cho ngày " + dailyReport.ReportDate.ToString("dd/MM/yyyy"),
+                    EntityId = projectId,
+                    Image = project.Image
+                };
+                List<string> userIdList = await DeviceTokenCache.GetSubcribedUserFromTopic(_cache, topic);
+                for(int i =0; i < userIdList.Count; i++)
+                {
+                    await NotificationCache.UpdateNotification(_cache, userIdList[i], notificationDetailDTO);
+                }
+                
                 return result;
             }
             catch(Exception e)

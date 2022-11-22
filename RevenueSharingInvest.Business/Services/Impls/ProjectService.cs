@@ -1581,6 +1581,29 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         notification.EntityId = projectId.ToString();
                         notification.Image = project.Image;
                         await NotificationCache.UpdateNotification(_cache, currentUser.userId, notification);
+
+                        PushNotification pushNotification = new()
+                        {
+                            Title = "Dự án sắp được triển khai!!!",
+                            Body = "Dự án "+project.Name+" mà bạn đầu tư đã gọi vốn thành công và sắp được triển khai.",
+                            ImageUrl = project.Image
+                        };
+                        string topic = await FirebasePushNotification.SendPushNotificationToUpdateProjectTopics(project.Id.ToString(), pushNotification);
+
+                        List<string> userIdList = await DeviceTokenCache.GetSubcribedUserFromTopic(_cache, topic);
+                        if(userIdList.Count > 0)
+                        {
+                            notification.Title = "Dự án "+project.Name+" mà bạn đầu tư đã gọi vốn thành công và sắp được triển khai.";
+                            notification.EntityId = projectId.ToString();
+                            notification.Image = project.Image;
+                            for(int i = 0; i < userIdList.Count; i++)
+                            {
+                                await NotificationCache.UpdateNotification(_cache, userIdList[i], notification);
+                            }
+                        }
+
+                        
+
                         return result;
                     }
                 }
