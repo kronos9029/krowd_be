@@ -128,7 +128,7 @@ namespace RevenueSharingInvest.API.Controllers
             {
                 throw new LoginException("You Have To Login First!!");
             }
-            if(long.TryParse(amount.ToString(), out _))
+            if(!double.TryParse(amount.ToString(), out _))
             {
                 throw new FormatException("Amount Must Be Numeric!!");
             }
