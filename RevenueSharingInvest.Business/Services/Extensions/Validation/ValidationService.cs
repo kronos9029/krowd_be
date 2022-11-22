@@ -1,5 +1,6 @@
 ﻿
 using AutoMapper;
+using AutoMapper.Execution;
 using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.ExtensionsRepos;
@@ -220,6 +221,23 @@ namespace RevenueSharingInvest.Business.Services.Extensions
             try
             {
                 return DateTime.Parse(dateString).ToString("dd/MM/yyyy HH:mm:ss");
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<string> FormatMoney(string number)
+        {
+            try
+            {
+                var separator = new System.Globalization.NumberFormatInfo()
+                {
+                    NumberDecimalDigits = 0,
+                    NumberGroupSeparator = ","
+                };
+                return Convert.ToUInt64(number).ToString("N", separator);
             }
             catch (Exception e)
             {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper.Execution;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;    
+using static System.Net.WebRequestMethods;
+using FormatException = RevenueSharingInvest.Business.Exceptions.FormatException;
 
 namespace RevenueSharingInvest.API.Controllers
 {
@@ -126,6 +128,12 @@ namespace RevenueSharingInvest.API.Controllers
             {
                 throw new LoginException("You Have To Login First!!");
             }
+            if(long.TryParse(amount.ToString(), out _))
+            {
+                throw new FormatException("Amount Must Be Numeric!!");
+            }
+           
+
             MomoPaymentRequest request = new()
             {
                 amount = amount,

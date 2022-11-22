@@ -21,5 +21,6 @@ namespace RevenueSharingInvest.Business.Services.Extensions
         public Task<bool> CheckText(string text);
         public Task<string> FormatDateInput(string dateString);
         public Task<string> FormatDateOutput(string dateString);
+        public Task<string> FormatMoney(string number);
     }
 }
