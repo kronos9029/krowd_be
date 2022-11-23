@@ -279,7 +279,7 @@ namespace RevenueSharingInvest.API.Controllers
                 } 
                 else if(businessDTO.Id.ToString().Equals(currentUser.businessId))
                 {
-                    if(project.status.Equals(ProjectStatusEnum.DRAFT.ToString()) || project.status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
+                    if(project.status.Equals(ProjectStatusEnum.DRAFT.ToString()) || project.status.Equals(ProjectStatusEnum.DENIED.ToString()))
                     {
                         var result = await _projectService.UpdateProject(projectDTO, id, currentUser);
                         return Ok(result);
