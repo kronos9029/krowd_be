@@ -316,7 +316,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                             PushNotification pushNotification = new()
                             {
                                 Title = "Bạn có đầu tư mới!!!",
-                                Body = notification.Title,
+                                Body = "Đầu tư vào dự án " + project.Name + " thành công, từ giờ bạn sẽ nhận được những cập nhật mới nhất của dự án.",
                                 ImageUrl = project.Image
                             };
                             await FirebasePushNotification.SendMultiDevicePushNotification(tokens.Tokens, pushNotification);
