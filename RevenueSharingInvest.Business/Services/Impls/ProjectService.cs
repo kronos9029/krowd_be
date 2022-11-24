@@ -1276,6 +1276,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                                 EntityId = projectId.ToString(),
                                 Image = project.Image
                             };
+
                             PushNotification pushNotification = new()
                             {
                                 Title = "Gọi vốn thành công!!!",
