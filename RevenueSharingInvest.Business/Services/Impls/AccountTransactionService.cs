@@ -128,7 +128,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     {
                         Investor investor = await _investorRepository.GetInvestorByUserId((Guid)accountTransaction.PartnerClientId);
                         InvestorTopUp(accountTransaction, investor);
-                        notification.Title = "Bạn vừa nạp "+momoPaymentResult.amount+"VNĐ vào ví đầu tư chung.";
+                        string moneySeparator = await _validationService.FormatMoney(momoPaymentResult.amount.ToString());
+                        notification.Title = "Bạn vừa nạp "+moneySeparator+"VNĐ vào ví đầu tư chung.";
                         await NotificationCache.UpdateNotification(_cache, momoPaymentResult.partnerClientId, notification);
 
                         DeviceToken deviceToken = await DeviceTokenCache.GetAvailableDevice(_cache, accountTransaction.PartnerClientId.ToString());

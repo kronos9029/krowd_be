@@ -250,10 +250,13 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> GetInvestedProjectsDetail(string projectId)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
-            var result = await _projectService.GetInvestedProjectDetail(projectId, currentUser.investorId);
+            if (currentUser.roleId.Equals(currentUser.investorRoleId))
+            {
+                var result = await _projectService.GetInvestedProjectDetail(projectId, currentUser);
+                return Ok(result);
+            }
 
-            return Ok(result);
-            //return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
         }
 
         //UPDATE
@@ -276,7 +279,7 @@ namespace RevenueSharingInvest.API.Controllers
                 } 
                 else if(businessDTO.Id.ToString().Equals(currentUser.businessId))
                 {
-                    if(project.status.Equals(ProjectStatusEnum.DRAFT.ToString()) || project.status.Equals(ProjectStatusEnum.WAITING_FOR_APPROVAL.ToString()))
+                    if(project.status.Equals(ProjectStatusEnum.DRAFT.ToString()) || project.status.Equals(ProjectStatusEnum.DENIED.ToString()))
                     {
                         var result = await _projectService.UpdateProject(projectDTO, id, currentUser);
                         return Ok(result);

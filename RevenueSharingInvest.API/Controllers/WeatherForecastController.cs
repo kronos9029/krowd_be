@@ -80,18 +80,9 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateNoti(string dv, string projectId)
+        public async Task<IActionResult> UpdateNoti(string number)
         {
-            List<string> registrationTokens = new()
-            {
-                dv
-            };
-            
-            string topic = "UpdateProject-" + projectId;
-
-            var response = await FirebaseMessaging.DefaultInstance.SubscribeToTopicAsync(registrationTokens, topic);
-
-            return Ok(response);
+            return Ok(DateTime.Now.ToString("dd/MM/yyyy"));
         }
 
         [HttpGet]

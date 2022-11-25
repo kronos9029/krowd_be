@@ -96,14 +96,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     await _investorWalletRepository.UpdateInvestorWalletBalance(investorWallet);
 
                     //Create CASH_OUT WalletTransaction from I3 to I2
-                    WalletTransaction walletTransaction = new WalletTransaction();
-                    walletTransaction.Amount = investment.TotalPrice;
-                    walletTransaction.Fee = 0;
-                    walletTransaction.Description = "Transfer money from I3 wallet to I2 wallet due to investment cancellation";
-                    walletTransaction.FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString())).Id;
-                    walletTransaction.ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString())).Id;
-                    walletTransaction.Type = WalletTransactionTypeEnum.CASH_OUT.ToString();
-                    walletTransaction.CreateBy = Guid.Parse(currentUser.userId);
+                    WalletTransaction walletTransaction = new WalletTransaction
+                    {
+                        Amount = investment.TotalPrice,
+                        Fee = 0,
+                        Description = "Transfer money from I3 wallet to I2 wallet due to investment cancellation",
+                        FromWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I3.ToString())).Id,
+                        ToWalletId = (await _investorWalletRepository.GetInvestorWalletByInvestorIdAndType(Guid.Parse(currentUser.investorId), WalletTypeEnum.I2.ToString())).Id,
+                        Type = WalletTransactionTypeEnum.CASH_OUT.ToString(),
+                        CreateBy = Guid.Parse(currentUser.userId)
+                    };
                     await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
                     //Add I2 balance
@@ -306,9 +308,20 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                         //Noti cho manager
                         await NotificationCache.UpdateNotification(_cache, projectManager.Id.ToString(), notification);
+
                         DeviceToken tokens = await DeviceTokenCache.GetAvailableDevice(_cache, currentUser.userId);
                         if (tokens.Tokens.Count > 0)
+                        {
                             await FirebasePushNotification.SubcribeTokensToUpdateProjectTopics(_cache, tokens, project.Id.ToString(), currentUser.userId);
+                            PushNotification pushNotification = new()
+                            {
+                                Title = "Bạn có đầu tư mới!!!",
+                                Body = "Đầu tư vào dự án " + project.Name + " thành công, từ giờ bạn sẽ nhận được những cập nhật mới nhất của dự án.",
+                                ImageUrl = project.Image
+                            };
+                            await FirebasePushNotification.SendMultiDevicePushNotification(tokens.Tokens, pushNotification);
+                        }
+
                     }
                     else
                     {

@@ -48,6 +48,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         public Task<InvestedProjectDetail> GetInvestedProjectDetail(Guid projectId, Guid investorId);
         public Task<double> GetReturnedDeptOfOneInvestor(Guid projectId, Guid userId);
         public Task<string> GetPrjectImageByProjectId(Guid projectId);
+        public Task<NumOfPaidStageAndLastPaymentDate> GetNumOfPaidStageAndLastPaymentDate(Guid projectId);
 
         //UPDATE
         public Task<int> UpdateProject(Project projectDTO, Guid projectId);

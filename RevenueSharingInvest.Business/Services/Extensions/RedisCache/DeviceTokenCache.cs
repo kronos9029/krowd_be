@@ -33,7 +33,9 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
                 }
                 else
                 {
-                    if(!result.Tokens.Find(x => x.Equals(token)).Equals(token))
+                    string check = result.Tokens.Find(x => x.Equals(token));
+                    check ??= "";
+                    if(check.Equals(""))
                         result.Tokens.Add(token);
                 }
                 await DistributedCacheExtensions.SetRecordAsync(cache, key, result);
@@ -133,7 +135,9 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
                 }
                 else
                 {
-                    if (!userIdList.Find(x => x.Equals(userId)).Equals(userId))
+                    string check = userIdList.Find(x => x.Equals(userId));
+                    check ??= "";
+                    if (check.Equals(""))
                         userIdList.Add(userId);
 
                 }

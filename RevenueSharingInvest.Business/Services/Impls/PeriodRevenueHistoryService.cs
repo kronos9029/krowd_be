@@ -206,7 +206,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         await _walletTransactionRepository.CreateWalletTransaction(walletTransaction);
 
                         //Create Payment
-                        Payment payment = new Payment();
+                        Payment payment = new();
                         payment.PeriodRevenueId = periodRevenue.Id;
                         payment.StageId = stage.Id;
                         payment.Amount = item.amount;
@@ -224,11 +224,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         notificationForInvestor.EntityId = paymentId;
                         notificationForInvestor.Image = project.Image;
                         await NotificationCache.UpdateNotification(_cache, payment.ToId.ToString(), notificationForInvestor);
-
-                        pushNotification.Title = "Tiền về ví!!!";
-                        pushNotification.Body = payment.Description;
-                        pushNotification.ImageUrl = project.Image;
-                        await FirebasePushNotification.SendPushNotificationToUpdateProjectTopics(project.Id.ToString(), pushNotification);
                     }
 
                     //Update PeriodRevenue
@@ -241,6 +236,12 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     project.PaidAmount = project.PaidAmount + createPeriodRevenueHistoryDTO.amount;
                     project.UpdateBy = Guid.Parse(currentUser.userId);
                     await _projectRepository.UpdateProjectRemainingAmount(project);
+
+                    //Push notification
+                    pushNotification.Title = "Tiền về ví!!!";
+                    pushNotification.Body = notificationForInvestor.Title;
+                    pushNotification.ImageUrl = project.Image;
+                    await FirebasePushNotification.SendPushNotificationToUpdateProjectTopics(project.Id.ToString(), pushNotification);
                 }
 
                 result = _mapper.Map<PeriodRevenueHistoryDTO>(periodRevenueHistory);

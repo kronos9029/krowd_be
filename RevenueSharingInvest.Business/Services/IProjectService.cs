@@ -42,7 +42,7 @@ namespace RevenueSharingInvest.Business.Services
         public Task<List<BusinessProjectDTO>> GetBusinessProjectsToAuthor(Guid businessId);
         public Task<IntegrateInfo> GetIntegrateInfoByUserEmail(string projectId);
         public Task<string> GetProjectNameForContractById(string projectId);
-        public Task<InvestedProjectDetailWithInvestment> GetInvestedProjectDetail(string projectId, string investorId);
+        public Task<InvestedProjectDetailWithInvestment> GetInvestedProjectDetail(string projectId, ThisUserObj currentUser);
 
         //UPDATE
         public Task<int> UpdateProject(UpdateProjectDTO projectDTO, Guid projectId, ThisUserObj thisUserObj);

@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using static Google.Apis.Requests.BatchRequest;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Exceptions;
+using AutoMapper.Execution;
 
 namespace RevenueSharingInvest.Business.Services.Impls
 {
@@ -33,6 +34,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         {
             try
             {
+
                 if (request.amount > 50000000)
                     throw new AmountExcessException("Maximum amount is 50000000 VND");
                 //request params need to request to MoMo system
@@ -40,7 +42,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 string apiEndpoint = _momoSettings.ApiEndpoint;
                 string accessKey = _momoSettings.AccessKey;
                 string serectkey = _momoSettings.SecretKey;
-                string orderInfo = "test";
+                string orderInfo = "";
                 
                 string notifyurl = _momoSettings.NotifyUrl; //lưu ý: notifyurl không được sử dụng localhost, có thể sử dụng ngrok để public localhost trong quá trình test
 
@@ -56,9 +58,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                 string returnUrl = "";
                 if (request.role.Equals(RoleEnum.INVESTOR.ToString()))
-                    returnUrl = _momoSettings.InvestorReturnUrl;                
+                {
+                    orderInfo = "Nạp tiền vào ví đầu tư chung.";
+                    returnUrl = _momoSettings.InvestorReturnUrl;
+                }
+                                    
                 if (request.role.Equals(RoleEnum.PROJECT_MANAGER.ToString()))
+                {
+                    orderInfo = "Nạp tiền vào ví thanh toán chung.";
                     returnUrl = _momoSettings.ProjectManagerReturnUrl;
+                }
+                    
 
                 //Before sign HMAC SHA256 signature
                 string rawHash = "accessKey=" + accessKey +

@@ -80,6 +80,10 @@ namespace RevenueSharingInvest.Business.Exceptions
                     errorMessageObject.Code = "A001";
                     statusCode=(int)HttpStatusCode.BadRequest;
                     break;
+                case FormatException:
+                    errorMessageObject.Code = "F002";
+                    statusCode = (int)HttpStatusCode.BadRequest;
+                    break;
 
             }
 

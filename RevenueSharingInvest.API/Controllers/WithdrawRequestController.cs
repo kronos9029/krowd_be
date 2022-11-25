@@ -51,7 +51,8 @@ namespace RevenueSharingInvest.API.Controllers
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
             if (currentUser.roleId.Equals(currentUser.investorRoleId))
             {
-                if (userId != null && !userId.Equals(Guid.Parse(currentUser.userId))) throw new InvalidFieldException("This userId is not your userId!!!");
+                if (userId != null && !userId.Equals(currentUser.userId)) 
+                    throw new InvalidFieldException("This userId is not your userId!!!");
 
                 var result = await _withdrawRequestService.GetAllWithdrawRequest(pageIndex, pageSize, userId == null ? currentUser.userId : userId.ToString(), filter.ToString());
                 return Ok(result);
