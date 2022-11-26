@@ -335,9 +335,6 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-
-            string storage = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(response.uid);
-
             response.token = tokenHandler.WriteToken(token);
             return response;
         }

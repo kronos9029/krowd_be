@@ -9,6 +9,6 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
 {
     public interface IITextService
     {
-        public Task<string> GenerateProjectContract(ThisUserObj currentUser, string projectId, decimal amount);
+        public Task<string> GenerateProjectContract(ThisUserObj currentUser, string projectId, decimal amount, string invesmentId);
     }
 }

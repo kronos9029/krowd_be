@@ -1,21 +1,27 @@
-﻿using Google.Api.Gax.ResourceNames;
+﻿using Firebase.Auth;
+using Google.Api.Gax.ResourceNames;
 using iText.Kernel.Font;
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
 using iText.Layout.Properties;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.CodeAnalysis;
+using Microsoft.Extensions.Options;
 using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
+using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.Entities;
 using RevenueSharingInvest.Data.Repositories.IRepos;
 using RevenueSharingInvest.Data.Repositories.Repos;
+using StackExchange.Redis;
 using System;
 using System.IO;
 using System.IO.Pipelines;
+using System.Text;
 using System.Threading.Tasks;
 using static Google.Cloud.Firestore.V1.StructuredQuery.Types;
 using static iText.Kernel.Font.PdfFontFactory;
@@ -31,11 +37,16 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
         private readonly IFileUploadService _fileUploadService;
         private readonly String COMPANY_NAME = " Công Ty Nhượng Quyền Thương Mại Điện Tử Krowd - Revenue Sharing Invest.";
         private readonly String COMPANY_ADDRESS = " Chung cư Vinhomes Grand Park Quận 9, Long Thạnh Mỹ, Quận 9, Thành phố Hồ Chí Minh, Việt Nam.";
-        public ITextService(IInvestorRepository investorRepository, IProjectRepository projectRepository, IFileUploadService fileUploadService)
+        private readonly AppSettings _appSettings;
+        private readonly IValidationService _validationService;
+
+        public ITextService(IInvestorRepository investorRepository, IProjectRepository projectRepository, IFileUploadService fileUploadService, IOptions<AppSettings> appSettings, IValidationService validationService)
         {
             _investorRepository = investorRepository;
             _projectRepository = projectRepository;
             _fileUploadService = fileUploadService;
+            _appSettings = appSettings.Value;
+            _validationService = validationService;
         }
 
         private string GetDirectoryPath()
@@ -48,7 +59,6 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
-
                 }
             }
 
@@ -70,25 +80,25 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
             return font;
         }
 
-        public async Task<string> GenerateProjectContract(ThisUserObj currentUser, string projectId, decimal amount)
+        public async Task<string> GenerateProjectContract(ThisUserObj currentUser, string projectId, decimal amount, string invesmentId)
         {
             try
             {
-                InvestorContractInfo investor = await _investorRepository.GetInvestorNameByEmail(currentUser.email);
-                if (investor == null)
+                InvestorContractInfo investorInfo = await _investorRepository.GetInvestorNameByEmail(currentUser.email);
+                if (investorInfo == null)
                     throw new NotFoundException("No Investor Found!!");
                 string projectName = await _projectRepository.GetProjectNameForContractById(Guid.Parse(projectId));
 
                 string directoryPath = GetDirectoryPath();
-                directoryPath += "\\"+ investor.Id + "\\";
+                directoryPath += "\\"+ investorInfo.Id + "\\";
                 if (!Directory.Exists(directoryPath))
                     Directory.CreateDirectory(directoryPath);
 
-                string fullPath = directoryPath + projectId + ".pdf";
+                string fullPath = directoryPath + invesmentId + ".pdf";
 
-                ManipulateContract(fullPath, investor, projectName, amount);
+                ManipulateContract(fullPath, investorInfo, projectName, amount, invesmentId);
 
-                string downloadLink = await GetFileToUploadAsync(fullPath, currentUser.userId, projectId);
+                string downloadLink = await GetFileToUploadAsync(fullPath, currentUser, projectName, invesmentId);
 
                 return downloadLink;
             }
@@ -101,7 +111,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
         }
 
 
-        public void ManipulateContract(string fullPath, InvestorContractInfo investor, string projectName, decimal amount)
+        public void ManipulateContract(string fullPath, InvestorContractInfo investor, string projectName, decimal amount, string invesmentId)
         {
 
             string fullName;
@@ -111,9 +121,14 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
                 fullName = investor.LastName;
 
             //Initialize PDF writer
-            PdfWriter writer = new PdfWriter(fullPath);
+            //PdfWriter writer = new PdfWriter(fullPath);
+            var userPassword = Encoding.UTF8.GetBytes(investor.SecretKey);
+            var ownerPassword = Encoding.UTF8.GetBytes(_appSettings.Secret);
+
+            PdfWriter writer = new(fullPath, new WriterProperties().SetStandardEncryption(userPassword, ownerPassword, EncryptionConstants.ALLOW_SCREENREADERS, EncryptionConstants.ENCRYPTION_AES_256));
+
             //Initialize PDF document
-            PdfDocument pdfDoc = new PdfDocument(writer);
+            PdfDocument pdfDoc = new(writer);
             //Initialize Document font
             PdfFont fontBold = GetFontType(FontType.Bold);
             PdfFont fontRegular = GetFontType(FontType.Regular);
@@ -125,7 +140,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
             string month = DateTimePicker.GetDateTimeByTimeZone().Month.ToString();
             string year = DateTimePicker.GetDateTimeByTimeZone().Year.ToString();
             //Initialize document
-            Document document = new Document(pdfDoc);
+            Document document = new(pdfDoc);
 
             Paragraph nationalHeader = new();
 
@@ -155,7 +170,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
                 .SetTextAlignment(TextAlignment.CENTER);
             document.Add(nationalHeader);
             nationalHeader = new();
-            nationalHeader.Add("Số:…/…/HĐGVKD")
+            nationalHeader.Add("Mã Số: "+invesmentId+" HĐGVKD")
                 .SetFontSize(12)
                 .SetFont(fontRegular)
                 .SetTextAlignment(TextAlignment.CENTER);
@@ -176,16 +191,16 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
             contractBody.Add("Tên tổ chức:" + COMPANY_NAME +
                 "\nTrụ sở chính:" + COMPANY_ADDRESS +
                 "\nMã số thuế: …do … cấp ngày …/…/…" +
-                "\nĐại diện bởi: Ông: Lâm Hữu Khánh Phương. Chức vụ: Tổng Giám Đốc Điều Hành").SetFontSize(10).SetFont(fontRegular);
+                "\nĐại diện bởi: Ông: Đỗ Dương Tâm Khánh. Chức vụ: Tổng Giám Đốc Điều Hành").SetFontSize(10).SetFont(fontRegular);
             document.Add(contractBody);
             contractBody = new();
             contractBody.Add("BÊN GÓP VỐN ( BÊN B):").SetFontSize(12).SetFont(fontBold).SetWordSpacing(-3);
             document.Add(contractBody);
             contractBody = new();
             contractBody.Add("Ông/bà : " + fullName + ".   Sinh năm: " + investor.DateOfBirth +
-                "\nChứng minh nhân dân số: " + investor.IdCard + "  Ngày cấp: …/…/….   Nơi cấp: ……………………" +
-            "\nThường trú : " + investor.Address + ", " + investor.District + ", " + investor.City + "." +
-                "\nSau khi bàn bạc thỏa thuận, hai bên đi đến thống nhất và đồng ý ký kết Hợp đồng góp vốn kinh doanh số:…/…/HĐGVKD với các điều khoản sau:")
+                "\nChứng minh nhân dân số: " + investor.IdCard +
+                "\nThường trú : " + investor.Address + ", " + investor.District + ", " + investor.City + "." +
+                "\nSau khi bàn bạc thỏa thuận, hai bên đi đến thống nhất và đồng ý ký kết Hợp đồng góp vốn kinh doanh mã số: "+invesmentId+" HĐGVKD với các điều khoản sau:")
                 .SetFontSize(10)
                 .SetFont(fontRegular);
             document.Add(contractBody);
@@ -200,7 +215,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
             conditionTitle = new();
             conditionBody = new();
             conditionTitle.Add("ĐIỀU 2: TỔNG GIÁ TRỊ VỐN GÓP VÀ PHƯƠNG THỨC GÓP VỐN").SetFontSize(12).SetFont(fontBold).SetWordSpacing(-3);
-            conditionBody.Add("Tổng giá trị đầu tư Bên B đầu tư cho bên A để thực hiện nội dung nêu tại Điều 1 là: " + amount + " VNĐ (Bằng chữ: " + NumberToTextVN(amount) + " ).")
+            conditionBody.Add("Tổng giá trị đầu tư Bên B đầu tư cho bên A để thực hiện nội dung nêu tại Điều 1 là: " + _validationService.FormatMoney(amount.ToString()) + " VNĐ (Bằng chữ: " + NumberToTextVN(amount) + " ).")
                 .SetFontSize(10)
                 .SetFont(fontRegular);
             document.Add(conditionTitle);
@@ -281,24 +296,29 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
             Paragraph signatureSpace = new();
             Paragraph fullnamePlease = new();
             signatureSpace.Add("BÊN A\t\t\t\t\t\t\t\t\t\t\t\t\t\tBÊN B").SetFontSize(12).SetFont(fontBold).SetPaddingTop(50).SetTextAlignment(TextAlignment.CENTER);
-            fullnamePlease.Add("Lâm Hữu Khánh Phương\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + fullName).SetFontSize(10).SetFont(fontItalic).SetTextAlignment(TextAlignment.CENTER);
+            fullnamePlease.Add("Đỗ Dương Tâm Khánh\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + fullName).SetFontSize(10).SetFont(fontItalic).SetTextAlignment(TextAlignment.CENTER);
             document.Add(signatureSpace);
             document.Add(fullnamePlease);
+
+            
 
             //Close document
             document.Close();
             writer.Close();
         }
 
-        public async Task<string> GetFileToUploadAsync(string path, string userId, string projectId)
+        public async Task<string> GetFileToUploadAsync(string path, ThisUserObj currentUser, string projectName, string invesmentId)
         {
             try
             {
                 StreamReader sr = new StreamReader(path);
 
-                Task<string> downloadLink = _fileUploadService.UploadGeneratedContractToFirebase(userId, projectId, sr.BaseStream);
+                Task<string> downloadLink = _fileUploadService.UploadGeneratedContractToFirebase(currentUser.userId, invesmentId, sr.BaseStream);
                 await Task.WhenAll(downloadLink);
                 sr.Close();
+
+                EmailService.SendEmail(path, currentUser.email, projectName);
+                
                 File.Delete(path);
                 return downloadLink.Result;
             }
@@ -310,7 +330,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
 
         }
 
-        public string NumberToTextVN(decimal total)
+        public static string NumberToTextVN(decimal total)
         {
             try
             {

@@ -16,7 +16,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
         public Task<string> UploadImageToFirebaseUser(IFormFile file, string uid);
         public Task<string> UploadBusinessContract(FirebaseBusinessContract request);
         public Task<List<string>> UploadFilesWithPath(FirebaseRequest request);
-        public Task<string> UploadGeneratedContractToFirebase(string userId, string projectId, Stream stream);
+        public Task<string> UploadGeneratedContractToFirebase(string userId, string invesmentId, Stream stream);
         public Task<string> UploadAdminTracsactionReceipt(string withdrawId, IFormFile file, string userId);
     }
 }

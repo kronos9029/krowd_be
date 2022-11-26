@@ -305,7 +305,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         {
             try
             {
-                string query = "SELECT I.Id, U.LastName, U.FirstName, U.PhoneNum, U.IdCard, U.DateOfBirth, U.City, U.District, U.Address FROM Investor I LEFT JOIN [User] U ON I.UserId = U.Id WHERE U.Email = @Email";
+                string query = "SELECT I.Id, U.LastName, U.FirstName, U.PhoneNum, U.IdCard, U.DateOfBirth, U.City, U.District, U.Address, U.SecretKey FROM Investor I LEFT JOIN [User] U ON I.UserId = U.Id WHERE U.Email = @Email";
                 var parameters = new DynamicParameters();
                 parameters.Add("Email", email, DbType.String);
                 using var connection = CreateConnection();
@@ -361,5 +361,6 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         public string City { get; set; }
         public string District { get; set; }
         public string Address { get; set; }
+        public string SecretKey { get; set; }
     }
 }

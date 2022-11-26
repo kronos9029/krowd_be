@@ -506,7 +506,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
         }
 
 
-        public async Task<string> UploadGeneratedContractToFirebase(string userId, string projectId, Stream stream)
+        public async Task<string> UploadGeneratedContractToFirebase(string userId, string invesmentId , Stream stream)
         {
             var tokenDescriptor = new Dictionary<string, object>()
             {
@@ -528,9 +528,8 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Firebase
                          ThrowOnCancel = true,
                      })
                     .Child("Contracts")
-                    .Child(projectId)
                     .Child(userId)
-                    .Child(projectId + ".pdf")
+                    .Child(invesmentId + ".pdf")
                     .PutAsync(stream);
 
 

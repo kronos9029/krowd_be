@@ -15,6 +15,7 @@ using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Business.Services.Extensions.iText;
 using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
+using RevenueSharingInvest.Business.Services.Extensions.Security;
 using RevenueSharingInvest.Business.Services.Impls;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers;
@@ -80,9 +81,17 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateNoti(string number)
+        public async Task<IActionResult> UpdateNoti()
         {
-            return Ok(DateTime.Now.ToString("dd/MM/yyyy"));
+            return Ok(0);
+        }
+
+        [HttpPost]
+        [Route("/test")]
+        public async Task<IActionResult> rt(string secrectKey)
+        {
+            
+            return Ok(GenerateSecurityKey.CreateKey(secrectKey));
         }
 
         [HttpGet]
