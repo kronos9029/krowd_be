@@ -309,7 +309,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         //noti cho Investor
                         await NotificationCache.UpdateNotification(_cache, currentUser.userId, notification);
 
-                        decimal decimalPrice = Convert.ToDecimal(investment.TotalPrice);
+                        decimal decimalPrice = Convert.ToDecimal(payment.Amount);
                         string contract = await _iTextService.GenerateProjectContract(currentUser, project.Id.ToString(), decimalPrice, investmentId);
 
                         await _investmentRepository.UpdateInvestmentContract(Guid.Parse(investmentId), contract);
