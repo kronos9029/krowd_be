@@ -25,6 +25,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
         //UPDATE
         public Task<int> CancelInvestment(Guid investmentId, Guid updateBy);
         public Task<int> UpdateInvestmentStatus(Investment investmentDTO);
+        public Task<int> UpdateInvestmentContract(Guid invesmentId, string contractLink);
 
         //DELETE
         //public Task<int> DeleteInvestmentById(Guid investmentId);

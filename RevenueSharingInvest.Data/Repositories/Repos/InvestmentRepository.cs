@@ -464,5 +464,27 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        public async Task<int> UpdateInvestmentContract(Guid invesmentId, string contractLink)
+        {
+            try
+            {
+                var query = "UPDATE Investment "
+                    + "     SET "
+                    + "         Contract = @Contract"
+                    + "     WHERE "
+                    + "         Id = @Id";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("Contract", contractLink, DbType.String);
+                using var connection = CreateConnection();
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

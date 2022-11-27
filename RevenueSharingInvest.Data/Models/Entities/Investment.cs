@@ -31,6 +31,7 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public DateTime? UpdateDate { get; set; }
         public Guid? UpdateBy { get; set; }
         public string Status { get; set; }
+        public string Contract { get; set; }
 
         [ForeignKey(nameof(InvestorId))]
         [InverseProperty("Investments")]

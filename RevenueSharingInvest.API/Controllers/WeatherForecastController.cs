@@ -81,9 +81,10 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateNoti()
+        public async Task<IActionResult> UpdateNoti(string projectId, double amount, string invesmentId)
         {
-            return Ok(0);
+            decimal result = Convert.ToDecimal(amount);
+            return Ok(result);
         }
 
         [HttpPost]

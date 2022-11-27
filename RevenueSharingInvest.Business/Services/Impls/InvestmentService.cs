@@ -5,6 +5,7 @@ using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Models.Constant;
 using RevenueSharingInvest.Business.Services.Extensions;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
+using RevenueSharingInvest.Business.Services.Extensions.iText;
 using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;
@@ -40,6 +41,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         private readonly IValidationService _validationService;
         private readonly IMapper _mapper;
         private readonly IDistributedCache _cache;
+        private readonly IITextService _iTextService;
 
         public InvestmentService(
             IInvestmentRepository investmentRepository, 
@@ -54,7 +56,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             IWalletTransactionRepository walletTransactionRepository,
             IValidationService validationService, 
             IMapper mapper,
-            IDistributedCache cache)
+            IDistributedCache cache,
+            IITextService iTextService)
         {
             _investorRepository = investorRepository;
             _investmentRepository = investmentRepository;
@@ -70,6 +73,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
             _validationService = validationService;
             _mapper = mapper;
             _cache = cache;
+            _iTextService = iTextService;
         }
 
         //CANCEL
@@ -304,8 +308,16 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         };
                         //noti cho Investor
                         await NotificationCache.UpdateNotification(_cache, currentUser.userId, notification);
-                        notification.Title = currentUser.fullName+" vừa đầu tư vào dự án "+project.Name+" của bạn.";
 
+                        decimal decimalPrice = Convert.ToDecimal(investment.TotalPrice);
+                        string contract = await _iTextService.GenerateProjectContract(currentUser, project.Id.ToString(), decimalPrice, investmentId);
+
+                        await _investmentRepository.UpdateInvestmentContract(Guid.Parse(investmentId), contract);
+
+                        notification.Title = "Một email chứa hợp đồng góp vốn đã được gửi đến Gmail của bạn!!!";
+                        await NotificationCache.UpdateNotification(_cache, currentUser.userId, notification);
+
+                        notification.Title = currentUser.fullName + " vừa đầu tư vào dự án " + project.Name + " của bạn.";
                         //Noti cho manager
                         await NotificationCache.UpdateNotification(_cache, projectManager.Id.ToString(), notification);
 

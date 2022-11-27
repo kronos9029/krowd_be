@@ -111,7 +111,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
         }
 
 
-        public void ManipulateContract(string fullPath, InvestorContractInfo investor, string projectName, decimal amount, string invesmentId)
+        public async void ManipulateContract(string fullPath, InvestorContractInfo investor, string projectName, decimal amount, string invesmentId)
         {
 
             string fullName;
@@ -139,6 +139,9 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
             string date = DateTimePicker.GetDateTimeByTimeZone().Day.ToString();
             string month = DateTimePicker.GetDateTimeByTimeZone().Month.ToString();
             string year = DateTimePicker.GetDateTimeByTimeZone().Year.ToString();
+
+            string parsedAmount = await _validationService.FormatMoney(amount.ToString());
+
             //Initialize document
             Document document = new(pdfDoc);
 
@@ -215,7 +218,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
             conditionTitle = new();
             conditionBody = new();
             conditionTitle.Add("ĐIỀU 2: TỔNG GIÁ TRỊ VỐN GÓP VÀ PHƯƠNG THỨC GÓP VỐN").SetFontSize(12).SetFont(fontBold).SetWordSpacing(-3);
-            conditionBody.Add("Tổng giá trị đầu tư Bên B đầu tư cho bên A để thực hiện nội dung nêu tại Điều 1 là: " + _validationService.FormatMoney(amount.ToString()) + " VNĐ (Bằng chữ: " + NumberToTextVN(amount) + " ).")
+            conditionBody.Add("Tổng giá trị đầu tư Bên B đầu tư cho bên A để thực hiện nội dung nêu tại Điều 1 là: " + parsedAmount + " VNĐ (Bằng chữ: " + NumberToTextVN(amount) + " ).")
                 .SetFontSize(10)
                 .SetFont(fontRegular);
             document.Add(conditionTitle);
@@ -317,7 +320,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
                 await Task.WhenAll(downloadLink);
                 sr.Close();
 
-                EmailService.SendEmail(path, currentUser.email, projectName);
+                await Task.WhenAll(EmailService.SendEmail(path, currentUser.email, projectName));
                 
                 File.Delete(path);
                 return downloadLink.Result;

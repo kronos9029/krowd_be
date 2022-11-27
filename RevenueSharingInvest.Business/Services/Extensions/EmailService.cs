@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using RevenueSharingInvest.Data.Helpers.Logger;
+using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 
 namespace RevenueSharingInvest.Business.Services.Extensions
 {
@@ -15,7 +16,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions
         //private static readonly string App_Password = "hchr lwct gcor qtsr";
         private static readonly string APP_PASSWORD = "hchrlwctgcorqtsr";
         private static readonly string SENDER = "krowd.dev.2022@gmail.com";
-        public static void SendEmail(string filePath, string receiver, string projectName)
+        public static async Task SendEmail(string filePath, string receiver, string projectName)
         {
             String SendMailSubject = "KROWD - Hợp Đồng Góp Vốn Kinh Doanh";
             String SendMailBody = "Hợp đồng góp vốn kinh doanh của dự án "+projectName;
@@ -44,6 +45,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions
                 //END
 
                 SmtpServer.Send(email);
+                email.Attachments.ToList().ForEach(x => x.Dispose());
             }
             catch (Exception e)
             {
