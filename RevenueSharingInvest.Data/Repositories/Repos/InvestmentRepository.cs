@@ -477,6 +477,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var parameters = new DynamicParameters();
                 parameters.Add("Contract", contractLink, DbType.String);
+                parameters.Add("Id", invesmentId, DbType.Guid);
                 using var connection = CreateConnection();
                 return await connection.ExecuteAsync(query, parameters);
             }
