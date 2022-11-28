@@ -1408,7 +1408,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
 
                     item.investedAmount = await _paymentRepository.GetInvestedAmountForInvestorByProjectId(Guid.Parse(item.id), Guid.Parse(currentUser.userId));
-                    item.receivedAmount = await _paymentRepository.GetReceivedAmountForInvestorByProjectId(Guid.Parse(item.id), Guid.Parse(currentUser.userId));
+                    item.receivedAmount = await _projectRepository.GetReturnedDeptOfOneInvestor(Guid.Parse(item.id), Guid.Parse(currentUser.userId));
                     item.lastestInvestmentDate = await _validationService.FormatDateOutput(await _paymentRepository.GetLastestInvestmentDateForInvestorByProjectId(Guid.Parse(item.id), Guid.Parse(currentUser.userId)));
 
                     result.listOfProject.Add(item);
