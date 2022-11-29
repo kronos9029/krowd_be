@@ -160,6 +160,9 @@ namespace RevenueSharingInvest.API.Extensions
             //MOMO
             services.AddScoped<IMomoService, MomoService>();
 
+            //MONEY OVERVIEW
+            services.AddScoped<IMoneyOverviewService, MoneyOverviewService>();
+
             //////////   
             // VALIDATION
             services.AddScoped<IValidationRepository, ValidationRepository>();
