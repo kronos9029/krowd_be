@@ -193,7 +193,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
             contractBody = new();
             contractBody.Add("Tên tổ chức:" + COMPANY_NAME +
                 "\nTrụ sở chính:" + COMPANY_ADDRESS +
-                "\nMã số thuế: …do … cấp ngày …/…/…" +
+                "\nMã số thuế: 3500806648 do Bộ Tài Chính cấp ngày 18/03/2018" +
                 "\nĐại diện bởi: Ông: Đỗ Dương Tâm Khánh. Chức vụ: Tổng Giám Đốc Điều Hành").SetFontSize(10).SetFont(fontRegular);
             document.Add(contractBody);
             contractBody = new();
