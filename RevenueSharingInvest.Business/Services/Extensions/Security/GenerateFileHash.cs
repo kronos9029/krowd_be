@@ -19,8 +19,9 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Security
                 using var hasher = System.Security.Cryptography.HashAlgorithm.Create(hashingAlgoType.ToString());
                 using var stream = System.IO.File.OpenRead(filePath);
                 var hash = hasher.ComputeHash(stream);
+                string result = BitConverter.ToString(hash).Replace("-", "");
                 stream.Close();
-                return BitConverter.ToString(hash).Replace("-", "");
+                return result;
 
             }
             catch(Exception ex)
