@@ -40,7 +40,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions
                     Body = SendMailBody
                 };
                 
-                var fileChecksum = await Task.WhenAll(GenerateFileHash.GetHash(HashingAlgoTypes.SHA256, filePath));
+                string[] fileChecksum = await Task.WhenAll(GenerateFileHash.GetHash(HashingAlgoTypes.SHA256, filePath));
 
                 email.Body += "\nChecksum của file hợp đồng: "+fileChecksum;
                 email.Body += "\nChecksum (tổng kiểm tra) là kết quả của việc chạy một thuật toán, được gọi là hàm băm mật mã, trên một phần dữ liệu, thường là một tệp duy nhất. So sánh Checksum mà bạn tạo từ phiên bản tệp của mình với phiên bản do nguồn tệp cung cấp, giúp đảm bảo rằng bản sao tệp của bạn là chính hãng và không có lỗi.\r\n\r\nTìm hiểu thêm về Checksum: https://wikimaytinh.com/checksum-la-gi-dung-checksum-de-lam-gi.html";
