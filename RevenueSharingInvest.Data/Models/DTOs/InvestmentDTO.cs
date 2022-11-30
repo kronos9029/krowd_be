@@ -34,5 +34,6 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public string packageName { get; set; }
         public double packagePrice { get; set; }
         public string projectName { get; set; }
+        public string projectStatus { get; set; }
     }
 }
