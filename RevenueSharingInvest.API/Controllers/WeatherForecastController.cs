@@ -83,7 +83,7 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateNoti(string filePath)
         {
-            var result = GenerateFileHash.GetHash(HashingAlgoTypes.SHA256, filePath);
+            var result = await Task.WhenAll(GenerateFileHash.GetHash(HashingAlgoTypes.SHA256, filePath));
             return Ok(result);
         }
 

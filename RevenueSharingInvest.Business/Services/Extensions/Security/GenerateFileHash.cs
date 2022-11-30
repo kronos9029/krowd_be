@@ -12,7 +12,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Security
 {
     public static class GenerateFileHash
     {
-        public static String GetHash(HashingAlgoTypes hashingAlgoType, string filePath)
+        public static async Task<string> GetHash(HashingAlgoTypes hashingAlgoType, string filePath)
         {
             try
             {
