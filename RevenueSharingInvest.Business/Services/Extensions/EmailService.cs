@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
+using RevenueSharingInvest.Business.Services.Extensions.Security;
 
 namespace RevenueSharingInvest.Business.Services.Extensions
 {
     public static class EmailService
     {
         //private static readonly string App_Password = "hchr lwct gcor qtsr";
-        private static readonly string APP_PASSWORD = "hchrlwctgcorqtsr";
-        private static readonly string SENDER = "krowd.dev.2022@gmail.com";
+        private static readonly string APP_PASSWORD = "cxrdzurzsizgzaep";
+        private static readonly string SENDER = "krowd.2022@gmail.com";
         public static async Task SendEmail(string filePath, string receiver, string projectName)
         {
             String SendMailSubject = "KROWD - Hợp Đồng Góp Vốn Kinh Doanh";
@@ -38,6 +39,11 @@ namespace RevenueSharingInvest.Business.Services.Extensions
                     Subject = SendMailSubject,
                     Body = SendMailBody
                 };
+                
+                string fileChecksum = GenerateFileHash.GetHash(HashingAlgoTypes.SHA256, filePath);
+
+                email.Body += "\nChecksum của file hợp đồng: "+fileChecksum;
+                email.Body += "\nChecksum (tổng kiểm tra) là kết quả của việc chạy một thuật toán, được gọi là hàm băm mật mã, trên một phần dữ liệu, thường là một tệp duy nhất. So sánh Checksum mà bạn tạo từ phiên bản tệp của mình với phiên bản do nguồn tệp cung cấp, giúp đảm bảo rằng bản sao tệp của bạn là chính hãng và không có lỗi.\r\n\r\nTìm hiểu thêm về Checksum: https://wikimaytinh.com/checksum-la-gi-dung-checksum-de-lam-gi.html";
                 email.Attachments.Add(new Attachment(filePath));
                 email.To.Add(receiver);
                 email.CC.Add(SENDER);
@@ -50,7 +56,6 @@ namespace RevenueSharingInvest.Business.Services.Extensions
             catch (Exception e)
             {
                 LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
             }
 
         }

@@ -81,9 +81,9 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateNoti(string projectId, double amount, string invesmentId)
+        public async Task<IActionResult> UpdateNoti(string filePath)
         {
-            decimal result = Convert.ToDecimal(amount);
+            var result = GenerateFileHash.GetHash(HashingAlgoTypes.SHA256, filePath);
             return Ok(result);
         }
 

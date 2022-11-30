@@ -328,7 +328,6 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
             catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
-                throw new Exception(e.Message);
             }
 
         }
