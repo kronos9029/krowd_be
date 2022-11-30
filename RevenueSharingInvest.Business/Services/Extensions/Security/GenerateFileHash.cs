@@ -21,7 +21,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Security
                 var hash = hasher.ComputeHash(stream);
                 string result = BitConverter.ToString(hash).Replace("-", "");
                 stream.Close();
-                return result;
+                return result; 
 
             }
             catch(Exception ex)
