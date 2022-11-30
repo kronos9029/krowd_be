@@ -314,7 +314,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
         {
             try
             {
-                StreamReader sr = new StreamReader(path);
+                StreamReader sr = new(path);
 
                 Task<string> downloadLink = _fileUploadService.UploadGeneratedContractToFirebase(currentUser.userId, invesmentId, sr.BaseStream);
                 await Task.WhenAll(downloadLink);
@@ -328,6 +328,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
             catch(Exception e)
             {
                 LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
             }
 
         }
