@@ -75,6 +75,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result.numOfCallingForInvestmentInvestedProject = projectList
                     .FindAll(project => project.Status.Equals(ProjectStatusEnum.CALLING_FOR_INVESTMENT.ToString())).Count;
 
+                result.numOfCallingTimeIsOverInvestedProject = projectList
+                    .FindAll(project => project.Status.Equals(ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString())).Count;
+
                 result.numOfActiveInvestedProject = projectList
                     .FindAll(project => project.Status.Equals(ProjectStatusEnum.ACTIVE.ToString())).Count;
 
