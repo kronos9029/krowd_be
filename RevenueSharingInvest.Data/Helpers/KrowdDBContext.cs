@@ -348,7 +348,7 @@ namespace RevenueSharingInvest.Data.Helpers
 
                 entity.Property(e => e.IsOverDue)
                     .IsUnicode(false)
-                    .HasComputedColumnSql("(case when [dbo].[Get_Period_Revenue_History]([Id])<>(0) AND (dateadd(hour,(7),getdate())>=[EndDate] AND dateadd(hour,(7),getdate())<=dateadd(day,(3),[EndDate])) then 'FALSE' when [dbo].[Get_Period_Revenue_History]([Id])=(0) AND dateadd(hour,(7),getdate())>dateadd(day,(3),[EndDate]) then 'TRUE' when dateadd(hour,(7),getdate())<[EndDate] then NULL  end)", false);
+                    .HasComputedColumnSql("(case when [dbo].[Get_Period_Revenue_History]([Id])>(0) AND [dbo].[Is_Paid_On_Stage]([Id])>(0) then 'FALSE' when [dbo].[Get_Period_Revenue_History]([Id])=(0) AND dateadd(hour,(7),getdate())>dateadd(day,(3),[EndDate]) then 'TRUE' when dateadd(hour,(7),getdate())<[EndDate] then NULL  end)", false);
 
                 entity.Property(e => e.Status)
                     .IsUnicode(false)

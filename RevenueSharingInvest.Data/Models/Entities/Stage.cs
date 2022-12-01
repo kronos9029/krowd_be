@@ -34,11 +34,11 @@ namespace RevenueSharingInvest.Data.Models.Entities
         public DateTime EndDate { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime StartDate { get; set; }
-        [StringLength(5)]
-        public string IsOverDue { get; set; }
         [Required]
         [StringLength(8)]
         public string Status { get; set; }
+        [StringLength(5)]
+        public string IsOverDue { get; set; }
 
         [ForeignKey(nameof(ProjectId))]
         [InverseProperty("Stages")]

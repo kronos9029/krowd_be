@@ -86,6 +86,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             PeriodRevenueHistoryDTO result = new PeriodRevenueHistoryDTO();
             try
             {
+                if (createPeriodRevenueHistoryDTO.amount < 10000) throw new InvalidFieldException("amount must be greater than 10000!!!");
+
                 if (createPeriodRevenueHistoryDTO.stageId == null || !await _validationService.CheckUUIDFormat(createPeriodRevenueHistoryDTO.stageId)) throw new InvalidFieldException("Invalid stageId!!!");
 
                 Stage stage = await _stageRepository.GetStageById(Guid.Parse(createPeriodRevenueHistoryDTO.stageId));
