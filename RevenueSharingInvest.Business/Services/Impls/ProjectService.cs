@@ -1395,6 +1395,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 listEntity = await _projectRepository.GetInvestedProjects(pageIndex, pageSize, Guid.Parse(currentUser.investorId));
 
                 List<InvestedProjectDTO> listDTO = _mapper.Map<List<InvestedProjectDTO>>(listEntity);
+                List<Investment> investmentList;
 
                 foreach (InvestedProjectDTO item in listDTO)
                 {
@@ -1407,7 +1408,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
 
-                    item.investedAmount = await _paymentRepository.GetInvestedAmountForInvestorByProjectId(Guid.Parse(item.id), Guid.Parse(currentUser.userId));
+                    investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, item.id, currentUser.investorId, TransactionStatusEnum.SUCCESS.ToString(), Guid.Parse(currentUser.roleId));
+                    item.investedAmount = (double)investmentList.Sum(investment => investment.TotalPrice);
                     item.receivedAmount = await _projectRepository.GetReturnedDeptOfOneInvestor(Guid.Parse(item.id), Guid.Parse(currentUser.userId));
                     item.lastestInvestmentDate = await _validationService.FormatDateOutput(await _paymentRepository.GetLastestInvestmentDateForInvestorByProjectId(Guid.Parse(item.id), Guid.Parse(currentUser.userId)));
 
