@@ -343,7 +343,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     PayType = "app",
                     ResultCode = 0,
                     Type = "WITHDRAW",
-                    WithdrawRequestId = withdrawRequest.Id
+                    WithdrawRequestId = withdrawRequest.Id,
+                    PartnerClientId = withdrawRequest.CreateBy
                 };
 
                 string result = await _accountTransactionRepository.CreateAccountTransaction(accountTransaction);

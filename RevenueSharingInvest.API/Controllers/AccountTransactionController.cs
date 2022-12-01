@@ -58,9 +58,6 @@ namespace RevenueSharingInvest.API.Controllers
                 var result = await _accountTransactionService.GetAccountTransactionsByDate(pageIndex, pageSize, fromDate, toDate, sort, currentUser);
                 return Ok(result);
             }
-            
-            
-
         }
 
 /*        private async Task<ThisUserObj> GetThisUserInfo(HttpContext? httpContext)
