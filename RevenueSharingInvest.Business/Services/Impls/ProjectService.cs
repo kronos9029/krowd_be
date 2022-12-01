@@ -1625,20 +1625,33 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 InvestedProjectDetail detail = await _projectRepository.GetInvestedProjectDetail(Guid.Parse(projectId), Guid.Parse(currentUser.investorId));
                 List<InvestedRecord> investedRecords = await _investmentRepository.GetInvestmentRecord(Guid.Parse(projectId), Guid.Parse(currentUser.investorId));
                 NumOfPaidStageAndLastPaymentDate numOfPaidStageAndLastPaymentDate = await _projectRepository.GetNumOfPaidStageAndLastPaymentDate(Guid.Parse(projectId));
+                List<Investment> investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, projectId, currentUser.investorId, null, Guid.Parse(currentUser.roleId));
 
                 InvestedProjectDetailWithInvestment detailWithInvestment = new InvestedProjectDetailWithInvestment();
                 detailWithInvestment.ProjectImage = detail.ProjectImage;
                 detailWithInvestment.ProjectName = detail.ProjectName;
                 detailWithInvestment.ProjectStatus = detail.ProjectStatus;
-                detailWithInvestment.ExpectedReturn = detail.ExpectedReturn;
+                detailWithInvestment.ExpectedReturn = detailWithInvestment.ProjectStatus
+                    .Equals(ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString()) ? 0 : detail.ExpectedReturn;
+
                 detailWithInvestment.ReturnedAmount = await _projectRepository.GetReturnedDeptOfOneInvestor(Guid.Parse(projectId), Guid.Parse(currentUser.userId));
-                detailWithInvestment.DeptRemain = detail.InvestedAmount - detailWithInvestment.ReturnedAmount;
-                detailWithInvestment.InvestedAmount = detail.InvestedAmount;
+                
+                detailWithInvestment.InvestedAmount = (double)investmentList
+                    .Where(investment => investment.Status.Equals(TransactionStatusEnum.SUCCESS.ToString()))
+                    .Sum(investment => investment.TotalPrice);
+
+                detailWithInvestment.DeptRemain = detailWithInvestment.ProjectStatus
+                    .Equals(ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString()) ? 0 : detailWithInvestment.InvestedAmount - detailWithInvestment.ReturnedAmount;
+
                 detailWithInvestment.NumOfStage = detail.NumOfStage;
                 detailWithInvestment.NumOfPayedStage = numOfPaidStageAndLastPaymentDate.NumOfPaidStage;
 
-                detailWithInvestment.MustPaidDept = detail.InvestedAmount - detailWithInvestment.ReturnedAmount;
-                detailWithInvestment.ProfitableDebt = detail.ExpectedReturn - detailWithInvestment.ReturnedAmount;
+                detailWithInvestment.MustPaidDept = detailWithInvestment.ProjectStatus
+                    .Equals(ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString()) ? 0 : detailWithInvestment.InvestedAmount - detailWithInvestment.ReturnedAmount;
+
+                detailWithInvestment.ProfitableDebt = detailWithInvestment.ProjectStatus
+                    .Equals(ProjectStatusEnum.CALLING_TIME_IS_OVER.ToString()) ? 0 : detailWithInvestment.ExpectedReturn - detailWithInvestment.ReturnedAmount;
+
                 //detailWithInvestment.PaidStage = 0;
                 detailWithInvestment.LatestPayment = await _validationService.FormatDateOutput(numOfPaidStageAndLastPaymentDate.LastPaymentDate.ToString());
                 detailWithInvestment.InvestmentRecords = investedRecords;

@@ -475,7 +475,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     item.packageName = package.Name;
                     item.packagePrice = package.Price;
 
-                    item.projectName = (await _projectRepository.GetProjectById(Guid.Parse(item.projectId))).Name;
+                    Project project = await _projectRepository.GetProjectById(Guid.Parse(item.projectId));
+                    item.projectName = project.Name;
+                    item.projectStatus = project.Status;
 
                     item.createDate = item.createDate == null ? null : await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = item.updateDate == null ? null : await _validationService.FormatDateOutput(item.updateDate);
@@ -542,7 +544,9 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result.packageName = package.Name;
                 result.packagePrice = package.Price;
 
-                result.projectName = (await _projectRepository.GetProjectById(Guid.Parse(result.projectId))).Name;
+                Project iProject = await _projectRepository.GetProjectById(Guid.Parse(result.projectId));
+                result.projectName = iProject.Name;
+                result.projectStatus = iProject.Status;
 
                 result.createDate = result.createDate == null ? null : await _validationService.FormatDateOutput(result.createDate);
                 result.updateDate = result.updateDate == null ? null : await _validationService.FormatDateOutput(result.updateDate);

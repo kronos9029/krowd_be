@@ -812,6 +812,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var whereCondition = " WHERE (Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(4) + "' OR Status = '"
+                + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "' OR Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(8) + "') "
@@ -892,6 +893,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
 
                 var whereCondition = " WHERE (Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(4) + "' OR Status = '"
+                + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(5) + "' OR Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(6) + "' OR Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(7) + "' OR Status = '"
                 + Enum.GetNames(typeof(ProjectStatusEnum)).ElementAt(8) + "') "

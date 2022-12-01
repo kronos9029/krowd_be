@@ -14,6 +14,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs.CommonDTOs
         public double totalReceivedAmount { get; set; }
         public int numOfInvestedProject { get; set; }
         public int numOfCallingForInvestmentInvestedProject { get; set; }
+        public int numOfCallingTimeIsOverInvestedProject { get; set; }
         public int numOfActiveInvestedProject { get; set; }
         public int numOfInvestment { get; set; }
         public int numOfSuccessInvestment { get; set; }
