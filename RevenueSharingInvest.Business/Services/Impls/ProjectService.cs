@@ -1690,5 +1690,51 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 throw new Exception(e.Message);
             }
         }
+
+        //GET OUTSTANDING PROJECTS
+        public async Task<AllProjectDTO> GetOutstadingProjects()
+        {
+            AllProjectDTO result = new AllProjectDTO();
+            result.listOfProject = new List<BasicProjectDTO>();
+            List<Project> listEntity = await _projectRepository.GetOutstadingProjects();
+            result.numOfProject = listEntity.Count;
+
+            try
+            {
+                List<BasicProjectDTO> listDTO = _mapper.Map<List<BasicProjectDTO>>(listEntity);
+                Data.Models.Entities.Business business = new Data.Models.Entities.Business();
+                Field field = new Field();
+
+                foreach (BasicProjectDTO item in listDTO)
+                {
+                    item.startDate = await _validationService.FormatDateOutput(item.startDate);
+                    item.endDate = await _validationService.FormatDateOutput(item.endDate);
+                    if (item.approvedDate != null)
+                    {
+                        item.approvedDate = await _validationService.FormatDateOutput(item.approvedDate);
+                    }
+                    item.createDate = await _validationService.FormatDateOutput(item.createDate);
+                    item.updateDate = await _validationService.FormatDateOutput(item.updateDate);
+
+                    business = await _businessRepository.GetBusinessById(Guid.Parse(item.businessId));
+                    item.businessName = business.Name;
+                    item.businessImage = business.Image;
+
+                    field = await _fieldRepository.GetFieldById(Guid.Parse(item.fieldId));
+                    item.fieldName = field.Name;
+                    item.fieldDescription = field.Description;
+
+                    item.tagList = await _projectTagService.GetProjectTagList(item);
+
+                    result.listOfProject.Add(item);
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

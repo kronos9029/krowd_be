@@ -243,6 +243,24 @@ namespace RevenueSharingInvest.API.Controllers
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role INVESTOR can perform this action!!!");
         }
 
+        //GET OUTSTANDING PROJECT
+        [HttpGet]
+        [Route("outstandingProject")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetOutstandingProjects()
+        {
+            ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
+
+            if (currentUser.roleId.Equals(currentUser.adminRoleId)
+                || currentUser.roleId.Equals(currentUser.investorRoleId)
+                || currentUser.roleId.Equals(""))
+            {
+                var result = await _projectService.GetOutstadingProjects();
+                return Ok(result);
+            }
+            return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role ADMIN or INVESTOR or GUEST can perform this action!!!");
+        }
+
         //GET DETAILED INVESTED PROJECT
         [HttpGet]
         [Route("investedProject/{projectId}")]
