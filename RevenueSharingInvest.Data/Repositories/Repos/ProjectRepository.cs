@@ -1156,5 +1156,36 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        //GET OUTSTANDING PROJECTS
+        public async Task<List<Project>> GetOutstadingProjects()
+        {
+            try
+            {
+                var query = "SELECT TOP 3 " 
+                    + "           P.Id, P.ManagerId , P.BusinessId , P.FieldId , P.AreaId , P.Name , P.Image , P.Description , P.Address , P.InvestmentTargetCapital , P.InvestedCapital , P.SharedRevenue , P.Multiplier , P.Duration , P.NumOfStage , P.RemainingPayableAmount , P.PaidAmount , P.StartDate , P.EndDate , P.BusinessLicense , P.ApprovedDate , P.ApprovedBy , P.Status , P.CreateDate , P.CreateBy , P.UpdateDate , P.UpdateBy " 
+                    + "     FROM " 
+                    + "           Project P " 
+                    + "           LEFT JOIN (SELECT I.* " 
+                    + "                      FROM " 
+                    + "                           Investment I " 
+                    + "                           JOIN Project P ON I.ProjectId = P.Id " 
+                    + "                      WHERE " 
+                    + "                             I.Status = 'SUCCESS' AND P.Status = 'CALLING_FOR_INVESTMENT') I ON P.Id = I.ProjectId " 
+                    + "     WHERE " 
+                    + "           P.Status = 'CALLING_FOR_INVESTMENT' " 
+                    + "     GROUP BY " 
+                    + "           P.Id, P.ManagerId , P.BusinessId , P.FieldId , P.AreaId , P.Name , P.Image , P.Description , P.Address , P.InvestmentTargetCapital , P.InvestedCapital , P.SharedRevenue , P.Multiplier , P.Duration , P.NumOfStage , P.RemainingPayableAmount , P.PaidAmount , P.StartDate , P.EndDate , P.BusinessLicense , P.ApprovedDate , P.ApprovedBy , P.Status , P.CreateDate , P.CreateBy , P.UpdateDate , P.UpdateBy" 
+                    + "     ORDER BY " 
+                    + "           COUNT(I.ProjectId) DESC";
+                using var connection = CreateConnection();
+                return (await connection.QueryAsync<Project>(query)).ToList();
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

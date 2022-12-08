@@ -27,6 +27,7 @@ namespace RevenueSharingInvest.Data.Repositories.IRepos
             string status, 
             string roleId
         );
+        public Task<List<Project>> GetOutstadingProjects();
         public Task<Project> GetProjectById(Guid projectId);
         public Task<int> CountProject
         (
