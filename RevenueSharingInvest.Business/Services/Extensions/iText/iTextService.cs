@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using RevenueSharingInvest.API;
 using RevenueSharingInvest.Business.Exceptions;
 using RevenueSharingInvest.Business.Helpers;
+using RevenueSharingInvest.Business.Services.Extensions.Email;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Data.Extensions;
 using RevenueSharingInvest.Data.Helpers.Logger;

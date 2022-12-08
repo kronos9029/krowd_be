@@ -9,8 +9,10 @@ using Microsoft.Extensions.Logging;
 using RevenueSharingInvest.Data.Helpers.Logger;
 using RevenueSharingInvest.Data.Models.DTOs.ExtensionDTOs;
 using RevenueSharingInvest.Business.Services.Extensions.Security;
+using System.IO;
+using Google.Cloud.Firestore;
 
-namespace RevenueSharingInvest.Business.Services.Extensions
+namespace RevenueSharingInvest.Business.Services.Extensions.Email
 {
     public static class EmailService
     {
@@ -19,8 +21,8 @@ namespace RevenueSharingInvest.Business.Services.Extensions
         private static readonly string SENDER = "krowd.2022@gmail.com";
         public static async Task SendEmail(string filePath, string receiver, string projectName)
         {
-            String SendMailSubject = "KROWD - Hợp Đồng Góp Vốn Kinh Doanh";
-            String SendMailBody = "Hợp đồng góp vốn kinh doanh của dự án "+projectName;
+            string SendMailSubject = "KROWD - Hợp Đồng Góp Vốn Kinh Doanh";
+            string SendMailBody = "Hợp đồng góp vốn kinh doanh của dự án " + projectName;
             try
             {
                 SmtpClient SmtpServer = new("smtp.gmail.com", 587)
@@ -39,7 +41,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions
                     Subject = SendMailSubject,
                     Body = SendMailBody
                 };
-                
+
                 var fileChecksum = await Task.WhenAll(GenerateFileHash.GetHash(HashingAlgoTypes.SHA256, filePath));
 
                 email.Body += "\nChecksum của file hợp đồng: " + fileChecksum[0];
@@ -56,6 +58,62 @@ namespace RevenueSharingInvest.Business.Services.Extensions
             catch (Exception e)
             {
                 LoggerService.Logger(e.ToString());
+            }
+
+        }
+
+        public static async Task<string> SendFancyEmail(string projectName, string investorName, string receiver)
+        {
+            try
+            {
+                SmtpClient SmtpServer = new("smtp.gmail.com", 587)
+                {
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Timeout = 5000,
+                    EnableSsl = true,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(SENDER, APP_PASSWORD)
+                };
+
+                string emailString = GetEmailTemplate();
+                emailString.Replace("[InvestorName],", investorName);
+
+
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.ToString());
+            }
+        }
+
+        private static string GetEmailTemplate()
+        {
+            try
+            {
+                var path = Environment.GetEnvironmentVariable("EmailTemplate_Path");
+                if (path == null)
+                {
+                    Environment.SetEnvironmentVariable("EmailTemplate_Path", "C:\\EmailTemplate\\EmailTemplate.html");
+                    path = Environment.GetEnvironmentVariable("EmailTemplate_Path");
+                    if (!Directory.Exists(path))
+                    {
+                        path = "C:\\EmailTemplate";
+                        Directory.CreateDirectory(path);
+                    }
+                }
+                else
+                {
+                    StreamReader stream = new(path);
+                    string mailTemp = stream.ReadToEnd();
+                    return mailTemp;
+                }
+                return path;
+            }
+            catch(Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
             }
 
         }

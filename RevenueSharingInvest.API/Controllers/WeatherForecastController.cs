@@ -12,6 +12,7 @@ using RevenueSharingInvest.API.Extensions;
 using RevenueSharingInvest.Business.Helpers;
 using RevenueSharingInvest.Business.Services;
 using RevenueSharingInvest.Business.Services.Extensions;
+using RevenueSharingInvest.Business.Services.Extensions.Email;
 using RevenueSharingInvest.Business.Services.Extensions.Firebase;
 using RevenueSharingInvest.Business.Services.Extensions.iText;
 using RevenueSharingInvest.Business.Services.Extensions.RedisCache;
@@ -83,8 +84,8 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateNoti(string filePath)
         {
-            var result =await Task.WhenAll(GenerateFileHash.GetHash(HashingAlgoTypes.SHA256, filePath));
-            return Ok(result[0]);
+            var result = await EmailService.SendFancyEmail();
+            return Ok(result);
         }
 
         [HttpPost]
