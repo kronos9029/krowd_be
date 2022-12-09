@@ -22,7 +22,14 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Email
         public static async Task SendEmail(string filePath, string receiver, string projectName)
         {
             string SendMailSubject = "KROWD - Hợp Đồng Góp Vốn Kinh Doanh";
-            string SendMailBody = "Hợp đồng góp vốn kinh doanh của dự án " + projectName;
+            //string SendMailBody = "Hợp đồng góp vốn kinh doanh của dự án " + projectName;
+            string SendMailBody = "Cảm ơn bạn đã tham gia đầu tư vào dự án của Krowd." +
+                "\r\nĐính kèm dưới đây là hợp đồng Hợp tác kinh doanh được kí kết giữa bạn và chúng tôi." +
+                "\r\nNhà đầu tư vui lòng đọc kĩ hợp đồng để nắm rõ thoả thuận giữa hai bên." +
+                "\r\nMọi thắc mắc vui lòng liên hệ cho chúng tôi qua địa chỉ email: krowd.2022@gmail.com." +
+                "\r\nChúng tôi sẽ phản hồi và giải đáp thắc mắc cho bạn sớm nhất có thể qua địa chỉ email này." +
+                "\r\nLưu ý: Đây là tin nhắn tự động, vui lòng không phản hồi email này";
+
             try
             {
                 SmtpClient SmtpServer = new("smtp.gmail.com", 587)
@@ -62,8 +69,10 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Email
 
         }
 
-        public static async Task<string> SendFancyEmail(string projectName, string investorName, string receiver)
+        public static async Task<string> SendFancyEmail(string projectName, string investorName, string receiver, string filePath)
         {
+            string SendMailSubject = "KROWD - Hợp Đồng Góp Vốn Kinh Doanh";
+
             try
             {
                 SmtpClient SmtpServer = new("smtp.gmail.com", 587)
@@ -75,8 +84,34 @@ namespace RevenueSharingInvest.Business.Services.Extensions.Email
                     Credentials = new NetworkCredential(SENDER, APP_PASSWORD)
                 };
 
-                string emailString = GetEmailTemplate();
-                emailString.Replace("[InvestorName],", investorName);
+                MailMessage email = new()
+                {
+                    // START
+                    From = new MailAddress(SENDER),
+                    Subject = SendMailSubject,
+                };
+
+
+                var fileChecksum = await Task.WhenAll(GenerateFileHash.GetHash(HashingAlgoTypes.SHA256, filePath));
+                string emailHTML = GetEmailTemplate();
+                emailHTML = emailHTML.Replace("[KrowdInvestorName]", investorName);
+                emailHTML = emailHTML.Replace("[KrowdProjectName]", projectName);
+                emailHTML = emailHTML.Replace("[FileContractChecksum]", fileChecksum[0]);
+                
+
+                email.Body= emailHTML;
+                email.Attachments.Add(new Attachment(filePath));
+                
+                email.To.Add(receiver);
+                email.CC.Add(SENDER);
+
+                email.IsBodyHtml = true;
+
+                SmtpServer.Send(email);
+
+                SmtpServer.Dispose();
+                email.Attachments.ToList().ForEach(x => x.Dispose());
+                return emailHTML;
 
 
             }

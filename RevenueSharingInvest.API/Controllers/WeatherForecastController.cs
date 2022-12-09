@@ -82,10 +82,13 @@ namespace RevenueSharingInvest.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateNoti(string filePath)
+        public async Task<IActionResult> UpdateNoti(string email)
         {
-            var result = await EmailService.SendFancyEmail();
-            return Ok(result);
+            if (email.Contains("@outlook"))
+            {
+                return Ok(email);
+            }
+            return Ok("No");
         }
 
         [HttpPost]

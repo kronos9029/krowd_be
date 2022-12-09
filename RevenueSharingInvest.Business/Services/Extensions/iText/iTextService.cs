@@ -90,6 +90,8 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
                     throw new NotFoundException("No Investor Found!!");
                 string projectName = await _projectRepository.GetProjectNameForContractById(Guid.Parse(projectId));
 
+                currentUser.fullName = investorInfo.LastName + " " +investorInfo.FirstName;
+
                 string directoryPath = GetDirectoryPath();
                 directoryPath += "\\"+ investorInfo.Id + "\\";
                 if (!Directory.Exists(directoryPath))
@@ -321,7 +323,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
                 await Task.WhenAll(downloadLink);
                 sr.Close();
 
-                await Task.WhenAll(EmailService.SendEmail(path, currentUser.email, projectName));
+                await Task.WhenAll(EmailService.SendFancyEmail(projectName, currentUser.fullName, currentUser.email, path));
                 
                 File.Delete(path);
                 return downloadLink.Result;
