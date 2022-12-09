@@ -90,7 +90,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
                     throw new NotFoundException("No Investor Found!!");
                 string projectName = await _projectRepository.GetProjectNameForContractById(Guid.Parse(projectId));
 
-                currentUser.fullName = investorInfo.LastName + " " +investorInfo.FirstName;
+                currentUser.fullName = investorInfo.LastName.Trim() + " " +investorInfo.FirstName.Trim();
 
                 string directoryPath = GetDirectoryPath();
                 directoryPath += "\\"+ investorInfo.Id + "\\";
@@ -119,7 +119,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
 
             string fullName;
             if (investor.FirstName != null)
-                fullName = investor.FirstName + " " + investor.LastName;
+                fullName = investor.FirstName.Trim() + " " + investor.LastName.Trim();
             else
                 fullName = investor.LastName;
 
@@ -164,7 +164,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
                 .SetPaddingTop(-15);
             document.Add(nationalHeader);
             nationalHeader = new();
-            nationalHeader.Add(hour + " giờ" + minute + " phút" + " , Ngày " + date + " Tháng " + month + " Năm " + year)
+            nationalHeader.Add(hour + " giờ " + minute + " phút" + " , Ngày " + date + " Tháng " + month + " Năm " + year)
                 .SetFontSize(10)
                 .SetFont(fontRegular)
                 .SetTextAlignment(TextAlignment.RIGHT);
@@ -203,7 +203,7 @@ namespace RevenueSharingInvest.Business.Services.Extensions.iText
             contractBody.Add("BÊN GÓP VỐN ( BÊN B):").SetFontSize(12).SetFont(fontBold).SetWordSpacing(-3);
             document.Add(contractBody);
             contractBody = new();
-            contractBody.Add("Ông/bà : " + fullName + ".   Sinh năm: " + investor.DateOfBirth +
+            contractBody.Add("Ông/bà : " + fullName + ". Sinh năm: " + investor.DateOfBirth +
                 "\nChứng minh nhân dân số: " + investor.IdCard +
                 "\nThường trú : " + investor.Address + ", " + investor.District + ", " + investor.City + "." +
                 "\nSau khi bàn bạc thỏa thuận, hai bên đi đến thống nhất và đồng ý ký kết Hợp đồng góp vốn kinh doanh mã số: "+invesmentId+" HĐGVKD với các điều khoản sau:")
