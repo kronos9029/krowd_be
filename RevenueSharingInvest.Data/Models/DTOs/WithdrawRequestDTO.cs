@@ -17,6 +17,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public double Amount { get; set; }
         public string Status { get; set; }
         public string RefusalReason { get; set; }
+        public string ReportMessage { get; set; }
         public string CreateDate { get; set; }
         public string CreateBy { get; set; }
         public string UpdateDate { get; set; }

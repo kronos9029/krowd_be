@@ -14,6 +14,7 @@ using RevenueSharingInvest.Data.Models.DTOs;
 using RevenueSharingInvest.Data.Models.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -49,7 +50,7 @@ namespace RevenueSharingInvest.API.Controllers
         public async Task<IActionResult> GetWithdrawRequestByUserId(int pageIndex, int pageSize, string userId, WithdrawRequestEnum filter)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
-            if (currentUser.roleId.Equals(currentUser.investorRoleId))
+            if (currentUser.roleId.Equals(currentUser.investorRoleId) || currentUser.roleId.Equals(currentUser.projectManagerRoleId))
             {
                 if (userId != null && !userId.Equals(currentUser.userId)) 
                     throw new InvalidFieldException("This userId is not your userId!!!");

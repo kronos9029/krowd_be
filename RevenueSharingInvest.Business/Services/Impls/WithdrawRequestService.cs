@@ -441,6 +441,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         Amount = withdrawRequest.Amount,
                         Status = withdrawRequest.Status,
                         RefusalReason = withdrawRequest.RefusalReason,
+                        ReportMessage= withdrawRequest.ReportMessage,
                         CreateDate = await _validationService.FormatDateOutput(withdrawRequest.CreateDate.ToString()),
                         CreateBy = withdrawRequest.CreateBy.ToString(),
                         UpdateDate = await _validationService.FormatDateOutput(withdrawRequest.UpdateDate.ToString()),
