@@ -126,6 +126,10 @@ namespace RevenueSharingInvest.Business.Services.Impls
 
                     //Update Project Amount
                     await _projectRepository.UpdateProjectInvestedCapital(investment.ProjectId, (double)-investment.TotalPrice, Guid.Parse(currentUser.userId));
+
+                    //Update Package Quantity
+                    Package package = await _packageRepository.GetPackageById(investment.PackageId);
+                    await _packageRepository.UpdatePackageRemainingQuantity(package.Id, package.RemainingQuantity + (int)investment.Quantity, Guid.Parse(currentUser.userId));
                 }
                 else throw new UpdateObjectException("Cancel failed!!!");
 
