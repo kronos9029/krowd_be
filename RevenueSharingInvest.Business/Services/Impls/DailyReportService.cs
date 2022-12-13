@@ -54,8 +54,17 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 result.numOfDailyReport = await _dailyReportRepository.CountAllDailyReports(projectId.ToString(), stageId == null ? null : stageId.ToString(), currentUser.roleId);
                 List<DailyReport> dailyReportList = await _dailyReportRepository.GetAllDailyReports(pageIndex, pageSize, projectId.ToString(), stageId == null ? null : stageId.ToString(), currentUser.roleId);
                 List<DailyReportDTO> list = _mapper.Map<List<DailyReportDTO>>(dailyReportList);
+                string sId = "";
+                string sName = "";
                 foreach (DailyReportDTO item in list)
                 {
+                    if (sId.Equals("") || !sId.Equals(item.stageId))
+                    {
+                        sId = item.stageId;
+                        sName = (await _stageRepository.GetStageById(Guid.Parse(sId))).Name;
+                    }
+
+                    item.stageName = sName;
                     item.reportDate = await _validationService.FormatDateOutput(item.reportDate);
                     item.createDate = await _validationService.FormatDateOutput(item.createDate);
                     item.updateDate = item.updateDate == null ? null : await _validationService.FormatDateOutput(item.updateDate);

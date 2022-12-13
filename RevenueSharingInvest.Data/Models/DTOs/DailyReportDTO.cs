@@ -10,6 +10,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
     {
         public string id { get; set; }
         public string stageId { get; set; }
+        public string stageName { get; set; }
         public double amount { get; set; }
         public string reportDate { get; set; }
         public string createDate { get; set; }
