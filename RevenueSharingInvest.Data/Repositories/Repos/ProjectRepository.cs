@@ -1187,5 +1187,32 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 throw new Exception(e.Message, e);
             }
         }
+
+        public async Task<double> GetReturnedDeptOfOneInvestorByStage(Guid stageId, Guid userId)
+        {
+            try
+            {
+                var query = "SELECT "
+                    + "         CAST(ISNULL(SUM(Amount),0) AS FLOAT) AS ReturnedAmount "
+                    + "     FROM "
+                    + "         Payment "
+                    + "     WHERE "
+                    + "         ToId = @UserId "
+                    + "         AND Type = @Type "
+                    + "         AND StageId = @StageId";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("UserId", userId, DbType.Guid);
+                parameters.Add("StageId", stageId, DbType.Guid);
+                parameters.Add("Type", PaymentTypeEnum.PERIOD_REVENUE.ToString(), DbType.String);
+                using var connection = CreateConnection();
+                return (double)connection.ExecuteScalar(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message, e);
+            }
+        }
     }
 }

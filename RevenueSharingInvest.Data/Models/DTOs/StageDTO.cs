@@ -46,7 +46,7 @@ namespace RevenueSharingInvest.Data.Models.DTOs
         public double? actualAmount { get; set; }
         public double? sharedAmount { get; set; }
         public double? paidAmount { get; set; }
-        public double? receivableAmount { get; set; }
+        public double? receivedAmount { get; set; }
         public double pessimisticExpectedAmount { get; set; }
         public double normalExpectedAmount { get; set; }
         public double optimisticExpectedAmount { get; set; }

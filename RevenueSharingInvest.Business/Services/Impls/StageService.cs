@@ -152,7 +152,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     item.actualAmount = periodRevenue.ActualAmount != null && isShowed ? (double)periodRevenue.ActualAmount : null;
                     item.sharedAmount = periodRevenue.SharedAmount != null && isShowed ? (double)periodRevenue.SharedAmount : null;
                     item.paidAmount = periodRevenue.PaidAmount != null && isShowed ? (double)periodRevenue.PaidAmount : null;
-                    item.receivableAmount = item.sharedAmount == null ? null : null;
+                    item.receivedAmount = !currentUser.roleId.Equals(currentUser.investorRoleId) ? null : await _projectRepository.GetReturnedDeptOfOneInvestorByStage(Guid.Parse(item.id), Guid.Parse(currentUser.userId)); ;
                     item.optimisticExpectedAmount = (periodRevenue.OptimisticExpectedAmount == null) ? 0 : (double)periodRevenue.OptimisticExpectedAmount;
                     item.normalExpectedAmount = (periodRevenue.NormalExpectedAmount == null) ? 0 : (double)periodRevenue.NormalExpectedAmount;
                     item.pessimisticExpectedAmount = (periodRevenue.PessimisticExpectedAmount == null) ? 0 : (double)periodRevenue.PessimisticExpectedAmount;
