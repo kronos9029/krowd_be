@@ -95,6 +95,25 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
             }
         }
 
+        public async Task<int> DeleteBillsByDailyReportId(Guid dailyReportId)
+        {
+            try
+            {
+                var query = "DELETE FROM Bill "
+                    + "     WHERE DailyReportId = @DailyReportId";
+                using var connection = CreateConnection();
+                var parameters = new DynamicParameters();
+                parameters.Add("DailyReportId", dailyReportId, DbType.Guid);
+
+                return await connection.ExecuteAsync(query, parameters);
+            }
+            catch (Exception e)
+            {
+                LoggerService.Logger(e.ToString());
+                throw new Exception(e.Message);
+            }
+        }
+
         //GET ALL
         public async Task<List<Bill>> GetAllBills(int pageIndex, int pageSize, Guid dailyReportId)
         {
