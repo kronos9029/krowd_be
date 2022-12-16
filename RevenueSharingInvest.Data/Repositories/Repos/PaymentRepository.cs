@@ -23,10 +23,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //COUNT
-        public async Task<int> CountAllPayments(string type, Guid roleId, Guid userId)
+        public async Task<int> CountAllPayments(string type, Guid roleId, Guid userId, Guid? projectId)
         {
             try
             {
+                string fromClause = " FROM Payment PAY ";
                 string whereCondition = "";
                 string typeCondition = "";
 
@@ -36,12 +37,30 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 {
                     if (type.Equals(PaymentTypeEnum.INVESTMENT.ToString()))
                     {
-                        whereCondition = whereCondition + " AND ToId = @ToId ";
+                        if (projectId != null)
+                        {
+                            fromClause = " FROM Payment PAY JOIN Package PAC ON PAY.PackageId = PAC.Id ";
+                            whereCondition = whereCondition + " AND PAY.ToId = @ToId AND PAC.ProjectId = @ProjectId ";
+                            parameters.Add("ProjectId", projectId, DbType.Guid);
+                        }
+                        else
+                        {
+                            whereCondition = whereCondition + " AND PAY.ToId = @ToId ";
+                        }
                         parameters.Add("ToId", userId, DbType.Guid);
                     }
                     else
                     {
-                        whereCondition = whereCondition + " AND FromId = @FromId ";
+                        if (projectId != null)
+                        {
+                            fromClause = " FROM Payment PAY JOIN Stage S ON PAY.StageId = S.Id ";
+                            whereCondition = whereCondition + " AND PAY.FromId = @FromId AND S.ProjectId = @ProjectId ";
+                            parameters.Add("ProjectId", projectId, DbType.Guid);
+                        }
+                        else
+                        {
+                            whereCondition = whereCondition + " AND PAY.FromId = @FromId ";
+                        }
                         parameters.Add("FromId", userId, DbType.Guid);
                     }
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
@@ -50,18 +69,36 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 {
                     if (type.Equals(PaymentTypeEnum.INVESTMENT.ToString()))
                     {
-                        whereCondition = whereCondition + " AND FromId = @FromId ";
+                        if (projectId != null)
+                        {
+                            fromClause = " FROM Payment PAY JOIN Package PAC ON PAY.PackageId = PAC.Id ";
+                            whereCondition = whereCondition + " AND PAY.FromId = @FromId AND PAC.ProjectId = @ProjectId ";
+                            parameters.Add("ProjectId", projectId, DbType.Guid);
+                        }
+                        else
+                        {
+                            whereCondition = whereCondition + " AND PAY.FromId = @FromId ";
+                        }
                         parameters.Add("FromId", userId, DbType.Guid);
                     }
                     else
                     {
-                        whereCondition = whereCondition + " AND ToId = @ToId ";
+                        if (projectId != null)
+                        {
+                            fromClause = " FROM Payment PAY JOIN Stage S ON PAY.StageId = S.Id ";
+                            whereCondition = whereCondition + " AND PAY.ToId = @ToId AND S.ProjectId = @ProjectId ";
+                            parameters.Add("ProjectId", projectId, DbType.Guid);
+                        }
+                        else
+                        {
+                            whereCondition = whereCondition + " AND PAY.ToId = @ToId ";
+                        }
                         parameters.Add("ToId", userId, DbType.Guid);
                     }
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
                 }
 
-                var query = "SELECT COUNT(*) FROM (SELECT * FROM Payment " + whereCondition + ") AS X";
+                var query = "SELECT COUNT(*) FROM (SELECT PAY.* " + fromClause + whereCondition + ") AS X";
                 using var connection = CreateConnection();
                 return (int)connection.ExecuteScalar(query, parameters);
             }
@@ -131,10 +168,11 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
         }
 
         //GET ALL
-        public async Task<List<Payment>> GetAllPayments(int pageIndex, int pageSize, string type, Guid roleId, Guid userId)
+        public async Task<List<Payment>> GetAllPayments(int pageIndex, int pageSize, string type, Guid? projectId, Guid roleId, Guid userId)
         {
             try
             {
+                string fromClause = " FROM Payment PAY ";
                 string whereCondition = "";
                 string typeCondition = "";
                 
@@ -144,12 +182,30 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 {
                     if (type.Equals(PaymentTypeEnum.INVESTMENT.ToString()))
                     {
-                        whereCondition = whereCondition + " AND ToId = @ToId ";
+                        if (projectId != null)
+                        {
+                            fromClause = " FROM Payment PAY JOIN Package PAC ON PAY.PackageId = PAC.Id ";
+                            whereCondition = whereCondition + " AND PAY.ToId = @ToId AND PAC.ProjectId = @ProjectId ";
+                            parameters.Add("ProjectId", projectId, DbType.Guid);
+                        }
+                        else
+                        {
+                            whereCondition = whereCondition + " AND PAY.ToId = @ToId ";
+                        }
                         parameters.Add("ToId", userId, DbType.Guid);
                     }
                     else
                     {
-                        whereCondition = whereCondition + " AND FromId = @FromId ";
+                        if (projectId != null)
+                        {
+                            fromClause = " FROM Payment PAY JOIN Stage S ON PAY.StageId = S.Id ";
+                            whereCondition = whereCondition + " AND PAY.FromId = @FromId AND S.ProjectId = @ProjectId ";
+                            parameters.Add("ProjectId", projectId, DbType.Guid);
+                        }
+                        else
+                        {
+                            whereCondition = whereCondition + " AND PAY.FromId = @FromId ";
+                        }                       
                         parameters.Add("FromId", userId, DbType.Guid);
                     }
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
@@ -158,12 +214,30 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 {
                     if (type.Equals(PaymentTypeEnum.INVESTMENT.ToString()))
                     {
-                        whereCondition = whereCondition + " AND FromId = @FromId ";
+                        if (projectId != null)
+                        {
+                            fromClause = " FROM Payment PAY JOIN Package PAC ON PAY.PackageId = PAC.Id ";
+                            whereCondition = whereCondition + " AND PAY.FromId = @FromId AND PAC.ProjectId = @ProjectId ";
+                            parameters.Add("ProjectId", projectId, DbType.Guid);
+                        }
+                        else
+                        {
+                            whereCondition = whereCondition + " AND PAY.FromId = @FromId ";
+                        }                       
                         parameters.Add("FromId", userId, DbType.Guid);
                     }
                     else
                     {
-                        whereCondition = whereCondition + " AND ToId = @ToId ";
+                        if (projectId != null)
+                        {
+                            fromClause = " FROM Payment PAY JOIN Stage S ON PAY.StageId = S.Id ";
+                            whereCondition = whereCondition + " AND PAY.ToId = @ToId AND S.ProjectId = @ProjectId ";
+                            parameters.Add("ProjectId", projectId, DbType.Guid);
+                        }
+                        else
+                        {
+                            whereCondition = whereCondition + " AND PAY.ToId = @ToId ";
+                        }
                         parameters.Add("ToId", userId, DbType.Guid);
                     }
                     whereCondition = "WHERE " + whereCondition.Substring(4, whereCondition.Length - 4);
@@ -175,9 +249,9 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                     + "         SELECT "
                     + "             ROW_NUMBER() OVER ( "
                     + "                 ORDER BY "
-                    + "                     CreateDate DESC ) AS Num, "
-                    + "             * "
-                    + "         FROM Payment "
+                    + "                     PAY.CreateDate DESC ) AS Num, "
+                    + "             PAY.* "
+                    +           fromClause
                     +           whereCondition
                     + "         ) "
                     + "     SELECT "
@@ -206,7 +280,7 @@ namespace RevenueSharingInvest.Data.Repositories.Repos
                 }
                 else
                 {
-                    var query = "SELECT * FROM Payment " + whereCondition + " ORDER BY CreateDate DESC";
+                    var query = "SELECT PAY.* " + fromClause + whereCondition + " ORDER BY PAY.CreateDate DESC";
                     using var connection = CreateConnection();
                     return (await connection.QueryAsync<Payment>(query, parameters)).ToList();
                 }               

@@ -48,8 +48,8 @@ namespace RevenueSharingInvest.Business.Services.Impls
             try
             {
                 List<AccountTransaction> accountTransactionList = await _accountTransactionRepository.GetAllAccountTransactions(0, 0, currentUser.userId, "");
-                List<Payment> investmentPaymentList = await _paymentRepository.GetAllPayments(0, 0, PaymentTypeEnum.INVESTMENT.ToString(), Guid.Parse(currentUser.roleId), Guid.Parse(currentUser.userId));
-                List<Payment> periodRevenuePaymentList = await _paymentRepository.GetAllPayments(0, 0, PaymentTypeEnum.PERIOD_REVENUE.ToString(), Guid.Parse(currentUser.roleId), Guid.Parse(currentUser.userId));
+                List<Payment> investmentPaymentList = await _paymentRepository.GetAllPayments(0, 0, PaymentTypeEnum.INVESTMENT.ToString(), null, Guid.Parse(currentUser.roleId), Guid.Parse(currentUser.userId));
+                List<Payment> periodRevenuePaymentList = await _paymentRepository.GetAllPayments(0, 0, PaymentTypeEnum.PERIOD_REVENUE.ToString(), null, Guid.Parse(currentUser.roleId), Guid.Parse(currentUser.userId));
                 List<Project> projectList = await _projectRepository.GetInvestedProjects(0, 0, Guid.Parse(currentUser.investorId));
                 List<Investment> investmentList = await _investmentRepository.GetAllInvestments(0, 0, null, null, null, currentUser.investorId, null, Guid.Parse(currentUser.roleId));
                 

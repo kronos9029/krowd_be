@@ -14,7 +14,7 @@ namespace RevenueSharingInvest.Business.Services
         //CREATE
 
         //READ
-        public Task<AllPaymentDTO> GetAllPayments(int pageIndex, int pageSize, string type, ThisUserObj currentUser);
+        public Task<AllPaymentDTO> GetAllPayments(int pageIndex, int pageSize, string type, Guid? projectId, ThisUserObj currentUser);
         public Task<dynamic> GetPaymentById(Guid paymentId, ThisUserObj currentUser);
 
         //UPDATE

@@ -54,7 +54,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
         }
 
         //GET ALL
-        public async Task<AllPaymentDTO> GetAllPayments(int pageIndex, int pageSize, string type, ThisUserObj currentUser)
+        public async Task<AllPaymentDTO> GetAllPayments(int pageIndex, int pageSize, string type, Guid? projectId, ThisUserObj currentUser)
         {
             AllPaymentDTO result = new AllPaymentDTO();
             try
@@ -62,17 +62,25 @@ namespace RevenueSharingInvest.Business.Services.Impls
                 if (!type.Equals(PaymentTypeEnum.INVESTMENT.ToString()) && !type.Equals(PaymentTypeEnum.PERIOD_REVENUE.ToString()))
                     throw new InvalidFieldException("Invalid type!!!");
 
-                List<Payment> paymentList = await _paymentRepository.GetAllPayments(pageIndex, pageSize, type, Guid.Parse(currentUser.roleId), Guid.Parse(currentUser.userId));
-                result.numOfPayment = await _paymentRepository.CountAllPayments(type, Guid.Parse(currentUser.roleId), Guid.Parse(currentUser.userId));
-                Project project = new Project();
-                
+                if (projectId != null)
+                {
+                    if (!await _validationService.CheckExistenceId("Project", (Guid)projectId)) throw new NotFoundException("This projectId is not existed!!!");
+                    
+                    if (currentUser.roleId.Equals(currentUser.projectManagerRoleId) 
+                        && !Guid.Parse(currentUser.userId).Equals((await _projectRepository.GetProjectById((Guid)projectId)).ManagerId)) 
+                            throw new InvalidFieldException("This projectId is not belong to your projects!!!");
+                }
 
+                List<Payment> paymentList = await _paymentRepository.GetAllPayments(pageIndex, pageSize, type, projectId, Guid.Parse(currentUser.roleId), Guid.Parse(currentUser.userId));
+                result.numOfPayment = await _paymentRepository.CountAllPayments(type, Guid.Parse(currentUser.roleId), Guid.Parse(currentUser.userId), projectId);
+                Project project = new Project();
+                         
                 if (type.Equals(PaymentTypeEnum.INVESTMENT.ToString()))
                 {
                     List<InvestmentPaymentDTO> list = _mapper.Map<List<InvestmentPaymentDTO>>(paymentList);
                     Package package = new Package();
                     foreach (InvestmentPaymentDTO item in list)
-                    {                  
+                    {
                         package = await _packageRepository.GetPackageById(Guid.Parse(item.packageId));
                         if (package != null)
                             project = await _projectRepository.GetProjectById(package.ProjectId);
@@ -84,7 +92,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                         item.investedQuantity = (int)(await _investmentRepository.GetInvestmentById(Guid.Parse(item.investmentId))).Quantity;
                         item.fromWalletName = (await _walletTypeRepository.GetWalletTypeById(Guid.Parse(WalletTypeDictionary.walletTypes.GetValueOrDefault("I2")))).Name;
                     }
-                    result.listOfInvestmentPayment = list;                    
+                    result.listOfInvestmentPayment = list;
                 }
                 else
                 {
@@ -95,7 +103,7 @@ namespace RevenueSharingInvest.Business.Services.Impls
                     {
                         stage = await _stageRepository.GetStageById(Guid.Parse(item.stageId));
                         if (stage != null)
-                            project = await _projectRepository.GetProjectById(stage.ProjectId);                       
+                            project = await _projectRepository.GetProjectById(stage.ProjectId);
                         item.createDate = await _validationService.FormatDateOutput(item.createDate);
                         item.projectId = stage == null ? "Dự án không còn tồn tại" : project.Id.ToString();
                         item.projectName = stage == null ? "Dự án không còn tồn tại" : project.Name.ToString();

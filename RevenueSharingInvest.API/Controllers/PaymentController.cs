@@ -39,14 +39,14 @@ namespace RevenueSharingInvest.API.Controllers
         [HttpGet]
         [Route("type/{type}")]
         [Authorize]
-        public async Task<IActionResult> GetAllPayments(int pageIndex, int pageSize, PaymentTypeEnum type)
+        public async Task<IActionResult> GetAllPayments(int pageIndex, int pageSize, PaymentTypeEnum type, Guid? projectId)
         {
             ThisUserObj currentUser = await GetCurrentUserInfo.GetThisUserInfo(HttpContext, _roleService, _userService);
 
             if (currentUser.roleId.Equals(currentUser.projectManagerRoleId)
                 || (currentUser.roleId.Equals(currentUser.investorRoleId) && !currentUser.investorId.Equals("")))
             {
-                var result = await _paymentService.GetAllPayments(pageIndex, pageSize, type.ToString(), currentUser);
+                var result = await _paymentService.GetAllPayments(pageIndex, pageSize, type.ToString(), projectId, currentUser);
                 return Ok(result);
             }
             return StatusCode((int)HttpStatusCode.Forbidden, "Only user with role PROJECT_MANAGER or INVESTOR can perform this action!!!");            
