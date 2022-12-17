@@ -65,6 +65,9 @@ namespace RevenueSharingInvest.Business.Services.Extensions.RedisCache
                     Tokens = result.Tokens,
                 };
 
+                if (result.Tokens.Count == 0)
+                    return result;
+
                 var response = await FirebaseMessaging.DefaultInstance.SendMulticastAsync(message, true);
 
                 var failedTokens = new List<string>();
